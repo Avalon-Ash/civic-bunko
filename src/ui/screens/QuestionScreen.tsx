@@ -1,46 +1,33 @@
-import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
 import { FAST_ADVANCE_MS } from '../../core/constants/round';
-import type { Choice, Enrich, LawRef, TopicInfo } from '../../core/types';
+import type { Choice, LawRef, TopicInfo } from '../../core/types';
 import type { World } from '../../core/world';
 import { formatLawRef, loadLawArticle, type LawArticleResult } from '../../data/laws';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
+import {
+  CHOICES,
+  CorrectionBox,
+  EnrichCard,
+  formatQuestionSource,
+  MarkedStem,
+  PassageCard,
+  TEXT_MODE_OPTIONS,
+} from '../components/QuestionParts';
 import { Burst } from '../kit/Burst';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import { ProgressBar } from '../kit/ProgressBar';
-import { Segmented, type SegmentedOption } from '../kit/Segmented';
+import { Segmented } from '../kit/Segmented';
 import { Sheet } from '../kit/Sheet';
 import { Toast } from '../kit/Toast';
-import { Visual } from '../kit/Visual';
-import { splitByMarks } from '../marks';
 import { useWorld } from '../useWorld';
 
-const CHOICES: readonly Choice[] = ['A', 'B', 'C', 'D'];
 const MILESTONE_COMBOS = new Set([5, 10, 20, 30]);
-const TEXT_MODE_OPTIONS: readonly SegmentedOption<'official' | 'plain'>[] = [
-  { value: 'official', label: '原文' },
-  { value: 'plain', label: '白話' },
-];
-
-function renderMarkedStem(stem: string, marks: Enrich['marks']): ReactNode {
-  const segments = splitByMarks(stem, marks);
-  if (segments.length === 0) return stem;
-
-  return segments.map((seg, i) =>
-    seg.color ? (
-      <mark key={`${i}-${seg.color}`} className={`cb-mark-${seg.color}`}>
-        {seg.text}
-      </mark>
-    ) : (
-      <Fragment key={i}>{seg.text}</Fragment>
-    ),
-  );
-}
 
 export interface QuestionScreenProps {
   world: World;
@@ -53,7 +40,6 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
   const config = currentRoundConfig(world);
 
   const [textMode, setTextMode] = useState<'official' | 'plain'>('official');
-  const [groupExpanded, setGroupExpanded] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
   const [lawState, setLawState] = useState<{ status: 'loading' } | LawArticleResult | null>(null);
@@ -163,10 +149,7 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
   const paper = questionPaper(world, question.paperId);
   const isAnswered = pick !== null;
 
-  const examLabel = paper ? (paper.exam === 'general' ? '普考' : '地特四等') : '';
-  const sourceLabel = paper
-    ? `${paper.year} ${examLabel}・${paper.subjectName} 第 ${question.no} 題`
-    : `第 ${question.no} 題`;
+  const sourceLabel = formatQuestionSource(paper, question.no);
   const firstTopic = enrich?.topic[0];
   const topicLabel = firstTopic
     ? resolveTopicLabel(topics, firstTopic)
@@ -258,40 +241,21 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
           )}
         </div>
 
-        {group && (
-          <Card className="cb-passage-card">
-            <button
-              type="button"
-              className="cb-passage-toggle"
-              aria-expanded={groupExpanded}
-              onClick={() => setGroupExpanded((open) => !open)}
-            >
-              <span>題組文章（第 {group.fromNo}–{group.toNo} 題）</span>
-              <span className="cb-sub">{groupExpanded ? '收合' : '展開'}</span>
-            </button>
-            {groupExpanded && <p className="cb-passage-text">{group.text}</p>}
-          </Card>
-        )}
+        {group && <PassageCard group={group} />}
 
         <p className="cb-stem">
-          {textMode === 'plain' && enrich?.plain
-            ? enrich.plain
-            : renderMarkedStem(question.stem, enrich?.marks ?? [])}
+          {textMode === 'plain' && enrich?.plain ? (
+            enrich.plain
+          ) : (
+            <MarkedStem stem={question.stem} marks={enrich?.marks ?? []} />
+          )}
         </p>
 
         <div className="cb-mt-sm">
           <Chip tone="plain">{sourceLabel}</Chip>
         </div>
 
-        {isAnswered && question.correction && (
-          <Card tone="orange" className="cb-correction-box cb-mt-md">
-            <div className="cb-row cb-wrap">
-              <Chip tone="orange">官方更正</Chip>
-              <span className="cb-sub-strong">原答案：{question.correction.original.join('、')}</span>
-            </div>
-            <p className="cb-correction-note">{question.correction.note}</p>
-          </Card>
-        )}
+        {isAnswered && question.correction && <CorrectionBox correction={question.correction} />}
       </div>
 
       <div className="cb-q-opts-col">
@@ -348,39 +312,16 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
               </Card>
             ) : enrich ? (
               <>
-                <Card tone={isCorrect ? 'green' : 'butter'} className={`cb-kou ${isCorrect ? '' : 'is-miss'}`}>
-                  <div className="cb-row">
-                    <Cat
-                      size={58}
-                      mood={isCorrect ? 'yay' : 'oops'}
-                      spin={catSpin}
-                      interactive
-                    />
-                    <div className="cb-grow">
-                      <div className="cb-kou-head">
-                        <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
-                        {!enrich.reviewed && <span className="cb-ai-tag">AI 解析</span>}
-                      </div>
-                      <b className="cb-kou-mnemonic">{enrich.mnemonic}</b>
-                    </div>
-                  </div>
-                  {enrich.visual && <Visual visual={enrich.visual} />}
-                  {enrich.trap && (
-                    <div className="cb-trap">
-                      <em>陷阱</em>
-                      <span>{enrich.trap}</span>
-                    </div>
-                  )}
-                  {enrich.confidence === 'low' && (
-                    <p className="cb-kou-low">這題的說明把握較低，以官方答案為準</p>
-                  )}
-                  {enrich.lawChanged !== null && (
-                    <div className="cb-law-changed">
-                      <span className="cb-law-changed-badge">修法提醒</span>
-                      <span className="cb-grow">{enrich.lawChanged}</span>
-                    </div>
-                  )}
-                </Card>
+                <EnrichCard
+                  enrich={enrich}
+                  tone={isCorrect ? 'green' : 'butter'}
+                  className={isCorrect ? '' : 'is-miss'}
+                  catMood={isCorrect ? 'yay' : 'oops'}
+                  catSpin={catSpin}
+                  label={
+                    <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
+                  }
+                />
                 <div className="cb-acts">
                   <Button
                     variant="ghost"

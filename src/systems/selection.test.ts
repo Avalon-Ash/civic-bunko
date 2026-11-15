@@ -44,6 +44,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-a1', {
       seen: 1,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: 'B',
       lastAt: '2026-11-14T10:00:00.000Z',
@@ -53,6 +54,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-a2', {
       seen: 1,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: 'A',
       lastAt: '2026-11-15T10:00:00.000Z',
@@ -62,6 +64,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-a3', {
       seen: 2,
       correct: 1,
+      views: 0,
       streak: 1,
       lastPick: 'C',
       lastAt: '2026-11-12T10:00:00.000Z',
@@ -71,6 +74,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-b1', {
       seen: 1,
       correct: 1,
+      views: 0,
       streak: 1,
       lastPick: 'D',
       lastAt: '2026-11-14T10:00:00.000Z',
@@ -95,6 +99,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-a1', {
       seen: 1,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: 'B',
       lastAt: '2026-11-14T10:00:00.000Z',
@@ -104,6 +109,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-a2', {
       seen: 1,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: 'A',
       lastAt: '2026-11-15T10:00:00.000Z',
@@ -113,6 +119,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-a3', {
       seen: 1,
       correct: 1,
+      views: 0,
       streak: 1,
       lastPick: 'C',
       lastAt: '2026-11-14T10:00:00.000Z',
@@ -122,6 +129,7 @@ describe('selection.buildQueue', () => {
     world.progress.set('q-b1', {
       seen: 2,
       correct: 1,
+      views: 0,
       streak: 1,
       lastPick: 'D',
       lastAt: '2026-11-12T10:00:00.000Z',
@@ -146,5 +154,71 @@ describe('selection.buildQueue', () => {
     const limited = buildQueue(world, makeConfig({ mode: 'mixed', count: 3 }), now, makeSeededRng(7));
     assert.equal(limited.length, 3);
     assert.deepEqual(new Set(limited), new Set(['q-a1', 'q-b1', 'q-a2']));
+  });
+
+  it('orders mixed mode with viewed-unseen ahead of completely unseen', () => {
+    const world = createTestWorld();
+
+    // q-a1: due
+    world.progress.set('q-a1', {
+      seen: 1,
+      correct: 0,
+      views: 0,
+      streak: 0,
+      lastPick: 'B',
+      lastAt: '2026-11-14T10:00:00.000Z',
+      due: '2026-11-14',
+    });
+    // q-a2: wrong
+    world.progress.set('q-a2', {
+      seen: 1,
+      correct: 0,
+      views: 0,
+      streak: 0,
+      lastPick: 'A',
+      lastAt: '2026-11-15T10:00:00.000Z',
+      due: '2026-11-17',
+    });
+    // q-a3: graduated (rest)
+    world.progress.set('q-a3', {
+      seen: 1,
+      correct: 1,
+      views: 0,
+      streak: 1,
+      lastPick: 'C',
+      lastAt: '2026-11-14T10:00:00.000Z',
+      due: null,
+    });
+    // q-b1: viewed in read mode, never answered
+    world.progress.set('q-b1', {
+      seen: 0,
+      correct: 0,
+      views: 2,
+      streak: 0,
+      lastPick: null,
+      lastAt: '2026-11-15T08:00:00.000Z',
+      due: null,
+    });
+    // q-b2: never viewed, never answered
+
+    const fullMixed = buildQueue(world, makeConfig({ mode: 'mixed', count: 10 }), now, makeSeededRng(7));
+    assert.deepEqual(fullMixed, ['q-a1', 'q-a2', 'q-b1', 'q-b2', 'q-a3']);
+  });
+
+  it('filters questions by ask (positive, negative, all)', () => {
+    const world = createTestWorld();
+    const qA2 = world.questions.get('q-a2')!;
+    world.questions.set('q-a2', { ...qA2, stem: '下列敘述何者錯誤？' });
+    const qB1 = world.questions.get('q-b1')!;
+    world.questions.set('q-b1', { ...qB1, stem: '下列何者非屬自治事項？' });
+
+    const pos = buildQueue(world, makeConfig({ ask: 'positive', count: 10 }), now, makeSeededRng(1));
+    assert.deepEqual(new Set(pos), new Set(['q-a1', 'q-a3', 'q-b2']));
+
+    const neg = buildQueue(world, makeConfig({ ask: 'negative', count: 10 }), now, makeSeededRng(1));
+    assert.deepEqual(new Set(neg), new Set(['q-a2', 'q-b1']));
+
+    const all = buildQueue(world, makeConfig({ ask: 'all', count: 10 }), now, makeSeededRng(1));
+    assert.equal(all.length, 5);
   });
 });

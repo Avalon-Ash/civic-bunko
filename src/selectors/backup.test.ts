@@ -20,6 +20,7 @@ describe('backup & install hint selectors', () => {
     world.progress.set('q-a1', {
       seen: 1,
       correct: 1,
+      views: 0,
       streak: 1,
       lastPick: 'A',
       lastAt: '2026-11-15T09:00:00.000Z',
@@ -28,6 +29,7 @@ describe('backup & install hint selectors', () => {
     world.progress.set('q-a2', {
       seen: 2,
       correct: 1,
+      views: 0,
       streak: 0,
       lastPick: 'B',
       lastAt: '2026-11-16T08:30:00.000Z',
@@ -36,6 +38,7 @@ describe('backup & install hint selectors', () => {
     world.progress.set('q-zero', {
       seen: 0,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: null,
       lastAt: '2026-11-17T00:00:00.000Z',
