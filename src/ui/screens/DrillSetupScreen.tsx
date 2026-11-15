@@ -8,17 +8,34 @@ import {
   ROUND_COUNT_STEP,
   SECONDS_PER_QUESTION,
 } from '../../core/constants/round';
-import type { RoundConfig, RoundMode, SubjectKey } from '../../core/types';
+import {
+  POSITIVE_UNLOCK_RATIO,
+  READ_PASSES_DEFAULT,
+  READ_PASSES_PRESETS,
+} from '../../core/constants/study';
+import type { AskFilter, RoundConfig, RoundMode, StudyMode, SubjectKey } from '../../core/types';
 import type { World } from '../../core/world';
-import { activeBank, availableCount, getSettings } from '../../selectors';
+import {
+  activeBank,
+  askCounts,
+  availableCount,
+  getSettings,
+  positiveCoverage,
+} from '../../selectors';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import { PawPicker } from '../kit/PawPicker';
+import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { Stepper } from '../kit/Stepper';
 import { Switch } from '../kit/Switch';
 import { useWorld } from '../useWorld';
+
+const STUDY_OPTIONS: readonly SegmentedOption<StudyMode>[] = [
+  { value: 'quiz', label: '自己作答' },
+  { value: 'read', label: '看答案' },
+];
 
 const MODE_OPTIONS: ReadonlyArray<{ value: RoundMode; label: string }> = [
   { value: 'mixed', label: '混合' },
@@ -27,16 +44,21 @@ const MODE_OPTIONS: ReadonlyArray<{ value: RoundMode; label: string }> = [
   { value: 'due', label: '到期複習' },
 ];
 
+const READ_MODE_OPTIONS: ReadonlyArray<{ value: RoundMode; label: string }> = MODE_OPTIONS.filter(
+  (opt) => opt.value === 'mixed' || opt.value === 'new',
+);
+
 function clampCount(value: number): number {
   return Math.min(ROUND_COUNT_MAX, Math.max(ROUND_COUNT_MIN, value));
 }
 
 export interface DrillSetupScreenProps {
   world: World;
+  papersLoading?: boolean;
 }
 
-/** 回合設定畫面：題數步進＋貓掌快選、多選科目、出題模式、快刷開關與可刷題數提示。 */
-export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
+/** 回合設定畫面：學習方式、題數步進＋貓掌快選、多選科目、題型篩選、看幾遍／出題模式與快刷開關。 */
+export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
   const settings = getSettings(world);
@@ -48,13 +70,22 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
 
   const validSubjectSet = new Set(bank?.subjects.map((s) => s.key) ?? []);
 
+  const [study, setStudy] = useState<StudyMode>(() => initialLast?.study ?? 'quiz');
+  const [ask, setAsk] = useState<AskFilter>(() => initialLast?.ask ?? 'positive');
+  const [passes, setPasses] = useState<number>(() => initialLast?.passes ?? READ_PASSES_DEFAULT);
   const [count, setCount] = useState<number>(() =>
     initialLast ? clampCount(initialLast.count) : ROUND_COUNT_DEFAULT,
   );
   const [subjectKeys, setSubjectKeys] = useState<SubjectKey[]>(() =>
     initialLast ? initialLast.subjectKeys.filter((k) => validSubjectSet.has(k)) : [],
   );
-  const [mode, setMode] = useState<RoundMode>(() => initialLast?.mode ?? 'mixed');
+  const [mode, setMode] = useState<RoundMode>(() => {
+    const m = initialLast?.mode ?? 'mixed';
+    if ((initialLast?.study ?? 'quiz') === 'read' && (m === 'wrong' || m === 'due')) {
+      return 'mixed';
+    }
+    return m;
+  });
   const [fast, setFast] = useState<boolean>(() => initialLast?.fast ?? true);
 
   useEffect(() => {
@@ -73,18 +104,35 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
     );
   }
 
+  const effectiveMode: RoundMode =
+    study === 'read' && (mode === 'wrong' || mode === 'due') ? 'mixed' : mode;
+
   const config: RoundConfig = {
     bankId: bank.id,
     subjectKeys,
     count,
-    mode,
+    mode: effectiveMode,
     fast,
+    study,
+    ask,
+    passes,
   };
 
   const now = new Date();
   const avail = availableCount(world, config, now);
   const actualCount = Math.min(count, avail);
   const estMinutes = Math.max(1, Math.round((actualCount * SECONDS_PER_QUESTION) / 60));
+  const counts = askCounts(world, { bankId: bank.id, subjectKeys });
+  const totalAskCount = counts.positive + counts.negative;
+  const coverage = positiveCoverage(world, bank.id, subjectKeys);
+  const showUnlockHint = !papersLoading && coverage >= POSITIVE_UNLOCK_RATIO && ask === 'positive';
+
+  const handleStudyChange = (nextStudy: StudyMode) => {
+    setStudy(nextStudy);
+    if (nextStudy === 'read' && (mode === 'wrong' || mode === 'due')) {
+      setMode('mixed');
+    }
+  };
 
   const toggleAllSubjects = () => {
     setSubjectKeys([]);
@@ -102,36 +150,83 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
   };
 
   const handleStart = () => {
-    if (avail === 0) return;
+    if (papersLoading || avail === 0) return;
     dispatch(world, { type: 'startRound', config });
   };
 
-  const startLabel =
-    avail === 0
+  const verb = study === 'read' ? '看' : '刷';
+  const startLabel = papersLoading
+    ? '題庫載入中…'
+    : avail === 0
       ? '這個範圍目前沒有題目'
       : count > avail
-        ? `開始刷 ${avail} 題（全部）`
-        : `開始刷 ${count} 題`;
+        ? `開始${verb} ${avail} 題（全部）`
+        : `開始${verb} ${count} 題`;
+
+  const askOptions: ReadonlyArray<{ value: AskFilter; label: string }> = [
+    { value: 'positive', label: papersLoading ? '正向題' : `正向題 ${counts.positive}` },
+    { value: 'all', label: papersLoading ? '全部' : `全部 ${totalAskCount}` },
+    { value: 'negative', label: papersLoading ? '反向題' : `反向題 ${counts.negative}` },
+  ];
+
+  const visibleModeOptions = study === 'read' ? READ_MODE_OPTIONS : MODE_OPTIONS;
 
   return (
     <div className="cb-stack">
       <h1>刷題</h1>
 
+      <section className="cb-section">
+        <h2>怎麼刷</h2>
+        <Segmented
+          options={STUDY_OPTIONS}
+          value={study}
+          onChange={handleStudyChange}
+          ariaLabel="怎麼刷"
+          className="cb-seg-fill"
+        />
+      </section>
+
       <Card className="cb-setup-card">
         <div className="cb-row cb-center">
           <Cat size={64} mood="yay" interactive />
-          <span className="cb-setup-prompt">這回合要刷幾題？</span>
+          <span className="cb-setup-prompt">
+            {study === 'read' ? '這批要看幾題？' : '這回合要刷幾題？'}
+          </span>
         </div>
         <Stepper
           value={count}
           min={ROUND_COUNT_MIN}
           max={ROUND_COUNT_MAX}
           step={ROUND_COUNT_STEP}
-          subtitle={avail > 0 ? `大概 ${estMinutes} 分鐘` : '請調整篩選範圍'}
+          subtitle={
+            avail > 0
+              ? study === 'read'
+                ? `${actualCount} 題 × ${passes} 遍`
+                : `大概 ${estMinutes} 分鐘`
+              : '請調整篩選範圍'
+          }
           onChange={setCount}
         />
         <PawPicker presets={ROUND_COUNT_PRESETS} value={count} onChange={setCount} />
       </Card>
+
+      {study === 'read' && (
+        <section className="cb-section">
+          <h2>看幾遍</h2>
+          <div className="cb-pick-grid" role="group" aria-label="看幾遍">
+            {READ_PASSES_PRESETS.map((preset) => (
+              <Chip
+                key={preset}
+                tone="mint"
+                active={passes === preset}
+                onClick={() => setPasses(preset)}
+              >
+                {preset} 遍
+              </Chip>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="cb-section">
         <h2>刷哪一科（可複選）</h2>
@@ -157,13 +252,44 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
       </section>
 
       <section className="cb-section">
-        <h2>出題模式</h2>
-        <div className="cb-pick-grid" role="group" aria-label="出題模式">
-          {MODE_OPTIONS.map((opt) => (
+        <h2>題型</h2>
+        <div className="cb-pick-grid" role="group" aria-label="題型">
+          {askOptions.map((opt) => (
             <Chip
               key={opt.value}
               tone="butter"
-              active={mode === opt.value}
+              active={ask === opt.value}
+              onClick={() => setAsk(opt.value)}
+            >
+              {opt.label}
+            </Chip>
+          ))}
+        </div>
+        <p className="cb-sub cb-m0">正向題＝問『哪個對』；反向題＝問『哪個錯』，等熟了再加。</p>
+      </section>
+
+      {showUnlockHint && (
+        <Card tone="mint" className="cb-stack-sm">
+          <div className="cb-row">
+            <Cat size={54} mood="yay" interactive />
+            <p className="cb-sub-strong cb-m0 cb-grow">
+              正向題已經看過六成，可以試試加入反向題了
+            </p>
+          </div>
+          <Button variant="butter" onClick={() => setAsk('all')}>
+            加入反向題
+          </Button>
+        </Card>
+      )}
+
+      <section className="cb-section">
+        <h2>出題模式</h2>
+        <div className="cb-pick-grid" role="group" aria-label="出題模式">
+          {visibleModeOptions.map((opt) => (
+            <Chip
+              key={opt.value}
+              tone="butter"
+              active={effectiveMode === opt.value}
               onClick={() => setMode(opt.value)}
             >
               {opt.label}
@@ -172,19 +298,27 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
         </div>
       </section>
 
-      <Card className="cb-row">
-        <div className="cb-grow">
-          <strong>快刷模式</strong>
-          <div className="cb-sub">答對自動下一題，答錯才停下來看口訣</div>
-        </div>
-        <Switch checked={fast} onChange={setFast} ariaLabel="快刷模式" />
-      </Card>
+      {study === 'quiz' && (
+        <Card className="cb-row">
+          <div className="cb-grow">
+            <strong>快刷模式</strong>
+            <div className="cb-sub">答對自動下一題，答錯才停下來看口訣</div>
+          </div>
+          <Switch checked={fast} onChange={setFast} ariaLabel="快刷模式" />
+        </Card>
+      )}
 
       <div className="cb-avail-hint" aria-live="polite">
-        這個範圍有 <b>{avail}</b> 題可刷
+        {papersLoading ? (
+          '題庫載入中…'
+        ) : (
+          <>
+            這個範圍有 <b>{avail}</b> 題可{verb}
+          </>
+        )}
       </div>
 
-      <Button onClick={handleStart} disabled={avail === 0}>
+      <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
         {startLabel}
       </Button>
     </div>

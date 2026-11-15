@@ -1,16 +1,22 @@
 import type { Progress, QuestionId, RoundConfig } from '../core/types';
 import type { World } from '../core/world';
+import { askTypeOf } from './askType';
 import { isDue } from './date';
 
 function isNewQuestion(progress: Progress | undefined): boolean {
   return progress === undefined || progress.seen === 0;
 }
 
+function isViewedOnlyQuestion(progress: Progress | undefined): boolean {
+  return progress !== undefined && progress.views > 0 && progress.seen === 0;
+}
+
 function isWrongQuestion(progress: Progress | undefined): boolean {
   return progress !== undefined && progress.seen > 0 && progress.streak === 0;
 }
 
-function shuffle<T>(items: readonly T[], rng: () => number): T[] {
+/** 回傳洗牌後的新陣列（不改動原陣列）。 */
+export function shuffle<T>(items: readonly T[], rng: () => number): T[] {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i -= 1) {
     const j = Math.min(i, Math.floor(rng() * (i + 1)));
@@ -34,6 +40,7 @@ function collectEligibleIds(world: World, config: RoundConfig): QuestionId[] {
     const paper = world.papers.get(question.paperId);
     if (!paper || paper.bankId !== config.bankId) continue;
     if (subjectSet && !subjectSet.has(paper.subjectKey)) continue;
+    if (config.ask !== 'all' && askTypeOf(question.stem) !== config.ask) continue;
     ids.push(question.id);
   }
 
@@ -62,10 +69,11 @@ function partitionForMode(
     ];
   }
 
-  // mixed：到期 → 上次答錯 → 沒作答過 → 其餘（互斥分層以確保不重複）
+  // mixed：到期 → 上次答錯 → 看過但還沒作答過 → 沒看過也沒作答 → 其餘（互斥分層以確保不重複）
   const dueTier: QuestionId[] = [];
   const wrongTier: QuestionId[] = [];
-  const newTier: QuestionId[] = [];
+  const viewedOnlyTier: QuestionId[] = [];
+  const unseenTier: QuestionId[] = [];
   const restTier: QuestionId[] = [];
 
   for (const id of eligible) {
@@ -74,14 +82,16 @@ function partitionForMode(
       dueTier.push(id);
     } else if (isWrongQuestion(prog)) {
       wrongTier.push(id);
+    } else if (isViewedOnlyQuestion(prog)) {
+      viewedOnlyTier.push(id);
     } else if (isNewQuestion(prog)) {
-      newTier.push(id);
+      unseenTier.push(id);
     } else {
       restTier.push(id);
     }
   }
 
-  return [dueTier, wrongTier, newTier, restTier];
+  return [dueTier, wrongTier, viewedOnlyTier, unseenTier, restTier];
 }
 
 /** 依設定篩選題目並洗牌，回傳不重複、最多 config.count 題的題號陣列。 */

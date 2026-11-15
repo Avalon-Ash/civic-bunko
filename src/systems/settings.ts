@@ -13,6 +13,18 @@ export function setTheme(world: World, theme: ThemeChoice): void {
   });
 }
 
+/** 標記使用者已永久關閉加到主畫面引導，並發出 settingsChanged。 */
+export function dismissInstallHint(world: World): void {
+  world.settings = {
+    ...world.settings,
+    installHintDismissed: true,
+  };
+  world.bus.emit({
+    type: 'settingsChanged',
+    settings: { ...world.settings },
+  });
+}
+
 /** 訂閱 roundStarted，自動記住最後一次回合設定並發出 settingsChanged。 */
 export function attachSettings(world: World): () => void {
   return world.bus.on('roundStarted', (event) => {

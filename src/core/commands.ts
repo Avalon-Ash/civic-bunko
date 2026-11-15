@@ -3,10 +3,12 @@ import {
   answerQuestion,
   nextQuestion,
   quitRound,
+  quizSameSet,
   retryWrong,
   startRound,
 } from '../systems/round';
-import { setTheme } from '../systems/settings';
+import { dismissInstallHint, setTheme } from '../systems/settings';
+import { disableSync, setSyncCode, syncNow } from '../systems/sync';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
 import type { World } from './world';
@@ -32,7 +34,7 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       answerQuestion(world, cmd.pick, now);
       break;
     case 'next': {
-      const outcome = nextQuestion(world, now);
+      const outcome = nextQuestion(world, now, rng);
       if (outcome === 'advanced') {
         bumpStore(world);
       }
@@ -48,8 +50,14 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
     case 'retryWrong':
       retryWrong(world);
       break;
+    case 'quizSameSet':
+      quizSameSet(world, rng);
+      break;
     case 'setTheme':
       setTheme(world, cmd.theme);
+      break;
+    case 'dismissInstallHint':
+      dismissInstallHint(world);
       break;
     case 'importProgress': {
       const result = importProgress(world, cmd.json);
@@ -60,6 +68,15 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
     }
     case 'resetProgress':
       resetProgress(world);
+      break;
+    case 'setSyncCode':
+      setSyncCode(world, cmd.code);
+      break;
+    case 'syncNow':
+      syncNow(world);
+      break;
+    case 'disableSync':
+      disableSync(world);
       break;
   }
 }

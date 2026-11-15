@@ -1,0 +1,148 @@
+{
+ "laws": [
+  {
+   "pcode": "A0000001",
+   "name": "中華民國憲法",
+   "amendedAt": null,
+   "articleCount": 175
+  },
+  {
+   "pcode": "A0000002",
+   "name": "中華民國憲法增修條文",
+   "amendedAt": "民國 94 年 06 月 10 日",
+   "articleCount": 12
+  },
+  {
+   "pcode": "A0030159",
+   "name": "憲法訴訟法",
+   "amendedAt": "民國 114 年 01 月 23 日",
+   "articleCount": 95
+  },
+  {
+   "pcode": "A0030133",
+   "name": "中央法規標準法",
+   "amendedAt": "民國 93 年 05 月 19 日",
+   "articleCount": 26
+  },
+  {
+   "pcode": "A0040003",
+   "name": "地方制度法",
+   "amendedAt": "民國 114 年 12 月 03 日",
+   "articleCount": 107
+  },
+  {
+   "pcode": "G0320015",
+   "name": "財政收支劃分法",
+   "amendedAt": "民國 114 年 12 月 03 日",
+   "articleCount": 44
+  },
+  {
+   "pcode": "D0020010",
+   "name": "公職人員選舉罷免法",
+   "amendedAt": "民國 115 年 07 月 01 日",
+   "articleCount": 148
+  },
+  {
+   "pcode": "D0020050",
+   "name": "公民投票法",
+   "amendedAt": "民國 114 年 12 月 03 日",
+   "articleCount": 56
+  },
+  {
+   "pcode": "A0030055",
+   "name": "行政程序法",
+   "amendedAt": "民國 110 年 01 月 20 日",
+   "articleCount": 176
+  },
+  {
+   "pcode": "A0030210",
+   "name": "行政罰法",
+   "amendedAt": "民國 111 年 06 月 15 日",
+   "articleCount": 46
+  },
+  {
+   "pcode": "A0030023",
+   "name": "行政執行法",
+   "amendedAt": "民國 99 年 02 月 03 日",
+   "articleCount": 45
+  },
+  {
+   "pcode": "A0030020",
+   "name": "訴願法",
+   "amendedAt": "民國 101 年 06 月 27 日",
+   "articleCount": 101
+  },
+  {
+   "pcode": "A0030154",
+   "name": "行政訴訟法",
+   "amendedAt": "民國 111 年 06 月 22 日",
+   "articleCount": 390
+  },
+  {
+   "pcode": "I0020004",
+   "name": "國家賠償法",
+   "amendedAt": "民國 108 年 12 月 18 日",
+   "articleCount": 17
+  },
+  {
+   "pcode": "I0020026",
+   "name": "政府資訊公開法",
+   "amendedAt": null,
+   "articleCount": 24
+  },
+  {
+   "pcode": "I0050021",
+   "name": "個人資料保護法",
+   "amendedAt": "民國 114 年 11 月 11 日",
+   "articleCount": 66
+  },
+  {
+   "pcode": "A0010036",
+   "name": "中央行政機關組織基準法",
+   "amendedAt": "民國 114 年 01 月 20 日",
+   "articleCount": 39
+  },
+  {
+   "pcode": "A0010032",
+   "name": "行政院組織法",
+   "amendedAt": "民國 114 年 01 月 24 日",
+   "articleCount": 15
+  },
+  {
+   "pcode": "S0020038",
+   "name": "公務員服務法",
+   "amendedAt": "民國 111 年 06 月 22 日",
+   "articleCount": 27
+  },
+  {
+   "pcode": "S0120001",
+   "name": "公務人員保障法",
+   "amendedAt": "民國 114 年 07 月 09 日",
+   "articleCount": 111
+  },
+  {
+   "pcode": "S0020001",
+   "name": "公務人員任用法",
+   "amendedAt": "民國 114 年 08 月 01 日",
+   "articleCount": 48
+  },
+  {
+   "pcode": "S0040001",
+   "name": "公務人員考績法",
+   "amendedAt": "民國 114 年 11 月 19 日",
+   "articleCount": 25
+  },
+  {
+   "pcode": "B0000001",
+   "name": "民法",
+   "amendedAt": "民國 115 年 08 月 17 日",
+   "articleCount": 1439
+  },
+  {
+   "pcode": "C0000001",
+   "name": "中華民國刑法",
+   "amendedAt": "民國 115 年 07 月 22 日",
+   "articleCount": 422
+  }
+ ]
+}

@@ -1,6 +1,8 @@
+import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import type {
   Bank,
   Enrich,
+  EnrichFile,
   OfficialQuestion,
   Paper,
   PaperFile,
@@ -124,18 +126,78 @@ export const testEnrich: Enrich[] = [
     mnemonic: '測試口訣 1',
     trap: '測試陷阱 1',
     plain: '測試白話 1',
-    marks: [{ start: 0, end: 2, color: 'blue' }],
+    marks: [{ text: '測試題', color: 'blue' }],
     options: {
-      A: { why: '測試解析 A', lawRef: null },
+      A: { why: '測試解析 A', lawRef: { law: '地方制度法', article: '26' } },
       B: { why: '測試解析 B', lawRef: null },
       C: { why: '測試解析 C', lawRef: null },
       D: { why: '測試解析 D', lawRef: null },
     },
-    model: 'test-fixture',
-    generatedAt: '2026-11-15T00:00:00.000Z',
+    visual: {
+      kind: 'flow',
+      lanes: [
+        {
+          steps: [
+            { text: '有罰則', tone: 'hot' },
+            { text: '核定', tone: 'key' },
+            { text: '發布', tone: 'plain' },
+          ],
+        },
+        {
+          steps: [
+            { text: '沒罰則', tone: 'plain' },
+            { text: '發布', tone: 'plain' },
+            { text: '備查', tone: 'plain' },
+          ],
+        },
+      ],
+    },
+    lawChanged: null,
+    confidence: 'high',
     reviewed: false,
   },
 ];
+
+export const testEnrichFile: EnrichFile = {
+  paperId: testPaperA.id,
+  model: 'test-fixture',
+  generatedAt: '2026-11-15T00:00:00.000Z',
+  items: testEnrich,
+};
+
+/** 涵蓋 versus、修法提醒、低把握度、紅色標記與條號查詢的測試用假資料。 */
+export const sampleRichEnrichFile: EnrichFile = {
+  paperId: testPaperB.id,
+  model: 'test-fixture',
+  generatedAt: '2026-11-16T00:00:00.000Z',
+  items: [
+    {
+      id: 'q-b1',
+      topic: ['admin-law/disposition'],
+      mnemonic: '違法叫撤銷，合法才廢止。',
+      trap: '看到「合法處分」別選成撤銷。',
+      plain: null,
+      marks: [
+        { text: 'q-b1', color: 'blue' },
+        { text: '測試題', color: 'red' },
+      ],
+      options: {
+        A: { why: '撤銷針對本來就違法的處分。', lawRef: { law: '行政程序法', article: '117' } },
+        B: { why: '廢止針對本來合法的處分。', lawRef: { law: '行政程序法', article: '122' } },
+        C: { why: '條號查無示範（故意不存在的條號）。', lawRef: { law: '地方制度法', article: '999' } },
+        D: { why: '本選項為正解示範。', lawRef: null },
+      },
+      visual: {
+        kind: 'versus',
+        left: { title: '撤銷', points: ['處分本來違法', '知道後 2 年內'] },
+        right: { title: '廢止', points: ['處分本來合法', '原因發生後 2 年內'] },
+      },
+      lawChanged: '現行地方制度法已修正副市長人數，作答本題請以現行條文為準。',
+      confidence: 'low',
+      reviewed: false,
+    },
+  ],
+};
 
 export const testPaperFiles: PaperFile[] = [
   {
@@ -160,7 +222,7 @@ export const testPaperFiles: PaperFile[] = [
 
 export function createTestWorld(): World {
   const world = createWorld();
-  loadBank(world, [testBank, otherBank], testPaperFiles, testEnrich);
+  loadBank(world, [testBank, otherBank], testPaperFiles, [testEnrichFile]);
   return world;
 }
 
@@ -171,6 +233,9 @@ export function makeConfig(overrides: Partial<RoundConfig> = {}): RoundConfig {
     count: 10,
     mode: 'mixed',
     fast: false,
+    study: 'quiz',
+    ask: 'positive',
+    passes: READ_PASSES_DEFAULT,
     ...overrides,
   };
 }

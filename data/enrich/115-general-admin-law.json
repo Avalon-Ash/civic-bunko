@@ -1,0 +1,1292 @@
+{
+  "paperId": "115-general-admin-law",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T00:30:00+08:00",
+  "items": [
+    {
+      "id": "115-general-admin-law-q01",
+      "topic": ["admin-law/enforcement"],
+      "mnemonic": "討公法欠款：執行員出動，抗告找民訴，出境兩次才限居。",
+      "trap": "抗告準用民事訴訟法，不是刑事訴訟法！",
+      "plain": "欠稅不繳被移送執行，分署可以做什麼、義務人又怎麼抗告？",
+      "marks": [
+        { "text": "公法上金錢給付義務", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。由行政執行官、執行書記官督同「執行員」辦理，不是法警。", "lawRef": { "law": "行政執行法", "article": "12" } },
+        "B": { "why": "對。分署得依職權或利害關係人申請，核發禁止特定投資命令。", "lawRef": { "law": "行政執行法", "article": "17-1" } },
+        "C": { "why": "錯。不服拘提管收裁定提起抗告，應準用「民事訴訟法」規定。", "lawRef": { "law": "行政執行法", "article": "17" } },
+        "D": { "why": "錯。欠款未達 10 萬元，須已出境達「2 次」才得限制住居。", "lawRef": { "law": "行政執行法", "article": "17" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "滯欠未達10萬", "tone": "hot" }, { "text": "出境達2次", "tone": "hot" }, { "text": "得限制住居", "tone": "key" }] },
+          { "steps": [{ "text": "不服拘提管收", "tone": "plain" }, { "text": "10日內抗告", "tone": "key" }, { "text": "準用民訴", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q02",
+      "topic": ["admin-law/principles"],
+      "mnemonic": "信賴保護不只護處分，法規改廢也要護；撤銷就賠錢，留著就存續。",
+      "trap": "法規變更或廢止一樣適用信賴保護，不是只有行政處分！",
+      "plain": "政府突然修法或收回原本給你的補助，信賴保護原則管不管得到？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "信賴保護原則", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。為公益必須撤銷授益處分時，應補償當事人信賴損失。", "lawRef": null },
+        "B": { "why": "這句對。若公益容許違法行為繼續存在，得採存續保障承認效力。", "lawRef": null },
+        "C": { "why": "這句對。信賴保護原則源自法安定性與憲法對既得權的保障。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。法規變更或廢止同樣適用信賴保護原則。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "存續保障", "points": ["維持原處分或法規效力", "適用於公益不反對時"] },
+        "right": { "title": "財產保障", "points": ["基於公益仍須撤銷或修法", "給予當事人合理損失補償"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q03",
+      "topic": ["admin-law/principles"],
+      "mnemonic": "一碼歸一碼！沒繳罰單跟車子安不安全無關，不能卡住行照。",
+      "trap": "只看兩件事有沒有正當關聯，別跟單純太嚴格（比例原則）搞混。",
+      "plain": "因為交通罰單還沒繳清，監理站就不准你申請發給行車執照，這樣合法嗎？",
+      "marks": [
+        { "text": "不當聯結禁止原則", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "違反。繳清罰鍰與車輛行車安全無正當關聯，屬不當聯結。", "lawRef": null },
+        "B": { "why": "涉及全體海岸一律禁釣，主要爭點為手段過當的比例原則。", "lawRef": null },
+        "C": { "why": "涉及職業自由與平等權，實務認違反比例與平等原則。", "lawRef": null },
+        "D": { "why": "師生戀遭解聘涉及教育倫理與工作權，屬比例原則審查。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "欠繳交通罰鍰", "tone": "hot" }, { "text": "性質無關", "tone": "plain" }, { "text": "卡住行照(違法)", "tone": "key" }] },
+          { "steps": [{ "text": "申請核發行照", "tone": "plain" }, { "text": "正當關聯", "tone": "plain" }, { "text": "審查車輛安全", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q04",
+      "topic": ["admin-law/principles"],
+      "mnemonic": "裁量不是隨便判！越權或濫權就算違法，法院照樣能撤銷。",
+      "trap": "法院不是不能審裁量，遇到裁量逾越或濫用就抓得住！",
+      "plain": "法律讓機關自己決定罰多罰少，是不是機關怎麼決定法院都管不著？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政裁量", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。行政裁量依學理分為「要不要做」決定與「怎麼做」選擇。", "lawRef": null },
+        "B": { "why": "這句對。機關行使裁量不得逾越範圍，且須符合法規授權目的。", "lawRef": { "law": "行政程序法", "article": "10" } },
+        "C": { "why": "這句對。機關作成處分有裁量權時，原則上得附加附款。", "lawRef": { "law": "行政程序法", "article": "93" } },
+        "D": { "why": "這句錯（本題答案）。裁量逾越權限或濫用權力時，法院得撤銷。", "lawRef": { "law": "行政訴訟法", "article": "201" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "合法裁量", "points": ["在法定範圍內選擇", "符合法規授權目的", "法院尊重不介入"] },
+        "right": { "title": "違法裁量", "points": ["逾越權限或濫用權力", "以違法論", "行政法院得予撤銷"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q05",
+      "topic": ["admin-law/state-liability"],
+      "mnemonic": "國賠雙軌走：先書面協議；打官司可找民事庭，也可在行政訴訟附帶請求。",
+      "trap": "別看到國賠就選只有民事訴訟！打行政訴訟也能附帶請求。",
+      "plain": "車子開進大坑洞壞了要找政府國賠，除了向民事法院提告，還有別條路嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "國家賠償", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。國賠法公務員指依法令從事公務者，範圍比任用法廣。", "lawRef": { "law": "國家賠償法", "article": "2" } },
+        "B": { "why": "這句對。請求國賠須先以書面請求協議，不成才可起訴。", "lawRef": { "law": "國家賠償法", "article": "10" } },
+        "C": { "why": "這句對。公務員侵權採過失責任，公共設施欠缺採無過失責任。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。除民事訴訟外，也可於行政訴訟合併請求。", "lawRef": { "law": "行政訴訟法", "article": "7" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "書面請求協議", "tone": "plain" }, { "text": "協議不成立", "tone": "hot" }, { "text": "民事訴訟求償", "tone": "key" }] },
+          { "steps": [{ "text": "提起行政訴訟", "tone": "plain" }, { "text": "同一程序中", "tone": "plain" }, { "text": "合併請求國賠", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q06",
+      "topic": ["admin-law/litigation"],
+      "mnemonic": "稅額、罰鍰、公法財產「150 萬以下」找地方庭；超過或都計找高等庭。",
+      "trap": "「以下」含 150 萬整！超過才歸高等庭。",
+      "plain": "不服政府罰錢或課稅想打行政官司，金額多少以下要到地方行政訴訟庭？",
+      "marks": [
+        { "text": "高等行政法院地方行政訴訟庭", "color": "blue" },
+        { "text": "第一審", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。公法上財產訴訟逾 150 萬元（155 萬），第一審歸高等庭。", "lawRef": { "law": "行政訴訟法", "article": "104-1" } },
+        "B": { "why": "錯。都市計畫審查程序，應逕向管轄之高等行政訴訟庭提起。", "lawRef": { "law": "行政訴訟法", "article": "237-18" } },
+        "C": { "why": "錯。罰鍰逾 150 萬元（180 萬），第一審應由高等庭管轄。", "lawRef": { "law": "行政訴訟法", "article": "104-1" } },
+        "D": { "why": "對。核課稅額在 150 萬元「以下」者，由地方庭任第一審。", "lawRef": { "law": "行政訴訟法", "article": "104-1" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "地方庭第一審", "points": ["稅額 150 萬以下", "罰鍰 150 萬以下", "公法財產 150 萬以下"] },
+        "right": { "title": "高等庭第一審", "points": ["標的超過 150 萬元", "都市計畫審查訴訟", "其他專屬或通常事件"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q07",
+      "topic": ["admin-law/procedure"],
+      "mnemonic": "處罰期間「始日算一天」，末日遇假日照計；但算起來對人民有利從優。",
+      "trap": "一般期間始日不算入，但「處罰或不利處分」始日要算一日！",
+      "plain": "機關寄來罰單或限期改善通知，計算天數時第一天到底算不算？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政程序法", "color": "blue" },
+        { "text": "期間", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。期間以小時計者，沒有始日不算的問題，即時起算。", "lawRef": { "law": "行政程序法", "article": "48" } },
+        "B": { "why": "這句錯（本題答案）。涉及處罰等不利處分，始日不計時刻以一日論。", "lawRef": { "law": "行政程序法", "article": "48" } },
+        "C": { "why": "這句對。依法規以掛號郵寄申請者，以交郵當日之郵戳為準。", "lawRef": { "law": "行政程序法", "article": "49" } },
+        "D": { "why": "這句對。人民依法規申請案件，法無特別規定時處理期間為 2 個月。", "lawRef": { "law": "行政程序法", "article": "51" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "一般期間", "points": ["以日計，始日不算入", "末日遇假日順延次日"] },
+        "right": { "title": "處罰不利期間", "points": ["始日不計時刻以1日論", "末日遇假日照計(有利除外)"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q08",
+      "topic": ["admin-law/rules"],
+      "mnemonic": "要罰人，先問中央！自治條例有罰則就是先「核定」再發布。",
+      "trap": "備查是發布後才報請知悉，有罰則的處罰規定必須事前核定！",
+      "plain": "市議會通過「亂丟垃圾要罰錢」的規定，發布前要先送中央做什麼？",
+      "marks": [
+        { "text": "地方自治條例", "color": "blue" },
+        { "text": "處罰規定", "color": "blue" },
+        { "text": "事前", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。備查是事後告知；沒有罰則的自治條例才在發布後報備查。", "lawRef": { "law": "地方制度法", "article": "26" } },
+        "B": { "why": "錯。特許不是地方制度法對自治法規的監督方式。", "lawRef": null },
+        "C": { "why": "對。自治條例規定有罰則時，應先報中央核定後再發布。", "lawRef": { "law": "地方制度法", "article": "26" } },
+        "D": { "why": "錯。地方制度法沒有「通報」這種自治法規監督方式。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "有罰則", "tone": "hot" }, { "text": "報中央核定", "tone": "key" }, { "text": "才能發布", "tone": "plain" }] },
+          { "steps": [{ "text": "沒罰則", "tone": "plain" }, { "text": "直接發布", "tone": "plain" }, { "text": "事後報備查", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q09",
+      "topic": ["admin-law/organization"],
+      "mnemonic": "二級獨立三兄弟：中選會、公平會、NCC（國家通訊傳播委員會）。",
+      "trap": "央行、故宮雖屬二級機關但非獨立機關；金管會也是一般委員會！",
+      "plain": "哪一個委員會像獨立裁判一樣，不受行政院院長指揮監督？",
+      "marks": [
+        { "text": "中央二級獨立機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。中央銀行設於行政院下，屬一般機關，非獨立機關。", "lawRef": { "law": "行政院組織法", "article": "7" } },
+        "B": { "why": "錯。國立故宮博物院設於行政院下，非二級獨立機關。", "lawRef": { "law": "行政院組織法", "article": "8" } },
+        "C": { "why": "對。行政院組織法明定公平會為相當中央二級獨立機關。", "lawRef": { "law": "行政院組織法", "article": "9" } },
+        "D": { "why": "錯。金融監督管理委員會為一般部會級委員會，非獨立機關。", "lawRef": { "law": "行政院組織法", "article": "4" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "中央二級獨立機關", "tone": "plain" }, { "text": "中選會／公平會／NCC", "tone": "key" }, { "text": "依法獨立行使職權", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q10",
+      "topic": ["admin-law/organization"],
+      "mnemonic": "上級交給下級叫「委任」，上下有隸屬關係，不用下級點頭同意！",
+      "trap": "委任不用下級機關同意，但仍須有法規依據並公告刊登公報。",
+      "plain": "部長依法把部分審核權交給下屬署長辦理，需要經過署長同意嗎？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "權限委任", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是要件。管轄權法定原則下，權限委任須有法規授權依據。", "lawRef": { "law": "行政程序法", "article": "15" } },
+        "B": { "why": "這句是要件。原管轄機關須為權限委任之公法上行為。", "lawRef": { "law": "行政程序法", "article": "15" } },
+        "C": { "why": "這句不是（本題答案）。對所屬下級機關委任，無須下級同意。", "lawRef": { "law": "行政程序法", "article": "15" } },
+        "D": { "why": "這句是要件。應將委任事項及法規依據公告並刊公報或新聞紙。", "lawRef": { "law": "行政程序法", "article": "15" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "上級機關", "tone": "plain" }, { "text": "依法規委任(免同意)", "tone": "key" }, { "text": "所屬下級機關", "tone": "plain" }] },
+          { "steps": [{ "text": "要件檢查", "tone": "plain" }, { "text": "法規依據+公告刊公報", "tone": "hot" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q11",
+      "topic": ["admin-law/organization"],
+      "mnemonic": "同管轄先辦為準；起爭議問共同上級；違土地管轄原則不撤銷。",
+      "trap": "數機關都有管轄權時先比「誰先受理」，不能分先後才協議！",
+      "plain": "兩個縣市政府搶著管同一件事，或都說不歸自己管，找誰拍板？",
+      "marks": [
+        { "text": "土地管轄", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。組織法規先定，不能定時還含營業處所、會址、事件發生地。", "lawRef": { "law": "行政程序法", "article": "12" } },
+        "B": { "why": "錯。若應為相同處分且非重大瑕疵無效，違反土地管轄無須撤銷。", "lawRef": { "law": "行政程序法", "article": "115" } },
+        "C": { "why": "對。管轄權有爭議時，有共同上級機關者，由該共同上級決定。", "lawRef": { "law": "行政程序法", "article": "14" } },
+        "D": { "why": "錯。數機關均有管轄權時，應先由「受理在先」之機關管轄。", "lawRef": { "law": "行政程序法", "article": "13" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "競合(都有權)", "points": ["1. 受理在先機關", "2. 協議定之", "3. 共同上級指定"] },
+        "right": { "title": "爭議(搶或推)", "points": ["1. 共同上級決定", "2. 無則各上級協議", "人民不得單獨聲明不服"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q12",
+      "topic": ["admin-law/civil-service"],
+      "mnemonic": "長官命令違法先報告；書面署名就要聽，但觸犯刑法絕對不從！",
+      "trap": "長官拒寫書面命令時，視為「撤回命令」，不是視為公務員同意！",
+      "plain": "主管口頭要你做一件違法的事，怕出事該怎麼自保、什麼時候不能做？",
+      "marks": [
+        { "text": "長官", "color": "blue" },
+        { "text": "違法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。公務人員認為長官命令違法時，應負「報告」之義務。", "lawRef": { "law": "公務人員保障法", "article": "17" } },
+        "B": { "why": "錯。長官以書面署名下達時，非違反刑法即應服從，責任歸長官。", "lawRef": { "law": "公務人員保障法", "article": "17" } },
+        "C": { "why": "對。長官命令若違反刑事法律，公務人員就沒有服從的義務。", "lawRef": { "law": "公務人員保障法", "article": "17" } },
+        "D": { "why": "錯。長官拒絕以書面署名下達時，視為「撤回」其命令。", "lawRef": { "law": "公務人員保障法", "article": "17" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "認命令違法", "tone": "plain" }, { "text": "先向長官報告", "tone": "plain" }, { "text": "違反刑法→不服從", "tone": "key" }] },
+          { "steps": [{ "text": "未違反刑法", "tone": "plain" }, { "text": "長官書面署名→服從", "tone": "key" }, { "text": "長官拒書面→撤回", "tone": "hot" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q13",
+      "topic": ["admin-law/civil-service"],
+      "mnemonic": "身分財產重影響走「復審」，內部工作與進修管理走「申訴再申訴」。",
+      "trap": "別因題幹寫「核定」就誤選復審或訴願！進修時間屬管理措施。",
+      "plain": "公務員申請上班時間去進修被機關駁回，覺得不公平要走哪條救濟路？",
+      "marks": [
+        { "text": "申請進修時間", "color": "blue" },
+        { "text": "救濟", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。保障法救濟分復審與申訴再申訴，無一般異議程序。", "lawRef": null },
+        "B": { "why": "錯。公務人員權益救濟依公務人員保障法，不走一般訴願。", "lawRef": { "law": "公務人員保障法", "article": "4" } },
+        "C": { "why": "錯。復審適用於行政處分，進修時間核定屬內部管理措施。", "lawRef": { "law": "公務人員保障法", "article": "25" } },
+        "D": { "why": "對。不服管理措施或工作條件處置，應提申訴、再申訴。", "lawRef": { "law": "公務人員保障法", "article": "77" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "復審(處分)", "points": ["免職、俸給、退休等", "向保訓會提復審", "不服再提行政訴訟"] },
+        "right": { "title": "申訴/再申訴", "points": ["進修、請假等管理措施", "先向服務機關申訴", "不服向保訓會再申訴"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q14",
+      "topic": ["admin-law/civil-service"],
+      "mnemonic": "領證職業下班做免費公益，或無給職非營利兼職，記得報「備查」。",
+      "trap": "企業是營利事業不可兼任；才藝與單次演講不須備查。",
+      "plain": "有諮商師執照的公務員，假日想免費幫民眾心理諮商，要跟機關報備嗎？",
+      "marks": [
+        { "text": "公務員服務法", "color": "blue" },
+        { "text": "備查", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。下班依個人才藝表現獲適當報酬，無須經同意或備查。", "lawRef": { "law": "公務員服務法", "article": "15" } },
+        "B": { "why": "錯。受邀發表論文領演講費屬單次發表，非應報備查兼職。", "lawRef": { "law": "公務員服務法", "article": "15" } },
+        "C": { "why": "錯。企業屬營利事業，法律顧問涉領證業務，非報備查即可。", "lawRef": { "law": "公務員服務法", "article": "15" } },
+        "D": { "why": "對。下班後從事社會公益性質活動且無礙本職，應報經備查。", "lawRef": { "law": "公務員服務法", "article": "15" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "下班做社會公益", "tone": "hot" }, { "text": "未妨礙本職工作", "tone": "plain" }, { "text": "應報經機關備查", "tone": "key" }] },
+          { "steps": [{ "text": "下班個人才藝表現", "tone": "plain" }, { "text": "未妨礙名譽/無利衝", "tone": "plain" }, { "text": "得獲報酬免備查", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q15",
+      "topic": ["admin-law/civil-service"],
+      "mnemonic": "任用資格只認「考試、銓敘、升等」三種；雙重國籍才免職，綠卡不會。",
+      "trap": "「永久居留權（綠卡）」不等於外國國籍，不會因此被免職！",
+      "plain": "沒請假不上班、洩漏機密給配偶買股、有外國綠卡，哪些會丟工作？",
+      "marks": [
+        { "text": "公務員法律關係", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。任用法第 9 條僅列考試、銓敘、升等，不含檢定通過。", "lawRef": { "law": "公務人員任用法", "article": "9" } },
+        "B": { "why": "錯。未經請假不到班屬「曠職」，不會自動以休假計算。", "lawRef": null },
+        "C": { "why": "錯。洩漏證券查核消息給配偶，違反保密義務非經營商業。", "lawRef": { "law": "公務員服務法", "article": "5" } },
+        "D": { "why": "錯。禁止的是「兼具外國國籍」，單純永久居留權不致免職。", "lawRef": { "law": "公務人員任用法", "article": "28" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "任用三資格", "tone": "plain" }, { "text": "考試/銓敘/升等", "tone": "key" }, { "text": "不含檢定通過", "tone": "hot" }] },
+          { "steps": [{ "text": "任用法28條", "tone": "plain" }, { "text": "禁具外國國籍", "tone": "key" }, { "text": "永久居留權不在內", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q16",
+      "topic": ["admin-law/civil-service"],
+      "mnemonic": "懲戒法停職看重罪或重大虞：通緝、入監、免撤休職虞；沒有「降職」。",
+      "trap": "懲戒只有「降級」無降職，且要免撤休職之虞才停職。",
+      "plain": "公務員犯錯還沒判決前，什麼嚴重情況下機關或法庭可以先停他的職？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "公務員懲戒法", "color": "blue" },
+        { "text": "停職", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這是當然停職事由。依刑事訴訟程序被通緝者，當然停止職務。", "lawRef": null },
+        "B": { "why": "這是當然停職事由。受徒刑宣告在監所執行中，當然停職。", "lawRef": null },
+        "C": { "why": "這不是（本題答案）。無降職處分，須有免撤休職情節重大之虞。", "lawRef": null },
+        "D": { "why": "這是裁定先行停職事由。懲戒法庭認情節重大得裁定先行停職。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "當然停職", "points": ["刑事通緝或羈押", "受褫奪公權宣告", "徒刑在監所執行中"] },
+        "right": { "title": "先行停職", "points": ["法庭認情節重大必要", "機關認有免/撤/休職虞", "不含降職處分"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q17",
+      "topic": ["admin-law/civil-service"],
+      "mnemonic": "大事（慰問金、涉訟輔助）記 10 年；小錢（健檢、加班、墊支）2 年。",
+      "trap": "保障法沒有 5 年時效！只有「10 年」跟「2 年」兩種。",
+      "plain": "公務員因公墊錢、申請健檢費或加班費，最多幾年內不去請領就會過期？",
+      "marks": [
+        { "text": "公法上財產請求權", "color": "blue" },
+        { "text": "消滅時效", "color": "blue" },
+        { "text": "公務人員保障法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。核准一般健康檢查費用請求權，因「2 年」不行使消滅。", "lawRef": { "law": "公務人員保障法", "article": "24-1" } },
+        "B": { "why": "錯。保障法規定意外慰問金為「10 年」，非損害賠償 2 年。", "lawRef": { "law": "公務人員保障法", "article": "24-1" } },
+        "C": { "why": "錯。依法執行職務涉訟輔助費用請求權，因「10 年」消滅。", "lawRef": { "law": "公務人員保障法", "article": "24-1" } },
+        "D": { "why": "對。執行職務墊支之必要費用，因 2 年間不行使而消滅。", "lawRef": { "law": "公務人員保障法", "article": "24-1" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "10 年消滅", "points": ["因公意外慰問金", "依法涉訟輔助費用"] },
+        "right": { "title": "2 年消滅", "points": ["核准健檢費用", "核准加班費", "職務墊支必要費用"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q18",
+      "topic": ["admin-law/public-property"],
+      "mnemonic": "公物要提供行政或公眾用；私人百貨停車場只做生意，當然是私物！",
+      "trap": "公共開放不等於公物！百貨停車場是民間營業設施。",
+      "plain": "公路、橋樑、公園跟百貨公司的停車場，都可以停車或散步，哪個不是公物？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "公物", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "非屬公物（本題答案）。為民間業者營業用私人財產，屬私物。", "lawRef": null },
+        "B": { "why": "屬於公物。國有公路直接提供不特定公眾通行，為公共用物。", "lawRef": null },
+        "C": { "why": "屬於公物。公共橋樑直接供公眾通行使用，為公共用物。", "lawRef": null },
+        "D": { "why": "屬於公物。公立公園直接開放給公眾休憩，為公共用物。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "公物(公共用)", "points": ["行政主體提供公用", "例：公路、橋樑、公園"] },
+        "right": { "title": "私物(非公物)", "points": ["私人營業用設施", "例：百貨公司停車場"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q19",
+      "topic": ["admin-law/disposition", "admin-law/procedure"],
+      "mnemonic": "撤銷算「知悉」起 2 年，廢止算「發生」起 2 年；執行 5 裁罰 3。",
+      "trap": "撤銷是「知有原因時起」，廢止是「廢止原因發生後」起算！",
+      "plain": "政府發錯執照要收回，跟後來發現不合法要廢掉，兩年期限從哪天開始算？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "期間", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。處分確定日起 5 年內未開始執行者，不再執行。", "lawRef": { "law": "行政執行法", "article": "7" } },
+        "B": { "why": "這句對。人民對行政機關公法上請求權，原則 10 年不行使消滅。", "lawRef": { "law": "行政程序法", "article": "131" } },
+        "C": { "why": "這句錯（本題答案）。廢止是自「原因發生後」2 年，非知悉時。", "lawRef": { "law": "行政程序法", "article": "124" } },
+        "D": { "why": "這句對。違反行政法上義務之裁處權，自行為終了起 3 年消滅。", "lawRef": { "law": "行政罰法", "article": "27" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "違法處分撤銷", "points": ["自「知有撤銷原因」起", "2 年內為之"] },
+        "right": { "title": "合法處分廢止", "points": ["自「廢止原因發生」後", "2 年內為之"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q20",
+      "topic": ["admin-law/rules"],
+      "mnemonic": "內部組織用下達就有效；解釋規定與裁量基準要首長簽署＋登公報！",
+      "trap": "行政規則非全登公報，但裁量基準與解釋規定必登！",
+      "plain": "政府內部寫給公務員看的裁量標準，需要登在政府公報讓大家知道嗎？",
+      "marks": [
+        { "text": "行政程序法", "color": "blue" },
+        { "text": "行政規則", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。有效下達的行政規則，對訂定機關、下級機關及屬官有拘束力。", "lawRef": { "law": "行政程序法", "article": "161" } },
+        "B": { "why": "錯。行政規則應下達下級機關或屬官，不能只長官知道而已。", "lawRef": { "law": "行政程序法", "article": "160" } },
+        "C": { "why": "錯。機關內部組織、人事管理等一般規定，得以行政規則訂定。", "lawRef": { "law": "行政程序法", "article": "159" } },
+        "D": { "why": "對。解釋性規定與裁量基準應由首長簽署，並登載政府公報發布。", "lawRef": { "law": "行政程序法", "article": "160" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "一般行政規則", "points": ["內部組織/業務/人事", "下達下級或屬官即可"] },
+        "right": { "title": "解釋與裁量基準", "points": ["統一解釋/行使裁量", "首長簽署+登公報發布"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q21",
+      "topic": ["admin-law/disposition"],
+      "mnemonic": "先給好處，再要你「做或不做某事」，違反可廢止，這就是「負擔」。",
+      "trap": "看到「如有違反將廢止」別選條件！條件會自動失效。",
+      "plain": "發居留證給你，但要求不准打工，打工了才會廢掉居留證，這是哪種附款？",
+      "marks": [
+        { "text": "行政處分附款", "color": "blue" },
+        { "text": "不得在臺灣工作", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。課予不作為義務且須另行廢止許可，符合「負擔」特徵。", "lawRef": { "law": "行政程序法", "article": "93" } },
+        "B": { "why": "錯。解除條件成就時處分「自動」失效，不須機關再行廢止。", "lawRef": { "law": "行政程序法", "article": "93" } },
+        "C": { "why": "錯。停止條件成就前處分還不生效，本題居留許可已准許生效。", "lawRef": { "law": "行政程序法", "article": "93" } },
+        "D": { "why": "錯。期限是看時間到沒（始期／終期），不是禁止工作義務。", "lawRef": { "law": "行政程序法", "article": "93" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "負擔", "points": ["課予作為/不作為義務", "可獨立強制執行", "違反須機關另行廢止"] },
+        "right": { "title": "解除條件", "points": ["看將來不確定事實", "無獨立強制性", "成就時處分自動失效"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q22",
+      "topic": ["admin-law/disposition"],
+      "mnemonic": "構成要件拘束「他機關」，實質存續拘束「原機關」，確認效力看事實認定。",
+      "trap": "構成要件效力是拘束「其他國家機關（含法院）」，不是原機關！",
+      "plain": "某機關發了一張建築執照，法院或其他機關審案時也要承認這張執照嗎？",
+      "marks": [
+        { "text": "行政處分效力", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。確認效力探討原處分對事實或法律前提認定是否拘束他機關。", "lawRef": null },
+        "B": { "why": "錯。行政處分原則上具自力執行力，無須先經法院判決即可執行。", "lawRef": null },
+        "C": { "why": "錯。形成處分一經生效即直接改變法律關係，無須待執行。", "lawRef": null },
+        "D": { "why": "錯。構成要件效力指規制內容對「其他國家機關」之拘束力。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "構成要件效力", "points": ["規制內容(主文)", "拘束其他機關與法院"] },
+        "right": { "title": "確認效力", "points": ["前置事實或法律認定", "對他機關之拘束力"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q23",
+      "topic": ["admin-law/disposition", "admin-law/civil-service"],
+      "mnemonic": "免職直接拔掉公務員身分、改變法律關係，屬於「形成處分」。",
+      "trap": "免職改變了公務員身分，早就是「行政處分」，不是內部管理措施！",
+      "plain": "公務員曠職太多被機關記兩大過免職，這道命令在法律上算什麼性質？",
+      "marks": [
+        { "text": "一次記二大過予以免職", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。下命處分是命人民作為或不作為，免職直接消滅任用關係。", "lawRef": null },
+        "B": { "why": "對。免職直接消滅公法上公務員身分關係，屬形成處分。", "lawRef": null },
+        "C": { "why": "錯。確認處分只確認權利或事實存否，不創設或消滅關係。", "lawRef": null },
+        "D": { "why": "錯。免職直接影響公務員身分保障，屬對外發生效力的行政處分。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "一次記二大過免職", "tone": "plain" }, { "text": "消滅公務員身分", "tone": "hot" }, { "text": "形成處分(行政處分)", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q24",
+      "topic": ["admin-law/rules"],
+      "mnemonic": "「自公布日施行」要算到第 3 日；「特定施行日」當天就生效！",
+      "trap": "特定施行日期不用加兩天！自該特定日起就發生效力。",
+      "plain": "法條寫「自 1 月 1 日施行」，到底 1 月 1 日還是 1 月 3 日生效？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "法規生效", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。法律由總統公布；法規命令由機關發布且刊登公報或報紙。", "lawRef": { "law": "行政程序法", "article": "157" } },
+        "B": { "why": "這句對。法規命令只放網頁未刊公報或新聞紙，不生發布效力。", "lawRef": { "law": "行政程序法", "article": "157" } },
+        "C": { "why": "這句對。明定自公布或發布日施行者，起算至第 3 日發生效力。", "lawRef": { "law": "中央法規標準法", "article": "13" } },
+        "D": { "why": "這句錯（本題答案）。特定施行日期者，自「該特定日起」即生效。", "lawRef": { "law": "中央法規標準法", "article": "14" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "公布/發布日施行", "points": ["中標法第 13 條", "起算至第 3 日生效"] },
+        "right": { "title": "特定施行日期", "points": ["中標法第 14 條", "自該特定日起生效"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q25",
+      "topic": ["admin-law/disposition"],
+      "mnemonic": "看是不是行政處分看「實質」！理由已經寫明准不准，就是處分。",
+      "trap": "鑑定、函釋、催告沒創設新效果，只有實質准駁算處分！",
+      "plain": "機關回函沒寫「准予或不准」三個字，但理由寫得很明白，算行政處分嗎？",
+      "marks": [
+        { "text": "行政處分", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。先決問題之鑑定結果未對外直接發生法律效果，非行政處分。", "lawRef": { "law": "行政程序法", "article": "92" } },
+        "B": { "why": "對。實務採實質認定，從理由足認已有准駁表示者即為行政處分。", "lawRef": null },
+        "C": { "why": "錯。一般性法令解釋未針對具體事件直接生法律效果，非處分。", "lawRef": { "law": "行政程序法", "article": "92" } },
+        "D": { "why": "錯。欠繳罰鍰之書面催告屬觀念通知，未生新法律效果，非處分。", "lawRef": { "law": "行政程序法", "article": "92" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "是行政處分", "points": ["具體事件單方決定", "對外直接生法律效果", "實質理由足認准駁"] },
+        "right": { "title": "非行政處分", "points": ["事實鑑定結果", "抽象法令函釋", "履行義務書面催告"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q26",
+      "topic": ["admin-law/contract"],
+      "mnemonic": "公家機關上街買電腦、買器材，跟一般人買東西一樣，簽「私法契約」。",
+      "trap": "雖然有一方是公立大學，但買教學設備是「國庫採購」私法行為！",
+      "plain": "公立大學跟廠商簽約買投影機，跟委託業者驗車，哪一個不是行政契約？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "行政契約", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "屬於行政契約。公立學校與教師聘約屬公法上聘任關係。", "lawRef": null },
+        "B": { "why": "屬於行政契約。國賠協議具公法性質，實務認屬公法上和解契約。", "lawRef": null },
+        "C": { "why": "非屬（本題答案）。機關採購器材屬私經濟國庫行為，為私法契約。", "lawRef": null },
+        "D": { "why": "屬於行政契約。委託民間檢驗汽車涉委託行使公權力，屬行政契約。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "行政契約", "points": ["公立學校教師聘約", "國家賠償協議", "委託民間驗車契約"] },
+        "right": { "title": "私法契約", "points": ["採購教學設備", "純粹私經濟國庫行為"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q27",
+      "topic": ["admin-law/contract"],
+      "mnemonic": "行政契約一部無效，原則「全部無效」！跟行政處分相反要記清。",
+      "trap": "處分一部無效其餘有效；契約一部無效原則「全無效」！",
+      "plain": "行政契約裡只要有一小段條款不合法無效，整份契約會一起無效嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政契約", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。履行將侵害第三人權利者，須經該第三人書面同意才生效。", "lawRef": { "law": "行政程序法", "article": "140" } },
+        "B": { "why": "這句錯（本題答案）。行政契約一部無效者，原則上「全部無效」。", "lawRef": { "law": "行政程序法", "article": "143" } },
+        "C": { "why": "這句對。行政契約之締結，原則上應以書面方式為之。", "lawRef": { "law": "行政程序法", "article": "139" } },
+        "D": { "why": "這句對。行政契約準用民法規定之結果為無效者，該契約無效。", "lawRef": { "law": "行政程序法", "article": "141" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "行政處分§112", "points": ["一部無效", "原則「其他仍有效」"] },
+        "right": { "title": "行政契約§143", "points": ["一部無效", "原則「全部無效」"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q28",
+      "topic": ["admin-law/factual-acts"],
+      "mnemonic": "事實行為沒處分效力、不用意思表示；但侵害權益還是能打行政訴訟！",
+      "trap": "事實行為不是沒救濟！受到侵害一樣可以提起一般給付訴訟救濟。",
+      "plain": "清潔車噴水洗街或警察勸導民眾，不算行政處分，出事了還能告嗎？",
+      "marks": [
+        { "text": "行政事實行為", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。行政事實行為只產生事實上結果，不對外直接發生法律效果。", "lawRef": null },
+        "B": { "why": "錯。事實行為不以意思表示為要素，與行政處分或契約不同。", "lawRef": null },
+        "C": { "why": "錯。觀念通知（如催告、說明）屬精神作用之行政事實行為。", "lawRef": null },
+        "D": { "why": "對。人民權益若受事實行為侵害，得依類型提起一般給付訴訟等。", "lawRef": { "law": "行政訴訟法", "article": "8" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "行政事實行為", "tone": "plain" }, { "text": "無直接法律效果", "tone": "plain" }, { "text": "侵害仍可提給付訴訟", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q29",
+      "topic": ["admin-law/penalty"],
+      "mnemonic": "一行為觸多條罰鍰，挑「最重的那條」開罰，沒有打對折這回事！",
+      "trap": "依法定罰鍰額「最高」規定裁處，條文裡完全沒有「二分之一」！",
+      "plain": "闖一次紅燈同時違反兩條交通規定，罰單金額是挑最重的罰，還是要打折？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政罰法", "color": "blue" },
+        { "text": "一行為不二罰原則", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。避免同一行為受數法重複處罰，導致過度不利後果。", "lawRef": null },
+        "B": { "why": "這句對。一行為不二罰乃司法院解釋肯認之現代法治國基本原則。", "lawRef": null },
+        "C": { "why": "這句錯（本題答案）。應依法定罰鍰額「最高」裁處，無二分之一。", "lawRef": { "law": "行政罰法", "article": "24" } },
+        "D": { "why": "這句對。處罰種類相同時，從一重處罰已足達目的者不得重複罰。", "lawRef": { "law": "行政罰法", "article": "24" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "一行為犯數法罰鍰", "tone": "plain" }, { "text": "比對各法上限", "tone": "plain" }, { "text": "依最高額法條裁處", "tone": "key" }] },
+          { "steps": [{ "text": "裁處額度下限", "tone": "plain" }, { "text": "不得低於各法最低額", "tone": "hot" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q30",
+      "topic": ["admin-law/penalty"],
+      "mnemonic": "未滿 14 歲才「不罰」；14 到 18 歲只是「得減輕」，還是要罰！",
+      "trap": "14 到 18 歲只是「得減輕」，不是免罰！",
+      "plain": "16 歲高中生違法騎車被抓，跟無心犯錯或正當防衛一樣可以完全免罰嗎？",
+      "marks": [
+        { "text": "不屬", "color": "red" },
+        { "text": "行政罰法", "color": "blue" },
+        { "text": "免以處罰", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "得免處罰。非出於故意或過失之行為，依第 7 條不予處罰。", "lawRef": { "law": "行政罰法", "article": "7" } },
+        "B": { "why": "得免處罰。未過當之正當防衛行為，依第 12 條不予處罰。", "lawRef": { "law": "行政罰法", "article": "12" } },
+        "C": { "why": "得免處罰。未過當之緊急避難行為，依第 13 條不予處罰。", "lawRef": { "law": "行政罰法", "article": "13" } },
+        "D": { "why": "不屬免罰（本題答案）。14 至未滿 18 歲僅「得減輕處罰」。", "lawRef": { "law": "行政罰法", "article": "9" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "不予處罰", "points": ["無故意或過失", "未滿 14 歲之行為", "防衛或避難未過當"] },
+        "right": { "title": "得減輕處罰", "points": ["14 歲以上未滿 18 歲", "精神心智能力顯著減低"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q31",
+      "topic": ["admin-law/penalty"],
+      "mnemonic": "刑罰優先不併罰鍰！但法院沒沒收可補「沒入」，不起訴改算 3 年。",
+      "trap": "法院沒宣告沒收的東西，行政機關還是可以單獨裁處「沒入」喔！",
+      "plain": "一件事同時觸犯刑法和行政法，如果法院沒沒收走私菸，海關能沒入嗎？",
+      "marks": [
+        { "text": "走私菸品", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。一行為同時犯刑法與行政罰時「依刑事法律處罰」，不併罰鍰。", "lawRef": { "law": "行政罰法", "article": "26" } },
+        "B": { "why": "錯。經不起訴或緩起訴確定後，行政機關仍得依行政罰法裁處。", "lawRef": { "law": "行政罰法", "article": "26" } },
+        "C": { "why": "對。得沒入之物若未經法院宣告沒收，行政機關仍得裁處沒入。", "lawRef": { "law": "行政罰法", "article": "26" } },
+        "D": { "why": "錯。受緩起訴處分時，裁處權時效自緩起訴「確定日」起算 3 年。", "lawRef": { "law": "行政罰法", "article": "27" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "一行為犯刑+行政", "tone": "plain" }, { "text": "先走刑事(刑罰優先)", "tone": "key" }, { "text": "未沒收→仍得沒入", "tone": "key" }] },
+          { "steps": [{ "text": "不起訴/緩起訴/無罪", "tone": "hot" }, { "text": "自裁判確定日起", "tone": "plain" }, { "text": "補行裁處行政罰", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q32",
+      "topic": ["admin-law/penalty"],
+      "mnemonic": "專技人員懲戒（停業、申誡）具裁罰性，實務與本題更正皆認適用！",
+      "trap": "官方更正：答A或B均給分！欠稅限境與拆違建非行政罰。",
+      "plain": "會計師被記申誡、藥師被罰停業、欠稅不能出國、違建要拆除，誰算行政罰？",
+      "marks": [
+        { "text": "行政罰法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "給分（官方更正）。藥師停業懲戒具裁罰性不利處分性質，亦給分。", "lawRef": null },
+        "B": { "why": "給分（原答案）。會計師違義務受申誡，實務認屬裁罰性不利處分。", "lawRef": null },
+        "C": { "why": "錯。欠稅限制出境屬確保稅捐徵起之保全管制措施，非行政罰。", "lawRef": null },
+        "D": { "why": "錯。拆除違建通知書重在排除違法狀態恢復合法，非裁罰處分。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "具裁罰性(A或B)", "points": ["專門職業停業/申誡", "具過去違規制裁性質", "官方更正 A、B 均給分"] },
+        "right": { "title": "非行政罰", "points": ["欠稅限制出境(保全)", "拆除違建(排除違法)"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q33",
+      "topic": ["admin-law/enforcement"],
+      "mnemonic": "聲明異議「終結前」找「執行機關」，不要等結束才去找主管機關！",
+      "trap": "要在執行終結「前」（非後），向「執行機關」提！",
+      "plain": "不服強制執行的扣押方式，是執行還沒結束前申訴，還是結束後才申訴？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政執行", "color": "blue" },
+        { "text": "聲明異議", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。公有市場租金屬私法租賃，實務認不得依第 9 條聲明異議。", "lawRef": null },
+        "B": { "why": "這句對。最高行政法院實務認第 9 條聲明異議程序相當於訴願。", "lawRef": null },
+        "C": { "why": "這句對。得針對執行命令、方法、程序或其他侵害利益情事異議。", "lawRef": { "law": "行政執行法", "article": "9" } },
+        "D": { "why": "這句錯（本題答案）。應於執行終結「前」，向「執行機關」異議。", "lawRef": { "law": "行政執行法", "article": "9" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "不服執行命令方法", "tone": "plain" }, { "text": "執行終結「前」", "tone": "hot" }, { "text": "向「執行機關」異議", "tone": "key" }] },
+          { "steps": [{ "text": "異議決定不服", "tone": "plain" }, { "text": "相當於訴願程序", "tone": "plain" }, { "text": "直接提行政訴訟", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q34",
+      "topic": ["admin-law/enforcement"],
+      "mnemonic": "要把人帶走或關起來（拘提、管收），法官點頭裁定才行！",
+      "trap": "管束（即時強制）跟禁止奢侈都是執行機關自己做，不用問法院。",
+      "plain": "拘提義務人、斷水電、發禁奢令、現場管束酒醉者，哪個一定要法官同意？",
+      "marks": [
+        { "text": "行政執行", "color": "blue" },
+        { "text": "法院裁定", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。人身自由侵害重大，拘提與管收均須由分署聲請法院裁定。", "lawRef": { "law": "行政執行法", "article": "17" } },
+        "B": { "why": "錯。斷絕營業水電屬直接強制方法，由執行機關依法辦理即可。", "lawRef": { "law": "行政執行法", "article": "28" } },
+        "C": { "why": "錯。禁止命令由行政執行分署依職權或申請核發，無須法院裁定。", "lawRef": { "law": "行政執行法", "article": "17-1" } },
+        "D": { "why": "錯。對人之管束屬即時強制，由現場執行機關即時處置。", "lawRef": { "law": "行政執行法", "article": "37" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "須法院裁定", "points": ["拘提(限時強制到場)", "管收(暫時限制自由)"] },
+        "right": { "title": "機關自行決定", "points": ["斷絕水電(直接強制)", "禁奢命令(分署核發)", "即時管束(現場處置)"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q35",
+      "topic": ["admin-law/enforcement"],
+      "mnemonic": "「即時強制」來不及先下命令就衝；「怠金」是先限期不聽才罰，屬間接。",
+      "trap": "看到「怠金」或「代履行」，就屬於一般義務的「間接強制」！",
+      "plain": "破門救小孩、封路防墜橋、管束醉漢、開罰噪音怠金，哪個不是緊急搶救？",
+      "marks": [
+        { "text": "不該當", "color": "red" },
+        { "text": "行政執行法", "color": "blue" },
+        { "text": "即時強制", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "屬即時強制。人民生命有迫切危害時得進入住宅救護。", "lawRef": { "law": "行政執行法", "article": "40" } },
+        "B": { "why": "屬即時強制。遇公共安全危害得限制或處置道路使用。", "lawRef": { "law": "行政執行法", "article": "36" } },
+        "C": { "why": "屬即時強制。酗酒泥醉非管束不能救護或防危害時得管束。", "lawRef": { "law": "行政執行法", "article": "37" } },
+        "D": { "why": "不屬（本題答案）。課處怠金是督促履行的「間接強制」方法。", "lawRef": { "law": "行政執行法", "article": "28" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "即時強制", "points": ["無事先處分直接處置", "對人管束/物扣留", "急迫進入住宅救護"] },
+        "right": { "title": "間接強制", "points": ["先限期履行不履行", "代履行", "課處怠金"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q36",
+      "topic": ["admin-law/procedure"],
+      "mnemonic": "合議制會議公開「案由、議程、決議、名單」四樣，不逼大家公開誰講啥。",
+      "trap": "要記住四項必公開清單：「發言內容」不包含在主動公開範圍內！",
+      "plain": "像是公平會、中選會開會決策，開會紀錄哪些部分依法一定要主動公開？",
+      "marks": [
+        { "text": "得不予主動公開", "color": "red" },
+        { "text": "政府資訊公開法", "color": "blue" },
+        { "text": "合議制機關會議紀錄", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對（本題答案）。第 7 條第 3 項公開範圍未含個別「發言內容」。", "lawRef": { "law": "政府資訊公開法", "article": "7" } },
+        "B": { "why": "錯。出席會議成員名單為第 7 條第 3 項明定應公開項目。", "lawRef": { "law": "政府資訊公開法", "article": "7" } },
+        "C": { "why": "錯。決議內容為第 7 條第 3 項明定應主動公開之事項。", "lawRef": { "law": "政府資訊公開法", "article": "7" } },
+        "D": { "why": "錯。審議議案之案由與議程均為依法應主動公開之項目。", "lawRef": { "law": "政府資訊公開法", "article": "7" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "應主動公開", "points": ["議案之案由與議程", "決議內容", "出席會議成員名單"] },
+        "right": { "title": "得不公開", "points": ["出席人員個別發言內容", "保障委員暢所欲言"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q37",
+      "topic": ["admin-law/procedure"],
+      "mnemonic": "程序要公平公開：迴避、調查、陳述意見、閱卷，還有「禁程序外接觸」！",
+      "trap": "法院審查、獨立委員會、監督體系屬訴訟或組織法。",
+      "plain": "承辦公務員私下跟申請人吃飯談案子，行政程序法有規定不准這樣嗎？",
+      "marks": [
+        { "text": "行政程序法", "color": "blue" },
+        { "text": "正當程序", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。法院審查屬於行政訴訟法所定司法救濟範疇，非行政程序法。", "lawRef": null },
+        "B": { "why": "對。行政程序法第 47 條明定禁止公務員為行政程序外之接觸。", "lawRef": { "law": "行政程序法", "article": "47" } },
+        "C": { "why": "錯。獨立委員會之設立屬於中央行政機關組織基準法等組織法。", "lawRef": null },
+        "D": { "why": "錯。監督機關與體系完整屬行政組織法原則，非正當程序規定。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "禁止程序外接觸", "tone": "key" }, { "text": "私下往來附卷公開", "tone": "plain" }, { "text": "確保程序公正透明", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q38",
+      "topic": ["admin-law/procedure"],
+      "mnemonic": "聽證改期只需「正當理由」；行政訴訟改期才要「重大理由」喔！",
+      "trap": "聽證改期門檻是「正當理由」，不是重大事由！",
+      "plain": "政府開聽證會前想改時間，需要多嚴重的理由才可以變更期日？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "聽證期日", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。第 55 條規定聽證前應以書面通知聽證期日及場所。", "lawRef": { "law": "行政程序法", "article": "55" } },
+        "B": { "why": "這句對。決定聽證期日時，應預留相當期間便利當事人或其代理人。", "lawRef": { "law": "行政程序法", "article": "55" } },
+        "C": { "why": "這句錯（本題答案）。變更聽證期日之門檻為「正當理由」非重大。", "lawRef": { "law": "行政程序法", "article": "56" } },
+        "D": { "why": "這句對。期日前得行預備聽證，結束前亦得決定繼續聽證之期日。", "lawRef": { "law": "行政程序法", "article": "58" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "聽證變更期日", "points": ["行政程序法第 56 條", "以有「正當理由」為限"] },
+        "right": { "title": "訴訟變更期日", "points": ["行政訴訟法第 87 條", "須有「重大理由」"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q39",
+      "topic": ["admin-law/appeal"],
+      "mnemonic": "訴願再審 30 天、向「原訴願決定機關」提，從決定「確定時」起算！",
+      "trap": "再審找「原決定機關」重看，非上級，期間 30 日！",
+      "plain": "訴願決定已經確定了，事後才找到新證據想翻案，要在幾天內找誰申請？",
+      "marks": [
+        { "text": "訴願再審", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。再審期間自「訴願決定確定時」起算，知悉在後者自知悉起算。", "lawRef": { "law": "訴願法", "article": "97" } },
+        "B": { "why": "錯。聲請訴願再審，應於「30 日內」提起，不是 60 日。", "lawRef": { "law": "訴願法", "article": "97" } },
+        "C": { "why": "對。發現未經斟酌之證物或得使用該證物者，得聲請再審。", "lawRef": { "law": "訴願法", "article": "97" } },
+        "D": { "why": "錯。應向「原訴願決定機關」申請再審，而非向其上級機關。", "lawRef": { "law": "訴願法", "article": "97" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "確定後有新證物等", "tone": "plain" }, { "text": "確定/知悉起30日", "tone": "hot" }, { "text": "向原決定機關再審", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q40",
+      "topic": ["admin-law/appeal"],
+      "mnemonic": "復查、復議、健保爭議都是訴願前哨戰；採購申訴直接「視同訴願」。",
+      "trap": "採購申訴視同訴願，走完直接告法院，非先行程序！",
+      "plain": "稅單不服先復查、採購案不服提申訴，哪一種走完不用再提訴願？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "訴願之先行程序", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "非屬（本題答案）。採購申訴審議判斷「視同訴願決定」，免再訴願。", "lawRef": null },
+        "B": { "why": "屬訴願先行程序。對健保核定不服，須先經爭議審議才可提訴願。", "lawRef": null },
+        "C": { "why": "屬訴願先行程序。對徵收補償價額不服，應先經復議程序再提訴願。", "lawRef": null },
+        "D": { "why": "屬訴願先行程序。稅捐處分須先經稅捐稽徵機關復查，始得提訴願。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "訴願先行程序", "points": ["復查→訴願→訴訟", "健保審議→訴願→訴訟", "徵收復議→訴願→訴訟"] },
+        "right": { "title": "相當訴願程序", "points": ["採購申訴(視同訴願)", "走完直接提行政訴訟"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q41",
+      "topic": ["admin-law/appeal"],
+      "mnemonic": "訴願「3+2」個月決定（延長 1 次 2 月）；不服「2 個月」打訴訟。",
+      "trap": "訴願「3 月」決定、延「1 次 2 月」；是決定非裁判。",
+      "plain": "提起訴願後機關最多可以審幾個月？沒過的話要在多久內打行政訴訟？",
+      "marks": [
+        { "text": "訴願之決定", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。訴願決定應自收受訴願書之次日起「3 個月內」為之。", "lawRef": { "law": "訴願法", "article": "85" } },
+        "B": { "why": "錯。延長以「1 次」為限，最長不得逾「2 個月」。", "lawRef": { "law": "訴願法", "article": "85" } },
+        "C": { "why": "對。訴願決定書應附記不服得於送達次日起 2 個月內提行政訴訟。", "lawRef": { "law": "訴願法", "article": "90" } },
+        "D": { "why": "錯。訴願無理由時，應以「決定」駁回，法院判決才稱裁判。", "lawRef": { "law": "訴願法", "article": "79" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "收受訴願書次日", "tone": "plain" }, { "text": "3個月(+延1次2月)", "tone": "hot" }, { "text": "作成訴願決定", "tone": "key" }] },
+          { "steps": [{ "text": "決定書送達次日", "tone": "plain" }, { "text": "2個月不變期間", "tone": "hot" }, { "text": "提起行政訴訟", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q42",
+      "topic": ["admin-law/appeal"],
+      "mnemonic": "不服縣市／直轄市「所屬局處」，訴願都找所屬的「市政府或縣政府」！",
+      "trap": "別跳去找中央環境部！不服直轄市局處找直轄市政府。",
+      "plain": "收到臺北市環保局開的罰單覺得冤枉，訴願書要寄給臺北市政府還是環境部？",
+      "marks": [
+        { "text": "臺北市政府環境保護局", "color": "blue" },
+        { "text": "訴願管轄機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。臺北市環保局是原處分機關，應向其上級臺北市政府提訴願。", "lawRef": { "law": "訴願法", "article": "4" } },
+        "B": { "why": "對。不服直轄市政府所屬各級機關處分，向直轄市政府提起訴願。", "lawRef": { "law": "訴願法", "article": "4" } },
+        "C": { "why": "錯。不服「臺北市政府」本身之處分，才會向中央主管部會提訴願。", "lawRef": { "law": "訴願法", "article": "4" } },
+        "D": { "why": "錯。行政院只受理不服中央各部會處分的訴願，不管地方環保局。", "lawRef": { "law": "訴願法", "article": "4" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "北市環保局(所屬)", "tone": "plain" }, { "text": "向臺北市政府提訴願", "tone": "key" }] },
+          { "steps": [{ "text": "臺北市政府(本身)", "tone": "plain" }, { "text": "向中央環境部提訴願", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q43",
+      "topic": ["admin-law/litigation"],
+      "mnemonic": "交通裁決免訴願！送達後「30 日內」直接告「裁決機關」進地方庭。",
+      "trap": "被告是裁決機關非警察局；免訴願，起訴只有30日！",
+      "plain": "收到超速罰單覺得不服氣想打官司，要先提訴願嗎？要在幾天內告誰？",
+      "marks": [
+        { "text": "行政救濟", "color": "blue" },
+        { "text": "處以罰鍰", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。應以「原處分（裁決）機關」為被告，非舉發警察機關。", "lawRef": { "law": "行政訴訟法", "article": "237-3" } },
+        "B": { "why": "錯。交通裁決事件免經訴願，逕向管轄地方行政訴訟庭起訴。", "lawRef": { "law": "行政訴訟法", "article": "237-3" } },
+        "C": { "why": "對。交通裁決撤銷訴訟，應於裁決書送達後 30 日內提起。", "lawRef": { "law": "行政訴訟法", "article": "237-3" } },
+        "D": { "why": "錯。交通裁決事件除特別規定外，準用「簡易訴訟程序」。", "lawRef": { "law": "行政訴訟法", "article": "237-9" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "不服交通裁決", "tone": "plain" }, { "text": "免經訴願程序", "tone": "hot" }, { "text": "30日內告裁決機關", "tone": "key" }, { "text": "地方庭(準用簡易)", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q44",
+      "topic": ["admin-law/litigation"],
+      "mnemonic": "行政訴訟不是每件都開庭辯論！裁定、交通裁決、最高行都常書面審。",
+      "trap": "「均應言詞辯論」太絕對！最高行與交通裁決都可書面審。",
+      "plain": "行政官司從地方打到最高行政法院，每一件每一審都一定要開庭辯論嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政訴訟", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。地方行政訴訟庭負責認定事實與適用法律，均為事實審。", "lawRef": null },
+        "B": { "why": "這句對。公益訴訟須以法律有特別規定者為限，始得提起。", "lawRef": { "law": "行政訴訟法", "article": "9" } },
+        "C": { "why": "這句錯（本題答案）。裁定、交通裁決及最高行原則均得不經辯論。", "lawRef": { "law": "行政訴訟法", "article": "188" } },
+        "D": { "why": "這句對。提起撤銷或課予義務訴訟，原則上應先踐行訴願程序。", "lawRef": { "law": "行政訴訟法", "article": "4" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "原則行辯論", "points": ["通常訴訟程序判決", "簡易訴訟程序原則"] },
+        "right": { "title": "得不行辯論", "points": ["裁定、顯無理由判決", "交通裁決事件", "最高行政法院(例外才開)"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q45",
+      "topic": ["admin-law/litigation"],
+      "mnemonic": "和解翻案要 30 天內、最遲 3 年內；但「無代理權」突破 3 年限制！",
+      "trap": "無權代理的和解根本不該算數，所以不受 3 年除斥期間限制！",
+      "plain": "打官司和解後才發現對方根本沒有代理權，過了 3 年還能不能請求翻案？",
+      "marks": [
+        { "text": "不符合", "color": "red" },
+        { "text": "和解", "color": "blue" },
+        { "text": "行政訴訟法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "符合。和解有無效或得撤銷原因時，當事人得請求繼續審判。", "lawRef": { "law": "行政訴訟法", "article": "223" } },
+        "B": { "why": "符合。原則自和解成立起算 30 日，知悉在後者自知悉時起算。", "lawRef": { "law": "行政訴訟法", "article": "224" } },
+        "C": { "why": "不符合（本題答案）。主張「代理權欠缺」者，不受 3 年限制。", "lawRef": { "law": "行政訴訟法", "article": "224" } },
+        "D": { "why": "符合。請求繼續審判若顯無理由，得不經言詞辯論以判決駁回。", "lawRef": { "law": "行政訴訟法", "article": "225" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "和解無效/得撤銷", "tone": "plain" }, { "text": "知悉起30日內", "tone": "hot" }, { "text": "請求繼續審判", "tone": "key" }] },
+          { "steps": [{ "text": "一般最長3年為限", "tone": "plain" }, { "text": "代理權欠缺除外", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q46",
+      "topic": ["admin-law/litigation"],
+      "mnemonic": "簡易訴訟記「50 萬以下、輕微警告、移民收容」；拆違建大事用通常！",
+      "trap": "違建拆除關係重大居住與財產權，不適用簡易程序！",
+      "plain": "被拆違建、被罰 50 萬以下、學生被記警告、外國人收容，哪件不是簡易審？",
+      "marks": [
+        { "text": "不適用", "color": "red" },
+        { "text": "行政訴訟法", "color": "blue" },
+        { "text": "簡易訴訟程序", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "不適用（本題答案）。拆除違建影響重大，不在第 229 條清單內。", "lawRef": { "law": "行政訴訟法", "article": "229" } },
+        "B": { "why": "適用。不服 50 萬元以下罰鍰處分，依第 229 條行簡易程序。", "lawRef": { "law": "行政訴訟法", "article": "229" } },
+        "C": { "why": "適用。不服告誡、警告等相類輕微處分，依第 229 條行簡易程序。", "lawRef": { "law": "行政訴訟法", "article": "229" } },
+        "D": { "why": "適用。關於移民署行政收容事件涉訟，依第 229 條行簡易程序。", "lawRef": { "law": "行政訴訟法", "article": "229" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "簡易訴訟(§229)", "points": ["稅/罰鍰/財產50萬以下", "警告記點等輕微處分", "移民署收容事件"] },
+        "right": { "title": "通常訴訟", "points": ["拆除違章建築事件", "超過 50 萬非簡易件"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q47",
+      "topic": ["admin-law/litigation"],
+      "mnemonic": "被課稅是要你掏錢的「負擔處分」，目標就是把它「撤銷」掉！",
+      "trap": "課予義務是「要處分」，撤銷是「撤掉課稅單」。",
+      "plain": "國稅局寄來一張覺得算錯的補稅單，訴願沒過後要打哪一種行政訴訟？",
+      "marks": [
+        { "text": "課稅處分", "color": "blue" },
+        { "text": "訴訟類型", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。確認訴訟具補充性，能提撤銷訴訟時不得提確認訴訟。", "lawRef": { "law": "行政訴訟法", "article": "6" } },
+        "B": { "why": "錯。一般給付訴訟針對非行政處分之給付，課稅單是行政處分。", "lawRef": { "law": "行政訴訟法", "article": "8" } },
+        "C": { "why": "錯。課予義務訴訟是請求機關「發給」處分，不是撤掉處分。", "lawRef": { "law": "行政訴訟法", "article": "5" } },
+        "D": { "why": "對。不服課稅等違法負擔處分，應經訴願後提起「撤銷訴訟」。", "lawRef": { "law": "行政訴訟法", "article": "4" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "負擔處分(課稅)", "points": ["要人民繳錢或做義務", "訴願後提「撤銷訴訟」"] },
+        "right": { "title": "申請遭拒(要補助)", "points": ["機關不給或駁回申請", "訴願後提「課予義務」"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q48",
+      "topic": ["admin-law/state-liability"],
+      "mnemonic": "國賠原則賠錢、含人身自由、時效2或5年、協議30或60日。",
+      "trap": "別記成回復原狀或1年！國賠原則賠錢，知起2年消滅。",
+      "plain": "路面坑洞摔車、時效幾年、協議拖過幾天能告，哪一項符合國賠法規定？",
+      "marks": [
+        { "text": "國家賠償", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。國賠「應以金錢為之」為原則，回復原狀只是例外。", "lawRef": { "law": "國家賠償法", "article": "7" } },
+        "B": { "why": "錯。108 年修法後，第 3 條已明確納入「人身自由」損害。", "lawRef": { "law": "國家賠償法", "article": "3" } },
+        "C": { "why": "錯。賠償請求權自知有損害時起「2 年」消滅，非 1 年。", "lawRef": { "law": "國家賠償法", "article": "8" } },
+        "D": { "why": "對。依第 11 條逾 30 日不協議或開始協議逾 60 日不成可起訴。", "lawRef": { "law": "國家賠償法", "article": "11" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "知悉損害2年內", "tone": "hot" }, { "text": "書面請求協議", "tone": "plain" }, { "text": "逾30/60日不成→起訴", "tone": "key" }] },
+          { "steps": [{ "text": "賠償方式原則", "tone": "plain" }, { "text": "以金錢賠償為主", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q49",
+      "topic": ["admin-law/state-liability"],
+      "mnemonic": "不作為國賠：法律要救特定人＋裁量縮到零！不用被害人先去求他。",
+      "trap": "該做不做就違法，不需人民先去拜託才算怠於執行！",
+      "plain": "政府該巡檢危險建物卻擺爛沒管導致意外，必須人民先檢舉過才能國賠嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "國家賠償法", "color": "blue" },
+        { "text": "公務員不作為", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。公務員不作為須屬於行使公權力之職務義務範圍。", "lawRef": null },
+        "B": { "why": "這句對。須法律明定公務員有應執行職務且保護人民之義務。", "lawRef": null },
+        "C": { "why": "這句錯（本題答案）。只要應依職權執行即足，不以先經請求為限。", "lawRef": null },
+        "D": { "why": "這句對。依釋字 469 號，須公務員已無不作為之裁量餘地。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "法律明定保護義務", "tone": "plain" }, { "text": "裁量收縮至零", "tone": "hot" }, { "text": "怠於執行(免先請求)", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-admin-law-q50",
+      "topic": ["admin-law/state-liability"],
+      "mnemonic": "「違法」加害找國賠，「合法」公益造成特別犧牲，給「損失補償」！",
+      "trap": "合法軍事演習致人民特別犧牲，屬「損失補償」非國賠！",
+      "plain": "國軍合法軍事演習卻誤炸民宅牆壁裂掉，屋主應該向政府請求什麼？",
+      "marks": [
+        { "text": "軍事演習", "color": "blue" },
+        { "text": "房屋", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。國賠法以公務員「違法」且故意過失侵害為前提，非本題所考。", "lawRef": { "law": "國家賠償法", "article": "2" } },
+        "B": { "why": "錯。人民財產因公益承受特別犧牲，依法得請求合理損失補償。", "lawRef": null },
+        "C": { "why": "錯。軍事演習屬公法上公權力行為，非民法私法侵權賠償關係。", "lawRef": null },
+        "D": { "why": "對。合法公權力行為致特定人民特別犧牲，應給予「損失補償」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "損失補償", "points": ["合法公權力行為", "致人民財產特別犧牲", "例：合法軍演誤損"] },
+        "right": { "title": "國家賠償", "points": ["違法行使公權力", "有故意或過失(或公物欠缺)"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}

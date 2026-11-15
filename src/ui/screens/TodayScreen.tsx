@@ -10,6 +10,7 @@ import {
   getSettings,
   weekActivity,
 } from '../../selectors';
+import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
@@ -27,6 +28,11 @@ export interface TodayScreenProps {
   world: World;
   onStartQuiz: () => void;
   onGoSetup: () => void;
+  onGoStamps?: () => void;
+  papersLoading?: boolean;
+  loadError?: boolean;
+  showInstallHint?: boolean;
+  onOpenInstallHint?: () => void;
 }
 
 function formatExamDate(isoDate: string): string {
@@ -36,13 +42,23 @@ function formatExamDate(isoDate: string): string {
 }
 
 /** 今日畫面：主題切換、筆試倒數、題庫總數與已刷數、三個 5 題快速任務、本週集章。 */
-export function TodayScreen({ world, onStartQuiz, onGoSetup }: TodayScreenProps) {
+export function TodayScreen({
+  world,
+  onStartQuiz,
+  onGoSetup,
+  onGoStamps,
+  papersLoading = false,
+  loadError = false,
+  showInstallHint = false,
+  onOpenInstallHint,
+}: TodayScreenProps) {
   useWorld(world);
   const [wobbleState, setWobbleState] = useState<{ idx: number; tick: number } | null>(null);
 
   const now = new Date();
   const bank = activeBank(world);
   const settings = getSettings(world);
+  const sync = getSyncState(world);
   const totals = bank ? bankTotals(world, bank.id) : { total: 0, seen: 0 };
   const remainingDays = bank ? daysLeft(bank, now) : 0;
   const missions = bank ? dailyMissions(world, bank.id, now) : [];
@@ -53,6 +69,7 @@ export function TodayScreen({ world, onStartQuiz, onGoSetup }: TodayScreenProps)
   };
 
   const handleMissionClick = (index: number) => {
+    if (papersLoading) return;
     const mission = missions[index];
     if (!mission) return;
     dispatch(world, { type: 'startRound', config: mission.config });
@@ -78,7 +95,7 @@ export function TodayScreen({ world, onStartQuiz, onGoSetup }: TodayScreenProps)
       {bank ? (
         <>
           <Card tone="pink" className="cb-countdown">
-            <Cat size={76} mood="idle" interactive />
+            <Cat size={76} mood={papersLoading ? 'sleepy' : 'idle'} interactive />
             <div className="cb-grow">
               <div className="cb-sub-strong">{bank.title}・距離筆試</div>
               <div className="cb-countdown-num">
@@ -88,21 +105,86 @@ export function TodayScreen({ world, onStartQuiz, onGoSetup }: TodayScreenProps)
             </div>
           </Card>
 
-          <Card className="cb-totals-card">
-            <div className="cb-totals-text">
-              題庫共 <b><CountUp value={totals.total} /></b> 題・已刷{' '}
-              <b><CountUp value={totals.seen} /></b> 題
-            </div>
-            <div className="cb-sub">
-              {totals.total > 0
-                ? `完成度 ${Math.round((totals.seen / totals.total) * 100)}%`
-                : '尚未載入題庫'}
-            </div>
-          </Card>
+          {papersLoading ? (
+            <Card className="cb-totals-card">
+              <div className="cb-totals-text">題庫載入中…</div>
+              <div className="cb-sub">正在準備歷屆試題</div>
+            </Card>
+          ) : loadError ? (
+            <Card className="cb-totals-card">
+              <div className="cb-totals-text">題庫載入失敗</div>
+              <div className="cb-sub">請重新整理頁面再試</div>
+            </Card>
+          ) : (
+            <Card className="cb-totals-card">
+              <div className="cb-totals-text">
+                題庫共 <b><CountUp value={totals.total} /></b> 題・已刷{' '}
+                <b><CountUp value={totals.seen} /></b> 題
+              </div>
+              <div className="cb-sub">
+                {totals.total > 0
+                  ? `完成度 ${Math.round((totals.seen / totals.total) * 100)}%`
+                  : '尚未載入題庫'}
+              </div>
+            </Card>
+          )}
+
+          {sync.status === 'error' && onGoStamps && (
+            <Card className="cb-sync-banner" onClick={onGoStamps}>
+              <div className="cb-grow">
+                <strong className="cb-install-banner-title">進度同步暫時出了問題</strong>
+                <span className="cb-sub cb-block">{sync.error ?? '點這裡前往同步與備份查看'}</span>
+              </div>
+              <span className="cb-go">前往</span>
+            </Card>
+          )}
+
+          {showInstallHint && onOpenInstallHint && (
+            <Card tone="butter" className="cb-install-banner" onClick={onOpenInstallHint}>
+              <div className="cb-grow">
+                <strong className="cb-install-banner-title">加到主畫面，保留刷題進度</strong>
+                <span className="cb-sub cb-block">避免 Safari 自動清除本機紀錄</span>
+              </div>
+              <span className="cb-go">查看</span>
+            </Card>
+          )}
 
           <section className="cb-section">
             <h2>今天的 3 個小任務</h2>
-            {missions.length > 0 ? (
+            {papersLoading ? (
+              <div className="cb-stack-sm">
+                {bank.subjects.slice(0, 2).map((subj, idx) => (
+                  <Card
+                    key={subj.key}
+                    className="cb-mission"
+                    onClick={() => {}}
+                    disabled
+                  >
+                    <span
+                      className={`cb-dot cb-tone-${idx === 0 ? 'butter' : 'mint'}`}
+                      aria-hidden="true"
+                    >
+                      {subj.short.slice(0, 1) || '題'}
+                    </span>
+                    <span className="cb-grow">
+                      <strong className="cb-mission-title">{subj.short} 5 題</strong>
+                      <span className="cb-sub cb-block">題庫載入中…</span>
+                    </span>
+                    <span className="cb-go">開始</span>
+                  </Card>
+                ))}
+                <Card className="cb-mission" onClick={() => {}} disabled>
+                  <span className="cb-dot cb-tone-pink" aria-hidden="true">
+                    綜
+                  </span>
+                  <span className="cb-grow">
+                    <strong className="cb-mission-title">綜合快刷 5 題</strong>
+                    <span className="cb-sub cb-block">題庫載入中…</span>
+                  </span>
+                  <span className="cb-go">開始</span>
+                </Card>
+              </div>
+            ) : missions.length > 0 ? (
               <div className="cb-stack-sm">
                 {missions.map((mission, idx) => (
                   <Card

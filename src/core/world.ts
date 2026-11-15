@@ -13,6 +13,7 @@ import type {
   QuestionId,
   RoundState,
   Settings,
+  SyncState,
 } from './types';
 
 export interface World {
@@ -25,6 +26,7 @@ export interface World {
   round: RoundState | null;
   lastRound: RoundState | null;
   settings: Settings;
+  sync: SyncState;
   bus: Bus;
 }
 
@@ -42,6 +44,11 @@ export function createWorld(): World {
     settings: {
       theme: 'system',
       lastRound: null,
+    },
+    sync: {
+      status: 'off',
+      lastSyncedAt: null,
+      error: null,
     },
     bus: createBus(),
   };

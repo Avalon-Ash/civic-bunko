@@ -1,5 +1,14 @@
 import { STORAGE_KEY } from '../core/constants/round';
-import type { Choice, Progress, QuestionId, RoundConfig, Settings } from '../core/types';
+import { READ_PASSES_DEFAULT } from '../core/constants/study';
+import type {
+  AskFilter,
+  Choice,
+  Progress,
+  QuestionId,
+  RoundConfig,
+  Settings,
+  StudyMode,
+} from '../core/types';
 import type { World } from '../core/world';
 
 export interface StorageLike {
@@ -25,7 +34,21 @@ function isChoice(value: unknown): value is Choice {
   return value === 'A' || value === 'B' || value === 'C' || value === 'D';
 }
 
-function isValidProgress(value: unknown): value is Progress {
+interface RawProgress extends Omit<Progress, 'views'> {
+  views?: number;
+}
+
+interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
+  study?: StudyMode;
+  ask?: AskFilter;
+  passes?: number;
+}
+
+interface RawSettings extends Omit<Settings, 'lastRound'> {
+  lastRound: RawRoundConfig | null;
+}
+
+function isValidProgress(value: unknown): value is RawProgress {
   if (!isRecord(value)) return false;
   if (typeof value.seen !== 'number' || !Number.isInteger(value.seen) || value.seen < 0) return false;
   if (
@@ -33,6 +56,12 @@ function isValidProgress(value: unknown): value is Progress {
     !Number.isInteger(value.correct) ||
     value.correct < 0 ||
     value.correct > value.seen
+  ) {
+    return false;
+  }
+  if (
+    value.views !== undefined &&
+    (typeof value.views !== 'number' || !Number.isInteger(value.views) || value.views < 0)
   ) {
     return false;
   }
@@ -45,7 +74,7 @@ function isValidProgress(value: unknown): value is Progress {
   return true;
 }
 
-function isValidRoundConfig(value: unknown): value is RoundConfig {
+function isValidRoundConfig(value: unknown): value is RawRoundConfig {
   if (!isRecord(value)) return false;
   if (typeof value.bankId !== 'string') return false;
   if (!Array.isArray(value.subjectKeys) || !value.subjectKeys.every((k) => typeof k === 'string')) {
@@ -63,14 +92,45 @@ function isValidRoundConfig(value: unknown): value is RoundConfig {
     return false;
   }
   if (typeof value.fast !== 'boolean') return false;
+  if (value.study !== undefined && value.study !== 'quiz' && value.study !== 'read') {
+    return false;
+  }
+  if (
+    value.ask !== undefined &&
+    value.ask !== 'positive' &&
+    value.ask !== 'negative' &&
+    value.ask !== 'all'
+  ) {
+    return false;
+  }
+  if (
+    value.passes !== undefined &&
+    (typeof value.passes !== 'number' || !Number.isInteger(value.passes) || value.passes < 1)
+  ) {
+    return false;
+  }
   return true;
 }
 
-function isValidSettings(value: unknown): value is Settings {
+function isValidSettings(value: unknown): value is RawSettings {
   if (!isRecord(value)) return false;
   if (value.theme !== 'system' && value.theme !== 'light' && value.theme !== 'dark') return false;
   if (value.lastRound !== null && !isValidRoundConfig(value.lastRound)) return false;
+  if (value.installHintDismissed !== undefined && typeof value.installHintDismissed !== 'boolean') {
+    return false;
+  }
   return true;
+}
+
+/** 驗證並正規化單筆作答進度（補齊舊版缺少的 views 欄位）；不合法時回傳 null。 */
+export function parseProgressEntry(value: unknown): Progress | null {
+  if (!isValidProgress(value)) {
+    return null;
+  }
+  return {
+    ...value,
+    views: value.views ?? 0,
+  };
 }
 
 function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok: false; error: string } {
@@ -93,10 +153,11 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
 
   const cleanProgress: Record<QuestionId, Progress> = {};
   for (const [id, entry] of Object.entries(parsed.progress)) {
-    if (!isValidProgress(entry)) {
+    const normalized = parseProgressEntry(entry);
+    if (!normalized) {
       return { ok: false, error: `Invalid progress entry for ${id}` };
     }
-    cleanProgress[id] = { ...entry };
+    cleanProgress[id] = normalized;
   }
 
   let cleanSettings: Settings | undefined;
@@ -110,8 +171,12 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
         ? {
             ...parsed.settings.lastRound,
             subjectKeys: [...parsed.settings.lastRound.subjectKeys],
+            study: parsed.settings.lastRound.study ?? 'quiz',
+            ask: parsed.settings.lastRound.ask ?? 'positive',
+            passes: parsed.settings.lastRound.passes ?? READ_PASSES_DEFAULT,
           }
         : null,
+      installHintDismissed: parsed.settings.installHintDismissed === true,
     };
   }
 

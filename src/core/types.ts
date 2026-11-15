@@ -97,10 +97,21 @@ export interface PaperIndex {
   }>;
 }
 
-// ── 加工層（data/enrich/**，AI 產生，可能不存在）──────────
+// ── 加工層（data/enrich/<PaperId>.json，AI 產生，可能不存在）──
 export type MarkColor = 'red' | 'blue';
+export type VisualTone = 'plain' | 'hot' | 'key';
+export type EnrichVisual =
+  | { kind: 'flow'; lanes: Array<{ steps: Array<{ text: string; tone: VisualTone }> }> }
+  | { kind: 'versus'; left: { title: string; points: string[] }; right: { title: string; points: string[] } };
+export interface LawRef {
+  /** data/laws/index.json 裡的法規名稱 */
+  law: string;
+  /** 條號，例 "26"、"17-1" */
+  article: string;
+}
 export interface Enrich {
   id: QuestionId;
+  /** data/topics.json 的 id，1–2 個 */
   topic: string[];
   /** 口訣 */
   mnemonic: string;
@@ -108,17 +119,46 @@ export interface Enrich {
   trap: string;
   /** 白話情境 */
   plain: string | null;
-  marks: Array<{ start: number; end: number; color: MarkColor }>;
-  options: Record<Choice, { why: string; lawRef: { law: string; article: string } | null }>;
+  /** text 是題幹裡的原文片段 */
+  marks: Array<{ text: string; color: MarkColor }>;
+  options: Record<Choice, { why: string; lawRef: LawRef | null }>;
+  visual: EnrichVisual | null;
+  /** 官方答案或題目前提與現行法不同時的提醒 */
+  lawChanged: string | null;
+  confidence: 'high' | 'low';
+  reviewed: boolean;
+}
+export interface EnrichFile {
+  paperId: PaperId;
   model: string;
   generatedAt: string;
-  reviewed: boolean;
+  items: Enrich[];
+}
+
+// ── 法規副本（data/laws/**，來自全國法規資料庫）──────────
+export interface LawFile {
+  pcode: string;
+  name: string;
+  amendedAt: string | null;
+  url: string;
+  fetchedAt: string;
+  articles: Array<{ no: string; text: string }>;
+}
+export interface LawIndex {
+  laws: Array<{ pcode: string; name: string; amendedAt: string | null; articleCount: number }>;
+}
+export interface TopicInfo {
+  id: string;
+  subjectKey: SubjectKey;
+  name: string;
 }
 
 // ── 個人進度（只存在裝置上）──────────────────────────────
 export interface Progress {
   seen: number;
   correct: number;
+  /** 看答案模式看過幾次 */
+  views: number;
   /** 目前連續答對次數 */
   streak: number;
   lastPick: Choice | null;
@@ -130,6 +170,11 @@ export interface Progress {
 
 // ── 回合 ────────────────────────────────────────────────
 export type RoundMode = 'mixed' | 'new' | 'wrong' | 'due';
+/** 問法：positive＝問哪個對；negative＝問哪個錯 */
+export type AskType = 'positive' | 'negative';
+export type AskFilter = AskType | 'all';
+/** quiz＝自己作答；read＝看答案（題目與正解一起出現） */
+export type StudyMode = 'quiz' | 'read';
 export interface RoundConfig {
   bankId: BankId;
   /** 空陣列＝全部科目 */
@@ -138,6 +183,10 @@ export interface RoundConfig {
   mode: RoundMode;
   /** 快刷：答對自動下一題 */
   fast: boolean;
+  study: StudyMode;
+  ask: AskFilter;
+  /** 看答案模式：這批題目看幾遍 */
+  passes: number;
 }
 export interface RoundResult {
   id: QuestionId;
@@ -153,6 +202,8 @@ export interface RoundState {
   results: RoundResult[];
   combo: number;
   finished: boolean;
+  /** 看答案模式：目前第幾遍（從 1 開始）；作答模式固定為 1 */
+  pass: number;
 }
 
 // ── 設定 ────────────────────────────────────────────────
@@ -161,6 +212,24 @@ export interface Settings {
   theme: ThemeChoice;
   /** 上一次的回合設定，下次預填 */
   lastRound: RoundConfig | null;
+  /** 已按過「知道了」，不再顯示加到主畫面的引導 */
+  installHintDismissed?: boolean;
+}
+
+// ── 同步（私人 GitHub repo）────────────────────────────
+export interface SyncCredentials {
+  owner: string;
+  repo: string;
+  /** 只存在裝置上，不得進入匯出檔、事件、記錄或網址 */
+  token: string;
+}
+export type SyncStatus = 'off' | 'idle' | 'syncing' | 'error';
+export interface SyncState {
+  status: SyncStatus;
+  /** ISO 時間 */
+  lastSyncedAt: string | null;
+  /** 給使用者看的短句 */
+  error: string | null;
 }
 
 // ── 事件（System 之間唯一的溝通方式）──────────────────────
@@ -168,9 +237,11 @@ export type AppEvent =
   | { type: 'bankLoaded'; bankId: BankId; questionCount: number }
   | { type: 'roundStarted'; config: RoundConfig; queue: QuestionId[] }
   | { type: 'answered'; id: QuestionId; pick: Choice; correct: boolean; at: string }
+  | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
   | { type: 'progressChanged'; ids: QuestionId[] }
-  | { type: 'settingsChanged'; settings: Settings };
+  | { type: 'settingsChanged'; settings: Settings }
+  | { type: 'syncChanged'; sync: SyncState };
 
 // ── 指令（畫面寫入狀態的唯一入口）────────────────────────
 export type UICommand =
@@ -179,6 +250,12 @@ export type UICommand =
   | { type: 'next' }
   | { type: 'quitRound' }
   | { type: 'retryWrong' }
+  /** 用剛看完的同一批題目開作答回合 */
+  | { type: 'quizSameSet' }
   | { type: 'setTheme'; theme: ThemeChoice }
+  | { type: 'dismissInstallHint' }
   | { type: 'importProgress'; json: string }
-  | { type: 'resetProgress' };
+  | { type: 'resetProgress' }
+  | { type: 'setSyncCode'; code: string }
+  | { type: 'syncNow' }
+  | { type: 'disableSync' };

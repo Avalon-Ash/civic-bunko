@@ -12,9 +12,9 @@ function getIntervalDays(index: number): number {
   return days;
 }
 
-/** 訂閱 answered 事件，更新題目作答進度與間隔複習到期日。 */
+/** 訂閱 answered 與 viewed 事件，更新題目進度、觀看次數與間隔複習到期日。 */
 export function attachScheduling(world: World): () => void {
-  return world.bus.on('answered', (event) => {
+  const unsubAnswered = world.bus.on('answered', (event) => {
     const prev = world.progress.get(event.id);
     const isNew = prev === undefined || prev.seen === 0;
     const atDate = new Date(event.at);
@@ -40,6 +40,7 @@ export function attachScheduling(world: World): () => void {
     const nextProgress: Progress = {
       seen,
       correct,
+      views: prev?.views ?? 0,
       streak,
       lastPick: event.pick,
       lastAt: event.at,
@@ -52,4 +53,28 @@ export function attachScheduling(world: World): () => void {
       ids: [event.id],
     });
   });
+
+  const unsubViewed = world.bus.on('viewed', (event) => {
+    const prev = world.progress.get(event.id);
+    const nextProgress: Progress = {
+      seen: prev?.seen ?? 0,
+      correct: prev?.correct ?? 0,
+      views: (prev?.views ?? 0) + 1,
+      streak: prev?.streak ?? 0,
+      lastPick: prev?.lastPick ?? null,
+      lastAt: event.at,
+      due: prev?.due ?? null,
+    };
+
+    world.progress.set(event.id, nextProgress);
+    world.bus.emit({
+      type: 'progressChanged',
+      ids: [event.id],
+    });
+  });
+
+  return () => {
+    unsubAnswered();
+    unsubViewed();
+  };
 }
