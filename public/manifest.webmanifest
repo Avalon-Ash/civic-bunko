@@ -1,0 +1,16 @@
+{
+  "name": "民政刷題",
+  "short_name": "民政刷題",
+  "description": "地方特考四等・一般民政的刷題小幫手",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#e6f4fa",
+  "theme_color": "#e6f4fa",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
