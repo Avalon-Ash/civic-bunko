@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
-import { loadBankMeta, loadPapers } from './data/source';
+import { loadBankMeta, loadEnrichFiles, loadPapers } from './data/source';
 import { loadBank } from './systems/bankLoader';
 import { attachPersistence } from './systems/persistence';
 import { App } from './ui/App';
@@ -14,8 +14,9 @@ attachPersistence(world, window.localStorage);
 const { banks } = loadBankMeta();
 loadBank(world, banks, []);
 
-const papersPromise = loadPapers().then((files) => {
-  loadBank(world, banks, files);
+// 加工內容載入失敗不影響刷題：當作沒有。
+const papersPromise = Promise.all([loadPapers(), loadEnrichFiles().catch(() => [])]).then(([files, enrich]) => {
+  loadBank(world, banks, files, enrich);
 });
 
 function Root({ world: appWorld }: { world: World }) {

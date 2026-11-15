@@ -1,4 +1,4 @@
-import type { Bank, Enrich, PaperFile } from '../core/types';
+import type { Bank, Enrich, EnrichFile, PaperFile } from '../core/types';
 import type { World } from '../core/world';
 
 /** 將題庫清單、試卷檔案與可選加工資料載入 world，並依題庫發出 bankLoaded 事件。 */
@@ -6,7 +6,7 @@ export function loadBank(
   world: World,
   banks: Bank[],
   files: PaperFile[],
-  enrichList: Enrich[] = [],
+  enrichFiles: ReadonlyArray<EnrichFile | Enrich> = [],
 ): void {
   const bankMap = new Map(world.banks.map((b) => [b.id, b]));
   for (const bank of banks) {
@@ -24,8 +24,14 @@ export function loadBank(
     }
   }
 
-  for (const item of enrichList) {
-    world.enrich.set(item.id, item);
+  for (const entry of enrichFiles) {
+    if ('items' in entry) {
+      for (const item of entry.items) {
+        world.enrich.set(item.id, item);
+      }
+    } else {
+      world.enrich.set(entry.id, entry);
+    }
   }
 
   for (const bank of banks) {

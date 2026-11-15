@@ -9,8 +9,10 @@ import {
   makeConfig,
   makeSeededRng,
   otherBank,
+  sampleRichEnrichFile,
   testBank,
   testEnrich,
+  testEnrichFile,
   testGroup,
   testPaperFiles,
 } from '../testing/fixture';
@@ -53,6 +55,17 @@ describe('bus & store & bankLoader', () => {
       { bankId: 'other-bank', questionCount: 1 },
     ]);
     assert.equal(getVersion(world), initialVersion + 2);
+  });
+
+  it('indexes EnrichFile.items into world.enrich by question id', () => {
+    const world = createWorld();
+    loadBank(world, [testBank], testPaperFiles, [testEnrichFile, sampleRichEnrichFile]);
+
+    assert.equal(world.enrich.size, 2);
+    assert.equal(world.enrich.get('q-a1')?.mnemonic, '測試口訣 1');
+    assert.equal(world.enrich.get('q-b1')?.visual?.kind, 'versus');
+    assert.equal(world.enrich.get('q-b1')?.confidence, 'low');
+    assert.ok(world.enrich.get('q-b1')?.lawChanged);
   });
 
   it('increments store version and notifies subscribers on events and next', () => {
