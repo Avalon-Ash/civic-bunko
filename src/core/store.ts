@@ -8,6 +8,7 @@ const ALL_EVENT_TYPES: readonly EventType[] = [
   'roundFinished',
   'progressChanged',
   'settingsChanged',
+  'syncChanged',
 ];
 
 interface StoreState {

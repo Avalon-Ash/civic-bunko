@@ -216,6 +216,22 @@ export interface Settings {
   installHintDismissed?: boolean;
 }
 
+// ── 同步（私人 GitHub repo）────────────────────────────
+export interface SyncCredentials {
+  owner: string;
+  repo: string;
+  /** 只存在裝置上，不得進入匯出檔、事件、記錄或網址 */
+  token: string;
+}
+export type SyncStatus = 'off' | 'idle' | 'syncing' | 'error';
+export interface SyncState {
+  status: SyncStatus;
+  /** ISO 時間 */
+  lastSyncedAt: string | null;
+  /** 給使用者看的短句 */
+  error: string | null;
+}
+
 // ── 事件（System 之間唯一的溝通方式）──────────────────────
 export type AppEvent =
   | { type: 'bankLoaded'; bankId: BankId; questionCount: number }
@@ -224,7 +240,8 @@ export type AppEvent =
   | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
   | { type: 'progressChanged'; ids: QuestionId[] }
-  | { type: 'settingsChanged'; settings: Settings };
+  | { type: 'settingsChanged'; settings: Settings }
+  | { type: 'syncChanged'; sync: SyncState };
 
 // ── 指令（畫面寫入狀態的唯一入口）────────────────────────
 export type UICommand =
@@ -238,4 +255,7 @@ export type UICommand =
   | { type: 'setTheme'; theme: ThemeChoice }
   | { type: 'dismissInstallHint' }
   | { type: 'importProgress'; json: string }
-  | { type: 'resetProgress' };
+  | { type: 'resetProgress' }
+  | { type: 'setSyncCode'; code: string }
+  | { type: 'syncNow' }
+  | { type: 'disableSync' };

@@ -2016,3 +2016,107 @@ mark {
   font-weight: 900;
   animation: cb-pop 0.28s var(--spring);
 }
+
+/* ── 私人 repo 同步與備份 ──────────────────────────────── */
+
+.cb-sync-banner {
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.cb-sync-status {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cb-sync-cat.is-spinning {
+  animation: cb-cat-spin 1.8s linear infinite;
+}
+
+.cb-sync-error-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cb-sync-retry-btn {
+  width: auto;
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 6px 14px;
+  font-size: var(--text-small);
+}
+
+.cb-sync-divider {
+  padding-top: 10px;
+  border-top: 2px dashed var(--hair);
+}
+
+.cb-subheading {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-collapse-toggle {
+  width: 100%;
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-align: left;
+  color: var(--ink);
+}
+
+.cb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cb-field-label {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cb-input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--tap-min);
+  padding: 10px 12px;
+  border-radius: var(--radius-option);
+  border: var(--border-w) solid var(--line);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.cb-input:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.cb-token-toggle {
+  width: auto;
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 6px 14px;
+  font-size: var(--text-small);
+}

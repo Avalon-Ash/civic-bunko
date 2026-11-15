@@ -10,6 +10,7 @@ import {
   getSettings,
   weekActivity,
 } from '../../selectors';
+import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
@@ -27,6 +28,7 @@ export interface TodayScreenProps {
   world: World;
   onStartQuiz: () => void;
   onGoSetup: () => void;
+  onGoStamps?: () => void;
   papersLoading?: boolean;
   loadError?: boolean;
   showInstallHint?: boolean;
@@ -44,6 +46,7 @@ export function TodayScreen({
   world,
   onStartQuiz,
   onGoSetup,
+  onGoStamps,
   papersLoading = false,
   loadError = false,
   showInstallHint = false,
@@ -55,6 +58,7 @@ export function TodayScreen({
   const now = new Date();
   const bank = activeBank(world);
   const settings = getSettings(world);
+  const sync = getSyncState(world);
   const totals = bank ? bankTotals(world, bank.id) : { total: 0, seen: 0 };
   const remainingDays = bank ? daysLeft(bank, now) : 0;
   const missions = bank ? dailyMissions(world, bank.id, now) : [];
@@ -122,6 +126,16 @@ export function TodayScreen({
                   ? `完成度 ${Math.round((totals.seen / totals.total) * 100)}%`
                   : '尚未載入題庫'}
               </div>
+            </Card>
+          )}
+
+          {sync.status === 'error' && onGoStamps && (
+            <Card className="cb-sync-banner" onClick={onGoStamps}>
+              <div className="cb-grow">
+                <strong className="cb-install-banner-title">進度同步暫時出了問題</strong>
+                <span className="cb-sub cb-block">{sync.error ?? '點這裡前往同步與備份查看'}</span>
+              </div>
+              <span className="cb-go">前往</span>
             </Card>
           )}
 
