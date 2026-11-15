@@ -1,0 +1,1276 @@
+{
+  "paperId": "115-general-public-admin",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T01:25:00+08:00",
+  "items": [
+    {
+      "id": "115-general-public-admin-q01",
+      "topic": ["public-admin/policy"],
+      "mnemonic": "政府「做」與「不做」，都是公共政策。",
+      "trap": "「不作為」也算政策，別只想到政府有做事。",
+      "plain": "政府決定對某問題出手處理，或選擇放著不管，這叫做什麼？",
+      "marks": [
+        { "text": "選擇作為或不作為", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "政治涉及權力分配與衝突協調，非此處定義。", "lawRef": null },
+        "B": { "why": "法律是強制性規範體系，只是政策工具之一。", "lawRef": null },
+        "C": { "why": "正解。戴伊名言：政府選擇作為或不作為皆為公共政策。", "lawRef": null },
+        "D": { "why": "管理著重組織運作與效率達成，非戴伊的政策定義。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "政府作為", "points": ["制定法規、發放補助", "積極介入解決問題"] },
+        "right": { "title": "政府不作為", "points": ["維持現狀、刻意不介入", "同樣屬於政策選擇"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q02",
+      "topic": ["public-admin/reform", "public-admin/foundations"],
+      "mnemonic": "公管企管都重視績效，只是公部門績效較難量化。",
+      "trap": "政府一樣重視績效，錯在說「重視程度不同」。",
+      "plain": "公家機關和私人公司管理起來很不一樣，哪一項其實兩者都在意？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "公共管理", "color": "blue" },
+        { "text": "企業管理", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。公部門靠稅收預算，企業靠營收獲利。", "lawRef": null },
+        "B": { "why": "這句對。公部門目標多元模糊，企業以獲利為明確目標。", "lawRef": null },
+        "C": { "why": "這句對。公部門受議會媒體與輿論高度監督。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。兩者都重視績效，只是公部門較難衡量。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "公共管理", "points": ["經費來自稅收預算", "目標多元且受外部高度監督"] },
+        "right": { "title": "企業管理", "points": ["經費來自市場營收", "目標明確皆重視績效"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q03",
+      "topic": ["public-admin/foundations", "public-admin/behavior"],
+      "mnemonic": "霍桑實驗看工廠內部「人際關係」，不看外在環境。",
+      "trap": "看到「外在環境互動」，那是後來的系統理論。",
+      "plain": null,
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "霍桑實驗", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是。霍桑實驗發現重視員工尊嚴能提升產量。", "lawRef": null },
+        "B": { "why": "這句是。讓員工參與與情緒發洩有助提升工作士氣。", "lawRef": null },
+        "C": { "why": "這句不是（本題答案）。與外在環境互動屬開放系統理論。", "lawRef": null },
+        "D": { "why": "這句是。非正式組織的社會規範會影響成員產出。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "霍桑實驗重點", "points": ["尊重人格與情緒抒發", "非正式組織具拘束力"] },
+        "right": { "title": "系統理論重點", "points": ["組織須與外在環境互動", "屬於較晚期的整合理論"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q04",
+      "topic": ["public-admin/foundations"],
+      "mnemonic": "修正理論看重人與動機，權威要部屬接受才算數。",
+      "trap": "「權力只看職位、不管部屬」是傳統理論的觀點。",
+      "plain": null,
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "修正理論時期", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。修正理論引進行為科學與實證研究方法。", "lawRef": null },
+        "B": { "why": "這句對。巴納德與相關學者強調個人與組織目標平衡。", "lawRef": null },
+        "C": { "why": "這句對。麥克雷格 Y 理論主張人有潛力，應重激勵。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。巴納德主張權威須部屬接受才成立。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "傳統理論觀點", "points": ["形式權威由上而下", "X理論重監督與控制"] },
+        "right": { "title": "修正理論觀點", "points": ["權威須獲部屬接受", "Y理論重激勵與平衡"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q05",
+      "topic": ["public-admin/foundations"],
+      "mnemonic": "科學管理只管「工廠內部標準化」，不管外在利益團體。",
+      "trap": "傳統理論假設政治行政二分，不會談利益團體價值。",
+      "plain": null,
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "科學管理學派", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。傳統與科學管理重視層級節制與指揮統一。", "lawRef": null },
+        "B": { "why": "這句對。早期封閉系統思維忽略外在環境影響。", "lawRef": null },
+        "C": { "why": "這句錯（本題答案）。科學管理聚焦內部效率，不談利益團體。", "lawRef": null },
+        "D": { "why": "這句對。泰勒科學管理追求動作標準化與效率極大化。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "動作時間研究", "tone": "plain" }, { "text": "標準化作業", "tone": "plain" }, { "text": "追求內部效率", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q06",
+      "topic": ["public-admin/foundations"],
+      "mnemonic": "新公共行政（NPA）講求「公平、協和、適應動盪」。",
+      "trap": "別把「邏輯實證」或「企業家精神」當成 NPA！",
+      "plain": null,
+      "marks": [
+        { "text": "新公共行政", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。邏輯實證論屬於 1940 年代西蒙等行為科學派。", "lawRef": null },
+        "B": { "why": "錯。企業家政府與創新屬於 1990 年代新公共管理。", "lawRef": null },
+        "C": { "why": "對。NPA 強調入世相關、社會公平與適應動盪環境。", "lawRef": null },
+        "D": { "why": "錯。NPA 主張彈性協和組織，而非加速解體官僚制度。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "新公共行政", "points": ["重視社會公平與正義", "適應動盪環境與協和型組織"] },
+        "right": { "title": "新公共管理", "points": ["師法企業與顧客導向", "重視效率與市場機制"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q07",
+      "topic": ["public-admin/reform"],
+      "mnemonic": "新公共管理（NPM）師法企業：鬆綁法規、重市場效率。",
+      "trap": "公平正義屬新公共行政，大有為政府跟 NPM 相反。",
+      "plain": null,
+      "marks": [
+        { "text": "新公共管理", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。NPM 強調解除管制與法規鬆綁，提升行政彈性。", "lawRef": null },
+        "B": { "why": "錯。強調社會公平正義主要是新公共行政的主張。", "lawRef": null },
+        "C": { "why": "錯。強調上級威權控制是傳統官僚制特徵，NPM 反對。", "lawRef": null },
+        "D": { "why": "錯。NPM 主張政府「導航而非操槳」，縮減政府規模。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "師法企業精神", "tone": "plain" }, { "text": "鬆綁繁瑣法規", "tone": "key" }, { "text": "引進市場競爭", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q08",
+      "topic": ["public-admin/reform"],
+      "mnemonic": "委外（Delegation）還是政府負責：外包、特許、抵用券。",
+      "trap": "無償移轉屬於「撤資」，政府直接退出不玩了。",
+      "plain": "政府把業務交給民間做，哪一種其實是「整個送出去不再負責」？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "委外", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是委外。政府付錢請民間簽約提供服務（如清潔外包）。", "lawRef": null },
+        "B": { "why": "這句非屬委外（本題答案）。無償移轉屬「撤資」民營化。", "lawRef": null },
+        "C": { "why": "這句是委外。政府特許民間經營公共服務（如客運、有線電視）。", "lawRef": null },
+        "D": { "why": "這句是委外。政府發券讓民眾自行向民間購買（如托育補助）。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "委外策略", "points": ["簽約外包、特許權", "抵用券、政府補助"] },
+        "right": { "title": "撤資民營化", "points": ["出售資產、無償移轉", "清算結束公營事業"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q09",
+      "topic": ["public-admin/ethics"],
+      "mnemonic": "對外在控制者（民意、議會）即時回應＝政治的倫理。",
+      "trap": "題目關鍵字是「對外回應」，不是對內管理或守法。",
+      "plain": null,
+      "marks": [
+        { "text": "對外的回應力", "color": "blue" },
+        { "text": "行政倫理", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。管理的倫理著重組織內部效率、專業與達成績效目標。", "lawRef": null },
+        "B": { "why": "錯。文化的倫理著重組織內部規範、團隊風氣與價值傳承。", "lawRef": null },
+        "C": { "why": "錯。遵循法律的倫理強調依法行政與遵守憲法法規規定。", "lawRef": null },
+        "D": { "why": "對。政治的倫理強調公務員對民選長官與民意的回應力。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "外在主要控制者", "tone": "hot" }, { "text": "強化對外回應力", "tone": "plain" }, { "text": "重視政治的倫理", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q10",
+      "topic": ["public-admin/organization", "public-admin/policy"],
+      "mnemonic": "機關被利益團體「俘虜」，變成幫業者說話的代理人。",
+      "trap": "別和「政策鐵三角」搞混，題幹只講機關被單方控制。",
+      "plain": "原本要監督業者的政府機關，最後卻處處替業者護航，叫什麼現象？",
+      "marks": [
+        { "text": "行政機關成為利益團體的代理人", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。代表性官僚是指公務員組成應反映人口多元背景。", "lawRef": null },
+        "B": { "why": "錯。政策鐵三角指行政機關、國會委員會與利益團體三方結盟。", "lawRef": null },
+        "C": { "why": "對。俘虜性組織指管制機關反被受管制利益團體所控制。", "lawRef": null },
+        "D": { "why": "錯。白京生定律指組織人員與經費會不斷自行膨脹。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "監管利益團體", "tone": "plain" }, { "text": "長期互動依賴", "tone": "hot" }, { "text": "淪為利益代理人", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q11",
+      "topic": ["public-admin/personnel", "public-admin/governance"],
+      "mnemonic": "政務官看短期政治效益，事務官看長期專業與程序。",
+      "trap": "人事和預算兩邊都要管，不是兩者衝突的主因。",
+      "plain": "民選首長帶來的政務官跟資深公務員常起衝突，哪一項不是原因？",
+      "marks": [
+        { "text": "並非", "color": "red" },
+        { "text": "政務官", "color": "blue" },
+        { "text": "事務官", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是衝突。政務官求政治勝選，事務官求依法行政與專業。", "lawRef": null },
+        "B": { "why": "這句並非衝突（本題答案）。人力與預算雙方皆關心，無此二分。", "lawRef": null },
+        "C": { "why": "這句是衝突。政務官受任期限制求速效，事務官重長期穩定。", "lawRef": null },
+        "D": { "why": "這句是衝突。政務官要下屬服從指令，事務官重視專業自主。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "政務官視角", "points": ["重視政治效益與回應民意", "任期有限追求短期績效"] },
+        "right": { "title": "事務官視角", "points": ["重視程序正義與專業判斷", "常任制度著重長期穩定"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q12",
+      "topic": ["public-admin/personnel"],
+      "mnemonic": "「一般性騷擾」找衛福部；職場找勞動部、校園找教育部。",
+      "trap": "三法主管機關不同，看到「性騷擾防治法」選衛福部。",
+      "plain": "在公車或餐廳遇到性騷擾適用性騷擾防治法，中央主管機關是誰？",
+      "marks": [
+        { "text": "性騷擾防治法", "color": "blue" },
+        { "text": "中央主管機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。勞動部主管《性別平等工作法》（職場性騷擾）。", "lawRef": null },
+        "B": { "why": "對。《性騷擾防治法》中央主管機關為衛生福利部。", "lawRef": null },
+        "C": { "why": "錯。教育部主管《性別平等教育法》（校園性騷擾）。", "lawRef": null },
+        "D": { "why": "錯。人事行政總處負責行政院所屬人事法制與管理。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "一般性騷擾防治", "tone": "plain" }, { "text": "衛生福利部", "tone": "key" }] },
+          { "steps": [{ "text": "職場性平工作法", "tone": "plain" }, { "text": "勞動部", "tone": "plain" }] },
+          { "steps": [{ "text": "校園性平教育法", "tone": "plain" }, { "text": "教育部", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q13",
+      "topic": ["public-admin/organization"],
+      "mnemonic": "民政、經建、社會、兵役各自管一種業務＝依「功能」分部化。",
+      "trap": "題幹雖提到「區公所」，但問的是裡面各課的分類依據。",
+      "plain": "區公所拆成民政課、經建課、社會課、兵役課，是怎麼分工的？",
+      "marks": [
+        { "text": "民政課、經建課、社會課、兵役課", "color": "blue" },
+        { "text": "分部化", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。依業務性質與專業職能劃分單位，稱為功能分部化。", "lawRef": null },
+        "B": { "why": "錯。地域分部化是按地區設分處（如北區、南區辦公室）。", "lawRef": null },
+        "C": { "why": "錯。程序分部化是依工作流程階段設部門（如收件、審核）。", "lawRef": null },
+        "D": { "why": "錯。服務對象分部化是按特定族群劃分（如兒童、榮民）。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "區公所業務分工", "tone": "plain" }, { "text": "民政／經建／社會", "tone": "plain" }, { "text": "依功能分部化", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q14",
+      "topic": ["public-admin/organization", "public-admin/reform"],
+      "mnemonic": "減少層級把組織「壓扁」，公文傳更快、反應更靈活。",
+      "trap": "扁平化會擴大控制幅度、減少層級，不是強化層級控制。",
+      "plain": "政府把中間一層層的主管精簡掉，讓組織變扁平，圖的是什麼？",
+      "marks": [
+        { "text": "扁平化組織結構", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。扁平化減少管理層級、充分授權，反而弱化層級控制。", "lawRef": null },
+        "B": { "why": "錯。組織扁平化常配合精簡人事，不會增加編制與預算。", "lawRef": null },
+        "C": { "why": "對。層級減少讓上下溝通更直接，提升決策速度與彈性。", "lawRef": null },
+        "D": { "why": "錯。扁平化調整的是內部層級結構，並非擴大對外職權。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "減少管理層級", "tone": "plain" }, { "text": "擴大控制幅度", "tone": "plain" }, { "text": "決策快速靈活", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q15",
+      "topic": ["public-admin/organization", "public-admin/behavior"],
+      "mnemonic": "「撐過去就沒事了」＝老油條心態＝「不稀罕效應」。",
+      "trap": "別和「白京生定律（人越來越多）」搞混！",
+      "plain": "上面推新政策，基層覺得忍耐撐過就會無疾而終，這叫什麼效應？",
+      "marks": [
+        { "text": "只要忍耐撐過，革新計畫最後有可能無疾而終", "color": "blue" },
+        { "text": "組織病態", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。邁爾斯定律是指「換了位置就換了腦袋」（立場依職位）。", "lawRef": null },
+        "B": { "why": "對。不稀罕效應（BOHICA）指成員消極抵制變革等它過去。", "lawRef": null },
+        "C": { "why": "錯。莫非定律是指「凡是可能出錯的事，就一定會出錯」。", "lawRef": null },
+        "D": { "why": "錯。白京生定律是指官僚組織人員與支出會無止境膨脹。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "長官推革新計畫", "tone": "plain" }, { "text": "基層消極觀望", "tone": "hot" }, { "text": "不稀罕效應", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q16",
+      "topic": ["public-admin/behavior"],
+      "mnemonic": "不靠官位也有影響力＝「專家權力」或「參照權力」。",
+      "trap": "合法、獎賞、懲處都綁定「正式職位」，屬於職位權力。",
+      "plain": "小職員沒有官職，大家卻都聽他的意見，他的力量從哪來？",
+      "marks": [
+        { "text": "比正式職位更有影響力", "color": "blue" },
+        { "text": "權力的來源", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。專家權力源自個人專業知識與技能，不依賴正式職位。", "lawRef": null },
+        "B": { "why": "錯。合法權力來自組織正式職位所賦予的法定指揮權限。", "lawRef": null },
+        "C": { "why": "錯。獎賞權力依賴正式職位掌握升遷、加薪等資源分配權。", "lawRef": null },
+        "D": { "why": "錯。懲處權力依賴正式職位掌握懲戒與制裁部屬的權限。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "個人權力", "points": ["專家權力（專業能力）", "參照權力（人格魅力）"] },
+        "right": { "title": "職位權力", "points": ["合法權力、獎賞權力", "懲處權力（綁定職位）"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q17",
+      "topic": ["public-admin/organization"],
+      "mnemonic": "行政法人是「公法人」，不是私法人！",
+      "trap": "行政法人雖用企業化運作，法律定位仍是「公法人」。",
+      "plain": "像兩廳院、中科院這類「行政法人」，在法律上算是私人機構嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "行政法人", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。適合具專業性、須強化效能與成本效益的公共事務。", "lawRef": null },
+        "B": { "why": "這句錯（本題答案）。行政法人具公法性質，為公法人非私法人。", "lawRef": { "law": "中央行政機關組織基準法", "article": "37" } },
+        "C": { "why": "這句對。採企業化經營，得排除傳統政府會計與採購法限制。", "lawRef": null },
+        "D": { "why": "這句對。高度公權力應由政府機關為之，行政法人僅涉低度。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "行政法人性質", "points": ["具公法性質之公法人", "承擔低度公權力業務"] },
+        "right": { "title": "運作彈性", "points": ["減輕會計採購法規限制", "強化成本效益與專業效能"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q18",
+      "topic": ["public-admin/organization"],
+      "mnemonic": "二級獨立機關只有「中選會、公平會、通傳會」，沒有核安會。",
+      "trap": "原能會改制後的「核能安全委員會」是三級獨立機關！",
+      "plain": null,
+      "marks": [
+        { "text": "不屬於", "color": "red" },
+        { "text": "中央政府之二級機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是二級機關。依行政院組織法第 3 條為行政院所屬部會。", "lawRef": { "law": "行政院組織法", "article": "3" } },
+        "B": { "why": "這句是二級機關。依行政院組織法第 7 條設中央銀行。", "lawRef": { "law": "行政院組織法", "article": "7" } },
+        "C": { "why": "這句是二級機關。依行政院組織法第 8 條設國立故宮博物院。", "lawRef": { "law": "行政院組織法", "article": "8" } },
+        "D": { "why": "這句不是（本題答案）。核能安全委員會屬行政院三級獨立機關。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "相當二級獨立機關", "points": ["中選會、公平會", "國家通訊傳播委員會"] },
+        "right": { "title": "三級獨立機關", "points": ["核能安全委員會", "原能會改制降為三級"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q19",
+      "topic": ["public-admin/organization", "public-admin/behavior"],
+      "mnemonic": "不同地位、不同地點、為交朋友非關工作＝「混合集團」。",
+      "trap": "題幹有「不同地位＋不同地點」，別選垂直或水平集團。",
+      "plain": "公司裡不同部門、不同職級的人因興趣揪團聚餐，算哪種非正式組織？",
+      "marks": [
+        { "text": "來自不同地位、工作地點", "color": "blue" },
+        { "text": "非正式組織", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。垂直共棲集團是同部門內上下級互利合作（如主管與親信）。", "lawRef": null },
+        "B": { "why": "錯。水平防守集團是同層級人員聯手抵制管理措施或變革。", "lawRef": null },
+        "C": { "why": "錯。水平攻擊集團是同層級人員串聯主動影響或改變組織政策。", "lawRef": null },
+        "D": { "why": "對。混合集團又稱隨機集團，成員跨地位與地點因友誼興趣聚集。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "不同地位＋地點", "tone": "hot" }, { "text": "因友誼興趣聚集", "tone": "plain" }, { "text": "混合（隨機）集團", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q20",
+      "topic": ["public-admin/personnel"],
+      "mnemonic": "功績制重考試與法制保障，反而「限制」主管用人裁量權。",
+      "trap": "「擴大主管用人裁量權」是政治用人（分贓制）的特色。",
+      "plain": "用公開考試選公務員（功績制），哪一項反而是主管做不到的事？",
+      "marks": [
+        { "text": "不屬於", "color": "red" },
+        { "text": "功績用人", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是優點。功績制依才能考試任用，可維持行政專業與中立。", "lawRef": null },
+        "B": { "why": "這句是優點。常任文官不隨政黨輪替更動，政務運作穩定延續。", "lawRef": null },
+        "C": { "why": "這句不是（本題答案）。功績制有法定任用規範，限縮主管裁量權。", "lawRef": null },
+        "D": { "why": "這句是優點。受公務員法制保障，免受主管任意免職或政治迫害。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "功績用人", "points": ["公開競爭與專業中立", "保障身分且限縮主管裁量"] },
+        "right": { "title": "政治用人", "points": ["首長自由進退親信", "主管人事裁量權極大"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q21",
+      "topic": ["public-admin/personnel"],
+      "mnemonic": "實務訓練還在試用期，不能請「侍親假」（留職停薪）。",
+      "trap": "婚假、娩假、流產假都可以請，唯獨侍親假不行。",
+      "plain": "剛考上公務員還在實務訓練期間，遇到哪種情況不能請假？",
+      "marks": [
+        { "text": "不得請", "color": "red" },
+        { "text": "實務訓練期間", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。依訓練辦法，實務訓練期間得依規定請婚假。", "lawRef": null },
+        "B": { "why": "錯。依訓練辦法，實務訓練期間得依規定請娩假。", "lawRef": null },
+        "C": { "why": "錯。依訓練辦法，實務訓練期間得依規定請流產假。", "lawRef": null },
+        "D": { "why": "對。侍親假屬留職停薪性質，實務訓練期間不得申請。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "實訓期間可請", "points": ["婚假、喪假、事假、病假", "娩假、流產假、陪產檢等"] },
+        "right": { "title": "實訓期間不可請", "points": ["侍親假（留職停薪）", "須正式任用後才可申請"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q22",
+      "topic": ["public-admin/personnel", "public-admin/ethics"],
+      "mnemonic": "公務員「絕對保密」，服從遇到「刑事違法」就不必服從。",
+      "trap": "離職旋轉門是 3 年（非 1 年），且不需絕對服從違法命令。",
+      "plain": null,
+      "marks": [
+        { "text": "公務人員的義務", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。依服務法第 16 條，旋轉門條款限制期間為「離職後 3 年內」。", "lawRef": { "law": "公務員服務法", "article": "16" } },
+        "B": { "why": "錯。依財產申報法，僅特定公職（如政務、簡任主管等）須申報。", "lawRef": null },
+        "C": { "why": "對。依服務法第 5 條，無論是否主管事務皆須絕對保守機密。", "lawRef": { "law": "公務員服務法", "article": "5" } },
+        "D": { "why": "錯。依服務法第 3 條，命令違背刑事法律時，公務員無服從義務。", "lawRef": { "law": "公務員服務法", "article": "3" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "長官下達違法命令", "tone": "hot" }, { "text": "先負報告義務", "tone": "plain" }, { "text": "違反刑法不服從", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q23",
+      "topic": ["public-admin/personnel"],
+      "mnemonic": "法定加給只有「職、專、地」三種，沒有「績效加給」。",
+      "trap": "工作表現傑出會反映在考績獎金，不是每月領「績效加給」。",
+      "plain": "在高山氣象站當主任又表現優異，哪一種加給是法規上根本沒有的？",
+      "marks": [
+        { "text": "無法獲得", "color": "red" },
+        { "text": "加給", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。擔任主任主管職務，可依規定領取「職務加給」。", "lawRef": null },
+        "B": { "why": "錯。氣象觀測具專業性質，可依法領取「技術或專業加給」。", "lawRef": null },
+        "C": { "why": "錯。玉山氣象站屬偏遠高山地區，可領取「地域加給」。", "lawRef": null },
+        "D": { "why": "對。公務人員俸給法僅列職、專、地三種，並無「績效加給」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "公務人員法定加給", "tone": "plain" }, { "text": "職務＋專業＋地域", "tone": "key" }, { "text": "無績效加給", "tone": "hot" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q24",
+      "topic": ["public-admin/personnel"],
+      "mnemonic": "不走公務員法、不用人事費、適用勞基法＝「約用人員」。",
+      "trap": "聘用、約僱都受人事法規與人事費規範，只有約用不是。",
+      "plain": "公家機關用業務費自己請的臨時或專案人員（適用勞基法），叫什麼？",
+      "marks": [
+        { "text": "非依公務人員法規", "color": "blue" },
+        { "text": "人事費以外經費", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。聘用人員是依《聘用人員聘用條例》進用，動支人事費。", "lawRef": null },
+        "B": { "why": "錯。約僱人員是依《行政院與所屬中央及地方各機關約僱人員僱用辦法》進用。", "lawRef": null },
+        "C": { "why": "對。約用人員非依公務員法規，以人事費以外經費進用。", "lawRef": null },
+        "D": { "why": "錯。派用人員依舊制派用條例進用（已廢止並落日），屬編制內。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "聘用／約僱人員", "points": ["依人事法規進用", "經費來自人事費"] },
+        "right": { "title": "約用人員", "points": ["適用勞基法進用", "經費來自業務費等非人事費"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q25",
+      "topic": ["public-admin/budget"],
+      "mnemonic": "以後要還的錢（公債、借款）不算「實質收入」。",
+      "trap": "公債和賒借收入只是先借來花，算「融資性收入」。",
+      "plain": "政府靠收費、租金、國營事業賺錢，哪一項其實是「借來的」不算實賺？",
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "非賦稅收入", "color": "blue" },
+        { "text": "實質收入", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是實質收入。含公營事業營業盈餘與事業收入。", "lawRef": null },
+        "B": { "why": "這句不是（本題答案）。公債收入日後須償還，屬融資性收入。", "lawRef": null },
+        "C": { "why": "這句是實質收入。含規費、罰款及賠償等行政收入。", "lawRef": null },
+        "D": { "why": "這句是實質收入。含國有財產孳息與售價等財產收入。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "實質收入", "points": ["稅課、規費罰鍰（行政）", "財產與公營事業（企業）"] },
+        "right": { "title": "非實質（融資性）", "points": ["公債及賒借收入", "移用以前年度歲計賸餘"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q26",
+      "topic": ["public-admin/budget"],
+      "mnemonic": "移轉性支付＝政府「無償」發錢給民間（像社福津貼）。",
+      "trap": "是「政府給民間」，而且「無償」，政府可支配所得會減少。",
+      "plain": "政府發育兒津貼或老農津貼，這種「移轉性支付」有什麼特徵？",
+      "marks": [
+        { "text": "移轉性支付", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。政府支出按經濟性分類，可分為消費、資本與移轉性支付。", "lawRef": null },
+        "B": { "why": "錯。移轉性支付主要是政府無償移轉資源給民間（如社福補助）。", "lawRef": null },
+        "C": { "why": "錯。移轉性支付屬單向「無償」給付，未換取商品或勞務。", "lawRef": null },
+        "D": { "why": "錯。錢從政府流向民間，會減少政府可支配所得、增加民間所得。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "政府支出經濟分類", "tone": "plain" }, { "text": "無償移轉給民間", "tone": "hot" }, { "text": "社福津貼／補助", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q27",
+      "topic": ["public-admin/budget", "public-admin/organization"],
+      "mnemonic": "主計總處的首長，簡稱「主計長」（不是總處長）。",
+      "trap": "別被「總處」兩個字騙了，人事總處叫人事長、主計叫主計長。",
+      "plain": null,
+      "marks": [
+        { "text": "行政院主計總處", "color": "blue" },
+        { "text": "首長", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。一般三級或內部處室稱處長，主計總處為二級機關。", "lawRef": null },
+        "B": { "why": "錯。我國行政機關編制並無「總處長」這個首長職稱。", "lawRef": null },
+        "C": { "why": "錯。正確職稱沒有「總」字，不叫主計總長。", "lawRef": null },
+        "D": { "why": "對。行政院主計總處置主計長一人，為特任首長。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "主計總處首長", "points": ["主計長（特任）", "相當部會首長位階"] },
+        "right": { "title": "人事總處首長", "points": ["人事長（特任）", "同樣不稱總處長"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q28",
+      "topic": ["public-admin/budget"],
+      "mnemonic": "各國會計年度起點不同：臺 1/1、日 4/1、美 10/1。",
+      "trap": "不是所有國家都從 1 月 1 日開始，也跟聯邦、內閣制無關。",
+      "plain": "美國、日本跟台灣的政府算年度預算，都是從 1 月 1 日開始嗎？",
+      "marks": [
+        { "text": "會計年度", "color": "blue" },
+        { "text": "起始日期", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。各國依歷史與國會會期自訂，並非都在 1 月 1 日。", "lawRef": null },
+        "B": { "why": "錯。會計年度起點與是否為聯邦制國家並無絕對對應關係。", "lawRef": null },
+        "C": { "why": "錯。我國採 1 月 1 日，美國總統制為 10 月 1 日，無此公式。", "lawRef": null },
+        "D": { "why": "對。各國各有規定，如我國 1 月、日本 4 月、美國 10 月。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "臺灣：1月1日", "tone": "plain" }, { "text": "日本：4月1日", "tone": "plain" }, { "text": "美國：10月1日", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q29",
+      "topic": ["public-admin/budget"],
+      "mnemonic": "績效預算只做機關內部「事與錢」的連結，沒引入市場競爭。",
+      "trap": "「引入市場競爭」是新公共管理／企業化預算，不是績效預算。",
+      "plain": null,
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "計畫與績效預算制度", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是優點。以計畫與成果編列，方便議會審查施政重點。", "lawRef": null },
+        "B": { "why": "這句不是（本題答案）。績效預算未引入市場競爭，屬企業化概念。", "lawRef": null },
+        "C": { "why": "這句是缺點。許多公共服務（如外交、社福）成效難以量化。", "lawRef": null },
+        "D": { "why": "這句是缺點。機關可能專挑好達成、易呈現的指標來編計畫。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "計畫與績效預算", "points": ["連結施政計畫與產出績效", "困難點：公部門成效難量化"] },
+        "right": { "title": "市場競爭精神", "points": ["屬民營化、委外與競爭機制", "非傳統績效預算的核心"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q30",
+      "topic": ["public-admin/decision", "public-admin/reform"],
+      "mnemonic": "SWOT 是看內外情勢的「現況診斷」，不用績效指標。",
+      "trap": "MBO、OKR、BSC 都要設指標，SWOT 不用。",
+      "plain": "開會常用四種工具，哪一種是在分析環境優劣勢，不用設 KPI 指標？",
+      "marks": [
+        { "text": "不需要", "color": "red" },
+        { "text": "績效指標", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。目標管理（MBO）須設定具體目標並據以評核績效。", "lawRef": null },
+        "B": { "why": "錯。OKR（目標與關鍵成果）以可量化的關鍵成果追蹤進度。", "lawRef": null },
+        "C": { "why": "對。SWOT 分析僅盤點優劣勢與機會威脅，屬環境診斷工具。", "lawRef": null },
+        "D": { "why": "錯。平衡計分卡（BSC）從四大構面設計明確的績效指標。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "需設績效指標", "points": ["目標管理（MBO）", "OKR、平衡計分卡（BSC）"] },
+        "right": { "title": "環境診斷工具", "points": ["SWOT 分析（優劣機會威脅）", "不設量化 KPI 指標"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q31",
+      "topic": ["public-admin/decision", "public-admin/behavior"],
+      "mnemonic": "主管和部屬「共同定目標、看結果分工」＝目標管理（MBO）。",
+      "trap": "看到「設定共同目標＋結果界定職責」，直接選目標管理。",
+      "plain": "主管不直接管過程，而是跟部屬一起訂目標、看成果驗收，叫什麼？",
+      "marks": [
+        { "text": "設定共同目標", "color": "blue" },
+        { "text": "結果來界定彼此的職責範圍", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。行政指導是行政機關對人民的非強制性勸導或建議。", "lawRef": null },
+        "B": { "why": "錯。組織發展是指有計畫的長期組織文化與結構變革。", "lawRef": null },
+        "C": { "why": "錯。精準行銷是針對特定目標受眾傳遞客製化訊息。", "lawRef": null },
+        "D": { "why": "對。目標管理（MBO）強調上下共同參與訂定目標並以成果考核。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "主管部屬參與", "tone": "plain" }, { "text": "設定共同目標", "tone": "key" }, { "text": "依結果界定職責", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q32",
+      "topic": ["public-admin/behavior"],
+      "mnemonic": "轉換型領導＝「交易型」加「魅力型」，靠願景和價值感召。",
+      "trap": "用「物質報酬換服從」是交易型領導，別跟轉換型搞混。",
+      "plain": null,
+      "marks": [
+        { "text": "轉換型領導", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。Bass 等學者指出轉換型領導源自魅力型與交易型領導觀點。", "lawRef": null },
+        "B": { "why": "錯。轉換型領導高度涉及價值觀、道德與願景的哲學實踐。", "lawRef": null },
+        "C": { "why": "錯。以物質報酬與升遷作為交換條件，屬於「交易型領導」。", "lawRef": null },
+        "D": { "why": "錯。轉換型領導核心在於用共同「組織願景」激勵員工超越自我。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "轉換型領導", "points": ["源自魅力與交易型理論", "以共同願景與價值激勵"] },
+        "right": { "title": "交易型領導", "points": ["以物質報酬換取服從", "重視獎懲與契約交換"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q33",
+      "topic": ["public-admin/decision"],
+      "mnemonic": "「斜行溝通」是指組織內部跨部門、跨層級，不是對外。",
+      "trap": "「斜行」還在組織裡面，由內向外叫對外溝通（公關）。",
+      "plain": "小職員跨部門找別科的科長協調算什麼溝通？由內向外又算什麼？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "組織溝通", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。透過小道消息、謠言傳遞訊息屬非正式溝通。", "lawRef": null },
+        "B": { "why": "這句對。基層向長官回報工作進度屬於上行（由下而上）溝通。", "lawRef": null },
+        "C": { "why": "這句錯（本題答案）。斜行溝通指內部跨部門且跨層級的溝通。", "lawRef": null },
+        "D": { "why": "這句對。如公告或命令只單方傳送訊息，不需對方回饋為單向。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "斜行溝通", "points": ["組織內部跨部門又跨層級", "如 A 科科員聯繫 B 科科長"] },
+        "right": { "title": "對外溝通", "points": ["組織內部向外界傳達訊息", "如新聞稿與公眾宣導"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q34",
+      "topic": ["public-admin/behavior"],
+      "mnemonic": "增強理論四招：「正增強、迴避學習、懲罰、削弱」，沒有分享。",
+      "trap": "「迴避學習」就是負增強，這是增強理論裡真的有的招式。",
+      "plain": null,
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "增強理論", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是。給予討厭的刺激以減少不良行為，稱為懲罰。", "lawRef": null },
+        "B": { "why": "這句是。不再給予獎賞讓原本行為逐漸消失，稱為削弱。", "lawRef": null },
+        "C": { "why": "這句是。迴避學習（消極增強）是為免受處罰而做出好行為。", "lawRef": null },
+        "D": { "why": "這句不是（本題答案）。增強理論四途徑並無「分享」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "想增加好行為", "tone": "plain" }, { "text": "正增強／迴避學習", "tone": "key" }] },
+          { "steps": [{ "text": "想減少壞行為", "tone": "plain" }, { "text": "懲罰／削弱", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q35",
+      "topic": ["public-admin/decision"],
+      "mnemonic": "出現「危機指揮中心」進駐監控，表示危機已經爆發了。",
+      "trap": "看到「監測系統」別誤選預防，注意已成立「危機指揮中心」。",
+      "plain": "指揮中心已經成立、照計畫指標緊盯災害回報，是危機管理的哪一步？",
+      "marks": [
+        { "text": "危機情境監測系統", "color": "blue" },
+        { "text": "危機指揮中心", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。爆發前（預防期）著重危機感應、計畫擬定與演練。", "lawRef": null },
+        "B": { "why": "對。依規定設指揮中心並啟動情境監測系統屬「爆發時處理階段」。", "lawRef": null },
+        "C": { "why": "錯。解除後（復原期）著重損害評估、重建與檢討學習。", "lawRef": null },
+        "D": { "why": "錯。危機管理三階段通常分為爆發前、爆發時與解除後。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "爆發前預防", "tone": "plain" }, { "text": "爆發時設指揮中心", "tone": "key" }, { "text": "爆發後復原檢討", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q36",
+      "topic": ["public-admin/decision", "public-admin/governance"],
+      "mnemonic": "「個人所得」是個人隱私與個資，不可能放在網路任人下載。",
+      "trap": "決算書依政資法要主動公開，只有「個人所得」受個資法保護。",
+      "plain": "上政府資料開放平臺抓資料，哪一種因為涉及隱私絕對找不到？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "政府資料開放平臺", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。環境監測與空氣品質屬公共環境資訊，已公開。", "lawRef": null },
+        "B": { "why": "這句對。去識別化之人口統計資料可自由下載運用。", "lawRef": null },
+        "C": { "why": "這句對。依政府資訊公開法第 7 條，預算及決算書應主動公開。", "lawRef": { "law": "政府資訊公開法", "article": "7" } },
+        "D": { "why": "這句錯（本題答案）。個人所得屬個人隱私，依第 18 條限制公開。", "lawRef": { "law": "政府資訊公開法", "article": "18" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "可開放政府資料", "points": ["空氣品質、人口統計", "政府機關預算及決算書"] },
+        "right": { "title": "限制公開資料", "points": ["個人所得等隱私資料", "侵害個資應限制提供"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q37",
+      "topic": ["public-admin/decision", "public-admin/ethics"],
+      "mnemonic": "用 AI 出的東西，由「承辦人」自己做最終判斷，不是首長！",
+      "trap": "題目寫「機關首長進行初步判斷」，錯在判斷人跟階段。",
+      "plain": "公務員用 ChatGPT 輔助辦公，哪一種說法違反行政院規範？",
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "生成式 AI", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句錯（本題答案）。應由「業務承辦人」做客觀專業最終判斷。", "lawRef": null },
+        "B": { "why": "這句對。機密文書禁止使用生成式 AI，須由承辦人親撰。", "lawRef": null },
+        "C": { "why": "這句對。不得向生成式 AI 詢問涉密或未公開個資等業務。", "lawRef": null },
+        "D": { "why": "這句對。AI 可能產生幻覺或錯誤，不可完全信任其產出。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "禁止輸入機密", "tone": "hot" }, { "text": "不可完全信任AI", "tone": "plain" }, { "text": "承辦人做最終判斷", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q38",
+      "topic": ["public-admin/policy"],
+      "mnemonic": "大家一起用不減損（非敵對）又不能擋人（非排他）＝純公共財。",
+      "trap": "俱樂部財可排他、共同財會敵對，只有純公共財「雙非」。",
+      "plain": "像國防安全或路燈，誰都能用且多一個人用也不會少，叫什麼財？",
+      "marks": [
+        { "text": "非敵對性", "color": "blue" },
+        { "text": "非排他性", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。純私人財（如便當）同時具有「敵對性」與「排他性」。", "lawRef": null },
+        "B": { "why": "錯。俱樂部財（如付費頻道）具「排他性」但「非敵對性」。", "lawRef": null },
+        "C": { "why": "錯。共同財（如公海漁業）具「敵對性」但「非排他性」。", "lawRef": null },
+        "D": { "why": "對。純公共財（如國防、燈塔）同時具非敵對性與非排他性。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "純公共財（雙非）", "points": ["非敵對：多一人用不減損", "非排他：無法禁止不付費者"] },
+        "right": { "title": "其他財貨比較", "points": ["私人財：敵對＋排他", "共同財敵對／俱樂部財排他"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q39",
+      "topic": ["public-admin/policy"],
+      "mnemonic": "口罩「實名制」限制購買資格與數量，屬於「管制」工具。",
+      "trap": "政府沒有自己開工廠賣（生產），而是用規定限制大家怎麼買。",
+      "plain": "疫情時規定拿健保卡才能限購幾個口罩，這屬於哪一種政策工具？",
+      "marks": [
+        { "text": "口罩實名制", "color": "blue" },
+        { "text": "政策工具", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。補助是政府給錢鼓勵特定行為（如購車補貼）。", "lawRef": null },
+        "B": { "why": "錯。生產是指政府直接經營公營事業或提供服務。", "lawRef": null },
+        "C": { "why": "對。實名制強制規範購買資格、週期與數量，屬命令管制工具。", "lawRef": null },
+        "D": { "why": "錯。賦稅是透過徵稅或減稅引導民間資源配置與行為。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "口罩實名制", "tone": "plain" }, { "text": "限制購買資格數量", "tone": "hot" }, { "text": "管制性政策工具", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q40",
+      "topic": ["public-admin/policy"],
+      "mnemonic": "「問題流」是金登多元流程的概念，不是薩巴提爾倡導聯盟。",
+      "trap": "ACF 有次級系統、政策掮客、指導工具，沒有「三流」。",
+      "plain": null,
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "倡導聯盟架構", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是。政策次級系統是 ACF 分析政策變遷的基本場域。", "lawRef": null },
+        "B": { "why": "這句是。政策掮客負責在對立聯盟間折衝協調、促成妥協。", "lawRef": null },
+        "C": { "why": "這句不是（本題答案）。問題流屬金登（Kingdon）多元流程模式。", "lawRef": null },
+        "D": { "why": "這句是。政府會動用指導工具（如法規、預算）回應聯盟訴求。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "倡導聯盟（ACF）", "points": ["政策次級系統、信念體系", "政策掮客、指導工具"] },
+        "right": { "title": "多元流程模式", "points": ["問題流、政策流、政治流", "開啟政策之窗"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q41",
+      "topic": ["public-admin/policy"],
+      "mnemonic": "「滾木立法」是議員互助投票，今天幫你推案、明天換你幫我。",
+      "trap": "「肉桶立法」是搶預算建設回自己選區，別跟滾木搞混。",
+      "plain": "國會議員之間互相交換支持彼此提案，讓法案都順利過關，叫什麼？",
+      "marks": [
+        { "text": "政策合法化", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。鐵三角指國會委員會、行政機關與利益團體，沒有司法機關。", "lawRef": null },
+        "B": { "why": "對。滾木立法（logrolling）指議員基於互惠相互支持法案。", "lawRef": null },
+        "C": { "why": "錯。肉桶立法是指議員爭取政府預算與工程回饋自己選區。", "lawRef": null },
+        "D": { "why": "錯。行政機關常主動擬訂法案送國會審議，積極參與合法化。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "滾木立法", "points": ["議員彼此互惠換票", "互相支持對對方有利法案"] },
+        "right": { "title": "肉桶立法", "points": ["爭取經費與公共工程", "把好處帶回自己選區"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q42",
+      "topic": ["public-admin/policy", "public-admin/reform"],
+      "mnemonic": "用行銷手法推廣「社會公益理念」、改變民眾行為＝社會行銷。",
+      "trap": "「社會行銷」目標是公益與社會改革，不是企業賺錢或政治洗腦。",
+      "plain": "政府拍廣告宣導「酒後不開車」或「減塑愛地球」，這叫做什麼？",
+      "marks": [
+        { "text": "有益社會福祉的理念", "color": "blue" },
+        { "text": "社會改革", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。慈善制度化指民間救濟行動組織化、常態化運作。", "lawRef": null },
+        "B": { "why": "錯。政治社會化指個人學習並內化政治價值與態度的過程。", "lawRef": null },
+        "C": { "why": "錯。企業行銷目的在於推廣商品或服務以獲取商業利潤。", "lawRef": null },
+        "D": { "why": "對。社會行銷運用行銷觀念推廣公益，促使大眾改變行為。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "借用行銷技術", "tone": "plain" }, { "text": "改變民眾認知行為", "tone": "plain" }, { "text": "促進社會福祉改革", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q43",
+      "topic": ["public-admin/budget", "public-admin/governance"],
+      "mnemonic": "中央統籌分配稅款來自「國稅」，地方拿到後列為「稅課收入」。",
+      "trap": "財源是國稅（所得、營業、貨物稅），但地方帳上列為稅課收入。",
+      "plain": null,
+      "marks": [
+        { "text": "中央統籌分配稅款", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。依財劃法第 16-1 條，按營業額、人口、面積等指標權數分配。", "lawRef": { "law": "財政收支劃分法", "article": "16-1" } },
+        "B": { "why": "錯。統籌分配稅款屬稅課分配，非第 30 條之中央計畫補助款。", "lawRef": { "law": "財政收支劃分法", "article": "30" } },
+        "C": { "why": "錯。依財劃法第 8 條，稅款來源為所得、營業、貨物等「國稅」。", "lawRef": { "law": "財政收支劃分法", "article": "8" } },
+        "D": { "why": "對。依財劃法第 16-1 條，受分配地方政府應列為當年度稅課收入。", "lawRef": { "law": "財政收支劃分法", "article": "16-1" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "中央國稅提撥", "tone": "plain" }, { "text": "統籌分配地方", "tone": "plain" }, { "text": "地方列為稅課收入", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q44",
+      "topic": ["public-admin/governance"],
+      "mnemonic": "跨域治理就是要「打破本位主義」，不會反而深化本位主義。",
+      "trap": "注意選項說「深化」本位主義，剛好講反了！",
+      "plain": "不同縣市或不同局處聯手解決共同問題（跨域治理），哪個說法是反的？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "跨域治理", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。廣義跨域治理包含組織內部跨局處的跨部門協調。", "lawRef": null },
+        "B": { "why": "這句對。亦涵蓋不同行政區地方政府間的區域合作（如北北基）。", "lawRef": null },
+        "C": { "why": "這句對。因公共問題複雜且跨界（如空污、交通）而需合作。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。跨域治理目的正是打破本位主義而非深化。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "政策問題複雜跨界", "tone": "plain" }, { "text": "跨域整合協調", "tone": "plain" }, { "text": "克服本位主義", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q45",
+      "topic": ["public-admin/governance"],
+      "mnemonic": "「地方公投」有專屬的《公民投票法》，不在《地方制度法》裡。",
+      "trap": "地制法只規範機關、選舉、財政，公投另外寫在《公民投票法》。",
+      "plain": "想查「地方公投」的提案門檻與規定，翻《地方制度法》找得到嗎？",
+      "marks": [
+        { "text": "不包含", "color": "red" },
+        { "text": "地方制度法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句有包含。地制法第 5 條及第 33 至 62 條規範地方機關。", "lawRef": { "law": "地方制度法", "article": "5" } },
+        "B": { "why": "這句有包含。地制法第 33 條等規定地方議員與首長之選舉任期。", "lawRef": { "law": "地方制度法", "article": "33" } },
+        "C": { "why": "這句不包含（本題答案）。地方公投規範於《公民投票法》第 2 條。", "lawRef": { "law": "公民投票法", "article": "2" } },
+        "D": { "why": "這句有包含。地制法第 67 條等專節規範地方財政收入與支出。", "lawRef": { "law": "地方制度法", "article": "67" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "地方制度法範圍", "points": ["地方立法與行政機關", "地方選舉與自治財政收支"] },
+        "right": { "title": "公民投票法範圍", "points": ["全國性與地方性公民投票", "不在地方制度法內規範"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q46",
+      "topic": ["public-admin/governance"],
+      "mnemonic": "強調跨國性民間事務的國際組織＝「非政府組織」（NGO）。",
+      "trap": "公益組織、獨立部門常指國內非營利組織，跨國常稱 NGO。",
+      "plain": "像無國界醫生、綠色和平這類跨國民間組織，通常叫什麼？",
+      "marks": [
+        { "text": "非營利部門", "color": "blue" },
+        { "text": "跨國性民間事務的國際性組織", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。第二部門指營利私部門（企業），非營利屬第三部門。", "lawRef": null },
+        "B": { "why": "錯。公益組織泛指不以營利為目的、從事公益的組織，未必跨國。", "lawRef": null },
+        "C": { "why": "錯。獨立部門為美國對國內非營利組織或第三部門之慣稱。", "lawRef": null },
+        "D": { "why": "對。非政府組織（NGO）在聯合國與國際場域特指跨國民間組織。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "非營利民間組織", "tone": "plain" }, { "text": "從事跨國國際事務", "tone": "hot" }, { "text": "非政府組織（NGO）", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q47",
+      "topic": ["public-admin/governance"],
+      "mnemonic": "市場失靈、政府失靈、第三方政府都解釋 NPO，利己主義不是。",
+      "trap": "非營利組織強調利他與公益，不會用「利己主義」解釋其出現。",
+      "plain": "為什麼社會上會出現這麼多非營利組織（NPO）？哪個不是原因？",
+      "marks": [
+        { "text": "不包含", "color": "red" },
+        { "text": "非營利組織", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句有。市場不願提供無利可圖的公共財，NPO 補位（市場失靈）。", "lawRef": null },
+        "B": { "why": "這句有。政府只滿足多數人需求，少數需求由 NPO 提供（政府失靈）。", "lawRef": null },
+        "C": { "why": "這句有。薩拉蒙提出政府資助、NPO 執行服務的第三方政府理論。", "lawRef": null },
+        "D": { "why": "這句不包含（本題答案）。NPO 具利他志願精神，非源於利己主義。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "市場失靈／政府失靈", "tone": "plain" }, { "text": "第三方政府合作", "tone": "plain" }, { "text": "催生非營利組織", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q48",
+      "topic": ["public-admin/reform", "public-admin/governance"],
+      "mnemonic": "BOT：民間出錢「興建、營運」，還要自己扛「營運風險」。",
+      "trap": "BOT 不是政府出錢蓋，民間得扛風險且前期談判成本高。",
+      "plain": "像台灣高鐵採 BOT 模式興建營運，風險跟工作主要是誰扛？",
+      "marks": [
+        { "text": "興建—營運—移轉模式", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。BOT（Build-Operate-Transfer）是由「民間」負責籌資興建。", "lawRef": null },
+        "B": { "why": "對。民間機構特許期間自負盈虧，為營運風險主要承擔者。", "lawRef": null },
+        "C": { "why": "錯。委外與特許合作仍有資訊不對稱與道德風險等代理問題。", "lawRef": null },
+        "D": { "why": "錯。BOT 涉及長約談判、招標與審查，前期交易成本極高。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "民間籌資興建(B)", "tone": "plain" }, { "text": "自負盈虧營運(O)", "tone": "key" }, { "text": "期滿移轉政府(T)", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q49",
+      "topic": ["public-admin/governance", "public-admin/reform"],
+      "mnemonic": "官僚層級複雜僵化的是「公部門」，不是私部門！",
+      "trap": "政府才容易被法規與層級卡死，選項把公私部門說反了。",
+      "plain": "政府跟民間企業合作（公私協力）常卡關，哪一個原因其實講反了？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "公私協力", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。政府重公平程序、企業重效率獲利，價值認知有落差。", "lawRef": null },
+        "B": { "why": "這句對。公私雙方對成本與專業資訊掌握不均，容易造成溝通障礙。", "lawRef": null },
+        "C": { "why": "這句對。繁瑣的事前審議與監督機制可能提高成本、削弱誘因。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。層級繁複且法規受限者是公部門，非私部門。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "公部門困境", "points": ["層級節制繁複且法規多", "重視程序公平與防弊"] },
+        "right": { "title": "私部門特性", "points": ["決策扁平彈性較高", "重視獲利效率與風險報酬"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-public-admin-q50",
+      "topic": ["public-admin/organization", "public-admin/governance"],
+      "mnemonic": "各機關把自身使命劃太死，反而容易產生「本位主義」不合作。",
+      "trap": "「明確化各機關使命」聽起來很正面，但反而強化各自為政。",
+      "plain": "要讓政府不同部門願意好好合作，做哪一件事反而可能幫倒忙？",
+      "marks": [
+        { "text": "最無助於", "color": "red" },
+        { "text": "行政機關之間的協調合作", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句有助。跨機關任務編組能直接拉近各單位共同解決問題。", "lawRef": null },
+        "B": { "why": "這句有助。由共同上級長官出面協調，可有效化解水平僵局。", "lawRef": null },
+        "C": { "why": "這句最無助（本題答案）。各自強化專屬使命容易助長本位主義。", "lawRef": null },
+        "D": { "why": "這句有助。建立業務窗口的非正式互信關係，能加速溝通協調。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "有助跨機關協調", "points": ["任務編組、共同長官介入", "建立業務窗口非正式關係"] },
+        "right": { "title": "反助長本位主義", "points": ["過度強調個別機關使命", "容易劃地自限、推諉責任"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}
