@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
 import { STORAGE_KEY } from '../core/constants/round';
+import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import { createWorld } from '../core/world';
 import {
   attachPersistence,
@@ -144,5 +145,73 @@ describe('persistence system', () => {
       settings: { theme: 'light', lastRound: null, installHintDismissed: 'yes' },
     });
     assert.equal(importProgress(restoredWorld, badSettingsJson).ok, false);
+  });
+
+  it('fills defaults for legacy saves missing views, study, ask, and passes', () => {
+    const legacyJson = JSON.stringify({
+      version: 1,
+      progress: {
+        'q-a1': {
+          seen: 2,
+          correct: 1,
+          streak: 0,
+          lastPick: 'B',
+          lastAt: '2026-11-15T10:00:00.000Z',
+          due: '2026-11-16',
+        },
+      },
+      settings: {
+        theme: 'dark',
+        lastRound: {
+          bankId: 'test-bank',
+          subjectKeys: ['subj-a'],
+          count: 10,
+          mode: 'mixed',
+          fast: true,
+        },
+      },
+    });
+
+    const world = createWorld();
+    attachPersistence(world, createMemoryStorage({ [STORAGE_KEY]: legacyJson }));
+
+    assert.equal(world.progress.get('q-a1')?.views, 0);
+    assert.equal(world.settings.lastRound?.study, 'quiz');
+    assert.equal(world.settings.lastRound?.ask, 'positive');
+    assert.equal(world.settings.lastRound?.passes, READ_PASSES_DEFAULT);
+
+    // Invalid new fields are rejected
+    const invalidViews = JSON.stringify({
+      version: 1,
+      progress: {
+        'q-a1': {
+          seen: 1,
+          correct: 1,
+          views: -1,
+          streak: 1,
+          lastPick: 'A',
+          lastAt: '2026-11-15T10:00:00.000Z',
+          due: null,
+        },
+      },
+    });
+    assert.equal(importProgress(world, invalidViews).ok, false);
+
+    const invalidStudy = JSON.stringify({
+      version: 1,
+      progress: {},
+      settings: {
+        theme: 'light',
+        lastRound: {
+          bankId: 'test-bank',
+          subjectKeys: [],
+          count: 10,
+          mode: 'mixed',
+          fast: false,
+          study: 'invalid',
+        },
+      },
+    });
+    assert.equal(importProgress(world, invalidStudy).ok, false);
   });
 });

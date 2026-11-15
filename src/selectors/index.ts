@@ -1,5 +1,7 @@
 import { ROUND_COUNT_MIN, SECONDS_PER_QUESTION } from '../core/constants/round';
+import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import type {
+  AskType,
   Bank,
   BankId,
   Choice,
@@ -10,10 +12,13 @@ import type {
   PassageGroup,
   QuestionId,
   RoundConfig,
+  RoundState,
   Settings,
+  StudyMode,
   SubjectKey,
 } from '../core/types';
 import type { World } from '../core/world';
+import { askTypeOf } from '../systems/askType';
 import { isDue, localDaysUntil, toLocalDateString } from '../systems/date';
 import { countAvailable } from '../systems/selection';
 
@@ -28,10 +33,30 @@ export interface CurrentQuestionView {
   combo: number;
 }
 
+export interface ReadQuestionView {
+  question: OfficialQuestion;
+  group: PassageGroup | null;
+  enrich: Enrich | null;
+  askType: AskType;
+  pass: number;
+  totalPasses: number;
+  index: number;
+  total: number;
+  views: number;
+}
+
+export interface AskCountsView {
+  positive: number;
+  negative: number;
+}
+
 export interface RoundSummaryView {
+  study: StudyMode;
   total: number;
   correct: number;
   wrongIds: QuestionId[];
+  questionCount: number;
+  passes: number;
 }
 
 export interface SubjectStatView {
@@ -43,10 +68,27 @@ export interface SubjectStatView {
   correctRate: number;
 }
 
-/** 讀取進行中回合的目前題目與作答狀態。 */
+const summaryCache = new WeakMap<RoundState, RoundSummaryView>();
+
+function* iterBankQuestions(
+  world: World,
+  bankId: BankId,
+  subjectKeys: readonly SubjectKey[] = [],
+): Iterable<OfficialQuestion> {
+  const subjectSet = subjectKeys.length > 0 ? new Set(subjectKeys) : null;
+  for (const question of world.questions.values()) {
+    if (question.parseStatus !== 'ok') continue;
+    const paper = world.papers.get(question.paperId);
+    if (!paper || paper.bankId !== bankId) continue;
+    if (subjectSet && !subjectSet.has(paper.subjectKey)) continue;
+    yield question;
+  }
+}
+
+/** 讀取進行中作答回合的目前題目與作答狀態。 */
 export function currentQuestion(world: World): CurrentQuestionView | null {
   const round = world.round;
-  if (!round || round.finished) {
+  if (!round || round.finished || round.config.study === 'read') {
     return null;
   }
 
@@ -77,11 +119,50 @@ export function currentQuestion(world: World): CurrentQuestionView | null {
   };
 }
 
-/** 讀取剛結束那一回合的摘要（總題數、答對數、錯題 ID 清單）。 */
+/** 讀取進行中看答案回合的目前題目與遍數狀態。 */
+export function readView(world: World): ReadQuestionView | null {
+  const round = world.round;
+  if (!round || round.finished || round.config.study !== 'read') {
+    return null;
+  }
+
+  const questionId = round.queue[round.index];
+  if (questionId === undefined) {
+    return null;
+  }
+
+  const question = world.questions.get(questionId);
+  if (!question) {
+    return null;
+  }
+
+  const group = question.groupId ? (world.groups.get(question.groupId) ?? null) : null;
+  const enrich = world.enrich.get(questionId) ?? null;
+  const views = world.progress.get(questionId)?.views ?? 0;
+
+  return {
+    question,
+    group,
+    enrich,
+    askType: askTypeOf(question.stem),
+    pass: round.pass,
+    totalPasses: Math.max(1, round.config.passes),
+    index: round.index,
+    total: round.queue.length,
+    views,
+  };
+}
+
+/** 讀取剛結束那一回合的摘要（模式、總題數、答對數、錯題 ID 清單與遍數）。 */
 export function roundSummary(world: World): RoundSummaryView | null {
   const lastRound = world.lastRound;
   if (!lastRound) {
     return null;
+  }
+
+  const cached = summaryCache.get(lastRound);
+  if (cached) {
+    return cached;
   }
 
   const total = lastRound.results.length;
@@ -96,7 +177,56 @@ export function roundSummary(world: World): RoundSummaryView | null {
     }
   }
 
-  return { total, correct, wrongIds };
+  const summary: RoundSummaryView = {
+    study: lastRound.config.study,
+    total,
+    correct,
+    wrongIds,
+    questionCount: lastRound.queue.length,
+    passes: Math.max(1, lastRound.config.passes),
+  };
+  summaryCache.set(lastRound, summary);
+  return summary;
+}
+
+/** 依目前科目篩選統計正向題與反向題題數。 */
+export function askCounts(
+  world: World,
+  config: Pick<RoundConfig, 'bankId' | 'subjectKeys'>,
+): AskCountsView {
+  let positive = 0;
+  let negative = 0;
+
+  for (const question of iterBankQuestions(world, config.bankId, config.subjectKeys)) {
+    if (askTypeOf(question.stem) === 'negative') {
+      negative += 1;
+    } else {
+      positive += 1;
+    }
+  }
+
+  return { positive, negative };
+}
+
+/** 計算指定科目範圍內的正向題中，「看過或作答過」的比例（0–1）。 */
+export function positiveCoverage(
+  world: World,
+  bankId: BankId,
+  subjectKeys: readonly SubjectKey[] = [],
+): number {
+  let totalPositive = 0;
+  let coveredPositive = 0;
+
+  for (const question of iterBankQuestions(world, bankId, subjectKeys)) {
+    if (askTypeOf(question.stem) !== 'positive') continue;
+    totalPositive += 1;
+    const prog = world.progress.get(question.id);
+    if (prog && (prog.views > 0 || prog.seen > 0)) {
+      coveredPositive += 1;
+    }
+  }
+
+  return totalPositive > 0 ? coveredPositive / totalPositive : 0;
 }
 
 /** 統計指定題庫各科目的總題數、已作答題數與正確率（0–1）。 */
@@ -294,6 +424,9 @@ export function dailyMissions(world: World, bankId: BankId, now: Date): DailyMis
       count: ROUND_COUNT_MIN,
       mode: 'mixed',
       fast: true,
+      study: 'quiz',
+      ask: 'positive',
+      passes: READ_PASSES_DEFAULT,
     };
     const available = countAvailable(world, config, now);
     if (available === 0) continue;
@@ -311,8 +444,18 @@ export function dailyMissions(world: World, bankId: BankId, now: Date): DailyMis
     });
   }
 
-  const dueTotal = dueCount(world, bankId, now);
-  const wrongTotal = wrongCount(world, bankId);
+  const basePositiveConfig: RoundConfig = {
+    bankId,
+    subjectKeys: [],
+    count: ROUND_COUNT_MIN,
+    mode: 'mixed',
+    fast: true,
+    study: 'quiz',
+    ask: 'positive',
+    passes: READ_PASSES_DEFAULT,
+  };
+  const dueTotal = countAvailable(world, { ...basePositiveConfig, mode: 'due' }, now);
+  const wrongTotal = countAvailable(world, { ...basePositiveConfig, mode: 'wrong' }, now);
 
   let thirdConfig: RoundConfig;
   let thirdBadge: string;
@@ -320,24 +463,21 @@ export function dailyMissions(world: World, bankId: BankId, now: Date): DailyMis
   let thirdSubtitle: string;
 
   if (dueTotal > 0) {
-    thirdConfig = { bankId, subjectKeys: [], count: ROUND_COUNT_MIN, mode: 'due', fast: true };
     const actualCount = Math.min(ROUND_COUNT_MIN, dueTotal);
-    thirdConfig.count = actualCount;
+    thirdConfig = { ...basePositiveConfig, mode: 'due', count: actualCount };
     thirdBadge = '複';
     thirdTitle = `到期複習 ${actualCount} 題`;
     thirdSubtitle = `${dueTotal} 題該回來看看`;
   } else if (wrongTotal > 0) {
-    thirdConfig = { bankId, subjectKeys: [], count: ROUND_COUNT_MIN, mode: 'wrong', fast: true };
     const actualCount = Math.min(ROUND_COUNT_MIN, wrongTotal);
-    thirdConfig.count = actualCount;
+    thirdConfig = { ...basePositiveConfig, mode: 'wrong', count: actualCount };
     thirdBadge = '錯';
     thirdTitle = `錯題重練 ${actualCount} 題`;
     thirdSubtitle = `${wrongTotal} 題上次答錯`;
   } else {
-    thirdConfig = { bankId, subjectKeys: [], count: ROUND_COUNT_MIN, mode: 'mixed', fast: true };
-    const availAll = countAvailable(world, thirdConfig, now);
+    const availAll = countAvailable(world, basePositiveConfig, now);
     const actualCount = Math.min(ROUND_COUNT_MIN, availAll);
-    thirdConfig.count = actualCount;
+    thirdConfig = { ...basePositiveConfig, mode: 'mixed', count: actualCount };
     thirdBadge = '綜';
     thirdTitle = `綜合快刷 ${actualCount} 題`;
     thirdSubtitle = estimateMinutesText(actualCount);

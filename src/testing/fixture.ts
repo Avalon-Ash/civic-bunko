@@ -1,3 +1,4 @@
+import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import type {
   Bank,
   Enrich,
@@ -232,6 +233,9 @@ export function makeConfig(overrides: Partial<RoundConfig> = {}): RoundConfig {
     count: 10,
     mode: 'mixed',
     fast: false,
+    study: 'quiz',
+    ask: 'positive',
+    passes: READ_PASSES_DEFAULT,
     ...overrides,
   };
 }

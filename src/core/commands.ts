@@ -3,6 +3,7 @@ import {
   answerQuestion,
   nextQuestion,
   quitRound,
+  quizSameSet,
   retryWrong,
   startRound,
 } from '../systems/round';
@@ -32,7 +33,7 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       answerQuestion(world, cmd.pick, now);
       break;
     case 'next': {
-      const outcome = nextQuestion(world, now);
+      const outcome = nextQuestion(world, now, rng);
       if (outcome === 'advanced') {
         bumpStore(world);
       }
@@ -47,6 +48,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
     }
     case 'retryWrong':
       retryWrong(world);
+      break;
+    case 'quizSameSet':
+      quizSameSet(world, rng);
       break;
     case 'setTheme':
       setTheme(world, cmd.theme);

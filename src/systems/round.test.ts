@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
+import type { RoundState } from '../core/types';
 import { createTestWorld, makeConfig, makeSeededRng } from '../testing/fixture';
 
 describe('round system', () => {
@@ -153,5 +154,89 @@ describe('round system', () => {
     assert.deepEqual(retriedRound.queue, [secondId]);
     assert.equal(retriedRound.config.count, 1);
     assert.deepEqual(retriedRound.config.subjectKeys, ['subj-a']);
+  });
+
+  it('runs read mode across multiple passes with reshuffling, ignores answer, and supports quizSameSet', () => {
+    const world = createTestWorld();
+    const viewedIds: string[] = [];
+    const finishedPayloads: Array<{ resultsLength: number }> = [];
+    world.bus.on('viewed', (e) => viewedIds.push(e.id));
+    world.bus.on('roundFinished', (e) => finishedPayloads.push({ resultsLength: e.results.length }));
+
+    dispatch(
+      world,
+      {
+        type: 'startRound',
+        config: makeConfig({ study: 'read', subjectKeys: ['subj-a'], count: 3, passes: 2 }),
+      },
+      { now: fixedNow, rng: makeSeededRng(10) },
+    );
+
+    assert.ok(world.round !== null);
+    const pass1Queue = [...world.round.queue];
+    assert.equal(pass1Queue.length, 3);
+    assert.equal(world.round.pass, 1);
+
+    // answer is ignored in read mode
+    dispatch(world, { type: 'answer', pick: 'A' }, { now: fixedNow });
+    assert.equal(world.round.pick, null);
+    assert.equal(world.round.results.length, 0);
+
+    // Advance through pass 1
+    dispatch(world, { type: 'next' }, { now: fixedNow, rng: makeSeededRng(20) });
+    assert.equal(world.round.index, 1);
+    dispatch(world, { type: 'next' }, { now: fixedNow, rng: makeSeededRng(20) });
+    assert.equal(world.round.index, 2);
+    dispatch(world, { type: 'next' }, { now: fixedNow, rng: makeSeededRng(20) });
+
+    // Now on pass 2, index 0, reshuffled with injected rng
+    assert.ok(world.round !== null);
+    assert.equal(world.round.pass, 2);
+    assert.equal(world.round.index, 0);
+    const pass2Queue = [...world.round.queue];
+    assert.deepEqual(new Set(pass2Queue), new Set(pass1Queue));
+    assert.notDeepEqual(pass2Queue, pass1Queue);
+
+    // Finish pass 2
+    for (let i = 0; i < 3; i += 1) {
+      dispatch(world, { type: 'next' }, { now: fixedNow, rng: makeSeededRng(20) });
+    }
+
+    assert.equal(world.round, null);
+    assert.ok(world.lastRound !== null);
+    assert.equal(world.lastRound.finished, true);
+    assert.equal(finishedPayloads.length, 1);
+    assert.equal(finishedPayloads[0]?.resultsLength, 0);
+    assert.deepEqual(viewedIds, [...pass1Queue, ...pass2Queue]);
+
+    // quizSameSet launches a quiz round using the deduplicated, shuffled queue from lastRound
+    const getRound = (): RoundState | null => world.round;
+    dispatch(world, { type: 'quizSameSet' }, { now: fixedNow, rng: makeSeededRng(30) });
+    const quizRound = getRound();
+    assert.ok(quizRound !== null);
+    assert.equal(quizRound.config.study, 'quiz');
+    assert.deepEqual(quizRound.config.subjectKeys, ['subj-a']);
+    assert.equal(quizRound.queue.length, 3);
+    assert.deepEqual(new Set(quizRound.queue), new Set(pass1Queue));
+  });
+
+  it('discards read mode immediately on quitRound without emitting roundFinished', () => {
+    const world = createTestWorld();
+    let finished = 0;
+    world.bus.on('roundFinished', () => {
+      finished += 1;
+    });
+
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ study: 'read', subjectKeys: ['subj-a'], count: 3, passes: 2 }) },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    dispatch(world, { type: 'next' }, { now: fixedNow, rng: makeSeededRng(1) });
+    dispatch(world, { type: 'quitRound' }, { now: fixedNow });
+
+    assert.equal(world.round, null);
+    assert.equal(world.lastRound, null);
+    assert.equal(finished, 0);
   });
 });

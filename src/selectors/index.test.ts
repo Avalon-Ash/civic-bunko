@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
 import {
   activeBank,
+  askCounts,
   availableCount,
   bankTotals,
   currentQuestion,
@@ -11,7 +12,9 @@ import {
   daysLeft,
   dueCount,
   getSettings,
+  positiveCoverage,
   questionPaper,
+  readView,
   roundSummary,
   subjectStats,
   weekActivity,
@@ -90,6 +93,7 @@ describe('selectors', () => {
     world.progress.set('q-a1', {
       seen: 2,
       correct: 1,
+      views: 0,
       streak: 0,
       lastPick: 'D',
       lastAt: '2026-11-14T10:00:00.000Z',
@@ -99,6 +103,7 @@ describe('selectors', () => {
     world.progress.set('q-a2', {
       seen: 1,
       correct: 1,
+      views: 0,
       streak: 1,
       lastPick: 'B',
       lastAt: '2026-11-14T10:00:00.000Z',
@@ -108,6 +113,7 @@ describe('selectors', () => {
     world.progress.set('q-b1', {
       seen: 1,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: 'A',
       lastAt: '2026-11-15T10:00:00.000Z',
@@ -191,6 +197,7 @@ describe('selectors', () => {
     world.progress.set('q-a1', {
       seen: 1,
       correct: 0,
+      views: 0,
       streak: 0,
       lastPick: 'B',
       lastAt: '2026-11-18T09:00:00',
@@ -200,6 +207,7 @@ describe('selectors', () => {
     const missionsWithDue = dailyMissions(world, testBank.id, now);
     assert.equal(missionsWithDue[2]?.config.mode, 'due');
     assert.equal(missionsWithDue[2]?.available, 1);
+    assert.ok(missionsWithDue.every((m) => m.config.study === 'quiz' && m.config.ask === 'positive'));
 
     const week = weekActivity(world, now);
     assert.equal(week.length, 7);
@@ -207,5 +215,69 @@ describe('selectors', () => {
     assert.equal(week[2]?.isToday, true);
     assert.equal(week[2]?.done, true);
     assert.equal(week[3]?.done, false);
+  });
+
+  it('computes askCounts, positiveCoverage, and readView', () => {
+    const world = createTestWorld();
+    const qA3 = world.questions.get('q-a3')!;
+    world.questions.set('q-a3', { ...qA3, stem: '下列敘述何者錯誤？' });
+    const qB2 = world.questions.get('q-b2')!;
+    world.questions.set('q-b2', { ...qB2, stem: '下列何者非屬行政處分？' });
+
+    assert.deepEqual(askCounts(world, { bankId: testBank.id, subjectKeys: [] }), {
+      positive: 3,
+      negative: 2,
+    });
+    assert.deepEqual(askCounts(world, { bankId: testBank.id, subjectKeys: ['subj-a'] }), {
+      positive: 2,
+      negative: 1,
+    });
+
+    assert.equal(positiveCoverage(world, testBank.id, []), 0);
+
+    // Mark one positive question viewed (q-a1) and one answered (q-b1), plus one negative viewed (q-a3)
+    world.bus.emit({ type: 'viewed', id: 'q-a1', at: '2026-11-15T10:00:00.000Z' });
+    world.bus.emit({
+      type: 'answered',
+      id: 'q-b1',
+      pick: 'D',
+      correct: true,
+      at: '2026-11-15T10:01:00.000Z',
+    });
+    world.bus.emit({ type: 'viewed', id: 'q-a3', at: '2026-11-15T10:02:00.000Z' });
+
+    // Positive questions in testBank: q-a1, q-a2, q-b1 -> 2/3 covered
+    assert.equal(positiveCoverage(world, testBank.id, []), 2 / 3);
+    // Positive questions in subj-a: q-a1, q-a2 -> 1/2 covered
+    assert.equal(positiveCoverage(world, testBank.id, ['subj-a']), 0.5);
+
+    assert.equal(readView(world), null);
+    dispatch(
+      world,
+      {
+        type: 'startRound',
+        config: makeConfig({
+          study: 'read',
+          ask: 'all',
+          subjectKeys: ['subj-a'],
+          count: 3,
+          passes: 2,
+        }),
+      },
+      { now: () => new Date('2026-11-15T10:05:00'), rng: makeSeededRng(1) },
+    );
+
+    // currentQuestion is null in read mode, while readView returns full read metadata
+    assert.equal(currentQuestion(world), null);
+    const rv = readView(world);
+    assert.ok(rv !== null);
+    assert.equal(rv.pass, 1);
+    assert.equal(rv.totalPasses, 2);
+    assert.equal(rv.index, 0);
+    assert.equal(rv.total, 3);
+    if (rv.question.id === 'q-a3') {
+      assert.equal(rv.askType, 'negative');
+      assert.equal(rv.views, 1);
+    }
   });
 });

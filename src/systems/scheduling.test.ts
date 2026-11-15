@@ -92,4 +92,52 @@ describe('scheduling system', () => {
     assert.equal(prog.streak, GRADUATE_STREAK);
     assert.equal(prog.due, null);
   });
+
+  it('increments views and updates lastAt on viewed without altering quiz scheduling fields', () => {
+    const world = createWorld();
+    const changed: string[][] = [];
+    world.bus.on('progressChanged', (e) => changed.push(e.ids));
+
+    // Brand-new question viewed in read mode
+    world.bus.emit({
+      type: 'viewed',
+      id: 'q-read-1',
+      at: day0.toISOString(),
+    });
+
+    let prog = world.progress.get('q-read-1');
+    assert.ok(prog);
+    assert.equal(prog.views, 1);
+    assert.equal(prog.seen, 0);
+    assert.equal(prog.correct, 0);
+    assert.equal(prog.streak, 0);
+    assert.equal(prog.lastPick, null);
+    assert.equal(prog.due, null);
+    assert.equal(prog.lastAt, day0.toISOString());
+    assert.deepEqual(changed, [['q-read-1']]);
+
+    // Existing answered question viewed again preserves seen, correct, streak, lastPick, due
+    world.bus.emit({
+      type: 'answered',
+      id: 'q-read-2',
+      pick: 'B',
+      correct: false,
+      at: day0.toISOString(),
+    });
+    const dueBefore = world.progress.get('q-read-2')!.due;
+
+    world.bus.emit({
+      type: 'viewed',
+      id: 'q-read-2',
+      at: day1.toISOString(),
+    });
+    prog = world.progress.get('q-read-2')!;
+    assert.equal(prog.views, 1);
+    assert.equal(prog.seen, 1);
+    assert.equal(prog.correct, 0);
+    assert.equal(prog.streak, 0);
+    assert.equal(prog.lastPick, 'B');
+    assert.equal(prog.due, dueBefore);
+    assert.equal(prog.lastAt, day1.toISOString());
+  });
 });

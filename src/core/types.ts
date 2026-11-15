@@ -157,6 +157,8 @@ export interface TopicInfo {
 export interface Progress {
   seen: number;
   correct: number;
+  /** 看答案模式看過幾次 */
+  views: number;
   /** 目前連續答對次數 */
   streak: number;
   lastPick: Choice | null;
@@ -168,6 +170,11 @@ export interface Progress {
 
 // ── 回合 ────────────────────────────────────────────────
 export type RoundMode = 'mixed' | 'new' | 'wrong' | 'due';
+/** 問法：positive＝問哪個對；negative＝問哪個錯 */
+export type AskType = 'positive' | 'negative';
+export type AskFilter = AskType | 'all';
+/** quiz＝自己作答；read＝看答案（題目與正解一起出現） */
+export type StudyMode = 'quiz' | 'read';
 export interface RoundConfig {
   bankId: BankId;
   /** 空陣列＝全部科目 */
@@ -176,6 +183,10 @@ export interface RoundConfig {
   mode: RoundMode;
   /** 快刷：答對自動下一題 */
   fast: boolean;
+  study: StudyMode;
+  ask: AskFilter;
+  /** 看答案模式：這批題目看幾遍 */
+  passes: number;
 }
 export interface RoundResult {
   id: QuestionId;
@@ -191,6 +202,8 @@ export interface RoundState {
   results: RoundResult[];
   combo: number;
   finished: boolean;
+  /** 看答案模式：目前第幾遍（從 1 開始）；作答模式固定為 1 */
+  pass: number;
 }
 
 // ── 設定 ────────────────────────────────────────────────
@@ -208,6 +221,7 @@ export type AppEvent =
   | { type: 'bankLoaded'; bankId: BankId; questionCount: number }
   | { type: 'roundStarted'; config: RoundConfig; queue: QuestionId[] }
   | { type: 'answered'; id: QuestionId; pick: Choice; correct: boolean; at: string }
+  | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
   | { type: 'progressChanged'; ids: QuestionId[] }
   | { type: 'settingsChanged'; settings: Settings };
@@ -219,6 +233,8 @@ export type UICommand =
   | { type: 'next' }
   | { type: 'quitRound' }
   | { type: 'retryWrong' }
+  /** 用剛看完的同一批題目開作答回合 */
+  | { type: 'quizSameSet' }
   | { type: 'setTheme'; theme: ThemeChoice }
   | { type: 'dismissInstallHint' }
   | { type: 'importProgress'; json: string }
