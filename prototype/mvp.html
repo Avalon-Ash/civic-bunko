@@ -76,6 +76,30 @@ mark.g{background:var(--green-bg);color:var(--green)} mark.o{background:var(--or
 @keyframes pop{from{transform:scale(.9) translateY(10px);opacity:0}}
 .acts{display:flex;gap:12px} .acts .btn{flex:1;padding:0 12px}
 
+/* 口訣回饋：答對答錯都出現。圖在上、口訣一句、陷阱一句。 */
+.kou{display:flex;flex-direction:column;gap:12px;background:var(--green-bg);border-color:var(--green);box-shadow:0 4px 0 var(--green);animation:pop .32s cubic-bezier(.3,1.5,.5,1)}
+.kou.miss{background:var(--butter);border-color:var(--ink);box-shadow:0 4px 0 var(--ink)}
+.kou small{display:block;font-size:13px;font-weight:900;color:var(--green);letter-spacing:.04em}
+.kou.miss small{color:var(--orange)}
+.kou b{display:block;font-size:19px;font-weight:900;line-height:1.45}
+.pic{background:#fff;border:2px solid var(--ink);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:center}
+.lane{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px;font-weight:700;font-size:14px;width:100%}
+.lane span{padding:5px 10px;border-radius:10px;background:#f4eee8;border:2px solid var(--hair)}
+.lane .hot{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+.lane .key{background:var(--green);border-color:var(--green);color:#fff;font-weight:900}
+.lane i{font-style:normal;color:var(--ink2);font-weight:900}
+.lane.off{opacity:.6}
+.trap{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:700}
+.trap em{font-style:normal;flex:none;font-size:12px;font-weight:900;color:#fff;background:var(--red);border-radius:8px;padding:2px 8px;margin-top:2px}
+
+/* 申論四格 */
+.four{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cell{padding:14px 10px;text-align:center;min-height:96px;display:flex;flex-direction:column;justify-content:center;border-radius:18px}
+.cell b{font-size:16px;font-weight:900}
+.cell p{margin:6px 0 0;font-size:14px;font-weight:500;line-height:1.45}
+.cell:nth-child(1){background:var(--butter)} .cell:nth-child(2){background:var(--blue-bg)}
+.cell:nth-child(3){background:var(--red-bg)} .cell:nth-child(4){background:var(--mint)}
+
 /* 圖卡：法律位階 */
 .tiers{display:flex;flex-direction:column;align-items:center;gap:10px}
 .tier{width:100%;text-align:center;padding:14px}
@@ -132,21 +156,24 @@ const QS = [
    stem:'中央主管機關對地方<mark class="b">自治條例</mark>設有<mark class="b">處罰規定</mark>者，有下列何種<mark class="b">事前</mark>監督方式？',
    plain:'市議會通過一條「亂丟垃圾要罰錢」的規定。<br>發布之前，要先送給中央做什麼？',
    opts:['備查','特許','核定','通報'], ans:2,
-   one:'有罰則的自治條例，要先「核定」才能發布。',
+   ku:'要罰人，先問中央。有罰則就是「核定」。', trap:'備查是做完才告知，不是事前。',
+   pic:'<div class="lane"><span class="hot">有罰則</span><i>→</i><span class="key">核定</span><i>→</i><span>發布</span></div><div class="lane off"><span>沒罰則</span><i>→</i><span>發布</span><i>→</i><span>備查</span></div>',
    why:['備查＝事後告知。沒有罰則才用這個。','特許不是自治法規的監督方式。','有罰則 → 先報中央核定，再發布。','法條沒有「通報」這種監督方式。'],
    law:'地方制度法 第 26 條第 4 項' },
  { src:'115 普考・行政法 第 34 題', topic:'行政執行法',
    stem:'下列行政執行行為，何者須由<mark class="b">法院裁定</mark>後為之？',
    plain:'欠稅不繳，執行機關想出手。<br>哪一招一定要先問過法官？',
    opts:['拘提','斷絕營業所必須之水電','禁止奢侈行為','對人之管束'], ans:0,
-   one:'把人帶走（拘提、管收），要法官點頭。',
+   ku:'要把人帶走，法官先點頭。', trap:'管束也限制人，但那是緊急當場做，不用法官。',
+   pic:'<div class="lane"><span class="hot">拘提、管收</span><i>→</i><span class="key">法官點頭</span></div><div class="lane off"><span>斷水電、禁奢、管束</span><i>→</i><span>機關自己來</span></div>',
    why:['限制人身自由 → 要法院裁定。','執行機關自己就能做。','執行分署依申請核發，不必經法院。','情況緊急的即時強制，當場就做。'],
    law:'行政執行法 第 17 條' },
  { src:'115 普考・行政法 第 2 題', topic:'信賴保護原則',
    stem:'有關<mark class="b">信賴保護原則</mark>，下列敘述<mark class="r">何者錯誤</mark>？',
    plain:'政府說好的事突然變卦，人民可以主張「我是相信你才這樣做的」。<br>下面哪一句<mark class="r">說錯了</mark>？',
    opts:['基於公益撤銷授益處分，應給與損失補償','公益容許時，得讓違法行為繼續存在','源於法安定性與既得權之保障','僅限於處分之撤銷或廢止，不包括法規之變更'], ans:3,
-   one:'法規改了，也有信賴保護。不只管處分。',
+   ku:'信賴保護是一把大傘，處分、法規都遮。', trap:'看到「僅限」「只有」，多半是錯的。',
+   pic:'<svg width="170" height="74" viewBox="0 0 170 74" aria-hidden="true"><path d="M10 62Q85-42 160 62Q135 46 110 62Q85 46 60 62Q35 46 10 62Z" fill="#ffc2cf" stroke="#5a4636" stroke-width="2.5" stroke-linejoin="round"/><path d="M85 12V4" stroke="#5a4636" stroke-width="2.5" stroke-linecap="round"/></svg><div class="lane"><span class="key">處分</span><span class="key">法規</span></div>',
    why:['對。撤銷了就要補償。','對。這叫存續保障。','對。這是它的來源。','錯在「僅限」。法規變更也適用。'],
    law:'司法院釋字第 525 號' }
 ];
@@ -155,13 +182,17 @@ const S = { tab:'today', i:0, pick:null, plain:false, score:0, done:false };
 const $ = id => document.getElementById(id);
 const K = 'ABCD';
 
-const sprout = (s=64, happy=false) => `<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true" style="flex:none">
- <path d="M32 16c-2-7 2-11 8-12-1 6-3 10-8 12z" fill="#8fd3a4" stroke="#5a4636" stroke-width="2.5" stroke-linejoin="round"/>
- <ellipse cx="32" cy="39" rx="24" ry="21" fill="#fffdf9" stroke="#5a4636" stroke-width="2.5"/>
- <ellipse cx="17" cy="44" rx="4.5" ry="3" fill="#ffc2cf"/><ellipse cx="47" cy="44" rx="4.5" ry="3" fill="#ffc2cf"/>
- ${happy ? '<path d="M20 38q3-4 6 0M38 38q3-4 6 0" fill="none" stroke="#5a4636" stroke-width="2.5" stroke-linecap="round"/>'
-         : '<circle cx="23" cy="38" r="2.6" fill="#5a4636"/><circle cx="41" cy="38" r="2.6" fill="#5a4636"/>'}
- <path d="M28 44q4 4 8 0" fill="none" stroke="#5a4636" stroke-width="2.5" stroke-linecap="round"/></svg>`;
+// 原創角色：八字臉的圓貓（奶茶色花紋）。mood: idle | yay | oops
+const cat = (s=64, mood='idle') => `<svg width="${s}" height="${s}" viewBox="0 0 64 64" aria-hidden="true" style="flex:none">
+ <path d="M11 28L14 7l15 10zM53 28L50 7 35 17z" fill="#c9ad94" stroke="#5a4636" stroke-width="2.5" stroke-linejoin="round"/>
+ <ellipse cx="32" cy="39" rx="26" ry="21" fill="#fffdf9"/>
+ <path d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z" fill="#c9ad94"/>
+ <ellipse cx="32" cy="39" rx="26" ry="21" fill="none" stroke="#5a4636" stroke-width="2.5"/>
+ <ellipse cx="15" cy="46" rx="4.5" ry="3" fill="#ffc2cf"/><ellipse cx="49" cy="46" rx="4.5" ry="3" fill="#ffc2cf"/>
+ ${mood==='yay' ? '<path d="M19 41q3.5-5 7 0M38 41q3.5-5 7 0" fill="none" stroke="#5a4636" stroke-width="2.5" stroke-linecap="round"/>'
+               : '<circle cx="22.5" cy="40" r="2.8" fill="#5a4636"/><circle cx="41.5" cy="40" r="2.8" fill="#5a4636"/>'}
+ ${mood==='oops' ? '<path d="M29 48h6" stroke="#5a4636" stroke-width="2.5" stroke-linecap="round"/><path d="M56 14q4 6 0 8q-4-2 0-8z" fill="#9fd0f0" stroke="#5a4636" stroke-width="1.8"/>'
+                : '<path d="M27 46q2.5 3.5 5 0q2.5 3.5 5 0" fill="none" stroke="#5a4636" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'}</svg>`;
 
 const TABS = [
  ['today','今日','<path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/>'],
@@ -173,7 +204,7 @@ const TABS = [
 function views(){
  if (S.tab==='today') return `
   <h1>今日</h1>
-  <div class="card count">${sprout(76)}<div class="grow"><div class="sub" style="color:var(--ink)">距離筆試</div><div><b>${daysLeft}</b> 天</div><div class="sub" style="color:var(--ink)">12/5（六）・12/6（日）</div></div></div>
+  <div class="card count">${cat(76)}<div class="grow"><div class="sub" style="color:var(--ink)">距離筆試</div><div><b>${daysLeft}</b> 天</div><div class="sub" style="color:var(--ink)">12/5（六）・12/6（日）</div></div></div>
   <h2>今天的 3 個小任務</h2>
   ${[['行','行政法 5 題','約 3 分鐘','var(--butter)'],['地','地方自治 5 題','約 3 分鐘','var(--mint)'],['回','錯題回來看 5 題','3 天前答錯的','var(--pink)']].map((m,n)=>`
   <button class="card press mission" data-act="start"><span class="dot" style="background:${m[3]}">${m[0]}</span>
@@ -189,7 +220,12 @@ function views(){
     ['法律','立法院通過、總統公布。名字是法、律、條例、通則。','例：行政程序法'],
     ['命令','行政機關自己訂的。不能超出法律給的範圍。','例：施行細則、辦法']].map((t,n)=>`
    <button class="card press tier" data-tier="${n}" aria-expanded="false"><b>${t[0]}</b><span hidden><p>${t[1]}</p><span class="chip eg">${t[2]}</span></span></button>`).join('')}</div>
-  <div class="say">${sprout(52)}<div class="bubble"><small style="color:var(--blue)">記這句就好</small>上面的壓過下面的。</div></div>`;
+  <div class="say">${cat(52)}<div class="bubble"><small style="color:var(--blue)">記這句就好</small>上面的壓過下面的。</div></div>
+  <div><h2>申論四格</h2><p class="sub" style="margin:4px 0 0">自治條例 vs 自治規則。四格寫完就是一題申論的骨架。</p></div>
+  <div class="four">${[['① 誰訂的','條例：議會通過<br>規則：政府自己訂'],['② 叫什麼','條例：○○市××自治條例<br>規則：辦法、細則、準則'],
+    ['③ 能罰嗎','條例：可以<br>規則：不行'],['④ 報給誰','有罰則：先核定<br>其他：發布後備查']].map((c,n)=>`
+   <button class="card press cell" data-tier="f${n}" aria-expanded="false"><b>${c[0]}</b><span hidden><p>${c[1]}</p></span></button>`).join('')}</div>
+  <p class="sub">地方制度法 第 25–27 條。示範內容。</p>`;
 
  if (S.tab==='stamps') return `
   <h1>集章</h1>
@@ -199,9 +235,9 @@ function views(){
 
  if (S.done) return `
   <div style="flex:1"></div>
-  <div class="stamp">拔草<br>完成</div>
+  <div class="stamp">過關<br>成功</div>
   <div style="text-align:center"><h1>${S.score} / ${QS.length}</h1><p class="sub" style="font-size:15px">答錯的 ${QS.length-S.score} 題，明天會再回來找你。</p></div>
-  <div class="row" style="justify-content:center">${sprout(84,true)}</div>
+  <div class="row" style="justify-content:center">${cat(96,'yay')}</div>
   <div style="flex:1"></div>
   <div class="acts"><button class="btn ghost press" data-act="home">回今日</button><button class="btn press" data-act="start">再來一回合</button></div>`;
 
@@ -215,7 +251,8 @@ function views(){
    <span class="chip plain" style="margin-top:8px">${q.src}</span>
   </div>
   <div class="opts">${q.opts.map((o,n)=>`<button class="card press opt ${ans?(n===q.ans?'right':n===S.pick?'picked':'dim'):''}" data-opt="${n}" ${ans?'disabled':''}><span class="k">${K[n]}</span><span class="grow">${o}</span></button>`).join('')}</div>
-  ${ans?`<div class="say">${sprout(52,ok)}<div class="bubble ${ok?'':'miss'}"><small>${ok?'答對了':'沒關係，記這句'}</small>${q.one}</div></div>
+  ${ans?`<div class="card kou ${ok?'':'miss'}"><div class="row">${cat(58,ok?'yay':'oops')}<div class="grow"><small>${ok?'答對了！口訣再記一次':'差一點！看這句馬上學會'}</small><b>${q.ku}</b></div></div>
+   <div class="pic">${q.pic}</div><div class="trap"><em>陷阱</em><span>${q.trap}</span></div></div>
   <div class="acts"><button class="btn ghost press" data-act="sheet">看每個選項</button><button class="btn press" data-act="next">${S.i===QS.length-1?'蓋章':'下一題'}</button></div>`:''}`;
 }
 
