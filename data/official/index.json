@@ -1,0 +1,254 @@
+{
+  "papers": [
+    {
+      "id": "115-general-admin-law",
+      "bankId": "local4-civil",
+      "year": 115,
+      "exam": "general",
+      "subjectKey": "admin-law",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "115-general-chinese",
+      "bankId": "local4-civil",
+      "year": 115,
+      "exam": "general",
+      "subjectKey": "chinese",
+      "mcqCount": 10,
+      "essayCount": 1,
+      "needsReview": 0
+    },
+    {
+      "id": "115-general-law-english",
+      "bankId": "local4-civil",
+      "year": 115,
+      "exam": "general",
+      "subjectKey": "law-english",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "115-general-local-gov",
+      "bankId": "local4-civil",
+      "year": 115,
+      "exam": "general",
+      "subjectKey": "local-gov",
+      "mcqCount": 25,
+      "essayCount": 2,
+      "needsReview": 0
+    },
+    {
+      "id": "115-general-public-admin",
+      "bankId": "local4-civil",
+      "year": 115,
+      "exam": "general",
+      "subjectKey": "public-admin",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "114-general-admin-law",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "general",
+      "subjectKey": "admin-law",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "114-general-chinese",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "general",
+      "subjectKey": "chinese",
+      "mcqCount": 10,
+      "essayCount": 1,
+      "needsReview": 0
+    },
+    {
+      "id": "114-general-law-english",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "general",
+      "subjectKey": "law-english",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "114-general-local-gov",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "general",
+      "subjectKey": "local-gov",
+      "mcqCount": 25,
+      "essayCount": 2,
+      "needsReview": 0
+    },
+    {
+      "id": "114-general-public-admin",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "general",
+      "subjectKey": "public-admin",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "114-local4-admin-law",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "local4",
+      "subjectKey": "admin-law",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "114-local4-chinese",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "local4",
+      "subjectKey": "chinese",
+      "mcqCount": 10,
+      "essayCount": 1,
+      "needsReview": 0
+    },
+    {
+      "id": "114-local4-law-english",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "local4",
+      "subjectKey": "law-english",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "114-local4-local-gov",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "local4",
+      "subjectKey": "local-gov",
+      "mcqCount": 25,
+      "essayCount": 2,
+      "needsReview": 0
+    },
+    {
+      "id": "114-local4-public-admin",
+      "bankId": "local4-civil",
+      "year": 114,
+      "exam": "local4",
+      "subjectKey": "public-admin",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "113-general-admin-law",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "general",
+      "subjectKey": "admin-law",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "113-general-chinese",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "general",
+      "subjectKey": "chinese",
+      "mcqCount": 10,
+      "essayCount": 1,
+      "needsReview": 0
+    },
+    {
+      "id": "113-general-law-english",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "general",
+      "subjectKey": "law-english",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "113-general-local-gov",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "general",
+      "subjectKey": "local-gov",
+      "mcqCount": 25,
+      "essayCount": 2,
+      "needsReview": 0
+    },
+    {
+      "id": "113-general-public-admin",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "general",
+      "subjectKey": "public-admin",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "113-local4-admin-law",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "local4",
+      "subjectKey": "admin-law",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "113-local4-chinese",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "local4",
+      "subjectKey": "chinese",
+      "mcqCount": 10,
+      "essayCount": 2,
+      "needsReview": 0
+    },
+    {
+      "id": "113-local4-law-english",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "local4",
+      "subjectKey": "law-english",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    },
+    {
+      "id": "113-local4-local-gov",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "local4",
+      "subjectKey": "local-gov",
+      "mcqCount": 25,
+      "essayCount": 2,
+      "needsReview": 0
+    },
+    {
+      "id": "113-local4-public-admin",
+      "bankId": "local4-civil",
+      "year": 113,
+      "exam": "local4",
+      "subjectKey": "public-admin",
+      "mcqCount": 50,
+      "essayCount": 0,
+      "needsReview": 0
+    }
+  ]
+}
