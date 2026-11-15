@@ -1,0 +1,337 @@
+{
+  "paperId": "114-local4-chinese",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T04:46:30+08:00",
+  "items": [
+    {
+      "id": "114-local4-chinese-q01",
+      "topic": ["chinese/words"],
+      "mnemonic": "「鳳毛麟角」指稀少珍貴，整句直接收尾最俐落，不疊加多餘字詞。",
+      "trap": "常順口說出「感到嘆為觀止」「無論任何」，念起來順卻是贅字。",
+      "plain": null,
+      "marks": [
+        { "text": "冗詞贅字", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。「嘆為觀止」已含讚嘆感受，前面不需再加「感到」。", "lawRef": null },
+        "B": { "why": "錯。「無論」與「任何」語意重疊，留其中一個就好。", "lawRef": null },
+        "C": { "why": "錯。「加以」與「妄加」重複出現「加」，語意冗贅。", "lawRef": null },
+        "D": { "why": "對（本題答案）。「鳳毛麟角」比喻珍貴稀少，全句簡潔無冗詞。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "精簡正確（D）",
+          "points": ["已是鳳毛麟角", "語意完整不重複"]
+        },
+        "right": {
+          "title": "常見冗詞錯誤",
+          "points": ["感到＋嘆為觀止", "無論＋任何、加以＋妄加"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q02",
+      "topic": ["chinese/practical"],
+      "mnemonic": "「溫恭淑慎」讚的是一個人的品德；其他三句都在祝成雙成對的夫妻。",
+      "trap": "四句都是好話，容易忽略「溫恭淑慎」只讚單人、非祝夫妻。",
+      "plain": null,
+      "marks": [
+        { "text": "題辭", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "是答案。讚美個人溫和恭謹、賢淑謹慎的品德，不是結婚賀辭。", "lawRef": null },
+        "B": { "why": "錯。結婚賀辭，比喻夫妻相敬如賓、感情和諧。", "lawRef": null },
+        "C": { "why": "錯。結婚賀辭，源自春秋秦國與晉國聯姻典故。", "lawRef": null },
+        "D": { "why": "錯。結婚賀辭，以魚和水相依比喻夫妻感情融洽。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "讚個人品德（A）",
+          "points": ["溫恭淑慎", "讚頌個人品德，非成雙"]
+        },
+        "right": {
+          "title": "結婚賀辭（BCD）",
+          "points": ["鸞鳳和鳴、秦晉之緣", "魚水和諧（皆喻夫妻）"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q03",
+      "topic": ["chinese/reading"],
+      "mnemonic": "上句說「不是超人」，下句接「好好做個人」，中間當然填「他的偉大在於他是人」。",
+      "trap": "別被「超凡」「聖人」字眼吸引，前後文都在強調「是人」。",
+      "plain": null,
+      "marks": [
+        { "text": "孔子", "color": "blue" },
+        { "text": "成人之學", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。「超凡」「平凡」並非此段主軸，前後文要對比「超人」與「人」。", "lawRef": null },
+        "B": { "why": "對（本題答案）。呼應前句「不是超人」與後句「人的典範」「成人之學」。", "lawRef": null },
+        "C": { "why": "錯。若「遙不可及」，就無法作為一般人學習做人的典範。", "lawRef": null },
+        "D": { "why": "錯。把孔子神格化，與作者強調「不是超人、是人」相反。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "不是超人", "tone": "hot" },
+              { "text": "恰恰相反", "tone": "plain" },
+              { "text": "偉大在於他是人", "tone": "key" }
+            ]
+          },
+          {
+            "steps": [
+              { "text": "好好做個人", "tone": "plain" },
+              { "text": "人的典範", "tone": "plain" },
+              { "text": "成人之學", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q04",
+      "topic": ["chinese/reading"],
+      "mnemonic": "堂號是尋根認祖用的，功能是「敦睦宗親」（同姓親族），不是敦睦「鄰里」。",
+      "trap": "「敦睦鄰里」太順口，沒回頭核對原文其實寫「敦睦宗親」。",
+      "plain": null,
+      "marks": [
+        { "text": "何者不恰當", "color": "red" },
+        { "text": "堂號", "color": "blue" },
+        { "text": "敦睦宗親", "color": "blue" },
+        { "text": "郡望", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句錯（本題答案）。原文寫的是「敦睦宗親」，不是「鄰里」。", "lawRef": null },
+        "B": { "why": "這句對。原文提及堂號用以「慎終追遠」、是「尋根意識」體現。", "lawRef": null },
+        "C": { "why": "這句對。原文明確指出堂號具「濃厚的宗教色彩與精神紐帶作用」。", "lawRef": null },
+        "D": { "why": "這句對。原文說「發祖地望」較為普遍，「占了堂號的大半」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "原文：敦睦宗親",
+          "points": ["凝聚同姓血緣宗族", "慎終追遠、尋根意識"]
+        },
+        "right": {
+          "title": "選項 A：敦睦鄰里",
+          "points": ["偷換成住家附近鄰居", "與堂號本義不符（錯）"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q05",
+      "topic": ["chinese/reading"],
+      "mnemonic": "絕不為迎合而遷就，寧可不戀愛結婚，也深信「慧眼識英雄」終有人懂。",
+      "trap": "易誤選 D，但重點不在穿舊衣，而在堅持原則不遷就。",
+      "plain": null,
+      "marks": [
+        { "text": "慧眼是可以識英雄的", "color": "blue" },
+        { "text": "遷就", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。作者明確說「這個原則不能變」「頂反對遷就」，並非放下身段。", "lawRef": null },
+        "B": { "why": "對（本題答案）。寧可孤身不妥協，仍相信有慧眼之人能識英雄。", "lawRef": null },
+        "C": { "why": "錯。文中沒有埋怨或討論如何磨練自己，而是強調拒絕世俗妥協。", "lawRef": null },
+        "D": { "why": "錯。破舊外表只是不迎合的結果，並非用來刻意「彰顯」原則。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "不迎合裝扮", "tone": "plain" },
+              { "text": "拒絕遷就", "tone": "hot" },
+              { "text": "相信慧眼識英雄", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q06",
+      "topic": ["chinese/reading"],
+      "mnemonic": "臺灣的山雖沒四季繽紛色彩，卻贏在空氣裡那股獨特的「淡淡檜木香」。",
+      "trap": "看到「高緯度國家」「檜木」容易腦補出「壯麗」「價值高」。",
+      "plain": null,
+      "marks": [
+        { "text": "臺灣的山", "color": "blue" },
+        { "text": "氣味", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。原文明確寫臺灣的山「沒有」四季顏色分明，只有白與綠。", "lawRef": null },
+        "B": { "why": "錯。原文僅對比色彩差異，並未比較誰比較「壯麗」。", "lawRef": null },
+        "C": { "why": "對（本題答案）。直接對應原文「仍有獨特的『氣味』」與檜木甜香。", "lawRef": null },
+        "D": { "why": "錯。原文描寫感官上的清爽甜味，未談論檜木的經濟「價值」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "高緯度的山",
+          "points": ["四季顏色分明"]
+        },
+        "right": {
+          "title": "臺灣的山（答案）",
+          "points": ["只有白雪與綠林", "有獨特檜木氣味"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q07",
+      "topic": ["chinese/reading"],
+      "mnemonic": "地方創生沒先想清楚，返鄉人就算人在家鄉，心卻斷了線，這就叫「鄉痛」。",
+      "trap": "「地方創生鼓勵返鄉」聽起來很常識，但這段文章沒這麼說。",
+      "plain": null,
+      "marks": [
+        { "text": "地方創生", "color": "blue" },
+        { "text": "鄉愁", "color": "blue" },
+        { "text": "鄉痛", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。原文沒有提到「緩解都市人口密度」，切勿用背景常識腦補。", "lawRef": null },
+        "B": { "why": "錯。文中肯定地方創生重要，並未主張不用返鄉。", "lawRef": null },
+        "C": { "why": "錯。環境社經遽變時，即使身處家鄉仍會產生「鄉痛」的疏離感。", "lawRef": null },
+        "D": { "why": "對（本題答案）。地方創生內涵不清導致人地鏈結斷裂，正是「鄉痛」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "創生意涵不清", "tone": "hot" },
+              { "text": "返鄉卻鏈結斷裂", "tone": "plain" },
+              { "text": "造成「鄉痛」", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q08",
+      "topic": ["chinese/reading"],
+      "mnemonic": "「有點熟又不太熟」保留距離，「自顧自發呆看書」是自由，這就是最好的時光。",
+      "trap": "容易被結尾「寫信給老師」帶偏，其實主角想說的是自在的感受。",
+      "plain": null,
+      "marks": [
+        { "text": "最好的時光", "color": "blue" },
+        { "text": "自顧自地", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。作者讀得快是為了留時間「發呆」，不是為了趕進度多看書。", "lawRef": null },
+        "B": { "why": "錯。「吞完大半本」只是比喻讀得快，全文沒在講「讀書別全飽」。", "lawRef": null },
+        "C": { "why": "對（本題答案）。「有點熟又不太熟」的距離與「自顧自」的自由最貼切。", "lawRef": null },
+        "D": { "why": "錯。只說想寫信「告訴他最好的時光還在」，未提邀老師共同創造。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "有點熟不太熟", "tone": "plain" },
+              { "text": "自顧自看書發呆", "tone": "plain" },
+              { "text": "距離＋自由＝最好時光", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q09",
+      "topic": ["chinese/reading"],
+      "mnemonic": "文章結尾直接給解方：生命教育＋幫農民無害防雞，就是人與石虎「和諧共生」。",
+      "trap": "前段列了一堆原因，結尾「應該是現階段的重要工作」才是主旨。",
+      "plain": null,
+      "marks": [
+        { "text": "石虎", "color": "blue" },
+        { "text": "非傷害性的方法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。原文第一句就說「並非來自毛皮需求」，意思完全相反。", "lawRef": null },
+        "B": { "why": "錯。雞不是殺手，獵捕壓力來自食補、寵養及農民的陷阱毒餌。", "lawRef": null },
+        "C": { "why": "錯。是石虎與人類「利益衝突」，不是石虎彼此爭奪地盤。", "lawRef": null },
+        "D": { "why": "對（本題答案）。呼應末句「協助農民以非傷害性方法降低損失」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "偷襲放山雞", "tone": "hot" },
+              { "text": "農民設陷阱毒餌", "tone": "plain" },
+              { "text": "傷及石虎", "tone": "plain" }
+            ]
+          },
+          {
+            "steps": [
+              { "text": "非傷害性防治", "tone": "key" },
+              { "text": "加上生命教育", "tone": "key" },
+              { "text": "人虎和諧共生", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-local4-chinese-q10",
+      "topic": ["chinese/reading"],
+      "mnemonic": "「但是」後面才是重點：不管狩獵族、傳統農民或歐美都市人，消耗熱量都差不多！",
+      "trap": "開頭「長期以來認為」是舊觀念，「但在…」後面才是文章結論。",
+      "plain": null,
+      "marks": [
+        { "text": "能量消耗", "color": "blue" },
+        { "text": "哈扎人", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。這是開頭提到的「舊觀念」，後文實測數據並不支持此推論。", "lawRef": null },
+        "B": { "why": "對（本題答案）。哈扎人、傳統農民與歐美都市人消耗熱量都相近。", "lawRef": null },
+        "C": { "why": "錯。文章只測量「熱量消耗」，並未比較誰的「身心較健康」。", "lawRef": null },
+        "D": { "why": "錯。質譜儀只是檢驗工具，重點在各族群能量消耗相近的結果。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "過去以為（錯）",
+          "points": ["原始狩獵族消耗較多", "現代人動少才變胖"]
+        },
+        "right": {
+          "title": "實測結果（答案）",
+          "points": ["狩獵族＝歐美都市人", "傳統農民＝現代便利生活"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}

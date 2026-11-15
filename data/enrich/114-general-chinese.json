@@ -1,0 +1,275 @@
+{
+  "paperId": "114-general-chinese",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T04:43:00+08:00",
+  "items": [
+    {
+      "id": "114-general-chinese-q01",
+      "topic": ["chinese/reading"],
+      "mnemonic": "偏鄉不缺熱血老師，缺的是能留住人的制度與支持。",
+      "trap": "看到「資源不足」別急著選 B，文中沒提北部師資。",
+      "plain": null,
+      "marks": [
+        { "text": "偏鄉教師的流失", "color": "blue" },
+        { "text": "完善師培制度與支持系統", "color": "blue" },
+        { "text": "本質所在", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文中建議「自辦甄選進修管道」來解套，非問題主因。", "lawRef": null },
+        "B": { "why": "錯。原文未提北部師資，且強調其實有六千人願前往。", "lawRef": null },
+        "C": { "why": "錯。開偏鄉專班是提出的解方，並非造成師資過剩。", "lawRef": null },
+        "D": { "why": "對。有人願去卻留不住，關鍵在完善師培與支持系統。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "累積6千申請人", "tone": "plain" }, { "text": "熱血人才不缺", "tone": "plain" }] },
+          { "steps": [{ "text": "師培與支持不足", "tone": "hot" }, { "text": "完善制度留人", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q02",
+      "topic": ["chinese/reading"],
+      "mnemonic": "歷史不只在課本裡，戲臺與街談也是常民的歷史來源。",
+      "trap": "別被 A 的「真實歷史」騙了，文意講多元而非真偽。",
+      "plain": null,
+      "marks": [
+        { "text": "常民的歷史世界", "color": "blue" },
+        { "text": "來源與傳播路徑", "color": "blue" },
+        { "text": "多元性", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。作者談的是知識來源多元，未說聊天才是真實歷史。", "lawRef": null },
+        "B": { "why": "錯。原文只說兩者關係複雜值得探究，非靠互動累積。", "lawRef": null },
+        "C": { "why": "對。司機從戲臺與講古學歷史，顯示理解來源多元。", "lawRef": null },
+        "D": { "why": "錯。文中將專業史學與常民歷史並列，未說前者根植後者。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "專業史學", "points": ["來自學術專業訓練", "史學工作者觀點"] },
+        "right": { "title": "常民歷史", "points": ["來自戲臺講古談天", "具多元來源與階層性"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q03",
+      "topic": ["chinese/reading"],
+      "mnemonic": "老鼠跑進母親一輩子的抱怨，寫的是她婚後的焦慮。",
+      "trap": "婆媳與滅鼠都是細節配角，主旨是母親的憂困人生。",
+      "plain": null,
+      "marks": [
+        { "text": "老鼠史", "color": "blue" },
+        { "text": "怨嘆起三十年前初嫁時", "color": "blue" },
+        { "text": "全民滅鼠運動", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。從初嫁漏水被啃到更年期焦慮，都藉老鼠串起。", "lawRef": null },
+        "B": { "why": "錯。祖母只是母親抱怨一環，非全篇要凸顯的主題。", "lawRef": null },
+        "C": { "why": "錯。滅鼠運動是文末呼應老鼠題旨的回憶，非主旨。", "lawRef": null },
+        "D": { "why": "錯。見到副刊文學獎只是覺得驚奇，並無諷刺文壇。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "初嫁新房漏水被啃", "tone": "plain" }, { "text": "更年期焦慮鼠聲", "tone": "hot" }, { "text": "母親婚後憂困", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q04",
+      "topic": ["chinese/reading"],
+      "mnemonic": "把聊天當親友探監，說話是為了釋放受困的孤獨。",
+      "trap": "別被 D 的「人人都是座孤島」吸引，文章只說特定的人。",
+      "plain": null,
+      "marks": [
+        { "text": "講個不停", "color": "blue" },
+        { "text": "自己的牢籠", "color": "blue" },
+        { "text": "來探監的親友", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文中說「遇人便開口」，對象不限於知交好友。", "lawRef": null },
+        "B": { "why": "對。把自己關進牢籠太久，藉傾訴釋放壓抑的話語。", "lawRef": null },
+        "C": { "why": "錯。原文只說據說富裕是冷清先決條件，非核心原因。", "lawRef": null },
+        "D": { "why": "錯。作者只描述「這樣的人」，並未推論人人都如此。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "長久專注自我目標", "tone": "plain" }, { "text": "陷入心理牢籠", "tone": "hot" }, { "text": "藉傾訴釋放自我", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q05",
+      "topic": ["chinese/reading"],
+      "mnemonic": "基隆港靠海運好位置加上外地工人撐起，帶動戰後繁榮。",
+      "trap": "C 把「少部分」放大成全部，看到絕對化字眼要小心。",
+      "plain": null,
+      "marks": [
+        { "text": "地理位置", "color": "blue" },
+        { "text": "經濟繁景", "color": "blue" },
+        { "text": "碼頭工人幾乎來自外地城鄉", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文中說戰後工業與港口產業「更形蓬勃」，無此比較。", "lawRef": null },
+        "B": { "why": "錯。原文僅說當地人有別的工作可選，未說主要做這三行。", "lawRef": null },
+        "C": { "why": "錯。聽聞外快多而移入的只是「少部分」，不可概全。", "lawRef": null },
+        "D": { "why": "對。海運位置加上外地遷入的碼頭勞力，共創港口繁榮。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "既有開發+地理優勢", "tone": "plain" }, { "text": "新興產業蓬勃", "tone": "plain" }, { "text": "外來勞力移入", "tone": "key" }, { "text": "促成經濟繁景", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q06",
+      "topic": ["chinese/reading"],
+      "mnemonic": "先安內才能抗外！企業先把體質顧好，才禁得起競爭。",
+      "trap": "B 只講賞罰制度、C 講不挖角，都偏離「內治勝外謀」。",
+      "plain": null,
+      "marks": [
+        { "text": "安則不可攻", "color": "blue" },
+        { "text": "治強不可責於外", "color": "blue" },
+        { "text": "不行法術於內", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。對應「安則不可攻、治強在內政」，先顧好內部體質。", "lawRef": null },
+        "B": { "why": "錯。原文重點在內外對比「重內政不求外」，非賞罰細節。", "lawRef": null },
+        "C": { "why": "錯。文中未談人才培植或不挖角，屬於過度衍伸。", "lawRef": null },
+        "D": { "why": "錯。只顧對外聯盟正是韓非批評的「事智於外」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "行法術於內", "points": ["重視內政、治理與安定", "企業健全體質禁得起競爭"] },
+        "right": { "title": "事智於外", "points": ["只在外部耍智謀求強", "無法真正達到治強"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q07",
+      "topic": ["chinese/reading"],
+      "mnemonic": "不靠政府也不靠大錢，自己背書箱走進街頭就是力量。",
+      "trap": "看到「圖書館」別直覺選機構或政府，她靠的是個人藏書。",
+      "plain": null,
+      "marks": [
+        { "text": "流動圖書館", "color": "blue" },
+        { "text": "從自己的藏書中挑選", "color": "blue" },
+        { "text": "瑪麗並不富有，卻堅定這麼做", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。她從自己藏書挑書背上街，不是靠機構捐助。", "lawRef": null },
+        "B": { "why": "對。她並不富有卻親背書箱走入社區，回應弱勢閱讀需求。", "lawRef": null },
+        "C": { "why": "錯。重點在身體力行的奉獻精神，而非管理與系統運作。", "lawRef": null },
+        "D": { "why": "錯。文中僅提獲英國授勳，未描述推動政府介入改善。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "見窮人無書可讀", "tone": "plain" }, { "text": "親背私人藏書", "tone": "hot" }, { "text": "建起社區圖書館", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q08",
+      "topic": ["chinese/reading"],
+      "mnemonic": "公平貿易＝買賣變夥伴，不剝削弱勢小農的合理報酬。",
+      "trap": "別選「自由市場」或「跨國投資」，公平貿易重視夥伴關係。",
+      "plain": null,
+      "marks": [
+        { "text": "公平貿易", "color": "blue" },
+        { "text": "夥伴關係建立", "color": "blue" },
+        { "text": "合理報酬", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。公平貿易靠消費選擇與夥伴關係，非自由市場競爭。", "lawRef": null },
+        "B": { "why": "錯。文中未提跨國企業投資或農村基礎建設與效率。", "lawRef": null },
+        "C": { "why": "對。直接呼應「建立夥伴關係，讓弱勢小農獲合理報酬」。", "lawRef": null },
+        "D": { "why": "錯。原文只說善待土地資源，沒說國際組織推土地國有化。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "建立夥伴關係", "tone": "key" }, { "text": "保障報酬與人權", "tone": "plain" }, { "text": "促成正義與永續", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q09",
+      "topic": ["chinese/reading"],
+      "mnemonic": "短波會有雜音，但關不掉又追不到人在哪，網路取代不了。",
+      "trap": "干擾會產生雜音，B 和 C 都把缺點寫反成沒干擾、沒雜音。",
+      "plain": null,
+      "marks": [
+        { "text": "短波通訊", "color": "blue" },
+        { "text": "難以被完全阻斷", "color": "blue" },
+        { "text": "不易定位收聽者", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。多為國家經營是背景事實，不是沒被網路取代的原因。", "lawRef": null },
+        "B": { "why": "錯。文中沒提穿透所有建築，且明講短波有可能被干擾。", "lawRef": null },
+        "C": { "why": "錯。電波相遇會在收音機發出雜音，並非沒有雜音。", "lawRef": null },
+        "D": { "why": "對。原文結尾明示這兩大特色讓短波至今難以被取代。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "短波可能被干擾", "tone": "hot" }, { "text": "難阻斷+難定位", "tone": "key" }, { "text": "難被網路取代", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "114-general-chinese-q10",
+      "topic": ["chinese/reading"],
+      "mnemonic": "別把志工當過客！開放制度納入自發力量，救災更給力。",
+      "trap": "「區隔傳統與現代」「不實消息」都是原文沒說的無中生有。",
+      "plain": null,
+      "marks": [
+        { "text": "納入救災體系", "color": "blue" },
+        { "text": "自發行動", "color": "blue" },
+        { "text": "制度與文化支持", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。原文主張兩者應協調合作，而不是區隔避免混用。", "lawRef": null },
+        "B": { "why": "對。將志工與在地自發力量納入體系，強化合作與效能。", "lawRef": null },
+        "C": { "why": "錯。原文完全沒提網路不實消息，屬於無中生有選項。", "lawRef": null },
+        "D": { "why": "錯。作者呼籲對彈性分散應變更開放，非強調權責分工。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "現況瓶頸", "points": ["自發行動被排除在外", "對彈性分散應變不夠開放"] },
+        "right": { "title": "改進方向", "points": ["納入志工與在地力量", "用制度支持強化協同合作"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}

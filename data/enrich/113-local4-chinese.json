@@ -1,0 +1,271 @@
+{
+  "paperId": "113-local4-chinese",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T04:48:00+08:00",
+  "items": [
+    {
+      "id": "113-local4-chinese-q01",
+      "topic": ["chinese/words"],
+      "mnemonic": "東西多到看不完叫「目不暇給」，逛夜市超貼切。",
+      "trap": "別把「擇善固執」當成孤僻，也別把謹慎說成「步履維艱」。",
+      "plain": null,
+      "marks": [
+        { "text": "詞語的運用", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。「海闊天空」比喻心胸開闊或無拘束的言談，不合「忘記叮嚀」。", "lawRef": null },
+        "B": { "why": "錯。「步履維艱」指行走困難或處境艱難，並非做事謹慎小心。", "lawRef": null },
+        "C": { "why": "錯。「擇善固執」指堅持正確原則，與「不喜歡打交道」的孤僻無關。", "lawRef": null },
+        "D": { "why": "對。「目不暇給」形容東西太多，眼睛看不過來，符合夜市景象。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "商品眾多", "tone": "plain" }, { "text": "眼看不過來", "tone": "hot" }, { "text": "目不暇給", "tone": "key" }] },
+          { "steps": [{ "text": "步履維艱", "tone": "plain" }, { "text": "是處境艱難", "tone": "hot" }, { "text": "非謹慎小心", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q02",
+      "topic": ["chinese/words", "chinese/reading"],
+      "mnemonic": "不在意吃穿享受、專心做學問，就是「淡泊寧靜」。",
+      "trap": "題幹有「坐忘」，別看到選項「相忘江湖」就誤選！",
+      "plain": null,
+      "marks": [
+        { "text": "忘記了吃好的穿好的", "color": "blue" },
+        { "text": "固窮的執著", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。主角不重物質享受、安貧樂道，正是「淡泊寧靜」的寫照。", "lawRef": null },
+        "B": { "why": "錯。「相忘江湖」指各自隱退不相往來，題幹只說專注學問忘卻物欲。", "lawRef": null },
+        "C": { "why": "錯。「時不我與」感嘆錯失時機，文中主角並無惋惜時代之意。", "lawRef": null },
+        "D": { "why": "錯。「蒿目時艱」指憂慮時局艱難，文中完全沒寫到憂國憂民。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "淡泊寧靜（正解）", "points": ["不慕吃穿與物質", "專注學問、安貧固窮"] },
+        "right": { "title": "相忘江湖（陷阱）", "points": ["指隱退後互不往來", "與文中『坐忘』不同"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q03",
+      "topic": ["chinese/reading"],
+      "mnemonic": "古納站在弱勢位置寫作，就是讓移民、難民被看見。",
+      "trap": "首句「文以載道」是陪襯對比，作者其實是在卸下這包袱。",
+      "plain": null,
+      "marks": [
+        { "text": "從弱勢的位置發聲", "color": "blue" },
+        { "text": "挑戰主流敘事", "color": "blue" },
+        { "text": "移民、難民", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。他是「挑戰」歐洲與帝國傳統，不是站在殖民主義立場。", "lawRef": null },
+        "B": { "why": "對。文中明言「從弱勢的位置發聲」，彰顯移民與難民的生命經驗。", "lawRef": null },
+        "C": { "why": "錯。文中指的主流敘事是「歐洲傳統或帝國傳統」，非大日本帝國。", "lawRef": null },
+        "D": { "why": "錯。開頭說創作者常有文以載道的包袱，但古納在意的是敘事發聲。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "弱勢位置發聲", "tone": "key" }, { "text": "挑戰歐洲帝國敘事", "tone": "hot" }, { "text": "彰顯移民難民經驗", "tone": "key" }] },
+          { "steps": [{ "text": "非文以載道", "tone": "plain" }, { "text": "非殖民主義立場", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q04",
+      "topic": ["chinese/reading"],
+      "mnemonic": "東西越囤越多、像毒癮般停不下來，最後反被物欲關進「看守所」。",
+      "trap": "「看守所」不是真的蓋房子，而是比喻人被貪念與物品囚禁。",
+      "plain": null,
+      "marks": [
+        { "text": "所有權", "color": "blue" },
+        { "text": "坐擁寶物而不饜足", "color": "blue" },
+        { "text": "看守所建造完成", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。人不斷搜刮囤積、沈溺物質恐慌，最後反被自己的貪念囚禁。", "lawRef": null },
+        "B": { "why": "錯。「小泥鰍變成大鱷魚」比喻欲望迅速膨脹，不是節制欲望。", "lawRef": null },
+        "C": { "why": "錯。文中提到人追求新款、比較、囤積，早已超出實用性需求。", "lawRef": null },
+        "D": { "why": "錯。一旦學會所有權概念，物質欲望反而跟飢渴恐慌一起爆發。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "學會所有權", "tone": "plain" }, { "text": "小泥鰍變大鱷魚", "tone": "hot" }, { "text": "搜刮比較囤積", "tone": "hot" }, { "text": "被物欲關進看守所", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q05",
+      "topic": ["chinese/reading"],
+      "mnemonic": "站在「遺址」、說「當有」跟「彷彿」，代表景物與師長都已成往事。",
+      "trap": "「春陽煦暖」和「談笑」前面都有「彷彿」，是回憶不是現場！",
+      "plain": null,
+      "marks": [
+        { "text": "從前六號的遺址", "color": "blue" },
+        { "text": "彷彿", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文中寫「彷彿聽到」，表示只是作者看著舊址產生的追憶。", "lawRef": null },
+        "B": { "why": "對。現場只剩未完工大廈與「從前六號的遺址」，故師長與木屋已逝。", "lawRef": null },
+        "C": { "why": "錯。木屋書齋是作者「定神凝睇」想見的昔日景象，不是新大廈規劃。", "lawRef": null },
+        "D": { "why": "錯。作者是在「夜色迷濛中」到訪，春陽煦暖只是內心彷彿的感受。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "眼前現實", "points": ["夜色迷濛的巷口", "未完工的粗糙大廈", "從前六號的遺址"] },
+        "right": { "title": "腦中追憶", "points": ["樸質的木屋書齋", "兩位師長親切談笑", "彷彿感受到春陽煦暖"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q06",
+      "topic": ["chinese/reading"],
+      "mnemonic": "巴哈寫的是「巴洛克作曲技巧」教學作品，實力要過百年才被推崇。",
+      "trap": "是「離世後一世紀」才被推崇，不是生前受「時人」推崇！",
+      "plain": null,
+      "marks": [
+        { "text": "傳授巴洛克音樂作曲技巧", "color": "blue" },
+        { "text": "在他離世後一世紀", "color": "blue" },
+        { "text": "音樂創新的職涯正走下坡", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。兒子名氣在「古典樂派」，並未與巴哈協同創新巴洛克音樂。", "lawRef": null },
+        "B": { "why": "錯。轉為教學者是因創新職涯走下坡，文中未說「更熱愛教學」。", "lawRef": null },
+        "C": { "why": "對。他能把巴洛克音樂作曲技巧寫成教學作品，後世奉為教科書。", "lawRef": null },
+        "D": { "why": "錯。他在「離世後一世紀」才被推崇，而非當時因演奏受人推崇。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "創新職涯走下坡", "tone": "hot" }, { "text": "轉為教學者", "tone": "plain" }, { "text": "傳授巴洛克作曲", "tone": "key" }] },
+          { "steps": [{ "text": "當時未受時人推崇", "tone": "hot" }, { "text": "離世後一世紀", "tone": "plain" }, { "text": "成為偉大作曲家", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q07",
+      "topic": ["chinese/reading"],
+      "mnemonic": "前晚期待到笑著睡，早上醒來馬上能吃到，是「美夢即將實現的滿足」。",
+      "trap": "前晚就想好要吃了，不是突然降臨，也沒有「急不可待」。",
+      "plain": null,
+      "marks": [
+        { "text": "充滿了幸福感", "color": "blue" },
+        { "text": "想起將面對的魚湯", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。作者前一夜「充滿幸福感、含笑睡著」，心境從容而非急躁。", "lawRef": null },
+        "B": { "why": "錯。馬上就要去吃魚湯了，是滿懷期待與滿足，並非遙遠的「思念」。", "lawRef": null },
+        "C": { "why": "對。從前夜盼望到清晨即將開動，心中開花正是願望將圓滿的喜悅。", "lawRef": null },
+        "D": { "why": "錯。這是前一天晚上就期待的事，並非毫無預期的「從天而降」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "前夜想到魚湯", "tone": "plain" }, { "text": "幸福含笑睡著", "tone": "plain" }, { "text": "清晨即將開吃", "tone": "hot" }, { "text": "美夢將實現的滿足", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q08",
+      "topic": ["chinese/reading"],
+      "mnemonic": "文章前後都在講「在地風土人文」與「生活樣貌」，這才是藝術季的靈魂。",
+      "trap": "A 只是文中的局部細節，主旨要找貫穿全文的「風土人文」。",
+      "plain": null,
+      "marks": [
+        { "text": "根據在地風土人文創作", "color": "blue" },
+        { "text": "風土民情與藝術作品", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。廢棄學校改建只是其中一個做法，並非整段文字的核心主旨。", "lawRef": null },
+        "B": { "why": "錯。住宿餐飲是「帶動」的附加效益，並非「只是為謀求商業利益」。", "lawRef": null },
+        "C": { "why": "錯。藝術季緊扣當地生活與獨特物產，文中沒說可「完整複製」各地。", "lawRef": null },
+        "D": { "why": "對。藝術家依「在地風土人文」創作，旅客也藉此認識當地生活樣貌。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "在地風土人文", "tone": "key" }, { "text": "藝術創作與空間", "tone": "plain" }, { "text": "帶動觀光認識地方", "tone": "plain" }] },
+          { "steps": [{ "text": "廢校變展場", "tone": "hot" }, { "text": "只是細節非主旨", "tone": "hot" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q09",
+      "topic": ["chinese/reading"],
+      "mnemonic": "後半段大篇幅講溼地吸收二氧化碳（碳匯），重點就是「護溼地能抗暖化」。",
+      "trap": "別把前段「候鳥」和後段「碳匯」混搭，兩者沒有因果！",
+      "plain": null,
+      "marks": [
+        { "text": "臺灣溼地的保育", "color": "blue" },
+        { "text": "碳匯功能", "color": "blue" },
+        { "text": "清除二氧化碳", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。候鳥僅是前段說明溼地重要的理由之一，未涵蓋後段氣候暖化重點。", "lawRef": null },
+        "B": { "why": "對。溼地是最主要的生物性碳庫，能吸收二氧化碳，有助減緩氣候暖化。", "lawRef": null },
+        "C": { "why": "錯。碳匯靠溼地植物光合作用達成，跟候鳥來不來臺沒有直接因果關係。", "lawRef": null },
+        "D": { "why": "錯。範圍太籠統，沒有扣緊後段強調「溼地吸納二氧化碳、抗暖化」的重點。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "前段：候鳥樞紐", "tone": "plain" }, { "text": "後段：溼地碳匯", "tone": "hot" }, { "text": "清除二氧化碳", "tone": "plain" }, { "text": "保育溼地抗暖化", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-chinese-q10",
+      "topic": ["chinese/reading"],
+      "mnemonic": "「不要相信每個念頭」就是提醒你：起煩惱時，先回頭檢查自己的念頭。",
+      "trap": "文中說不容易的是「承認痛苦自己造」，不是「找方法」不容易！",
+      "plain": null,
+      "marks": [
+        { "text": "不要相信你的每個念頭", "color": "blue" },
+        { "text": "處理自己的念頭與感受", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。作者認為心理痛苦來自自己的念頭，而非與外在苦難大小成正比。", "lawRef": null },
+        "B": { "why": "錯。文中明確說這表示「不能再怪罪他人或環境」，不是環境害的。", "lawRef": null },
+        "C": { "why": "對。作者主張「不要相信每個念頭」，要學會審視並處理自己的念頭。", "lawRef": null },
+        "D": { "why": "錯。偷換主詞！文中說不容易的是「了解痛苦是自己造成的」，不是找方法。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "文章真實意思", "points": ["痛苦常由自己念頭造成", "別輕信念頭，回頭省察", "不再怪罪他人或環境"] },
+        "right": { "title": "選項偷換陷阱", "points": ["硬扯外在苦難或環境", "把『承認』偷換成『找方法』"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}

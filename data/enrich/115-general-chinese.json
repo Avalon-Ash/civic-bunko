@@ -1,0 +1,345 @@
+{
+  "paperId": "115-general-chinese",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T04:45:00+08:00",
+  "items": [
+    {
+      "id": "115-general-chinese-q01",
+      "topic": ["chinese/reading"],
+      "mnemonic": "事實不帶情緒只講發生什麼；需要則是明確告訴對方怎麼做。",
+      "trap": "別把「問句請求」當事實，也別把「講情緒」當成提出需要。",
+      "plain": null,
+      "marks": [
+        { "text": "描述客觀事實", "color": "blue" },
+        { "text": "表達感受", "color": "blue" },
+        { "text": "提出需要", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "只陳述觀察到的客觀行為，不含情緒或評價，符合「描述事實」。", "lawRef": null },
+        "B": { "why": "用問句徵詢「我可以…嗎？」是「提出需要」，不是客觀事實。", "lawRef": null },
+        "C": { "why": "「我有點困擾」在講情緒反應，屬於「表達感受」而非「提出需要」。", "lawRef": null },
+        "D": { "why": "推測對方焦急並關心原因，是「同理感受」而非「提出需要」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "事實：客觀觀察", "tone": "key" },
+              { "text": "感受：情緒同理", "tone": "plain" },
+              { "text": "需要：明確期待", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q02",
+      "topic": ["chinese/reading"],
+      "mnemonic": "共餐建立「我群」共感，宴席凝聚節慶團聚，核心就是群體緊密連結。",
+      "trap": "「特定社群證明」太狹隘，「飲食文明」與「族群儀式」過度延伸。",
+      "plain": null,
+      "marks": [
+        { "text": "共餐", "color": "blue" },
+        { "text": "宴席", "color": "blue" },
+        { "text": "『我群』的象徵", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "共餐是社群建立基礎，但非用來當作「活動證明」。", "lawRef": null },
+        "B": { "why": "文章聚焦辦桌的群體互動與儀式感，未談「飲食文明脈絡」。", "lawRef": null },
+        "C": { "why": "共餐塑造「我群」共感、宴席強化團聚，正體現群體緊密關聯。", "lawRef": null },
+        "D": { "why": "文中提到宗教節慶，但未限定單一「族群」的文化認同。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "共餐", "tone": "plain" },
+              { "text": "「我群」共感", "tone": "hot" },
+              { "text": "共同群體關聯", "tone": "key" }
+            ]
+          },
+          {
+            "steps": [
+              { "text": "宴席", "tone": "plain" },
+              { "text": "團聚與儀式", "tone": "hot" },
+              { "text": "凝聚社群情感", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q03",
+      "topic": ["chinese/reading"],
+      "mnemonic": "能判斷「對或錯」的直述句才是命題；命令、請求、疑問都不算。",
+      "trap": "命題不一定要是「真的」，只要能判定真或假就算命題。",
+      "plain": null,
+      "marks": [
+        { "text": "命題", "color": "blue" },
+        { "text": "真值或假值", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "「請你…」屬於請求或祈使句，沒有真假可言，不是命題。", "lawRef": null },
+        "B": { "why": "「鐵受熱會膨漲」是陳述事實的語句，可以驗證真假，是命題。", "lawRef": null },
+        "C": { "why": "「禁止…」屬於禁令或規範句，無法判斷真假，不是命題。", "lawRef": null },
+        "D": { "why": "「…會如何」屬於疑問句，沒有斷定內容的真假，不是命題。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "是命題",
+          "points": ["直述陳述句", "能判斷真或假"]
+        },
+        "right": {
+          "title": "不是命題",
+          "points": ["請求、命令、禁止句", "疑問或感嘆句"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q04",
+      "topic": ["chinese/reading"],
+      "mnemonic": "質性在自然情境「歸納找意義」；量化靠變項控制「統計驗假設」。",
+      "trap": "這題錯的選項全都在「把質性跟量化的特徵張冠李戴」。",
+      "plain": null,
+      "marks": [
+        { "text": "質性研究", "color": "blue" },
+        { "text": "量化研究", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "剛好相反：統計分析屬於量化研究，深度探索動機偏向質性研究。", "lawRef": null },
+        "B": { "why": "完全符合原文：質性重視自然情境與意義理解，量化重理論驗證與因果。", "lawRef": null },
+        "C": { "why": "剛好相反：假設檢證屬於量化研究，開放蒐集與概念建構屬質性研究。", "lawRef": null },
+        "D": { "why": "剛好相反：變項控制屬於量化研究，理解社會意義與主體性屬質性研究。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "質性研究",
+          "points": ["不預設假設、歸納", "自然情境與主體意義"]
+        },
+        "right": {
+          "title": "量化研究",
+          "points": ["嚴格控制變項", "統計檢驗假設與因果"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q05",
+      "topic": ["chinese/reading"],
+      "mnemonic": "現代主義講「機能」，民藝講「日常實用」，兩者都追求簡單與實用之美。",
+      "trap": "文中沒提「回歸自然求平靜」，也非只重主觀「內心感受」。",
+      "plain": null,
+      "marks": [
+        { "text": "外在形體與內在精神的簡單", "color": "blue" },
+        { "text": "機能", "color": "blue" },
+        { "text": "日常實用", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "原文說的是外在形體與內在精神「簡單」，不是兩者達成「平衡」。", "lawRef": null },
+        "B": { "why": "兩者皆去除多餘裝飾，從簡單、機能與日常實用中展現生活之美。", "lawRef": null },
+        "C": { "why": "原文未提及「回歸自然」或「求得生命平靜」，屬過度推論。", "lawRef": null },
+        "D": { "why": "原文強調機能、材料與日常需求，非單以個人內心感受為美的依歸。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "現代主義", "tone": "plain" },
+              { "text": "去裝飾重機能", "tone": "plain" },
+              { "text": "簡單實用之美", "tone": "key" }
+            ]
+          },
+          {
+            "steps": [
+              { "text": "日本民藝", "tone": "plain" },
+              { "text": "樸實日常器物", "tone": "plain" },
+              { "text": "簡單實用之美", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q06",
+      "topic": ["chinese/reading"],
+      "mnemonic": "詩詞不只寫眼前風景，更藏言外情緒；AI 讀不到文字背後的多層心境。",
+      "trap": "AI 並非抓不到資訊，而是讀不懂文字背後的「言外之情」。",
+      "plain": null,
+      "marks": [
+        { "text": "蘊藏豐富的語義", "color": "blue" },
+        { "text": "複雜的思想", "color": "blue" },
+        { "text": "AI 完全無法理解", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "原文未討論不同時期文言文的用字或風格辨識能力。", "lawRef": null },
+        "B": { "why": "擷取資訊細節恰是電腦強項，文中指出的限制是無法感受複雜情感。", "lawRef": null },
+        "C": { "why": "舉李清照與杜甫為例，正說明文字表層外的情緒與多層意涵 AI 難懂。", "lawRef": null },
+        "D": { "why": "文中強調的是人對情緒與複雜思想的「感受」，非客觀歷史考據。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "人類理解",
+          "points": ["讀懂表層文意", "感受言外相思與憂國"]
+        },
+        "right": {
+          "title": "AI 的限制",
+          "points": ["只見表層文字", "無法體會情境與深層情感"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q07",
+      "topic": ["chinese/reading"],
+      "mnemonic": "煤氣燈效應的招牌台詞就是「你記錯了」，故意動搖你對記憶與判斷的信心。",
+      "trap": "不是所有嚴厲責備或抹黑都叫煤氣燈，關鍵在「讓你懷疑自己」。",
+      "plain": null,
+      "marks": [
+        { "text": "煤氣燈效應", "color": "blue" },
+        { "text": "心理操控", "color": "blue" },
+        { "text": "懷疑自己的記憶", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "具體指出報告數據錯誤屬於工作指導與糾正，並非心理操控。", "lawRef": null },
+        "B": { "why": "主管否認事實並說「你記錯了」，正是讓人懷疑記憶的煤氣燈效應。", "lawRef": null },
+        "C": { "why": "私下造謠毀謗是職場抹黑或排擠，並不是要讓你懷疑自己的記憶。", "lawRef": null },
+        "D": { "why": "依表現不佳進行正式懲處調職，屬行政管理程序而非隱晦心理操控。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "否認曾發生的事", "tone": "hot" },
+              { "text": "反指「你記錯了」", "tone": "hot" },
+              { "text": "懷疑記憶與感受", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q08",
+      "topic": ["chinese/reading"],
+      "mnemonic": "先認清因果：外部開發與氣候壓力衝擊原住民，才削弱了他們守護生態的能力。",
+      "trap": "小心「不到」與「至少」反寫，還有因果倒置成原住民失能害地球。",
+      "plain": null,
+      "marks": [
+        { "text": "至少四分之一", "color": "blue" },
+        { "text": "負面影響", "color": "blue" },
+        { "text": "削弱其守護生物多樣性的能力", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "原文寫的是「至少四分之一」，選項改成「不到四分之一」剛好相反。", "lawRef": null },
+        "B": { "why": "因果倒置！是三重危機與開發威脅削弱其能力，不是原住民失能造成危機。", "lawRef": null },
+        "C": { "why": "原文指出傳統文化連結「中斷」才會削弱守護能力，恢復連結反而有助守護。", "lawRef": null },
+        "D": { "why": "與原文完全一致，開採、採礦、基礎設施等社經壓力對其造成極大負面影響。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "開發壓力＋氣候威脅", "tone": "hot" },
+              { "text": "衝擊生計與文化連結", "tone": "plain" },
+              { "text": "削弱守護生態能力", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q09",
+      "topic": ["chinese/reading"],
+      "mnemonic": "多巴胺在「快樂發生前」因「期待」飆升，推著人往前去追尋目標。",
+      "trap": "文中重點是「期待推人去追求」，沒說「準備就能成功」。",
+      "plain": null,
+      "marks": [
+        { "text": "做快樂的事之前", "color": "blue" },
+        { "text": "因為我們期待", "color": "blue" },
+        { "text": "追求幸福", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "扣緊「期待在事前提振興奮度、推動人去追求」的核心，最符合文意。", "lawRef": null },
+        "B": { "why": "原文談的是「為意想不到的事做準備」的演化機制，未談「迎接成功」。", "lawRef": null },
+        "C": { "why": "原文並沒有探討「成功的來源」，而且也未將追求幸福等同於成功。", "lawRef": null },
+        "D": { "why": "原文最後提醒人只顧追求卻常沒享受幸福本身，非教人「努力創造幸福」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "事前的期待", "tone": "hot" },
+              { "text": "多巴胺激增", "tone": "plain" },
+              { "text": "推動人去追求", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-chinese-q10",
+      "topic": ["chinese/reading"],
+      "mnemonic": "高雅〈陽春白雪〉沒人懂，通俗〈下里巴人〉上千人和，感慨知音難尋。",
+      "trap": "「白雪」指高雅曲調，「巴人」指通俗歌謠，不是在講古今之別。",
+      "plain": null,
+      "marks": [
+        { "text": "吟白雪", "color": "blue" },
+        { "text": "舉世誰為傳", "color": "blue" },
+        { "text": "巴人唱", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "高雅的〈白雪〉無人傳唱、通俗的〈巴人〉卻眾人附和，正嘆知音難尋。", "lawRef": null },
+        "B": { "why": "「為人作嫁」指辛苦替別人忙碌而自己無所得，與曲高和寡無關。", "lawRef": null },
+        "C": { "why": "詩中對比「高雅 vs 通俗」的曲調，並非「貴古賤今」的時代比較。", "lawRef": null },
+        "D": { "why": "「和者乃數千」指多數人只愛通俗淺白之作，並非小人趨炎附勢。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "吟白雪（高雅）",
+          "points": ["遺響飛青天", "舉世誰為傳（無人懂）"]
+        },
+        "right": {
+          "title": "巴人唱（通俗）",
+          "points": ["通俗大眾口味", "和者乃數千（眾附和）"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}

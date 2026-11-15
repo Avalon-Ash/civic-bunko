@@ -1,0 +1,326 @@
+{
+  "paperId": "113-general-chinese",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T04:46:00+08:00",
+  "items": [
+    {
+      "id": "113-general-chinese-q01",
+      "topic": ["chinese/practical"],
+      "mnemonic": "送禮給人微笑收下，謙稱「敬請哂納」就對了。",
+      "trap": "看到「賻儀」別亂用，賻字從貝，專指喪禮奠儀！",
+      "plain": null,
+      "marks": [
+        { "text": "祝壽", "color": "blue" },
+        { "text": "稱謂與禮俗", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。公婆應稱「翁姑」或「舅姑」，沒有「丈姑」這個稱謂。", "lawRef": null },
+        "B": { "why": "錯。「賻儀」是喪禮致贈的白包；祝壽應寫「壽儀」或「賀儀」。", "lawRef": null },
+        "C": { "why": "對。「哂」是微笑，「敬請哂納」是送禮請對方笑納的常用敬辭。", "lawRef": null },
+        "D": { "why": "錯。「八秩」指八十歲，「晉三」為加三，意即八十三歲。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "祝壽送禮",
+          "points": ["封套寫壽儀、賀儀", "敬辭寫敬請哂納", "公婆稱翁姑"]
+        },
+        "right": {
+          "title": "常見誤用",
+          "points": ["賻儀用於喪禮白包", "八秩晉三是83歲", "沒有丈姑這稱謂"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q02",
+      "topic": ["chinese/reading", "chinese/practical"],
+      "mnemonic": "七夕詩必有銀河、鵲橋、牛女；寫洞庭孤舟的是秋日羈旅愁。",
+      "trap": "選項都有秋風明月，別看到「秋」就以為是七夕！",
+      "plain": null,
+      "marks": [
+        { "text": "何者不是", "color": "red" },
+        { "text": "詠七夕詩", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這首是七夕詩。「雲潢」指銀河，「靈匹」指牛郎織女相會。", "lawRef": null },
+        "B": { "why": "這首是七夕詩。「烏鵲橋」、「牛女會今宵」點明七夕。", "lawRef": null },
+        "C": { "why": "這首不是（本題答案）。寫洞庭秋水、孤鴻落葉，是羈旅懷愁。", "lawRef": null },
+        "D": { "why": "這首是七夕詩。「雕鵲填河」、今夜同枕明日空床寫牛女分離。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "七夕詩關鍵",
+          "points": ["銀河、雲潢", "鵲橋、填河為梁", "牛女、靈匹、今宵"]
+        },
+        "right": {
+          "title": "選項C意象",
+          "points": ["湘山、洞庭水", "孤鴻落葉一扁舟", "屬秋日江上羈旅愁"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q03",
+      "topic": ["chinese/reading"],
+      "mnemonic": "讀文章看轉折「然而」後面：被罵單細胞還賞識，就是氣度大。",
+      "trap": "別選「捐棄成見」，文末只寫連雅堂不生氣又賞識後輩。",
+      "plain": null,
+      "marks": [
+        { "text": "不以為忤", "color": "blue" },
+        { "text": "十分的賞識", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文中只提楊常翻閱舊詩文，未說以此作為創作基礎。", "lawRef": null },
+        "B": { "why": "錯。僅提「有一次」抬槓到天明，非「往往」且重點不在底蘊。", "lawRef": null },
+        "C": { "why": "對。文末「然而」點題，連被比為單細胞動物仍不生氣且賞識。", "lawRef": null },
+        "D": { "why": "錯。文中未提兩人放棄各自立場，重點是連對後輩的包容。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "楊撰文批連", "tone": "plain" },
+              { "text": "比為單細胞", "tone": "hot" },
+              { "text": "連不以為忤", "tone": "key" },
+              { "text": "反十分賞識", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q04",
+      "topic": ["chinese/reading"],
+      "mnemonic": "愛國是學來的觀念，愛故鄉山川與親友才是自然情感。",
+      "trap": "文章用屈原當引子，重點在後半段對比「愛國」與「愛鄉」。",
+      "plain": null,
+      "marks": [
+        { "text": "後天學習來的觀念", "color": "blue" },
+        { "text": "不可分割的情感", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "對。文末點明「愛國」是後天學習，對鄉土親友才是自然情感。", "lawRef": null },
+        "B": { "why": "錯。文中完全沒談「齊家、治國、平天下」的順序主張。", "lawRef": null },
+        "C": { "why": "錯。文中未討論楚王智力，僅問屈原為何執著於楚國。", "lawRef": null },
+        "D": { "why": "錯。作者認同屈原戀鄉土，只是說單稱「愛國詩人」太草率。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "愛國",
+          "points": ["非人類本能", "後天學習來的觀念"]
+        },
+        "right": {
+          "title": "愛鄉土親友",
+          "points": ["源自生活經驗", "自然建立不可分割"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q05",
+      "topic": ["chinese/reading", "chinese/words"],
+      "mnemonic": "「意透徹」要講到點上，「語脫灑」要乾脆不囉唆，不求新奇。",
+      "trap": "這題問「不適當」！看清楚原文沒講「高妙」或「新奇」。",
+      "plain": null,
+      "marks": [
+        { "text": "何者解釋不適當", "color": "red" },
+        { "text": "意貴透徹", "color": "blue" },
+        { "text": "語貴脫灑", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。「隔靴抓癢」比喻力道沒到痛處，即未切中要旨。", "lawRef": null },
+        "B": { "why": "這句對。「貴」就是看重、追求，「透徹」與「脫灑」是目標。", "lawRef": null },
+        "C": { "why": "這句對。「拖泥帶水」形容言辭累贅、不夠簡潔明快。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。原文追求明白切題與自然流暢，非求新奇。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "嚴羽主張",
+          "points": ["意貴透徹：切中要旨", "語貴脫灑：簡潔流暢"]
+        },
+        "right": {
+          "title": "反對毛病",
+          "points": ["隔靴抓癢：不中要害", "拖泥帶水：累贅繁瑣"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q06",
+      "topic": ["chinese/reading"],
+      "mnemonic": "同時抓兩個線索：「深愛父母」加上「斷絕聯絡」＝愛卻仍告別。",
+      "trap": "選項C、D都寫「一起生活」，和題幹「斷絕聯絡」直接衝突。",
+      "plain": null,
+      "marks": [
+        { "text": "斷絕聯絡", "color": "blue" },
+        { "text": "仍深愛父母", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。題幹設定「仍深愛父母」，不會徹底忘記養育之恩。", "lawRef": null },
+        "B": { "why": "對。同時符合題幹的「從此斷絕聯絡」與「仍深愛父母」。", "lawRef": null },
+        "C": { "why": "錯。文中已寫「與父母從此斷絕聯絡」，不會回去一起生活。", "lawRef": null },
+        "D": { "why": "錯。題幹明言和原生家庭分道揚鑣，並非同住一屋淡漠相處。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "活在權威牢籠", "tone": "plain" },
+              { "text": "選擇斷絕聯絡", "tone": "hot" },
+              { "text": "但仍深愛思念", "tone": "hot" },
+              { "text": "愛卻道離別", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q07",
+      "topic": ["chinese/reading"],
+      "mnemonic": "演講別急著講解法，多花篇幅講「挑戰與內心轉折」的關鍵細節。",
+      "trap": "別自己腦補演講常識！文本沒提「開場」或「走到臺下」。",
+      "plain": null,
+      "marks": [
+        { "text": "敘述挑戰的篇幅應該最長", "color": "blue" },
+        { "text": "內心的轉折", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。好萊塢公式只是舉例，作者重點在改善「只講解法」的通病。", "lawRef": null },
+        "B": { "why": "對。對應文中「挑戰篇幅最長、特別強調內心轉折」的核心建議。", "lawRef": null },
+        "C": { "why": "錯。文中並未提到演講「開場」該如何設計。", "lawRef": null },
+        "D": { "why": "錯。拉近距離靠的是「分享內心轉折」，不是走到臺下。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "一般人講法",
+          "points": ["重點放「如何解決」", "挑戰與掙扎輕描淡寫"]
+        },
+        "right": {
+          "title": "作者建議",
+          "points": ["挑戰篇幅應該最長", "強調內心轉折細節", "藉此拉近聽眾距離"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q08",
+      "topic": ["chinese/reading"],
+      "mnemonic": "光對暗：寶釵陽光大氣適合大家族，黛玉陰鬱在人際裡吃虧。",
+      "trap": "別套自己對紅樓夢的印象！文中完全沒比兩人的「才華」或EQ。",
+      "plain": null,
+      "marks": [
+        { "text": "龐大的家族", "color": "blue" },
+        { "text": "寶釵的『明亮』", "color": "blue" },
+        { "text": "黛玉的『陰鬱』", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文中指黛玉「器量狹窄、酸味十足」，未說她 EQ 更高。", "lawRef": null },
+        "B": { "why": "錯。文中未比較兩人「才華」，且明說人緣比拚是「黛玉敗北」。", "lawRef": null },
+        "C": { "why": "錯。文中只談兩人原型「對比反襯」，未強調「相互依存」。", "lawRef": null },
+        "D": { "why": "對。對應「明亮反襯陰鬱」，且在龐大家族人際網中寶釵勝出。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "薛寶釵",
+          "points": ["大氣、善解人意", "明亮／陽光女孩", "大家族人緣勝出"]
+        },
+        "right": {
+          "title": "林黛玉",
+          "points": ["器量狹窄、酸味足", "陰鬱／冬季女王", "複雜人際網中敗北"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q09",
+      "topic": ["chinese/reading"],
+      "mnemonic": "先弄清事實與感受，別急著評斷，這就是關注「真實的內容」。",
+      "trap": "媒體急著「解釋評斷」是他不滿的，別誤選「評價的意義」！",
+      "plain": null,
+      "marks": [
+        { "text": "還沒弄清楚事實、感受", "color": "blue" },
+        { "text": "急著要解釋要評斷", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。他去採訪是為了還原事實與感受，不是追求情節曲折。", "lawRef": null },
+        "B": { "why": "錯。他正是對別人急著「解釋與評斷」感到困惑與不滿。", "lawRef": null },
+        "C": { "why": "對。對應他想在評斷之前先「弄清楚事實、感受」的態度。", "lawRef": null },
+        "D": { "why": "錯。採訪受害者與教徒是為了了解事件，非追逐傳奇人物。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": {
+          "title": "媒體與知識界",
+          "points": ["未弄清事實感受", "急著先解釋評斷"]
+        },
+        "right": {
+          "title": "村上春樹",
+          "points": ["親訪受害者與教徒", "先弄清真實內容"]
+        }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-general-chinese-q10",
+      "topic": ["chinese/reading"],
+      "mnemonic": "有專長還念人類學，像金字塔又廣又高＝眼界寬、人生更開闊。",
+      "trap": "別選B！馬友友早就確定要走音樂路，不是「找不到人生羅盤」。",
+      "plain": null,
+      "marks": [
+        { "text": "人文思想教育", "color": "blue" },
+        { "text": "『完整』的人", "color": "blue" },
+        { "text": "要能廣大要能高", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯。文章不是談把握機會，而是談在專業之外培養人文素養。", "lawRef": null },
+        "B": { "why": "錯。文中明說他早知道要往音樂發展，並非「找不到羅盤」。", "lawRef": null },
+        "C": { "why": "錯。文中沒有提及他正面臨或調和什麼人生矛盾衝突。", "lawRef": null },
+        "D": { "why": "對。對應跨出單一專長、修習多元人文知識以成就「完整」人生。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          {
+            "steps": [
+              { "text": "已有音樂天賦", "tone": "plain" },
+              { "text": "跨讀人文學科", "tone": "hot" },
+              { "text": "金字塔廣且高", "tone": "key" },
+              { "text": "成就完整人生", "tone": "key" }
+            ]
+          }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}
