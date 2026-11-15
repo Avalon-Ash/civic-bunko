@@ -1,0 +1,172 @@
+/* SSOT：顏色、圓角、字級、間距只定義在這裡。元件一律用 token，不寫色碼。
+   主題三態：預設跟隨系統；<html data-theme="light|dark"> 為手動指定。 */
+
+:root {
+  color-scheme: light;
+
+  /* 版面底色（上天空、下草地） */
+  --bg-top: #e6f4fa;
+  --bg-bottom: #dff3dc;
+  --surface: #fffdf9;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f4eee8;
+
+  /* 文字與線條 */
+  --ink: #5a4636;
+  --ink-soft: #9b8878;
+  --line: #5a4636; /* 貼紙外框與下壓陰影 */
+  --hair: #eadfd3; /* 細分隔線、未選取外框 */
+  --on-solid: #fffdf9; /* 放在 --ink 實心底上的字 */
+
+  /* 品牌色塊（卡片底、按鈕） */
+  --pink: #ffc2cf;
+  --pink-deep: #ee8199;
+  --mint: #c4ebd3;
+  --butter: #ffe9a8;
+
+  /* 四色語意：紅＝問法陷阱、綠＝正解、藍＝法條與名詞、橘＝官方更正。不得挪作他用。 */
+  --red: #d9435c;
+  --red-bg: #ffe1e6;
+  --green: #2f8f5b;
+  --green-bg: #dcf5e5;
+  --blue: #2f76b8;
+  --blue-bg: #dfedfb;
+  --orange: #c9741a;
+  --orange-bg: #ffe9cc;
+  --on-semantic: #ffffff; /* 放在四色實心底上的字 */
+
+  /* 角色 */
+  --cat-fur: #fffdf9;
+  --cat-patch: #c9ad94;
+  --cat-blush: #ffc2cf;
+  --cat-line: #5a4636;
+
+  --veil: rgba(90, 70, 54, 0.35);
+  --bar-bg: rgba(255, 253, 249, 0.86);
+
+  /* 形狀與字 */
+  --radius-card: 22px;
+  --radius-option: 18px;
+  --radius-pill: 999px;
+  --border-w: 2.5px;
+  --press-depth: 4px;
+  --font: 'Chiron GoRound TC', 'PingFang TC', -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif;
+  --text-title: 2rem;
+  --text-stem: 1.1875rem;
+  --text-body: 1rem;
+  --text-small: 0.8125rem;
+  --tap-min: 44px;
+  --gutter: 18px;
+  --content-max: 480px; /* 手機單欄的最大寬度 */
+  --wide-max: 1080px; /* 平板兩欄的最大寬度 */
+  --spring: cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* 深色：暖色調的夜晚，不是反相。色塊壓暗、語意色提亮，外框改用柔和的奶茶色。 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg-top: #1b2126;
+    --bg-bottom: #1b231d;
+    --surface: #2b2521;
+    --surface-raised: #362e29;
+    --surface-sunken: #221d1a;
+    --ink: #f3e9dc;
+    --ink-soft: #b5a595;
+    --line: #a08c7a;
+    --hair: #4d423a;
+    --on-solid: #2b2521;
+    --pink: #7d4352;
+    --pink-deep: #f093a8;
+    --mint: #2f5c46;
+    --butter: #6a5622;
+    --red: #ff8fa1;
+    --red-bg: #4b232b;
+    --green: #7ddba6;
+    --green-bg: #1f4332;
+    --blue: #8fc4f3;
+    --blue-bg: #1f3651;
+    --orange: #f4b56a;
+    --orange-bg: #4c3517;
+    --on-semantic: #1e1a17;
+    --cat-fur: #f3e9dc;
+    --cat-patch: #a98b72;
+    --cat-blush: #e79aab;
+    --cat-line: #3a2d24;
+    --veil: rgba(0, 0, 0, 0.55);
+    --bar-bg: rgba(43, 37, 33, 0.86);
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-top: #1b2126;
+  --bg-bottom: #1b231d;
+  --surface: #2b2521;
+  --surface-raised: #362e29;
+  --surface-sunken: #221d1a;
+  --ink: #f3e9dc;
+  --ink-soft: #b5a595;
+  --line: #a08c7a;
+  --hair: #4d423a;
+  --on-solid: #2b2521;
+  --pink: #7d4352;
+  --pink-deep: #f093a8;
+  --mint: #2f5c46;
+  --butter: #6a5622;
+  --red: #ff8fa1;
+  --red-bg: #4b232b;
+  --green: #7ddba6;
+  --green-bg: #1f4332;
+  --blue: #8fc4f3;
+  --blue-bg: #1f3651;
+  --orange: #f4b56a;
+  --orange-bg: #4c3517;
+  --on-semantic: #1e1a17;
+  --cat-fur: #f3e9dc;
+  --cat-patch: #a98b72;
+  --cat-blush: #e79aab;
+  --cat-line: #3a2d24;
+  --veil: rgba(0, 0, 0, 0.55);
+  --bar-bg: rgba(43, 37, 33, 0.86);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg-top);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--text-body);
+  line-height: 1.55;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+button:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
