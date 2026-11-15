@@ -30,6 +30,13 @@
 - 解析引用法條必須寫法規名稱與條號，且條文內容要能在 `data/laws/**`（全國法規資料庫的本機副本）查到；查不到就寫 `lawRef: null` 並在 `note` 說明，不憑印象寫條號。
 - 字數上限由 `npm run validate` 強制（口訣 ≤ 40 字、陷阱提醒 ≤ 30 字、白話情境 ≤ 60 字、單一選項解析 ≤ 50 字、圖卡單面 ≤ 30 字）。超過就拆卡，不放寬上限。
 
+**架構（ECS＋SSOT，細節在開案書 §4）**
+- 型別只定義在 `src/core/types.ts`；數值、上限、日期、顏色語意只定義在 `src/core/constants/*.ts` 與 `src/theme.css`。其他地方不寫魔術數字、不重複定義。
+- Component 是純資料；邏輯放 System（純函式）；System 之間只透過 `src/core/bus.ts` 溝通。
+- 一個狀態欄位只有一個擁有者 System。畫面只經 `selectors` 讀、只經 `UICommand` 寫；System 不碰 DOM。
+- 題庫是可抽換的包，登記在 `data/banks.json`；程式裡不得寫死考試名稱、年度、科目清單。
+- 不得使用 `alert`、`confirm`、`prompt`、`window.open`、`target="_blank"`。抽屜、對話框、提示一律用 `src/ui/kit/` 的自製元件。
+
 **介面**
 - 一個畫面只講一件事；細節用點擊展開。先做 iPhone 直式（390px），再做 iPad。
 - 四色語意固定：紅＝問法陷阱（何者錯誤、非屬）、綠＝正解、藍＝法條與核心名詞、橘＝官方更正。不得拿這四色做別的用途。

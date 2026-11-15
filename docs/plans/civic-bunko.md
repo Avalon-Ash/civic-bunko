@@ -55,9 +55,18 @@
 3. 點「看每個選項」：底部抽屜，逐選項一行（≤ 50 字）＋法條條號。
 4. 點條號：顯示條文原文（來自全國法規資料庫）。
 
+### 快刷模式（使用者 11/15 追加，主要用法）
+
+她現在要靠大量刷題記憶，像語言學習 App 那樣一題接一題。
+
+- 開始前一張「回合設定」抽屜：選科目、選題數、開關快刷。題數用貓掌按鈕（5／10／20／30／50）加上加減鈕微調，上一次的設定會記住。
+- 快刷開啟時：答對只閃一行口訣就自動跳下一題；答錯才停下來顯示完整口訣卡（圖＋口訣＋陷阱），按了才繼續。
+- 畫面上方顯示連對數；中途可以隨時結束，已答的題照樣記錄。
+- 回合結束：答對率、這回合錯的題一鍵重刷。
+
 ### 回合組成
 
-- 一回合固定 5 題；答完蓋章。可以連續再來一回合，但不強迫。
+- 題數由使用者決定（預設 10 題，範圍 5–100）；答完蓋章。「今日任務」仍是每個 5 題的小任務。
 - 排程用簡化的間隔複習：答錯的題 1 天、3 天、7 天後回來；連對兩次才畢業。
 - 「高頻回合」依考點出現次數；「弱點回合」依個人答錯率。
 - 考前 3 天自動切成衝刺模式：只出錯題＋高頻考點，不出新題。
@@ -86,6 +95,47 @@ src/                Vite + React + TypeScript + Tailwind，打包時合併 offic
 - **法條有本機副本**：解析引用的條號要在 `data/laws/` 查得到，驗證腳本自動檢查，減少模型憑印象寫錯條號。
 - **進度只存裝置**：localStorage；提供匯出／匯入 JSON 讓 iPhone 與 iPad 之間搬進度。
 - 考選部試題依著作權法第 9 條不屬著作權標的，可公開放在 GitHub。
+
+### App 架構：ECS＋SSOT（使用者 11/15 指定）
+
+題庫量大、之後還會換題庫或加考試，所以資料、邏輯、畫面三者分開。
+
+```
+src/core/types.ts          所有型別的唯一定義
+src/core/constants/*.ts    題數範圍、字數上限、複習間隔、考試日期、四色語意（不寫魔術數字）
+src/core/world.ts          實體 ID 與各 component store 的容器
+src/core/bus.ts            事件匯流排（answered、roundFinished、bankLoaded…）
+src/core/commands.ts       UICommand：畫面寫入狀態的唯一入口
+src/components/            純資料，以實體 ID 為鍵，不含邏輯
+src/systems/               純函式，讀寫 component，彼此只透過 bus 溝通
+src/selectors/             畫面讀取狀態的唯一入口（唯讀）
+src/ui/kit/                自製元件：Sheet、Dialog、Toast、Stepper、Segmented、Chip…
+src/ui/screens/            四個分頁與回合畫面，只呼叫 selectors 與 commands
+src/theme.css              色彩、圓角、字級的唯一定義
+```
+
+| 實體 | Component（純資料） |
+| :-- | :-- |
+| 題目 | `Official`（題幹、選項、答案、來源）、`Enrich`（口訣、陷阱、圖、標記）、`TopicRef`、`Progress`（作答次數、連對、下次到期日） |
+| 考點 | `TopicInfo`（名稱、所屬科目）、`TopicStats`（出現次數、個人答錯率） |
+| 圖卡／申論卡 | `CardContent`、`Progress` |
+| 回合 | `RoundConfig`（科目、題數、模式）、`RoundState`（題目序列、目前位置、連對數） |
+
+| System | 職責 | 擁有的欄位 |
+| :-- | :-- | :-- |
+| `BankLoader` | 依 `data/banks.json` 載入題庫包到 `Official`／`Enrich` | `Official`、`Enrich` |
+| `Selection` | 依 `RoundConfig` 組出題目序列（科目、高頻、弱點、錯題、到期） | `RoundState.queue` |
+| `Round` | 推進回合、判定對錯、連對數 | `RoundState` 其餘欄位 |
+| `Scheduling` | 間隔複習到期日 | `Progress.due`、`Progress.streak` |
+| `Stats` | 考點統計、弱點排行 | `TopicStats` |
+| `Daily` | 倒數、今日任務、集章 | `Daily*` |
+| `Persistence` | 進度存取 localStorage、匯出匯入 | 無（只序列化） |
+
+規則：
+- 一個欄位只有一個擁有者 System；其他 System 要改就發事件給它。
+- 畫面元件不直接讀寫 store、不放業務邏輯；System 不碰 DOM。這樣 System 可以用 `node:test` 直接測，不需要瀏覽器。
+- **題庫是可抽換的包**：`data/banks.json` 登記每個題庫（ID、名稱、科目、資料路徑）；題目紀錄帶 `bankId`。之後加別的考試或別的年度只要加一個包，不改程式。
+- **不用瀏覽器彈窗**：`alert`、`confirm`、`prompt`、`window.open`、`target="_blank"` 一律禁用（lint 規則擋）。所有抽屜、對話框、提示都用 `src/ui/kit/` 的自製元件，畫在頁面內。
 
 ### 資料格式（摘要）
 
@@ -123,7 +173,9 @@ src/                Vite + React + TypeScript + Tailwind，打包時合併 offic
 | P1b | 爬蟲：依 P0 的清單下載試題、答案、更正答案到 `data/raw/` | agy Hydrogen | P0 |
 | P1c | 解析器：試題 PDF → official JSON；答案與更正合併；解析不了的標 `needs_review` | agy Hydrogen（兩次不及格 → Claude） | P1b |
 | P1d | 驗證腳本與 schema（主代理先寫，當韁繩） | 主代理 | — |
-| P1e | 刷題核心畫面：題卡、選項、作答回饋、5 題回合、錯題重刷 | 主代理定元件與手感 → agy Hydrogen 接資料與狀態 | P1a |
+| P1e-1 | `src/core`（types、constants、world、bus、commands）＋ `Selection`、`Round`、`Persistence` 三個 System 與測試 | 主代理定介面 → agy Hydrogen 實作 | P1a |
+| P1e-2 | `src/ui/kit` 自製元件＋回合設定抽屜、題卡、口訣回饋、快刷流程、錯題重刷 | 主代理定元件與手感 → agy Hydrogen | P1e-1 |
+| P2d | 申論架構卡（地方自治申論題 → 四格骨架） | 主代理寫內容 → agy Hydrogen 排版 | P1c |
 | P2a | 法規副本：下載五科常用法規到 `data/laws/` | agy Hydrogen | P1a |
 | P2b | 加工批次：每批一科一年度（約 25–50 題），照 enrich schema 產出 | agy Hydrogen；Codex 恢復後抽樣第二意見 | P1c、P1d、P2a |
 | P2c | 前置圖卡第一批（內容主代理寫，互動元件外派） | 主代理＋agy Hydrogen | P1e |

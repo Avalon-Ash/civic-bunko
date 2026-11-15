@@ -92,6 +92,22 @@ mark.g{background:var(--green-bg);color:var(--green)} mark.o{background:var(--or
 .trap{display:flex;gap:8px;align-items:flex-start;font-size:15px;font-weight:700}
 .trap em{font-style:normal;flex:none;font-size:12px;font-weight:900;color:#fff;background:var(--red);border-radius:8px;padding:2px 8px;margin-top:2px}
 
+/* 回合設定：題數與快刷 */
+.setup{display:flex;flex-direction:column;gap:16px}
+.num{text-align:center} .num b{font-size:64px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums}
+.rnd{width:54px;height:54px;border-radius:50%;border:2.5px solid var(--ink);box-shadow:0 4px 0 var(--ink);background:var(--butter);font-size:28px;font-weight:900;flex:none;line-height:1}
+.paws{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.paw{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 6px;border-radius:16px;border:2.5px solid var(--hair);background:#fff;font-weight:900;font-size:15px;color:var(--ink2)}
+.paw svg{width:26px;height:26px;fill:var(--hair)}
+.paw[aria-pressed=true]{border-color:var(--ink);background:var(--pink);color:var(--ink);box-shadow:0 3px 0 var(--ink)}
+.paw[aria-pressed=true] svg{fill:var(--pink-deep)}
+.pick{display:flex;flex-wrap:wrap;gap:8px}
+.pick button{min-height:38px;padding:0 14px;border-radius:999px;border:2.5px solid var(--hair);background:#fff;font-weight:700;font-size:14px;color:var(--ink2)}
+.pick button[aria-pressed=true]{border-color:var(--ink);background:var(--mint);color:var(--ink)}
+.sw{width:58px;height:34px;border-radius:999px;border:2.5px solid var(--ink);background:#fff;position:relative;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:var(--ink);transition:transform .22s cubic-bezier(.3,1.6,.5,1)}
+.sw[aria-checked=true]{background:var(--mint)} .sw[aria-checked=true]::after{transform:translateX(24px)}
+
 /* 申論四格 */
 .four{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .cell{padding:14px 10px;text-align:center;min-height:96px;display:flex;flex-direction:column;justify-content:center;border-radius:18px}
@@ -178,7 +194,8 @@ const QS = [
    law:'司法院釋字第 525 號' }
 ];
 
-const S = { tab:'today', i:0, pick:null, plain:false, score:0, done:false };
+const S = { tab:'today', on:false, n:5, count:10, fast:true, subj:0, combo:0, i:0, pick:null, plain:false, score:0, done:false };
+const PAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="16" rx="6" ry="4.6"/><circle cx="5.5" cy="10" r="2.4"/><circle cx="12" cy="7" r="2.6"/><circle cx="18.5" cy="10" r="2.4"/></svg>';
 const $ = id => document.getElementById(id);
 const K = 'ABCD';
 
@@ -207,7 +224,7 @@ function views(){
   <div class="card count">${cat(76)}<div class="grow"><div class="sub" style="color:var(--ink)">距離筆試</div><div><b>${daysLeft}</b> 天</div><div class="sub" style="color:var(--ink)">12/5（六）・12/6（日）</div></div></div>
   <h2>今天的 3 個小任務</h2>
   ${[['行','行政法 5 題','約 3 分鐘','var(--butter)'],['地','地方自治 5 題','約 3 分鐘','var(--mint)'],['回','錯題回來看 5 題','3 天前答錯的','var(--pink)']].map((m,n)=>`
-  <button class="card press mission" data-act="start"><span class="dot" style="background:${m[3]}">${m[0]}</span>
+  <button class="card press mission" data-act="start5"><span class="dot" style="background:${m[3]}">${m[0]}</span>
    <span class="grow"><b>${m[1]}</b><br><span class="sub">${m[2]}</span></span><span class="go">${n?'等等':'開始'}</span></button>`).join('')}
   <h2>這週的章</h2>
   <div class="week">${['一','二','三','四','五','六','日'].map((d,n)=>`<i class="${n<3?'on':n===3?'today':''}">${n<3?'完成':d}</i>`).join('')}</div>
@@ -233,17 +250,34 @@ function views(){
    <div class="card"><div class="row"><b class="grow">${s[0]}</b><span class="sub">${s[1]}%</span></div><div class="bar" style="margin-top:10px"><i style="width:${s[1]}%"></i></div></div>`).join('')}
   <p class="sub">示範資料。</p>`;
 
+ if (!S.on) return `
+  <h1>刷題</h1>
+  <div class="card setup">
+   <div class="row" style="justify-content:center">${cat(64,'yay')}<span class="sub" style="font-size:15px;font-weight:700;color:var(--ink)">這回合要刷幾題？</span></div>
+   <div class="row"><button class="rnd press" data-step="-5" aria-label="少 5 題">−</button>
+    <div class="num grow"><b>${S.count}</b> 題<div class="sub">大概 ${Math.max(1,Math.round(S.count*0.4))} 分鐘</div></div>
+    <button class="rnd press" data-step="5" aria-label="多 5 題">＋</button></div>
+   <div class="paws">${[5,10,20,30,50].map(n=>`<button class="paw" data-cnt="${n}" aria-pressed="${S.count===n}">${PAW}${n}</button>`).join('')}</div>
+  </div>
+  <h2>刷哪一科</h2>
+  <div class="pick">${['全部','行政法','行政學','地方自治','法學知識','國文'].map((s,n)=>`<button data-subj="${n}" aria-pressed="${S.subj===n}">${s}</button>`).join('')}</div>
+  <div class="card row"><div class="grow"><b>快刷模式</b><br><span class="sub">答對自動下一題，答錯才停下來看口訣</span></div>
+   <button class="sw" role="switch" aria-checked="${S.fast}" data-act="fast" aria-label="快刷模式"></button></div>
+  <button class="btn press" data-act="start">開始刷 ${S.count} 題</button>
+  <p class="sub">原型只有 3 題示範題，會循環出現。</p>`;
+
  if (S.done) return `
   <div style="flex:1"></div>
   <div class="stamp">過關<br>成功</div>
-  <div style="text-align:center"><h1>${S.score} / ${QS.length}</h1><p class="sub" style="font-size:15px">答錯的 ${QS.length-S.score} 題，明天會再回來找你。</p></div>
+  <div style="text-align:center"><h1>${S.score} / ${S.n}</h1><p class="sub" style="font-size:15px">${S.n-S.score ? `答錯的 ${S.n-S.score} 題，明天會再回來找你。` : '全對！'}</p></div>
   <div class="row" style="justify-content:center">${cat(96,'yay')}</div>
   <div style="flex:1"></div>
-  <div class="acts"><button class="btn ghost press" data-act="home">回今日</button><button class="btn press" data-act="start">再來一回合</button></div>`;
+  <div class="acts"><button class="btn ghost press" data-act="home">回今日</button><button class="btn press" data-act="again">再刷 ${S.n} 題</button></div>`;
 
- const q = QS[S.i], ans = S.pick!==null, ok = S.pick===q.ans;
+ const q = QS[S.i % QS.length], ans = S.pick!==null, ok = S.pick===q.ans;
  return `
-  <div class="prog" aria-label="第 ${S.i+1} 題，共 ${QS.length} 題">${QS.map((_,n)=>`<i class="${n<S.i?'done':n===S.i?'now':''}"></i>`).join('')}</div>
+  <div class="row"><div class="bar grow" aria-label="第 ${S.i+1} 題，共 ${S.n} 題"><i style="width:${(S.i+(ans?1:0))/S.n*100}%"></i></div>
+   <span class="sub"><b>${S.i+1}</b> / ${S.n}</span>${S.combo>1?`<span class="chip">連對 ${S.combo}</span>`:''}<button class="chip plain" data-act="quit">結束</button></div>
   <div>
    <div class="row"><span class="chip">${q.topic}</span>
     <div class="seg" role="group" aria-label="題目版本"><button aria-pressed="${!S.plain}" data-plain="0">原文</button><button aria-pressed="${S.plain}" data-plain="1">白話</button></div></div>
@@ -251,13 +285,14 @@ function views(){
    <span class="chip plain" style="margin-top:8px">${q.src}</span>
   </div>
   <div class="opts">${q.opts.map((o,n)=>`<button class="card press opt ${ans?(n===q.ans?'right':n===S.pick?'picked':'dim'):''}" data-opt="${n}" ${ans?'disabled':''}><span class="k">${K[n]}</span><span class="grow">${o}</span></button>`).join('')}</div>
-  ${ans?`<div class="card kou ${ok?'':'miss'}"><div class="row">${cat(58,ok?'yay':'oops')}<div class="grow"><small>${ok?'答對了！口訣再記一次':'差一點！看這句馬上學會'}</small><b>${q.ku}</b></div></div>
+  ${ans&&S.fast&&ok?`<div class="card kou"><div class="row">${cat(58,'yay')}<div class="grow"><small>答對！</small><b>${q.ku}</b></div></div></div>`
+  :ans?`<div class="card kou ${ok?'':'miss'}"><div class="row">${cat(58,ok?'yay':'oops')}<div class="grow"><small>${ok?'答對了！口訣再記一次':'差一點！看這句馬上學會'}</small><b>${q.ku}</b></div></div>
    <div class="pic">${q.pic}</div><div class="trap"><em>陷阱</em><span>${q.trap}</span></div></div>
-  <div class="acts"><button class="btn ghost press" data-act="sheet">看每個選項</button><button class="btn press" data-act="next">${S.i===QS.length-1?'蓋章':'下一題'}</button></div>`:''}`;
+  <div class="acts"><button class="btn ghost press" data-act="sheet">看每個選項</button><button class="btn press" data-act="next">${S.i===S.n-1?'蓋章':'下一題'}</button></div>`:''}`;
 }
 
 function sheet(){
- const q = QS[S.i];
+ const q = QS[S.i % QS.length];
  $('sheet').innerHTML = `<button class="grab" data-act="close" aria-label="關閉"></button>
   ${q.why.map((w,n)=>`<div class="line ${n===q.ans?'ok':''}"><span class="k">${K[n]}</span><span class="grow">${w}</span></div>`).join('')}
   <div style="margin-top:12px"><mark class="b">${q.law}</mark></div>`;
@@ -269,20 +304,33 @@ function render(keep){
  v.scrollTop = keep ? y : 0;
  $('tabs').innerHTML = TABS.map(t=>`<button data-tab="${t[0]}" ${S.tab===t[0]?'aria-current="page"':''}><svg viewBox="0 0 24 24">${t[2]}</svg>${t[1]}</button>`).join('');
 }
-function start(){ Object.assign(S,{tab:'quiz',i:0,pick:null,plain:false,score:0,done:false}); render(); }
-function next(){ if (S.pick===null) return; if (S.i===QS.length-1) S.done=true; else { S.i++; S.pick=null; S.plain=false; } render(); }
+function start(n){ Object.assign(S,{tab:'quiz',on:true,n,i:0,pick:null,plain:false,score:0,combo:0,done:false}); render(); }
+function next(){ if (S.pick===null) return; if (S.i===S.n-1) S.done=true; else { S.i++; S.pick=null; S.plain=false; } render(); }
 
 $('app').addEventListener('click', e=>{
  const b = e.target.closest('button');
  if (e.target.id==='veil') return $('app').classList.remove('open');
  if (!b) return;
  const d = b.dataset;
- if (d.tab){ S.tab=d.tab; if (d.tab==='quiz' && S.done) return start(); return render(); }
+ if (d.tab){ S.tab=d.tab; if (d.tab==='quiz' && S.done) S.on=false; return render(); }
+ if (d.cnt){ S.count=+d.cnt; return render(true); }
+ if (d.step){ S.count=Math.min(100,Math.max(5,S.count+ +d.step)); return render(true); }
+ if (d.subj){ S.subj=+d.subj; return render(true); }
+ if (d.act==='fast'){ S.fast=!S.fast; return render(true); }
+ if (d.act==='start5') return start(5);
+ if (d.act==='again') return start(S.n);
+ if (d.act==='quit'){ const did=S.i+(S.pick!==null?1:0); if (did){ S.n=did; S.done=true; } else S.on=false; return render(); }
  if (d.plain!==undefined){ S.plain = d.plain==='1'; return render(true); }
- if (d.opt!==undefined){ S.pick=+d.opt; if (S.pick===QS[S.i].ans) S.score++; render(true); return $('view').scrollTo({top:9e4,behavior:'smooth'}); }
+ if (d.opt!==undefined){
+  S.pick=+d.opt; const ok=S.pick===QS[S.i % QS.length].ans, at=S.i;
+  if (ok){ S.score++; S.combo++; } else S.combo=0;
+  render(true); $('view').scrollTo({top:9e4,behavior:'smooth'});
+  if (ok && S.fast) setTimeout(()=>{ if (S.on && !S.done && S.tab==='quiz' && S.i===at && S.pick!==null) next(); }, 1200);
+  return;
+ }
  if (d.tier!==undefined){ const s=b.querySelector('span[hidden],span:not(.chip)'); const open=b.getAttribute('aria-expanded')==='true'; s.hidden=open; return b.setAttribute('aria-expanded',!open); }
- if (d.act==='start') return start();
- if (d.act==='home'){ S.tab='today'; return render(); }
+ if (d.act==='start') return start(S.count);
+ if (d.act==='home'){ S.tab='today'; S.on=false; return render(); }
  if (d.act==='next') return next();
  if (d.act==='sheet'){ sheet(); return $('app').classList.add('open'); }
  if (d.act==='close') return $('app').classList.remove('open');

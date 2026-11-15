@@ -3,19 +3,20 @@
 更新：2026-11-15
 
 ## 目前狀態
-- M0：合約與開案書方向已確認；手感原型第二版待使用者看。
-- **P1b 爬蟲完成，待合併**：成果在 `C:\Git\_wt_civic_crawler` 分支 `p1b-crawler`（commit `7463b60`），55 個官方 PDF、8.4 MB，`verify.mjs` ERROR=0。合併進 `main` 要先問使用者。
-- 沒有執行代理在跑。
+- M0 完成：合約、開案書、手感原型第三版（口訣回饋、八字臉貓、題數設定、快刷）。
+- P1b 爬蟲已合併進 `main`：`data/raw/` 55 個官方 PDF，`node tools/crawler/verify.mjs` ERROR=0。
+- GitHub repo 已建立（公開）並 push `main`。Pages 尚未開。
+- 沒有執行代理在跑。`C:\Git\_wt_civic_crawler` 已無用，可刪（要先問）。
 
 ## 使用者已決定（2026-11-15）
 - 地方自治申論題要做（申論架構卡）。
-- GitHub repo 公開。repo 名稱與建立、push、開 Pages 仍要分別問。
-- README 中英文各一份。
+- 主要用法是快速大量刷題；題數可自訂（開案書 §3 快刷模式）。
+- 架構採 ECS＋SSOT、題庫可抽換、不用瀏覽器彈窗（開案書 §4、`AGENTS.md` §2）。Kyoto-Bunko 的資料架構只當參考。
 
 ## 等使用者決定
-1. 是否把 `p1b-crawler` 合併進 `main`。
-2. 手感原型第二版（口訣回饋、貓角色、圖像）是否定案。
-3. 額度表超過 1 天沒更新，請看一次 Antigravity 與 Claude 的額度畫面。
+1. 原型第三版是否定案（定案後才派 P1e-2 介面包）。
+2. 額度表超過 1 天沒更新，請看一次 Antigravity 與 Claude 的額度畫面。
+3. 何時開 GitHub Pages（建議 M1 有可刷題版本時）。
 
 ## 給 P1c 解析器的已知事實（寫派工單時帶上）
 - 試題 PDF 是文字型，`pdftotext -layout` 抽得出題幹與選項文字。
@@ -24,6 +25,5 @@
 - 同一份試卷多個類科共用（表頭列出所有類科）；地特與離島考試共用同一份題目。
 - 科目代碼每年不同，以 `data/raw/manifest.json` 為準。
 
-## 待辦
-- P1a 骨架、P1d 驗證腳本 → P1c 解析器 → P1e 刷題畫面。
-- 開案書 §6 拆包表要補「申論架構卡」一包。
+## 待辦（依序）
+- P1a 骨架＋P1d 驗證腳本（平行）→ P1c 解析器 → P1e-1 核心與 System → P1e-2 介面。
