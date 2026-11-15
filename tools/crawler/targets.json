@@ -13,7 +13,7 @@
     { "code": "115080", "y": 2026, "year": 115, "exam": "general", "levelIncludes": "普通考試" },
     { "code": "114080", "y": 2025, "year": 114, "exam": "general", "levelIncludes": "普通考試" },
     { "code": "113080", "y": 2024, "year": 113, "exam": "general", "levelIncludes": "普通考試" },
-    { "code": "114190", "y": 2025, "year": 114, "exam": "local4", "levelIncludes": "四等" },
-    { "code": "113200", "y": 2024, "year": 113, "exam": "local4", "levelIncludes": "四等" }
+    { "code": "114190", "y": 2025, "year": 114, "exam": "local4", "levelIncludes": "地方政府公務人員四等" },
+    { "code": "113200", "y": 2024, "year": 113, "exam": "local4", "levelIncludes": "地方政府公務人員考試四等" }
   ]
 }
