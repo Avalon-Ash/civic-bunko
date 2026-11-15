@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "command(node tools/parser/parse.mjs --dump)",
+      "command(node tools/parser/parse.mjs)",
+      "command(node tools/validate/validate.mjs)",
+      "command(node --test tools/parser/parse.test.mjs)",
+      "command(npm run lint)"
+    ]
+  }
+}

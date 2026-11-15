@@ -1,0 +1,30 @@
+{
+  "name": "civic-bunko",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3100 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --port=3100",
+    "lint": "tsc --noEmit && node tools/lint/no-popups.mjs",
+    "test": "node --import tsx --test \"src/**/*.test.ts\" \"tools/**/*.test.mjs\"",
+    "crawl": "node tools/crawler/crawl.mjs",
+    "parse": "node tools/parser/parse.mjs",
+    "validate": "node tools/validate/validate.mjs"
+  },
+  "dependencies": {
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "pdfjs-dist": "^4.10.38",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.3"
+  }
+}
