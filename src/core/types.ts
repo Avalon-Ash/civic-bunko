@@ -161,6 +161,8 @@ export interface Settings {
   theme: ThemeChoice;
   /** 上一次的回合設定，下次預填 */
   lastRound: RoundConfig | null;
+  /** 已按過「知道了」，不再顯示加到主畫面的引導 */
+  installHintDismissed?: boolean;
 }
 
 // ── 事件（System 之間唯一的溝通方式）──────────────────────
@@ -180,5 +182,6 @@ export type UICommand =
   | { type: 'quitRound' }
   | { type: 'retryWrong' }
   | { type: 'setTheme'; theme: ThemeChoice }
+  | { type: 'dismissInstallHint' }
   | { type: 'importProgress'; json: string }
   | { type: 'resetProgress' };

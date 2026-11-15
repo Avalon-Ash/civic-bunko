@@ -28,5 +28,10 @@ describe('settings system', () => {
     assert.deepEqual(world.settings.lastRound, config);
     assert.equal(emitted.length, 2);
     assert.deepEqual(emitted[1]?.lastRound, config);
+
+    dispatch(world, { type: 'dismissInstallHint' });
+    assert.equal(world.settings.installHintDismissed, true);
+    assert.equal(emitted.length, 3);
+    assert.equal(emitted[2]?.installHintDismissed, true);
   });
 });

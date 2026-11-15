@@ -6,7 +6,7 @@ import {
   retryWrong,
   startRound,
 } from '../systems/round';
-import { setTheme } from '../systems/settings';
+import { dismissInstallHint, setTheme } from '../systems/settings';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
 import type { World } from './world';
@@ -50,6 +50,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'setTheme':
       setTheme(world, cmd.theme);
+      break;
+    case 'dismissInstallHint':
+      dismissInstallHint(world);
       break;
     case 'importProgress': {
       const result = importProgress(world, cmd.json);

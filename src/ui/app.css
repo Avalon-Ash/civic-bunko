@@ -167,6 +167,16 @@ h2 {
   align-items: center;
 }
 
+.cb-card-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.cb-m0 {
+  margin: 0;
+}
+
 .cb-tone-pink {
   background: var(--pink);
 }
@@ -1233,8 +1243,9 @@ mark {
   left: 50%;
   transform: translate(-50%, -140%);
   opacity: 0;
-  z-index: 20;
+  z-index: 40;
   pointer-events: none;
+  max-width: calc(100vw - 24px);
   transition: transform 0.34s var(--spring), opacity 0.25s ease;
 }
 
@@ -1252,7 +1263,8 @@ mark {
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 900;
-  white-space: nowrap;
+  text-align: center;
+  word-break: break-word;
 }
 
 /* ── 底部抽屜 Sheet ─────────────────────────────────────── */
@@ -1468,4 +1480,125 @@ mark {
     width: 46px;
     height: 46px;
   }
+}
+
+/* ── 加到主畫面引導、進度備份與確認對話框 ───────────────── */
+
+.cb-install-banner {
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.cb-install-banner-title {
+  display: block;
+  font-size: 0.9375rem;
+}
+
+.cb-install-heading {
+  display: block;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+
+.cb-install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cb-install-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+.cb-install-icon {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 14px;
+  border: var(--border-w) solid var(--line);
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--ink);
+}
+
+.cb-backup-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 4px;
+  border-bottom: 2px dashed var(--hair);
+}
+
+.cb-backup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cb-textarea {
+  width: 100%;
+  min-height: 132px;
+  padding: 12px;
+  border-radius: var(--radius-option);
+  border: var(--border-w) solid var(--line);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 1rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.cb-textarea:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.cb-dialog-root {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+.cb-dialog-veil {
+  opacity: 1;
+}
+
+.cb-dialog {
+  position: relative;
+  width: 100%;
+  max-width: var(--content-max);
+  max-height: 82dvh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cb-dialog-title {
+  font-size: 1.125rem;
+  font-weight: 900;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+
+.cb-dialog-body {
+  font-size: 0.9375rem;
+  line-height: 1.55;
 }

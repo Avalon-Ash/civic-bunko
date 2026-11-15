@@ -121,4 +121,28 @@ describe('persistence system', () => {
     attachPersistence(reloaded, targetStorage);
     assert.equal(reloaded.progress.size, 0);
   });
+
+  it('defaults installHintDismissed to false for legacy saves and preserves true on round-trip', () => {
+    const legacyJson = JSON.stringify({
+      version: 1,
+      progress: {},
+      settings: { theme: 'light', lastRound: null },
+    });
+    const legacyWorld = createWorld();
+    attachPersistence(legacyWorld, createMemoryStorage({ [STORAGE_KEY]: legacyJson }));
+    assert.equal(legacyWorld.settings.installHintDismissed, false);
+
+    dispatch(legacyWorld, { type: 'dismissInstallHint' });
+    const exported = exportProgress(legacyWorld);
+    const restoredWorld = createWorld();
+    dispatch(restoredWorld, { type: 'importProgress', json: exported });
+    assert.equal(restoredWorld.settings.installHintDismissed, true);
+
+    const badSettingsJson = JSON.stringify({
+      version: 1,
+      progress: {},
+      settings: { theme: 'light', lastRound: null, installHintDismissed: 'yes' },
+    });
+    assert.equal(importProgress(restoredWorld, badSettingsJson).ok, false);
+  });
 });
