@@ -4,11 +4,12 @@ import {
   SYNC_REMOTE_PATH,
   SYNC_STORAGE_KEY,
 } from '../core/constants/sync';
-import type { Progress, QuestionId, SyncCredentials, SyncState } from '../core/types';
+import type { DayKey, Progress, QuestionId, SyncCredentials, SyncState } from '../core/types';
 import type { World } from '../core/world';
+import { parseDaysRecord } from './daily';
 import { parseProgressEntry, type StorageLike } from './persistence';
 import { base64ToUtf8, decodeSyncCode, utf8ToBase64, validateSyncCredentials } from './syncCode';
-import { mergeProgress } from './syncMerge';
+import { mergeDays, mergeProgress } from './syncMerge';
 
 export interface SyncStorageLike extends StorageLike {
   removeItem?(key: string): void;
@@ -32,7 +33,7 @@ interface SyncController {
 
 type RemoteFetchResult =
   | { kind: 'missing' }
-  | { kind: 'ok'; sha: string; progress: Map<QuestionId, Progress> }
+  | { kind: 'ok'; sha: string; progress: Map<QuestionId, Progress>; days: Map<DayKey, number> }
   | { kind: 'error'; message: string };
 
 const MSG_INVALID_CODE = '同步碼格式不對';
@@ -149,7 +150,40 @@ function progressMapsEqual(
   return true;
 }
 
-function parseRemoteContent(base64Content: string): Map<QuestionId, Progress> | null {
+function diffDayLogs(
+  prev: ReadonlyMap<DayKey, number>,
+  next: ReadonlyMap<DayKey, number>,
+): Array<{ day: DayKey; count: number }> {
+  const changed: Array<{ day: DayKey; count: number }> = [];
+  for (const [day, nextCount] of next) {
+    if (prev.get(day) !== nextCount) {
+      changed.push({ day, count: nextCount });
+    }
+  }
+  for (const day of prev.keys()) {
+    if (!next.has(day)) {
+      changed.push({ day, count: 0 });
+    }
+  }
+  return changed;
+}
+
+function dayMapsEqual(
+  a: ReadonlyMap<DayKey, number>,
+  b: ReadonlyMap<DayKey, number>,
+): boolean {
+  if (a.size !== b.size) return false;
+  for (const [day, countA] of a) {
+    if (b.get(day) !== countA) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function parseRemoteContent(
+  base64Content: string,
+): { progress: Map<QuestionId, Progress>; days: Map<DayKey, number> } | null {
   try {
     const jsonText = base64ToUtf8(base64Content);
     const parsed: unknown = JSON.parse(jsonText);
@@ -157,13 +191,21 @@ function parseRemoteContent(base64Content: string): Map<QuestionId, Progress> | 
     if (parsed.version !== SYNC_FILE_VERSION) return null;
     if (!isRecord(parsed.progress)) return null;
 
-    const result = new Map<QuestionId, Progress>();
+    const progress = new Map<QuestionId, Progress>();
     for (const [id, rawEntry] of Object.entries(parsed.progress)) {
       const normalized = parseProgressEntry(rawEntry);
       if (!normalized) return null;
-      result.set(id, normalized);
+      progress.set(id, normalized);
     }
-    return result;
+
+    let days = new Map<DayKey, number>();
+    if (parsed.days !== undefined) {
+      const parsedDays = parseDaysRecord(parsed.days);
+      if (!parsedDays) return null;
+      days = parsedDays;
+    }
+
+    return { progress, days };
   } catch {
     return null;
   }
@@ -205,12 +247,12 @@ async function fetchRemoteFile(
     return { kind: 'error', message: MSG_DATA_ERROR };
   }
 
-  const progress = parseRemoteContent(body.content);
-  if (!progress) {
+  const parsed = parseRemoteContent(body.content);
+  if (!parsed) {
     return { kind: 'error', message: MSG_DATA_ERROR };
   }
 
-  return { kind: 'ok', sha: body.sha, progress };
+  return { kind: 'ok', sha: body.sha, progress: parsed.progress, days: parsed.days };
 }
 
 function isStale(controller: SyncController, gen: number): boolean {
@@ -244,9 +286,12 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     }
 
     const remoteMap = remote.kind === 'ok' ? remote.progress : new Map<QuestionId, Progress>();
+    const remoteDays = remote.kind === 'ok' ? remote.days : new Map<DayKey, number>();
     const remoteSha = remote.kind === 'ok' ? remote.sha : null;
 
     const merged = mergeProgress(world.progress, remoteMap);
+    const mergedDays = mergeDays(world.dayLog, remoteDays);
+
     const changedIds = diffProgressIds(world.progress, merged);
     if (changedIds.length > 0) {
       world.progress.clear();
@@ -257,7 +302,22 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       if (isStale(controller, gen)) return;
     }
 
-    const shouldPut = remote.kind === 'missing' || !progressMapsEqual(merged, remoteMap);
+    const changedDays = diffDayLogs(world.dayLog, mergedDays);
+    if (changedDays.length > 0) {
+      world.dayLog.clear();
+      for (const [day, count] of mergedDays) {
+        world.dayLog.set(day, count);
+      }
+      for (const { day, count } of changedDays) {
+        world.bus.emit({ type: 'dayLogChanged', day, count });
+        if (isStale(controller, gen)) return;
+      }
+    }
+
+    const shouldPut =
+      remote.kind === 'missing' ||
+      !progressMapsEqual(merged, remoteMap) ||
+      !dayMapsEqual(mergedDays, remoteDays);
     if (!shouldPut) {
       setSyncState(world, {
         status: 'idle',
@@ -271,6 +331,7 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       version: SYNC_FILE_VERSION,
       updatedAt: deps.now().toISOString(),
       progress: Object.fromEntries(merged),
+      days: Object.fromEntries(mergedDays),
     });
     const putBody: Record<string, unknown> = {
       message: 'chore: sync progress',

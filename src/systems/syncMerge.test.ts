@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import type { Progress, QuestionId } from '../core/types';
-import { mergeProgress } from './syncMerge';
+import type { DayKey, Progress, QuestionId } from '../core/types';
+import { mergeDays, mergeProgress } from './syncMerge';
 
 function makeProg(overrides: Partial<Progress> = {}): Progress {
   return {
@@ -100,5 +100,29 @@ describe('syncMerge', () => {
     for (const [id, entry] of lr) {
       assert.deepEqual(entry, rl.get(id));
     }
+  });
+
+  it('merges days by taking the max count per date and is commutative', () => {
+    const local = new Map<DayKey, number>([
+      ['2026-11-14', 5],
+      ['2026-11-15', 16],
+      ['2026-11-16', 4],
+    ]);
+    const remote = new Map<DayKey, number>([
+      ['2026-11-15', 12],
+      ['2026-11-16', 15],
+      ['2026-11-17', 9],
+    ]);
+
+    const lr = mergeDays(local, remote);
+    const rl = mergeDays(remote, local);
+
+    assert.deepEqual(Object.fromEntries(lr), {
+      '2026-11-14': 5,
+      '2026-11-15': 16,
+      '2026-11-16': 15,
+      '2026-11-17': 9,
+    });
+    assert.deepEqual(Object.fromEntries(lr), Object.fromEntries(rl));
   });
 });

@@ -7,7 +7,7 @@ import {
   SYNC_REMOTE_PATH,
   SYNC_STORAGE_KEY,
 } from '../core/constants/sync';
-import type { AppEvent, Progress, QuestionId, SyncCredentials } from '../core/types';
+import type { AppEvent, DayKey, Progress, QuestionId, SyncCredentials } from '../core/types';
 import { createWorld } from '../core/world';
 import { exportProgress } from './persistence';
 import { attachSync, waitForSync, type SyncStorageLike } from './sync';
@@ -44,11 +44,16 @@ function makeProgress(overrides: Partial<Progress> = {}): Progress {
   };
 }
 
-function encodeRemoteContent(progress: Record<QuestionId, Progress>, updatedAt = '2026-11-15T10:00:00.000Z'): string {
+function encodeRemoteContent(
+  progress: Record<QuestionId, Progress>,
+  updatedAt = '2026-11-15T10:00:00.000Z',
+  days?: Record<DayKey, number>,
+): string {
   const json = JSON.stringify({
     version: SYNC_FILE_VERSION,
     updatedAt,
     progress,
+    ...(days !== undefined ? { days } : {}),
   });
   const b64 = Buffer.from(json, 'utf8').toString('base64');
   // Simulate GitHub Contents API wrapping base64 with newlines
@@ -58,7 +63,12 @@ function encodeRemoteContent(progress: Record<QuestionId, Progress>, updatedAt =
 function decodePutContent(bodyText: string): {
   message: string;
   sha?: string;
-  payload: { version: number; updatedAt: string; progress: Record<QuestionId, Progress> };
+  payload: {
+    version: number;
+    updatedAt: string;
+    progress: Record<QuestionId, Progress>;
+    days?: Record<DayKey, number>;
+  };
 } {
   const parsed = JSON.parse(bodyText) as { message: string; content: string; sha?: string };
   const json = Buffer.from(parsed.content, 'base64').toString('utf8');
@@ -69,6 +79,7 @@ function decodePutContent(bodyText: string): {
       version: number;
       updatedAt: string;
       progress: Record<QuestionId, Progress>;
+      days?: Record<DayKey, number>;
     },
   };
 }
@@ -411,5 +422,104 @@ describe('sync system', () => {
     assert.equal(exported.includes(TEST_CRED.token), false);
     assert.equal(exported.includes(TEST_CRED.owner), false);
     assert.equal(exported.includes(TEST_CRED.repo), false);
+  });
+
+  it('merges days taking max count, emits dayLogChanged, and reads legacy remote files without days', async () => {
+    const world = createWorld();
+    world.dayLog.set('2026-11-15', 16);
+    world.dayLog.set('2026-11-16', 3);
+
+    const storage = createMemoryStorage({
+      [SYNC_STORAGE_KEY]: JSON.stringify(TEST_CRED),
+    });
+
+    const dayEvents: Array<{ day: string; count: number }> = [];
+    world.bus.on('dayLogChanged', (e) => dayEvents.push({ day: e.day, count: e.count }));
+
+    let putBodyRaw = '';
+    const methods: string[] = [];
+
+    attachSync(world, {
+      fetch: async (_input, init) => {
+        const method = init?.method ?? 'GET';
+        methods.push(method);
+        if (method === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-days-1',
+            content: encodeRemoteContent({}, '2026-11-16T00:00:00.000Z', {
+              '2026-11-15': 10,
+              '2026-11-16': 15,
+              '2026-11-17': 6,
+            }),
+          });
+        }
+        putBodyRaw = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-days-2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-17T08:00:00.000Z'),
+    });
+    await waitForSync(world);
+
+    assert.deepEqual(methods, ['GET', 'PUT']);
+    assert.deepEqual(Object.fromEntries(world.dayLog), {
+      '2026-11-15': 16,
+      '2026-11-16': 15,
+      '2026-11-17': 6,
+    });
+    assert.deepEqual(
+      dayEvents.sort((a, b) => a.day.localeCompare(b.day)),
+      [
+        { day: '2026-11-16', count: 15 },
+        { day: '2026-11-17', count: 6 },
+      ],
+    );
+
+    const put = decodePutContent(putBodyRaw);
+    assert.deepEqual(put.payload.days, {
+      '2026-11-15': 16,
+      '2026-11-16': 15,
+      '2026-11-17': 6,
+    });
+
+    // Legacy remote file without `days` must still be readable and merge cleanly
+    const worldLegacy = createWorld();
+    worldLegacy.progress.set('q1', makeProgress({ seen: 1 }));
+    worldLegacy.dayLog.set('2026-11-18', 5);
+    let legacyPutRaw = '';
+    attachSync(worldLegacy, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-old',
+            content: encodeRemoteContent({ q1: makeProgress({ seen: 1 }) }),
+          });
+        }
+        legacyPutRaw = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-new' } });
+      },
+      storage,
+      now: () => new Date('2026-11-18T08:00:00.000Z'),
+    });
+    await waitForSync(worldLegacy);
+    assert.equal(worldLegacy.sync.status, 'idle');
+    assert.deepEqual(decodePutContent(legacyPutRaw).payload.days, { '2026-11-18': 5 });
+
+    // Invalid days in remote file reports data format error
+    const worldInvalid = createWorld();
+    attachSync(worldInvalid, {
+      fetch: async () =>
+        jsonResponse(200, {
+          sha: 'sha-bad',
+          content: encodeRemoteContent({}, '2026-11-18T00:00:00.000Z', {
+            'bad-date': 5,
+          }),
+        }),
+      storage,
+      now: () => new Date('2026-11-18T09:00:00.000Z'),
+    });
+    await waitForSync(worldInvalid);
+    assert.equal(worldInvalid.sync.status, 'error');
+    assert.equal(worldInvalid.sync.error, '同步資料格式不正確');
   });
 });

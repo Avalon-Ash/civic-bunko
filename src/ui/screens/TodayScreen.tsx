@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { dispatch } from '../../core/commands';
-import type { ThemeChoice } from '../../core/types';
+import { DAILY_GOAL_QUESTIONS } from '../../core/constants/daily';
+import type { DayKey, ThemeChoice } from '../../core/types';
 import type { World } from '../../core/world';
 import {
   activeBank,
@@ -9,14 +10,15 @@ import {
   daysLeft,
   getSettings,
   savedRoundInfo,
-  weekActivity,
 } from '../../selectors';
+import { currentAccessory, todayProgress, weekStamps } from '../../selectors/daily';
 import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
 import { CountUp } from '../kit/CountUp';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
+import { Toast } from '../kit/Toast';
 import { checkForUpdateNow, formatAppVersion, getCurrentAppVersion } from '../useAppVersion';
 import { useWorld } from '../useWorld';
 
@@ -25,6 +27,11 @@ const THEME_OPTIONS: readonly SegmentedOption<ThemeChoice>[] = [
   { value: 'light', label: '淺色' },
   { value: 'dark', label: '深色' },
 ];
+
+export interface StampCelebration {
+  day: DayKey;
+  unlockedName: string | null;
+}
 
 export interface TodayScreenProps {
   world: World;
@@ -35,6 +42,8 @@ export interface TodayScreenProps {
   loadError?: boolean;
   showInstallHint?: boolean;
   onOpenInstallHint?: () => void;
+  celebration?: StampCelebration | null;
+  onCelebrationDone?: () => void;
 }
 
 function formatExamDate(isoDate: string): string {
@@ -53,9 +62,30 @@ export function TodayScreen({
   loadError = false,
   showInstallHint = false,
   onOpenInstallHint,
+  celebration = null,
+  onCelebrationDone,
 }: TodayScreenProps) {
   useWorld(world);
   const [wobbleState, setWobbleState] = useState<{ idx: number; tick: number } | null>(null);
+  const [showStampAnim, setShowStampAnim] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [queuedUnlock, setQueuedUnlock] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!celebration) return;
+    setShowStampAnim(true);
+    setToastMessage('今天的章蓋好了！');
+    setQueuedUnlock(celebration.unlockedName);
+    onCelebrationDone?.();
+  }, [celebration, onCelebrationDone]);
+
+  useEffect(() => {
+    if (!showStampAnim) return;
+    const timer = window.setTimeout(() => {
+      setShowStampAnim(false);
+    }, 2100);
+    return () => window.clearTimeout(timer);
+  }, [showStampAnim]);
 
   const now = new Date();
   const bank = activeBank(world);
@@ -65,7 +95,9 @@ export function TodayScreen({
   const totals = bank ? bankTotals(world, bank.id) : { total: 0, seen: 0 };
   const remainingDays = bank ? daysLeft(bank, now) : 0;
   const missions = bank ? dailyMissions(world, bank.id, now) : [];
-  const week = weekActivity(world, now);
+  const today = todayProgress(world, now);
+  const week = weekStamps(world, now);
+  const accessory = currentAccessory(world);
 
   const handleThemeChange = (theme: ThemeChoice) => {
     dispatch(world, { type: 'setTheme', theme });
@@ -109,8 +141,25 @@ export function TodayScreen({
     setWobbleState((prev) => ({ idx, tick: (prev?.tick ?? 0) + 1 }));
   };
 
+  const handleToastDismiss = () => {
+    if (queuedUnlock) {
+      setToastMessage(`解鎖新配件：${queuedUnlock}`);
+      setQueuedUnlock(null);
+    } else {
+      setToastMessage(null);
+    }
+  };
+
   return (
     <div className="cb-stack">
+      <Toast message={toastMessage} onDismiss={handleToastDismiss} />
+
+      {showStampAnim && (
+        <div className="cb-daily-stamp-overlay" aria-hidden="true">
+          <div className="cb-stamp">今日達成</div>
+        </div>
+      )}
+
       <header className="cb-page-head">
         <h1>今日</h1>
         <Segmented
@@ -124,7 +173,7 @@ export function TodayScreen({
       {!papersLoading && savedRound && (
         <Card tone="butter" className="cb-stack-sm">
           <div className="cb-row">
-            <Cat size={54} mood="idle" interactive />
+            <Cat size={54} mood="idle" accessory={accessory} interactive />
             <div className="cb-grow">
               <strong className="cb-resume-title">
                 {savedRound.study === 'read'
@@ -147,7 +196,12 @@ export function TodayScreen({
       {bank ? (
         <>
           <Card tone="pink" className="cb-countdown">
-            <Cat size={76} mood={papersLoading ? 'sleepy' : 'idle'} interactive />
+            <Cat
+              size={76}
+              mood={papersLoading ? 'sleepy' : 'idle'}
+              accessory={accessory}
+              interactive
+            />
             <div className="cb-grow">
               <div className="cb-sub-strong">{bank.title}・距離筆試</div>
               <div className="cb-countdown-num">
@@ -202,7 +256,36 @@ export function TodayScreen({
           )}
 
           <section className="cb-section">
-            <h2>今天的 3 個小任務</h2>
+            <div className="cb-mission-head">
+              <h2>今天的 3 個小任務</h2>
+              <span className="cb-sub-strong cb-num-tabular">
+                今天 {today.count} / {today.goal} 題
+              </span>
+            </div>
+            <div
+              className="cb-daily-paws"
+              role="img"
+              aria-label={`今日已完成 ${today.missionsDone} / ${today.missionsTotal} 個小任務`}
+            >
+              {Array.from({ length: today.missionsTotal }, (_, idx) => {
+                const lit = idx < today.missionsDone;
+                return (
+                  <span
+                    key={idx}
+                    className={`cb-daily-paw ${lit ? 'is-lit' : ''}`.trim()}
+                    style={{ animationDelay: `${idx * 60}ms` }}
+                    aria-hidden="true"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <ellipse cx="12" cy="16" rx="6" ry="4.6" />
+                      <circle cx="5.5" cy="10" r="2.4" />
+                      <circle cx="12" cy="7" r="2.6" />
+                      <circle cx="18.5" cy="10" r="2.4" />
+                    </svg>
+                  </span>
+                );
+              })}
+            </div>
             {papersLoading ? (
               <div className="cb-stack-sm">
                 {bank.subjects.slice(0, 2).map((subj, idx) => (
@@ -263,6 +346,11 @@ export function TodayScreen({
                 </div>
               </Card>
             )}
+            <p className="cb-sub cb-m0 cb-daily-goal-note">
+              {today.stamped
+                ? '今天的章蓋好了！'
+                : `三個任務都做完（${DAILY_GOAL_QUESTIONS} 題）才會蓋今天的章`}
+            </p>
           </section>
 
           <section className="cb-section">
@@ -270,22 +358,27 @@ export function TodayScreen({
             <div className="cb-week">
               {week.map((day, idx) => {
                 const isWobbling = wobbleState?.idx === idx;
+                const text = day.stamped
+                  ? '完成'
+                  : day.isToday
+                    ? `${day.count}/${DAILY_GOAL_QUESTIONS}`
+                    : day.label;
                 return (
                   <button
                     key={isWobbling ? `${day.date}-${wobbleState.tick}` : day.date}
                     type="button"
                     className={[
                       'cb-week-stamp',
-                      day.done ? 'is-on' : '',
+                      day.stamped ? 'is-on' : '',
                       day.isToday ? 'is-today' : '',
                       isWobbling ? 'is-wobbling' : '',
                     ]
                       .filter(Boolean)
                       .join(' ')}
                     onClick={() => handleStampTap(idx)}
-                    aria-label={`${day.date} 週${day.label}${day.done ? ' 已完成' : day.isToday ? ' 今天' : ''}`}
+                    aria-label={`${day.date} 週${day.label}${day.stamped ? ' 已蓋章' : day.isToday ? ` 今天 ${day.count}/${DAILY_GOAL_QUESTIONS} 題` : ''}`}
                   >
-                    {day.done ? '完成' : day.label}
+                    {text}
                   </button>
                 );
               })}

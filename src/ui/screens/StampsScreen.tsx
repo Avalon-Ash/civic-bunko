@@ -1,14 +1,18 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
+import { ACCESSORIES, STAMPS_PER_REWARD } from '../../core/constants/daily';
+import type { AccessoryId } from '../../core/types';
 import type { World } from '../../core/world';
 import { activeBank, subjectStats } from '../../selectors';
 import { progressOverview } from '../../selectors/backup';
+import { currentAccessory, stampTotals } from '../../selectors/daily';
 import { getSyncState } from '../../selectors/sync';
 import { exportProgress } from '../../systems/persistence';
 import { encodeSyncCode, validateSyncCredentials } from '../../systems/syncCode';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
-import { Cat } from '../kit/Cat';
+import { AccessoryIcon, Cat } from '../kit/Cat';
+import { CountUp } from '../kit/CountUp';
 import { Dialog } from '../kit/Dialog';
 import { ProgressBar } from '../kit/ProgressBar';
 import { Sheet } from '../kit/Sheet';
@@ -69,13 +73,72 @@ async function copyTextWithFallback(
   }
 }
 
-/** 集章畫面：顯示各科總題數、已刷題數與答對率，以及最下方的同步與備份區塊。 */
+function LockIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+      <rect
+        x="5"
+        y="11"
+        width="14"
+        height="10"
+        rx="3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+      />
+      <path
+        d="M8 11V7a4 4 0 0 1 8 0v4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/** 集章畫面：顯示我的章與小貓配件、各科總題數與答對率，以及最下方的同步與備份區塊。 */
 export function StampsScreen({ world, papersLoading = false }: StampsScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
   const stats = bank ? subjectStats(world, bank.id) : [];
   const overview = progressOverview(world);
   const sync = getSyncState(world);
+  const totals = stampTotals(world);
+  const equipped = currentAccessory(world);
+
+  const [catSpin, setCatSpin] = useState(false);
+  const spinTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (spinTimerRef.current !== null) {
+        window.clearTimeout(spinTimerRef.current);
+      }
+    };
+  }, []);
+
+  const triggerCatSpin = () => {
+    if (spinTimerRef.current !== null) {
+      window.clearTimeout(spinTimerRef.current);
+    }
+    setCatSpin(false);
+    window.requestAnimationFrame(() => {
+      setCatSpin(true);
+      spinTimerRef.current = window.setTimeout(() => {
+        setCatSpin(false);
+        spinTimerRef.current = null;
+      }, 680);
+    });
+  };
+
+  const handleToggleAccessory = (id: AccessoryId) => {
+    const next = equipped === id ? null : id;
+    dispatch(world, { type: 'setAccessory', accessory: next });
+    if (next !== null) {
+      triggerCatSpin();
+    }
+  };
 
   const ownerInputId = useId();
   const repoInputId = useId();
@@ -220,6 +283,72 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
         <h1>集章</h1>
         {papersLoading && <span className="cb-sub">題庫載入中…</span>}
       </div>
+
+      <Card tone="pink" className="cb-stack-sm cb-stamps-hero">
+        <div className="cb-row">
+          <Cat size={76} mood="yay" accessory={equipped} spin={catSpin} interactive />
+          <div className="cb-grow">
+            <div className="cb-sub-strong">我的章</div>
+            <div className="cb-stamps-count">
+              <b>
+                <CountUp value={totals.total} />
+              </b>{' '}
+              個章
+            </div>
+            <div className="cb-sub-strong">
+              {totals.next
+                ? `再 ${totals.next.need} 個章解鎖 ${totals.next.name}`
+                : '六個配件全部解鎖了！'}
+            </div>
+          </div>
+        </div>
+
+        <div className="cb-acc-grid" role="group" aria-label="小貓配件">
+          {ACCESSORIES.map((acc, idx) => {
+            const threshold = (idx + 1) * STAMPS_PER_REWARD;
+            const isUnlocked = totals.unlocked.includes(acc.id);
+            const isEquipped = equipped === acc.id;
+            const need = Math.max(1, threshold - totals.total);
+
+            if (isUnlocked) {
+              return (
+                <button
+                  key={acc.id}
+                  type="button"
+                  className={`cb-acc-item cb-press ${isEquipped ? 'is-equipped' : ''}`.trim()}
+                  aria-pressed={isEquipped}
+                  onClick={() => handleToggleAccessory(acc.id)}
+                >
+                  <span className="cb-acc-circle">
+                    <AccessoryIcon id={acc.id} size={36} />
+                  </span>
+                  <span className="cb-acc-name">{acc.name}</span>
+                  <span className="cb-acc-meta">{isEquipped ? '配戴中' : '點我戴上'}</span>
+                </button>
+              );
+            }
+
+            return (
+              <div
+                key={acc.id}
+                className="cb-acc-item is-locked"
+                aria-label={`${acc.name}，未解鎖，再 ${need} 個章解鎖`}
+              >
+                <span className="cb-acc-circle">
+                  <span className="cb-acc-silhouette" aria-hidden="true">
+                    <AccessoryIcon id={acc.id} size={36} />
+                  </span>
+                  <span className="cb-acc-lock" aria-hidden="true">
+                    <LockIcon />
+                  </span>
+                </span>
+                <span className="cb-acc-name">{acc.name}</span>
+                <span className="cb-acc-meta">再 {need} 個章</span>
+              </div>
+            );
+          })}
+        </div>
+      </Card>
 
       {stats.length > 0 ? (
         <div className="cb-stack-sm">

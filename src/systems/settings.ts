@@ -1,11 +1,27 @@
-import type { ThemeChoice } from '../core/types';
+import type { AccessoryId, ThemeChoice } from '../core/types';
 import type { World } from '../core/world';
+import { unlockedAccessories } from './daily';
 
 /** 更新佈景主題設定並發出 settingsChanged。 */
 export function setTheme(world: World, theme: ThemeChoice): void {
   world.settings = {
     ...world.settings,
     theme,
+  };
+  world.bus.emit({
+    type: 'settingsChanged',
+    settings: { ...world.settings },
+  });
+}
+
+/** 更新貓咪配戴的配件；只接受已解鎖的配件或 null，並發出 settingsChanged。 */
+export function setAccessory(world: World, accessory: AccessoryId | null): void {
+  if (accessory !== null && !unlockedAccessories(world).includes(accessory)) {
+    return;
+  }
+  world.settings = {
+    ...world.settings,
+    accessory,
   };
   world.bus.emit({
     type: 'settingsChanged',

@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
-import type { Choice, Correction, Enrich, Paper, PassageGroup } from '../../core/types';
+import type { AccessoryId, Choice, Correction, Enrich, Paper, PassageGroup } from '../../core/types';
 import { Card, type CardTone } from '../kit/Card';
 import { Cat, type CatMood } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
@@ -86,6 +86,7 @@ export interface EnrichCardProps {
   className?: string;
   catMood?: CatMood;
   catSpin?: boolean;
+  catAccessory?: AccessoryId | null;
   label: ReactNode;
 }
 
@@ -96,12 +97,13 @@ export function EnrichCard({
   className = '',
   catMood = 'idle',
   catSpin = false,
+  catAccessory = null,
   label,
 }: EnrichCardProps) {
   return (
     <Card tone={tone} className={`cb-kou ${className}`.trim()}>
       <div className="cb-row">
-        <Cat size={58} mood={catMood} spin={catSpin} interactive />
+        <Cat size={58} mood={catMood} spin={catSpin} accessory={catAccessory} interactive />
         <div className="cb-grow">
           <div className="cb-kou-head">
             {label}

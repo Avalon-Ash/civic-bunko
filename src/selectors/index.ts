@@ -19,7 +19,7 @@ import type {
 } from '../core/types';
 import type { World } from '../core/world';
 import { askTypeOf } from '../systems/askType';
-import { isDue, localDaysUntil, toLocalDateString } from '../systems/date';
+import { isDue, localDaysUntil } from '../systems/date';
 import { countAvailable } from '../systems/selection';
 
 export interface CurrentQuestionView {
@@ -340,15 +340,6 @@ export interface DailyMissionView {
   config: RoundConfig;
 }
 
-export interface WeekDayView {
-  date: string;
-  label: string;
-  done: boolean;
-  isToday: boolean;
-}
-
-const WEEKDAY_LABELS = ['一', '二', '三', '四', '五', '六', '日'] as const;
-
 /** 取得目前使用中的題庫（優先取最近回合的題庫，否則取第一個）。 */
 export function activeBank(world: World): Bank | null {
   const preferredId = world.settings.lastRound?.bankId;
@@ -389,6 +380,10 @@ export function getSettings(world: World): Settings {
           subjectKeys: [...world.settings.lastRound.subjectKeys],
         }
       : null,
+    ...(world.settings.installHintDismissed !== undefined
+      ? { installHintDismissed: world.settings.installHintDismissed }
+      : {}),
+    ...(world.settings.accessory !== undefined ? { accessory: world.settings.accessory } : {}),
   };
 }
 
@@ -520,30 +515,4 @@ export function dailyMissions(world: World, bankId: BankId, now: Date): DailyMis
   }
 
   return missions;
-}
-
-/** 計算本週（週一到週日）每日是否有作答紀錄。 */
-export function weekActivity(world: World, now: Date): WeekDayView[] {
-  const activeDates = new Set<string>();
-  for (const prog of world.progress.values()) {
-    const d = new Date(prog.lastAt);
-    if (!Number.isNaN(d.getTime())) {
-      activeDates.add(toLocalDateString(d));
-    }
-  }
-
-  const todayStr = toLocalDateString(now);
-  const dayOfWeek = now.getDay(); // 0 = Sun, 1 = Mon, ...
-  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-
-  return WEEKDAY_LABELS.map((label, idx) => {
-    const dayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + mondayOffset + idx);
-    const dateStr = toLocalDateString(dayDate);
-    return {
-      date: dateStr,
-      label,
-      done: activeDates.has(dateStr),
-      isToday: dateStr === todayStr,
-    };
-  });
 }

@@ -206,6 +206,11 @@ export interface RoundState {
   pass: number;
 }
 
+// ── 每日紀錄與集章 ──────────────────────────────────────
+/** 當地日期 YYYY-MM-DD */
+export type DayKey = string;
+export type AccessoryId = 'bow' | 'straw-hat' | 'scarf' | 'flower' | 'glasses' | 'crown';
+
 // ── 設定 ────────────────────────────────────────────────
 export type ThemeChoice = 'system' | 'light' | 'dark';
 export interface Settings {
@@ -214,6 +219,8 @@ export interface Settings {
   lastRound: RoundConfig | null;
   /** 已按過「知道了」，不再顯示加到主畫面的引導 */
   installHintDismissed?: boolean;
+  /** 貓目前戴的配件；必須是已解鎖的 */
+  accessory?: AccessoryId | null;
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────
@@ -241,6 +248,7 @@ export type AppEvent =
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
   | { type: 'roundRestored' }
   | { type: 'progressChanged'; ids: QuestionId[] }
+  | { type: 'dayLogChanged'; day: DayKey; count: number }
   | { type: 'settingsChanged'; settings: Settings }
   | { type: 'syncChanged'; sync: SyncState };
 
@@ -257,6 +265,7 @@ export type UICommand =
   /** 用剛看完的同一批題目開作答回合 */
   | { type: 'quizSameSet' }
   | { type: 'setTheme'; theme: ThemeChoice }
+  | { type: 'setAccessory'; accessory: AccessoryId | null }
   | { type: 'dismissInstallHint' }
   | { type: 'importProgress'; json: string }
   | { type: 'resetProgress' }

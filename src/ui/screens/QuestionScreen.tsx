@@ -7,6 +7,7 @@ import { formatLawRef, loadLawArticle, type LawArticleResult } from '../../data/
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
+import { currentAccessory } from '../../selectors/daily';
 import {
   CHOICES,
   CorrectionBox,
@@ -147,6 +148,7 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
 
   const { question, group, enrich, index, total } = view;
   const paper = questionPaper(world, question.paperId);
+  const accessory = currentAccessory(world);
   const isAnswered = pick !== null;
 
   const sourceLabel = formatQuestionSource(paper, question.no);
@@ -300,7 +302,7 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
             {showCompactFastFeedback && enrich ? (
               <Card tone="green" className="cb-kou cb-kou-compact">
                 <div className="cb-row">
-                  <Cat size={58} mood="yay" spin={catSpin} interactive />
+                  <Cat size={58} mood="yay" spin={catSpin} accessory={accessory} interactive />
                   <div className="cb-grow">
                     <div className="cb-kou-head">
                       <small>答對！</small>
@@ -318,6 +320,7 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
                   className={isCorrect ? '' : 'is-miss'}
                   catMood={isCorrect ? 'yay' : 'oops'}
                   catSpin={catSpin}
+                  catAccessory={accessory}
                   label={
                     <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
                   }
@@ -345,6 +348,7 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
                       size={58}
                       mood={isCorrect ? 'yay' : 'oops'}
                       spin={catSpin}
+                      accessory={accessory}
                       interactive
                     />
                     <div className="cb-grow">
