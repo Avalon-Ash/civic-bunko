@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 export interface SheetProps {
   open: boolean;
@@ -7,7 +8,10 @@ export interface SheetProps {
   children: ReactNode;
 }
 
-/** 底部抽屜：彈簧滑入、點遮罩或下拉把手即可關閉。 */
+/**
+ * 底部抽屜：彈簧滑入、點遮罩或下拉把手即可關閉。
+ * 一律掛到 document.body：畫在內容區裡會被分頁列蓋住，也會被有 transform 的祖先困住。
+ */
 export function Sheet({ open, onClose, title, children }: SheetProps) {
   const sheetRef = useRef<HTMLElement | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -41,7 +45,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
     }
   };
 
-  return (
+  return createPortal(
     <div className={`cb-sheet-root ${open ? 'is-open' : ''}`} aria-hidden={!open}>
       <div className="cb-veil" onClick={onClose} />
       <section
@@ -65,6 +69,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
         </div>
         <div className="cb-sheet-body">{children}</div>
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }
