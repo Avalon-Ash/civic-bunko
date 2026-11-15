@@ -23,7 +23,7 @@
       .boot { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
         font-family: 'Chiron GoRound TC', 'PingFang TC', -apple-system, sans-serif; color: #5a4636;
         background: linear-gradient(#e6f4fa 0, #f3fbf4 62%, #dff3dc 100%); }
-      .boot img { width: 112px; height: 112px; border-radius: 28px; border: 3px solid #5a4636; box-shadow: 0 5px 0 #5a4636;
+      .boot-cat { width: 112px; height: 112px; display: block; border-radius: 28px; border: 3px solid #5a4636; box-shadow: 0 5px 0 #5a4636;
         animation: boot-bob 1.1s ease-in-out infinite; }
       .boot b { font-size: 22px; font-weight: 900; letter-spacing: 0.06em; }
       .boot span { font-size: 14px; color: #9b8878; }
@@ -35,16 +35,27 @@
       @media (prefers-color-scheme: dark) {
         body { background: #1b2126; }
         .boot { color: #f3e9dc; background: linear-gradient(#1b2126 0, #1b231d 100%); }
-        .boot img { border-color: #a08c7a; box-shadow: 0 5px 0 #a08c7a; }
+        .boot-cat { border-color: #a08c7a; box-shadow: 0 5px 0 #a08c7a; }
         .boot span { color: #b5a595; }
       }
-      @media (prefers-reduced-motion: reduce) { .boot img, .boot i { animation: none; } }
+      @media (prefers-reduced-motion: reduce) { .boot-cat, .boot i { animation: none; } }
     </style>
   </head>
   <body>
     <div id="root">
       <div class="boot" role="status" aria-live="polite">
-        <img src="./icons/icon-192.png" alt="" />
+        <svg class="boot-cat" viewBox="0 0 64 64" aria-hidden="true">
+          <rect width="64" height="64" fill="#ffc2cf" />
+          <g transform="translate(6.4 8.3) scale(0.8)">
+            <path d="M9 30L12 5l18 13zM55 30L52 5 34 18z" fill="#c9ad94" stroke="#5a4636" stroke-width="2.6" stroke-linejoin="round" />
+            <ellipse cx="32" cy="39" rx="26" ry="21" fill="#fffdf9" />
+            <path d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z" fill="#c9ad94" />
+            <ellipse cx="32" cy="39" rx="26" ry="21" fill="none" stroke="#5a4636" stroke-width="2.6" />
+            <ellipse cx="14.5" cy="46" rx="4.6" ry="3.1" fill="#ff9fb4" /><ellipse cx="49.5" cy="46" rx="4.6" ry="3.1" fill="#ff9fb4" />
+            <circle cx="22.5" cy="40" r="2.9" fill="#5a4636" /><circle cx="41.5" cy="40" r="2.9" fill="#5a4636" />
+            <path d="M27 46.5q2.5 3.6 5 0q2.5 3.6 5 0" fill="none" stroke="#5a4636" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          </g>
+        </svg>
         <b>民政刷題</b>
         <span>題庫準備中</span>
         <div aria-hidden="true"><i></i><i></i><i></i></div>
