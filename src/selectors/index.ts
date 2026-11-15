@@ -59,6 +59,14 @@ export interface RoundSummaryView {
   passes: number;
 }
 
+export interface SavedRoundView {
+  study: StudyMode;
+  pass: number;
+  totalPasses: number;
+  current: number;
+  total: number;
+}
+
 export interface SubjectStatView {
   key: SubjectKey;
   name: string;
@@ -393,6 +401,21 @@ export function currentRoundConfig(world: World): RoundConfig | null {
   return {
     ...round.config,
     subjectKeys: [...round.config.subjectKeys],
+  };
+}
+
+/** 讀取待續接回合的進度摘要；沒有可續接回合時回傳 null。 */
+export function savedRoundInfo(world: World): SavedRoundView | null {
+  const saved = world.savedRound;
+  if (!saved || saved.finished || saved.queue.length === 0) {
+    return null;
+  }
+  return {
+    study: saved.config.study,
+    pass: saved.pass,
+    totalPasses: Math.max(1, saved.config.passes),
+    current: Math.min(saved.queue.length, saved.index + 1),
+    total: saved.queue.length,
   };
 }
 

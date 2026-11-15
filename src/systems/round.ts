@@ -4,6 +4,32 @@ import { buildQueue, shuffle } from './selection';
 
 export type RoundStepOutcome = 'noop' | 'advanced' | 'finished' | 'discarded';
 
+/** 檢查待續接的回合是否所有題目都仍存在於題庫；有缺題就丟棄並回傳 true。 */
+export function validateSavedRound(world: World): boolean {
+  const saved = world.savedRound;
+  if (!saved) {
+    return false;
+  }
+  if (world.questions.size === 0) {
+    return false;
+  }
+  const allExist = saved.queue.every((id) => world.questions.has(id));
+  if (!allExist) {
+    world.savedRound = null;
+    return true;
+  }
+  return false;
+}
+
+/** 訂閱 bankLoaded，在題庫載入完成後驗證待續接的回合。 */
+export function attachRound(world: World): () => void {
+  return world.bus.on('bankLoaded', (event) => {
+    if (!world.savedRound) return;
+    if (world.savedRound.config.bankId !== event.bankId) return;
+    validateSavedRound(world);
+  });
+}
+
 /** 依設定組題並開始新回合；若沒有符合條件的題目則不開啟回合。 */
 export function startRound(
   world: World,
@@ -22,6 +48,7 @@ export function startRound(
     passes: Math.max(1, Math.floor(config.passes)),
   };
 
+  world.savedRound = null;
   world.round = {
     config: normalizedConfig,
     queue,
@@ -199,6 +226,7 @@ export function retryWrong(world: World): void {
     count: wrongIds.length,
   };
 
+  world.savedRound = null;
   world.round = {
     config,
     queue: wrongIds,
@@ -236,6 +264,7 @@ export function quizSameSet(world: World, rng: () => number): void {
     study: 'quiz',
   };
 
+  world.savedRound = null;
   world.round = {
     config,
     queue,
@@ -252,4 +281,37 @@ export function quizSameSet(world: World, rng: () => number): void {
     config,
     queue: [...queue],
   });
+}
+
+/** 將暫存於 savedRound 的未完成回合恢復為進行中回合並發出 roundRestored。 */
+export function resumeRound(world: World): boolean {
+  const saved = world.savedRound;
+  if (!saved) {
+    return false;
+  }
+  if (world.questions.size > 0 && validateSavedRound(world)) {
+    return false;
+  }
+
+  world.round = {
+    ...saved,
+    config: {
+      ...saved.config,
+      subjectKeys: [...saved.config.subjectKeys],
+    },
+    queue: [...saved.queue],
+    results: saved.results.map((r) => ({ ...r })),
+  };
+  world.savedRound = null;
+  world.bus.emit({ type: 'roundRestored' });
+  return true;
+}
+
+/** 丟棄暫存的未完成回合。 */
+export function discardSavedRound(world: World): boolean {
+  if (!world.savedRound) {
+    return false;
+  }
+  world.savedRound = null;
+  return true;
 }

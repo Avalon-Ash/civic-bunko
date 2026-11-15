@@ -1,9 +1,11 @@
 import { importProgress, resetProgress } from '../systems/persistence';
 import {
   answerQuestion,
+  discardSavedRound,
   nextQuestion,
   quitRound,
   quizSameSet,
+  resumeRound,
   retryWrong,
   startRound,
 } from '../systems/round';
@@ -43,6 +45,18 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
     case 'quitRound': {
       const outcome = quitRound(world, now);
       if (outcome === 'discarded') {
+        bumpStore(world);
+      }
+      break;
+    }
+    case 'resumeRound': {
+      if (resumeRound(world)) {
+        bumpStore(world);
+      }
+      break;
+    }
+    case 'discardSavedRound': {
+      if (discardSavedRound(world)) {
         bumpStore(world);
       }
       break;

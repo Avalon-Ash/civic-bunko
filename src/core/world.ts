@@ -1,3 +1,4 @@
+import { attachRound } from '../systems/round';
 import { attachScheduling } from '../systems/scheduling';
 import { attachSettings } from '../systems/settings';
 import { createBus, type Bus } from './bus';
@@ -24,6 +25,7 @@ export interface World {
   enrich: Map<QuestionId, Enrich>;
   progress: Map<QuestionId, Progress>;
   round: RoundState | null;
+  savedRound: RoundState | null;
   lastRound: RoundState | null;
   settings: Settings;
   sync: SyncState;
@@ -40,6 +42,7 @@ export function createWorld(): World {
     enrich: new Map(),
     progress: new Map(),
     round: null,
+    savedRound: null,
     lastRound: null,
     settings: {
       theme: 'system',
@@ -55,6 +58,7 @@ export function createWorld(): World {
 
   attachScheduling(world);
   attachSettings(world);
+  attachRound(world);
   initStore(world);
 
   return world;

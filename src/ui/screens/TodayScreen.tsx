@@ -8,6 +8,7 @@ import {
   dailyMissions,
   daysLeft,
   getSettings,
+  savedRoundInfo,
   weekActivity,
 } from '../../selectors';
 import { getSyncState } from '../../selectors/sync';
@@ -59,6 +60,7 @@ export function TodayScreen({
   const bank = activeBank(world);
   const settings = getSettings(world);
   const sync = getSyncState(world);
+  const savedRound = savedRoundInfo(world);
   const totals = bank ? bankTotals(world, bank.id) : { total: 0, seen: 0 };
   const remainingDays = bank ? daysLeft(bank, now) : 0;
   const missions = bank ? dailyMissions(world, bank.id, now) : [];
@@ -66,6 +68,16 @@ export function TodayScreen({
 
   const handleThemeChange = (theme: ThemeChoice) => {
     dispatch(world, { type: 'setTheme', theme });
+  };
+
+  const handleResumeSaved = () => {
+    if (papersLoading) return;
+    dispatch(world, { type: 'resumeRound' });
+    onStartQuiz();
+  };
+
+  const handleDiscardSaved = () => {
+    dispatch(world, { type: 'discardSavedRound' });
   };
 
   const handleMissionClick = (index: number) => {
@@ -91,6 +103,29 @@ export function TodayScreen({
           ariaLabel="畫面主題模式"
         />
       </header>
+
+      {!papersLoading && savedRound && (
+        <Card tone="butter" className="cb-stack-sm">
+          <div className="cb-row">
+            <Cat size={54} mood="idle" interactive />
+            <div className="cb-grow">
+              <strong className="cb-resume-title">
+                {savedRound.study === 'read'
+                  ? `上次刷到第 ${savedRound.pass} 遍・第 ${savedRound.current} / ${savedRound.total} 題，要繼續嗎？`
+                  : `上次刷到第 ${savedRound.current} / ${savedRound.total} 題，要繼續嗎？`}
+              </strong>
+            </div>
+          </div>
+          <div className="cb-acts">
+            <Button variant="ghost" onClick={handleDiscardSaved}>
+              不用了
+            </Button>
+            <Button variant="primary" onClick={handleResumeSaved}>
+              繼續
+            </Button>
+          </div>
+        </Card>
+      )}
 
       {bank ? (
         <>

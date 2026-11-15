@@ -16,6 +16,7 @@ import {
   questionPaper,
   readView,
   roundSummary,
+  savedRoundInfo,
   subjectStats,
   weekActivity,
   wrongCount,
@@ -279,5 +280,46 @@ describe('selectors', () => {
       assert.equal(rv.askType, 'negative');
       assert.equal(rv.views, 1);
     }
+  });
+
+  it('returns savedRoundInfo for quiz and read saved rounds', () => {
+    const world = createTestWorld();
+    assert.equal(savedRoundInfo(world), null);
+
+    world.savedRound = {
+      config: makeConfig({ study: 'quiz', count: 20 }),
+      queue: Array.from({ length: 20 }, (_, i) => `q-${i}`),
+      index: 6,
+      pick: null,
+      results: [],
+      combo: 0,
+      finished: false,
+      pass: 1,
+    };
+    assert.deepEqual(savedRoundInfo(world), {
+      study: 'quiz',
+      pass: 1,
+      totalPasses: 3,
+      current: 7,
+      total: 20,
+    });
+
+    world.savedRound = {
+      config: makeConfig({ study: 'read', passes: 3, count: 20 }),
+      queue: Array.from({ length: 20 }, (_, i) => `q-${i}`),
+      index: 6,
+      pick: null,
+      results: [],
+      combo: 0,
+      finished: false,
+      pass: 2,
+    };
+    assert.deepEqual(savedRoundInfo(world), {
+      study: 'read',
+      pass: 2,
+      totalPasses: 3,
+      current: 7,
+      total: 20,
+    });
   });
 });

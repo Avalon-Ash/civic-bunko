@@ -2120,3 +2120,59 @@ mark {
   padding: 6px 14px;
   font-size: var(--text-small);
 }
+
+/* ── 回合續接、新版提示與版本顯示 ───────────────────────── */
+
+.cb-resume-title {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.cb-update-banner-wrap {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto 14px;
+  animation: cb-banner-slide 0.34s var(--spring);
+}
+
+.cb-main.is-wide .cb-update-banner-wrap {
+  max-width: var(--wide-max);
+}
+
+.cb-update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--butter);
+  color: var(--ink);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+}
+
+.cb-update-btn {
+  width: auto;
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 6px 16px;
+  font-size: var(--text-small);
+}
+
+@keyframes cb-banner-slide {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cb-version-note {
+  text-align: center;
+  padding: 4px 0 8px;
+}

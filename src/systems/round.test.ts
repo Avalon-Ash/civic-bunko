@@ -239,4 +239,63 @@ describe('round system', () => {
     assert.equal(world.lastRound, null);
     assert.equal(finished, 0);
   });
+
+  it('resumes savedRound, discards savedRound, and clears savedRound on startRound', () => {
+    const world = createTestWorld();
+    let restoredCount = 0;
+    world.bus.on('roundRestored', () => {
+      restoredCount += 1;
+    });
+
+    world.savedRound = {
+      config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }),
+      queue: ['q-a1', 'q-a2'],
+      index: 1,
+      pick: null,
+      results: [{ id: 'q-a1', pick: 'A', correct: true }],
+      combo: 1,
+      finished: false,
+      pass: 1,
+    };
+
+    dispatch(world, { type: 'resumeRound' });
+    assert.equal(restoredCount, 1);
+    assert.equal(world.savedRound, null);
+    assert.ok(world.round !== null);
+    assert.equal(world.round.index, 1);
+
+    // discardSavedRound clears savedRound without touching round
+    world.round = null;
+    world.savedRound = {
+      config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }),
+      queue: ['q-a1', 'q-a2'],
+      index: 0,
+      pick: null,
+      results: [],
+      combo: 0,
+      finished: false,
+      pass: 1,
+    };
+    dispatch(world, { type: 'discardSavedRound' });
+    assert.equal(world.savedRound, null);
+
+    // startRound also clears savedRound
+    world.savedRound = {
+      config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }),
+      queue: ['q-a1', 'q-a2'],
+      index: 0,
+      pick: null,
+      results: [],
+      combo: 0,
+      finished: false,
+      pass: 1,
+    };
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now: fixedNow, rng: makeSeededRng(7) },
+    );
+    assert.equal(world.savedRound, null);
+    assert.ok(world.round !== null);
+  });
 });

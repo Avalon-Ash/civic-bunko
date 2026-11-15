@@ -134,12 +134,16 @@ export function ReadScreen({ world }: ReadScreenProps) {
           value={index + 1}
           total={total}
           showCat
-          ariaLabel={`第 ${pass} 遍，第 ${index + 1} 題，共 ${total} 題`}
+          ariaLabel={
+            totalPasses > 1
+              ? `第 ${pass} 遍，第 ${index + 1} 題，共 ${total} 題`
+              : `第 ${index + 1} 題，共 ${total} 題`
+          }
           className="cb-grow"
         />
         <span className="cb-q-counter">
-          第 {pass} 遍・<b>{index + 1}</b> / {total}
-          {totalPasses > 1 ? '' : ''}
+          {totalPasses > 1 ? `第 ${pass} 遍・` : ''}
+          <b>{index + 1}</b> / {total}
         </span>
         <Chip tone="plain" onClick={handleQuit}>
           結束
