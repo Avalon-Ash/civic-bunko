@@ -2,20 +2,29 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
 import {
+  activeBank,
   availableCount,
+  bankTotals,
   currentQuestion,
+  currentRoundConfig,
+  dailyMissions,
   daysLeft,
   dueCount,
+  getSettings,
+  questionPaper,
   roundSummary,
   subjectStats,
+  weekActivity,
   wrongCount,
 } from './index';
 import {
   createTestWorld,
   makeConfig,
   makeSeededRng,
+  otherBank,
   testBank,
   testGroup,
+  testPaperA,
 } from '../testing/fixture';
 
 describe('selectors', () => {
@@ -142,5 +151,61 @@ describe('selectors', () => {
     assert.equal(daysLeft(testBank, new Date('2026-12-05T00:01:00')), 0);
     assert.equal(daysLeft(testBank, new Date('2026-12-05T23:59:00')), 0);
     assert.equal(daysLeft(testBank, new Date('2026-12-06T08:00:00')), 0);
+  });
+
+  it('provides activeBank, bankTotals, getSettings, currentRoundConfig, and questionPaper', () => {
+    const world = createTestWorld();
+    assert.equal(activeBank(world)?.id, testBank.id);
+
+    const totalsBefore = bankTotals(world, testBank.id);
+    assert.deepEqual(totalsBefore, { total: 5, seen: 0 });
+
+    dispatch(world, { type: 'setTheme', theme: 'dark' });
+    assert.equal(getSettings(world).theme, 'dark');
+    assert.equal(currentRoundConfig(world), null);
+
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ bankId: otherBank.id, count: 1, fast: true }) },
+      { now: () => new Date('2026-11-15T10:00:00'), rng: makeSeededRng(2) },
+    );
+    assert.equal(activeBank(world)?.id, otherBank.id);
+    assert.equal(currentRoundConfig(world)?.fast, true);
+
+    dispatch(world, { type: 'answer', pick: 'B' }, { now: () => new Date('2026-11-15T10:01:00') });
+    assert.deepEqual(bankTotals(world, otherBank.id), { total: 1, seen: 1 });
+    assert.equal(questionPaper(world, testPaperA.id)?.subjectName, '測試科目甲');
+    assert.equal(questionPaper(world, 'missing-paper'), null);
+  });
+
+  it('builds dailyMissions and weekActivity from world state', () => {
+    const world = createTestWorld();
+    const now = new Date('2026-11-18T12:00:00'); // Wednesday
+
+    const missionsInitial = dailyMissions(world, testBank.id, now);
+    assert.equal(missionsInitial.length, 3);
+    assert.equal(missionsInitial[0]?.config.subjectKeys[0], 'subj-a');
+    assert.equal(missionsInitial[1]?.config.subjectKeys[0], 'subj-b');
+    assert.equal(missionsInitial[2]?.config.mode, 'mixed');
+
+    world.progress.set('q-a1', {
+      seen: 1,
+      correct: 0,
+      streak: 0,
+      lastPick: 'B',
+      lastAt: '2026-11-18T09:00:00',
+      due: '2026-11-18',
+    });
+
+    const missionsWithDue = dailyMissions(world, testBank.id, now);
+    assert.equal(missionsWithDue[2]?.config.mode, 'due');
+    assert.equal(missionsWithDue[2]?.available, 1);
+
+    const week = weekActivity(world, now);
+    assert.equal(week.length, 7);
+    assert.equal(week[0]?.label, '一');
+    assert.equal(week[2]?.isToday, true);
+    assert.equal(week[2]?.done, true);
+    assert.equal(week[3]?.done, false);
   });
 });

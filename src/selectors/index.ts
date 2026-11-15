@@ -1,16 +1,20 @@
+import { ROUND_COUNT_MIN, SECONDS_PER_QUESTION } from '../core/constants/round';
 import type {
   Bank,
   BankId,
   Choice,
   Enrich,
   OfficialQuestion,
+  Paper,
+  PaperId,
   PassageGroup,
   QuestionId,
   RoundConfig,
+  Settings,
   SubjectKey,
 } from '../core/types';
 import type { World } from '../core/world';
-import { isDue, localDaysUntil } from '../systems/date';
+import { isDue, localDaysUntil, toLocalDateString } from '../systems/date';
 import { countAvailable } from '../systems/selection';
 
 export interface CurrentQuestionView {
@@ -181,4 +185,202 @@ export function daysLeft(bank: Bank, now: Date): number {
 /** 計算此回合設定下最多能出幾題。 */
 export function availableCount(world: World, config: RoundConfig, now: Date): number {
   return countAvailable(world, config, now);
+}
+
+export interface BankTotalsView {
+  total: number;
+  seen: number;
+}
+
+export interface DailyMissionView {
+  id: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  tone: 'butter' | 'mint' | 'pink';
+  available: number;
+  config: RoundConfig;
+}
+
+export interface WeekDayView {
+  date: string;
+  label: string;
+  done: boolean;
+  isToday: boolean;
+}
+
+const WEEKDAY_LABELS = ['一', '二', '三', '四', '五', '六', '日'] as const;
+
+/** 取得目前使用中的題庫（優先取最近回合的題庫，否則取第一個）。 */
+export function activeBank(world: World): Bank | null {
+  const preferredId = world.settings.lastRound?.bankId;
+  if (preferredId) {
+    const found = world.banks.find((b) => b.id === preferredId);
+    if (found) return found;
+  }
+  return world.banks[0] ?? null;
+}
+
+/** 統計指定題庫的總題數與已刷題數。 */
+export function bankTotals(world: World, bankId: BankId): BankTotalsView {
+  let total = 0;
+  let seen = 0;
+
+  for (const question of world.questions.values()) {
+    if (question.parseStatus !== 'ok') continue;
+    const paper = world.papers.get(question.paperId);
+    if (!paper || paper.bankId !== bankId) continue;
+
+    total += 1;
+    const prog = world.progress.get(question.id);
+    if (prog && prog.seen > 0) {
+      seen += 1;
+    }
+  }
+
+  return { total, seen };
+}
+
+/** 唯讀取得使用者設定複本。 */
+export function getSettings(world: World): Settings {
+  return {
+    theme: world.settings.theme,
+    lastRound: world.settings.lastRound
+      ? {
+          ...world.settings.lastRound,
+          subjectKeys: [...world.settings.lastRound.subjectKeys],
+        }
+      : null,
+  };
+}
+
+/** 取得進行中回合的設定複本；未進行回合時回傳 null。 */
+export function currentRoundConfig(world: World): RoundConfig | null {
+  const round = world.round;
+  if (!round || round.finished) {
+    return null;
+  }
+  return {
+    ...round.config,
+    subjectKeys: [...round.config.subjectKeys],
+  };
+}
+
+/** 依試卷 ID 取得試卷中繼資料。 */
+export function questionPaper(world: World, paperId: PaperId): Paper | null {
+  return world.papers.get(paperId) ?? null;
+}
+
+function estimateMinutesText(questionCount: number): string {
+  const mins = Math.max(1, Math.round((questionCount * SECONDS_PER_QUESTION) / 60));
+  return `約 ${mins} 分鐘`;
+}
+
+/** 依題庫科目與作答進度產生三個今日 5 題快速任務。 */
+export function dailyMissions(world: World, bankId: BankId, now: Date): DailyMissionView[] {
+  const bank = world.banks.find((b) => b.id === bankId);
+  if (!bank) {
+    return [];
+  }
+
+  const missions: DailyMissionView[] = [];
+  const tones: readonly ('butter' | 'mint' | 'pink')[] = ['butter', 'mint', 'pink'];
+
+  for (const subject of bank.subjects) {
+    if (missions.length >= 2) break;
+    const config: RoundConfig = {
+      bankId,
+      subjectKeys: [subject.key],
+      count: ROUND_COUNT_MIN,
+      mode: 'mixed',
+      fast: true,
+    };
+    const available = countAvailable(world, config, now);
+    if (available === 0) continue;
+
+    const actualCount = Math.min(ROUND_COUNT_MIN, available);
+    const tone = tones[missions.length] ?? 'butter';
+    missions.push({
+      id: `subj-${subject.key}`,
+      badge: subject.short.slice(0, 1) || '題',
+      title: `${subject.short} ${actualCount} 題`,
+      subtitle: estimateMinutesText(actualCount),
+      tone,
+      available,
+      config: { ...config, count: actualCount },
+    });
+  }
+
+  const dueTotal = dueCount(world, bankId, now);
+  const wrongTotal = wrongCount(world, bankId);
+
+  let thirdConfig: RoundConfig;
+  let thirdBadge: string;
+  let thirdTitle: string;
+  let thirdSubtitle: string;
+
+  if (dueTotal > 0) {
+    thirdConfig = { bankId, subjectKeys: [], count: ROUND_COUNT_MIN, mode: 'due', fast: true };
+    const actualCount = Math.min(ROUND_COUNT_MIN, dueTotal);
+    thirdConfig.count = actualCount;
+    thirdBadge = '複';
+    thirdTitle = `到期複習 ${actualCount} 題`;
+    thirdSubtitle = `${dueTotal} 題該回來看看`;
+  } else if (wrongTotal > 0) {
+    thirdConfig = { bankId, subjectKeys: [], count: ROUND_COUNT_MIN, mode: 'wrong', fast: true };
+    const actualCount = Math.min(ROUND_COUNT_MIN, wrongTotal);
+    thirdConfig.count = actualCount;
+    thirdBadge = '錯';
+    thirdTitle = `錯題重練 ${actualCount} 題`;
+    thirdSubtitle = `${wrongTotal} 題上次答錯`;
+  } else {
+    thirdConfig = { bankId, subjectKeys: [], count: ROUND_COUNT_MIN, mode: 'mixed', fast: true };
+    const availAll = countAvailable(world, thirdConfig, now);
+    const actualCount = Math.min(ROUND_COUNT_MIN, availAll);
+    thirdConfig.count = actualCount;
+    thirdBadge = '綜';
+    thirdTitle = `綜合快刷 ${actualCount} 題`;
+    thirdSubtitle = estimateMinutesText(actualCount);
+  }
+
+  const thirdAvail = countAvailable(world, thirdConfig, now);
+  if (thirdAvail > 0) {
+    missions.push({
+      id: `extra-${thirdConfig.mode}`,
+      badge: thirdBadge,
+      title: thirdTitle,
+      subtitle: thirdSubtitle,
+      tone: tones[missions.length] ?? 'pink',
+      available: thirdAvail,
+      config: thirdConfig,
+    });
+  }
+
+  return missions;
+}
+
+/** 計算本週（週一到週日）每日是否有作答紀錄。 */
+export function weekActivity(world: World, now: Date): WeekDayView[] {
+  const activeDates = new Set<string>();
+  for (const prog of world.progress.values()) {
+    const d = new Date(prog.lastAt);
+    if (!Number.isNaN(d.getTime())) {
+      activeDates.add(toLocalDateString(d));
+    }
+  }
+
+  const todayStr = toLocalDateString(now);
+  const dayOfWeek = now.getDay(); // 0 = Sun, 1 = Mon, ...
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+
+  return WEEKDAY_LABELS.map((label, idx) => {
+    const dayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + mondayOffset + idx);
+    const dateStr = toLocalDateString(dayDate);
+    return {
+      date: dateStr,
+      label,
+      done: activeDates.has(dateStr),
+      isToday: dateStr === todayStr,
+    };
+  });
 }
