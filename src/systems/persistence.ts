@@ -1,15 +1,19 @@
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
+import { subscribe } from '../core/store';
 import type {
   AskFilter,
   Choice,
   Progress,
   QuestionId,
   RoundConfig,
+  RoundResult,
+  RoundState,
   Settings,
   StudyMode,
 } from '../core/types';
 import type { World } from '../core/world';
+import { validateSavedRound } from './round';
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -24,6 +28,7 @@ interface PersistedPayload {
   version: 1;
   progress: Record<QuestionId, Progress>;
   settings?: Settings;
+  round?: RoundState;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -122,6 +127,53 @@ function isValidSettings(value: unknown): value is RawSettings {
   return true;
 }
 
+function normalizeRoundConfig(raw: RawRoundConfig): RoundConfig {
+  return {
+    ...raw,
+    subjectKeys: [...raw.subjectKeys],
+    study: raw.study ?? 'quiz',
+    ask: raw.ask ?? 'positive',
+    passes: raw.passes ?? READ_PASSES_DEFAULT,
+  };
+}
+
+function isValidRoundResult(value: unknown): value is RoundResult {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string' && isChoice(value.pick) && typeof value.correct === 'boolean';
+}
+
+function parseRoundState(value: unknown): RoundState | undefined {
+  if (!isRecord(value)) return undefined;
+  if (!isValidRoundConfig(value.config)) return undefined;
+  if (!Array.isArray(value.queue) || value.queue.length === 0 || !value.queue.every((id) => typeof id === 'string')) {
+    return undefined;
+  }
+  if (
+    typeof value.index !== 'number' ||
+    !Number.isInteger(value.index) ||
+    value.index < 0 ||
+    value.index >= value.queue.length
+  ) {
+    return undefined;
+  }
+  if (value.pick !== null && !isChoice(value.pick)) return undefined;
+  if (!Array.isArray(value.results) || !value.results.every(isValidRoundResult)) return undefined;
+  if (typeof value.combo !== 'number' || !Number.isInteger(value.combo) || value.combo < 0) return undefined;
+  if (typeof value.finished !== 'boolean' || value.finished) return undefined;
+  if (typeof value.pass !== 'number' || !Number.isInteger(value.pass) || value.pass < 1) return undefined;
+
+  return {
+    config: normalizeRoundConfig(value.config),
+    queue: [...value.queue],
+    index: value.index,
+    pick: value.pick,
+    results: value.results.map((r) => ({ id: r.id, pick: r.pick, correct: r.correct })),
+    combo: value.combo,
+    finished: false,
+    pass: value.pass,
+  };
+}
+
 /** 驗證並正規化單筆作答進度（補齊舊版缺少的 views 欄位）；不合法時回傳 null。 */
 export function parseProgressEntry(value: unknown): Progress | null {
   if (!isValidProgress(value)) {
@@ -167,18 +219,12 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
     }
     cleanSettings = {
       theme: parsed.settings.theme,
-      lastRound: parsed.settings.lastRound
-        ? {
-            ...parsed.settings.lastRound,
-            subjectKeys: [...parsed.settings.lastRound.subjectKeys],
-            study: parsed.settings.lastRound.study ?? 'quiz',
-            ask: parsed.settings.lastRound.ask ?? 'positive',
-            passes: parsed.settings.lastRound.passes ?? READ_PASSES_DEFAULT,
-          }
-        : null,
+      lastRound: parsed.settings.lastRound ? normalizeRoundConfig(parsed.settings.lastRound) : null,
       installHintDismissed: parsed.settings.installHintDismissed === true,
     };
   }
+
+  const cleanRound = parsed.round !== undefined ? parseRoundState(parsed.round) : undefined;
 
   return {
     ok: true,
@@ -186,21 +232,33 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       version: 1,
       progress: cleanProgress,
       ...(cleanSettings ? { settings: cleanSettings } : {}),
+      ...(cleanRound ? { round: cleanRound } : {}),
     },
   };
 }
 
-function serializeWorld(world: World): string {
+function serializeWorld(world: World, includeRound: boolean): string {
+  const roundToSave = includeRound
+    ? world.round && !world.round.finished
+      ? world.round
+      : world.savedRound && !world.savedRound.finished
+        ? world.savedRound
+        : undefined
+    : undefined;
+
   const payload: PersistedPayload = {
     version: 1,
     progress: Object.fromEntries(world.progress),
     settings: world.settings,
+    ...(roundToSave ? { round: roundToSave } : {}),
   };
   return JSON.stringify(payload);
 }
 
-/** 啟動時從 storage 讀回 progress 與 settings（壞資料不丟例外），並訂閱異動自動寫回。 */
+/** 啟動時從 storage 讀回 progress、settings 與待續接回合（壞資料不丟例外），並訂閱異動自動寫回。 */
 export function attachPersistence(world: World, storage: StorageLike): () => void {
+  let discardedOnLoad = false;
+
   try {
     const raw = storage.getItem(STORAGE_KEY);
     if (raw !== null) {
@@ -214,6 +272,10 @@ export function attachPersistence(world: World, storage: StorageLike): () => voi
         if (parsed.data.settings) {
           world.settings = parsed.data.settings;
         }
+        if (parsed.data.round) {
+          world.savedRound = parsed.data.round;
+          discardedOnLoad = validateSavedRound(world);
+        }
         if (restoredIds.length > 0) {
           world.bus.emit({ type: 'progressChanged', ids: restoredIds });
         }
@@ -226,26 +288,34 @@ export function attachPersistence(world: World, storage: StorageLike): () => voi
     // 讀檔失敗或資料損毀時當作無存檔，不丟例外
   }
 
+  let lastWritten: string | null = null;
   const writeBack = () => {
+    const next = serializeWorld(world, true);
+    if (next === lastWritten) return;
     try {
-      storage.setItem(STORAGE_KEY, serializeWorld(world));
+      storage.setItem(STORAGE_KEY, next);
+      lastWritten = next;
     } catch {
       // 忽略寫入失敗（例如空間已滿）
     }
   };
 
-  const unsubProgress = world.bus.on('progressChanged', writeBack);
-  const unsubSettings = world.bus.on('settingsChanged', writeBack);
+  if (discardedOnLoad) {
+    writeBack();
+  }
+
+  const unsubStore = subscribe(world, writeBack);
+  const unsubRestored = world.bus.on('roundRestored', writeBack);
 
   return () => {
-    unsubProgress();
-    unsubSettings();
+    unsubStore();
+    unsubRestored();
   };
 }
 
-/** 將目前進度與設定序列化為 JSON 字串。 */
+/** 將目前進度與設定序列化為 JSON 字串（不含進行中的回合）。 */
 export function exportProgress(world: World): string {
-  return serializeWorld(world);
+  return serializeWorld(world, false);
 }
 
 /** 匯入進度 JSON；格式不對時不動現有資料並回傳失敗原因。 */

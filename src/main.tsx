@@ -3,11 +3,15 @@ import { createRoot } from 'react-dom/client';
 import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
-import { loadBankMeta, loadEnrichFiles, loadPapers } from './data/source';
+import { loadBankMeta, loadEnrichFiles, loadPapers, loadTopics } from './data/source';
 import { loadBank } from './systems/bankLoader';
 import { attachPersistence } from './systems/persistence';
 import { attachSync } from './systems/sync';
 import { App } from './ui/App';
+
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => undefined);
+}
 
 const world = createWorld();
 attachPersistence(world, window.localStorage);
@@ -36,6 +40,16 @@ function Root({ world: appWorld }: { world: World }) {
         if (active) {
           setPapersLoading(false);
         }
+        const swReady =
+          import.meta.env.PROD && typeof navigator !== 'undefined' && 'serviceWorker' in navigator
+            ? navigator.serviceWorker.ready.catch(() => undefined)
+            : Promise.resolve();
+        void swReady.then(() => {
+          if (active && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
+            return loadTopics().catch(() => []);
+          }
+          return undefined;
+        });
       })
       .catch(() => {
         if (active) {

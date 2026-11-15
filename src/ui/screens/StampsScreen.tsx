@@ -13,6 +13,7 @@ import { Dialog } from '../kit/Dialog';
 import { ProgressBar } from '../kit/ProgressBar';
 import { Sheet } from '../kit/Sheet';
 import { Toast } from '../kit/Toast';
+import { formatAppVersion, getCurrentAppVersion } from '../useAppVersion';
 import { useWorld } from '../useWorld';
 
 export interface StampsScreenProps {
@@ -111,6 +112,7 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
     (sync.status === 'error' && (sync.lastSyncedAt !== null || sync.error !== '同步碼格式不對'));
 
   const lastSyncLabel = formatSyncTime(sync.lastSyncedAt);
+  const versionLabel = formatAppVersion(getCurrentAppVersion());
 
   const handleOpenSyncSheet = () => {
     setSyncCodeText('');
@@ -549,6 +551,10 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
           </div>
         </div>
       </Dialog>
+
+      {versionLabel && (
+        <p className="cb-sub cb-version-note cb-m0">版本 {versionLabel}</p>
+      )}
     </div>
   );
 }

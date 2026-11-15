@@ -3,7 +3,18 @@ import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
+import type { RoundState } from '../core/types';
 import { createWorld } from '../core/world';
+import {
+  makeConfig,
+  makeSeededRng,
+  testBank,
+  testPaperA,
+  testPaperB,
+  testPaperFiles,
+  testQuestionsA,
+} from '../testing/fixture';
+import { loadBank } from './bankLoader';
 import {
   attachPersistence,
   exportProgress,
@@ -213,5 +224,131 @@ describe('persistence system', () => {
       },
     });
     assert.equal(importProgress(world, invalidStudy).ok, false);
+  });
+
+  it('persists active round, restores into savedRound, omits round from export, and clears on finish/discard', () => {
+    const fixedNow = () => new Date('2026-11-16T01:00:00.000Z');
+    const storage = createMemoryStorage();
+
+    // 1. Save active round progress into storage
+    const world1 = createWorld();
+    attachPersistence(world1, storage);
+    loadBank(world1, [testBank], testPaperFiles);
+
+    dispatch(
+      world1,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 3 }) },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    assert.ok(world1.round !== null);
+
+    const firstId = world1.round.queue[0]!;
+    const firstAns = world1.questions.get(firstId)!.answer[0]!;
+    dispatch(world1, { type: 'answer', pick: firstAns }, { now: fixedNow });
+    dispatch(world1, { type: 'next' }, { now: fixedNow });
+    assert.equal(world1.round.index, 1);
+
+    // exportProgress must NOT contain round
+    const exported = JSON.parse(exportProgress(world1)) as Record<string, unknown>;
+    assert.equal('round' in exported, false);
+
+    // storage must contain round at index 1
+    const storedBeforeReload = JSON.parse(storage.data[STORAGE_KEY]!) as { round?: { index: number } };
+    assert.equal(storedBeforeReload.round?.index, 1);
+
+    // 2. Recreate world: puts round into savedRound (not world.round), survives empty initial loadBank, validates on papers load
+    const world2 = createWorld();
+    const getRound2 = (): RoundState | null => world2.round;
+    attachPersistence(world2, storage);
+    assert.equal(getRound2(), null);
+    assert.ok(world2.savedRound !== null);
+    assert.equal(world2.savedRound.index, 1);
+
+    // Initial metadata-only loadBank (0 questions) must not prematurely discard savedRound
+    loadBank(world2, [testBank], []);
+    assert.ok(world2.savedRound !== null);
+
+    // Full loadBank keeps savedRound when all questions exist
+    loadBank(world2, [testBank], testPaperFiles);
+    assert.ok(world2.savedRound !== null);
+
+    // Resume moves savedRound to world.round and emits roundRestored
+    let restoredEvents = 0;
+    world2.bus.on('roundRestored', () => {
+      restoredEvents += 1;
+    });
+    dispatch(world2, { type: 'resumeRound' });
+    assert.equal(restoredEvents, 1);
+    assert.equal(world2.savedRound, null);
+    const resumed = getRound2();
+    assert.ok(resumed !== null);
+    assert.equal(resumed.index, 1);
+
+    // 3. Finish remaining questions -> round is cleared from storage
+    while (getRound2()) {
+      const current = getRound2()!;
+      const qId = current.queue[current.index]!;
+      const ans = world2.questions.get(qId)!.answer[0]!;
+      dispatch(world2, { type: 'answer', pick: ans }, { now: fixedNow });
+      dispatch(world2, { type: 'next' }, { now: fixedNow });
+    }
+    const storedAfterFinish = JSON.parse(storage.data[STORAGE_KEY]!) as Record<string, unknown>;
+    assert.equal('round' in storedAfterFinish, false);
+
+    // 4. Discards savedRound when any queued question is missing from bank
+    dispatch(
+      world2,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 3 }) },
+      { now: fixedNow, rng: makeSeededRng(2) },
+    );
+    assert.ok(world2.round !== null);
+
+    const world3 = createWorld();
+    attachPersistence(world3, storage);
+    assert.ok(world3.savedRound !== null);
+    loadBank(world3, [testBank], [
+      { paper: testPaperA, groups: [], questions: testQuestionsA.slice(0, 1), essays: [] },
+      { paper: testPaperB, groups: [], questions: [], essays: [] },
+    ]);
+    assert.equal(world3.savedRound, null);
+    const storedAfterInvalid = JSON.parse(storage.data[STORAGE_KEY]!) as Record<string, unknown>;
+    assert.equal('round' in storedAfterInvalid, false);
+  });
+
+  it('clears saved round on quitRound (discarded) and discardSavedRound', () => {
+    const fixedNow = () => new Date('2026-11-16T01:00:00.000Z');
+    const storage = createMemoryStorage();
+
+    const world1 = createWorld();
+    attachPersistence(world1, storage);
+    loadBank(world1, [testBank], testPaperFiles);
+
+    // Read mode advances are persisted, and quitRound clears storage
+    dispatch(
+      world1,
+      { type: 'startRound', config: makeConfig({ study: 'read', subjectKeys: ['subj-a'], count: 3, passes: 2 }) },
+      { now: fixedNow, rng: makeSeededRng(3) },
+    );
+    dispatch(world1, { type: 'next' }, { now: fixedNow, rng: makeSeededRng(3) });
+    const storedRead = JSON.parse(storage.data[STORAGE_KEY]!) as { round?: { index: number } };
+    assert.equal(storedRead.round?.index, 1);
+
+    dispatch(world1, { type: 'quitRound' }, { now: fixedNow });
+    const storedAfterQuit = JSON.parse(storage.data[STORAGE_KEY]!) as Record<string, unknown>;
+    assert.equal('round' in storedAfterQuit, false);
+
+    // discardSavedRound clears storage too
+    dispatch(
+      world1,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now: fixedNow, rng: makeSeededRng(4) },
+    );
+    const world2 = createWorld();
+    attachPersistence(world2, storage);
+    assert.ok(world2.savedRound !== null);
+    dispatch(world2, { type: 'discardSavedRound' });
+    assert.equal(world2.savedRound, null);
+    const storedAfterDiscard = JSON.parse(storage.data[STORAGE_KEY]!) as Record<string, unknown>;
+    assert.equal('round' in storedAfterDiscard, false);
   });
 });

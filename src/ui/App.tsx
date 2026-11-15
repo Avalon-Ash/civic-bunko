@@ -4,6 +4,7 @@ import type { World } from '../core/world';
 import { currentQuestion, getSettings, readView, roundSummary, type RoundSummaryView } from '../selectors';
 import { isInstallHintDismissed } from '../selectors/backup';
 import { InstallHintSheet } from './components/InstallHintSheet';
+import { UpdateBanner } from './components/UpdateBanner';
 import { TabBar, type TabId } from './kit/TabBar';
 import { isStandaloneApp } from './platform';
 import { CardsScreen } from './screens/CardsScreen';
@@ -13,6 +14,7 @@ import { ReadScreen } from './screens/ReadScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { StampsScreen } from './screens/StampsScreen';
 import { TodayScreen } from './screens/TodayScreen';
+import { useAppVersion } from './useAppVersion';
 import { useWorld } from './useWorld';
 
 export interface AppProps {
@@ -24,6 +26,7 @@ export interface AppProps {
 /** 應用程式外殼：管理四個分頁、套用主題到 <html data-theme>、協調刷題流程與安裝引導。 */
 export function App({ world, papersLoading = false, loadError = false }: AppProps) {
   useWorld(world);
+  const hasUpdate = useAppVersion();
 
   const [tab, setTab] = useState<TabId>('today');
   const [showResult, setShowResult] = useState(false);
@@ -162,6 +165,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
         ref={mainRef}
         className={`cb-main ${isWideContent ? 'is-wide' : ''}`.trim()}
       >
+        {hasUpdate && <UpdateBanner onReload={() => window.location.reload()} />}
         <div className="cb-container">{renderMain()}</div>
       </main>
       {showInstallHint && (

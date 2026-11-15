@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export interface SheetProps {
   open: boolean;
@@ -7,10 +7,41 @@ export interface SheetProps {
   children: ReactNode;
 }
 
-/** 底部抽屜：彈簧滑入、點遮罩或下拉把手即可關閉。 */
+const SHEET_CLOSE_TIMEOUT_MS = 420;
+
+/** 底部抽屜：彈簧滑入、點遮罩或下拉把手即可關閉；關閉時不渲染子內容並保留關閉動畫。 */
 export function Sheet({ open, onClose, title, children }: SheetProps) {
+  const [mounted, setMounted] = useState(open);
+  const [visible, setVisible] = useState(open);
   const sheetRef = useRef<HTMLElement | null>(null);
   const touchStartY = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setMounted(true);
+      const raf = window.requestAnimationFrame(() => {
+        setVisible(true);
+      });
+      return () => window.cancelAnimationFrame(raf);
+    }
+
+    setVisible(false);
+    return undefined;
+  }, [open]);
+
+  useEffect(() => {
+    if (open || !mounted) {
+      return undefined;
+    }
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const timer = window.setTimeout(
+      () => setMounted(false),
+      reduced ? 0 : SHEET_CLOSE_TIMEOUT_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [open, mounted]);
 
   useEffect(() => {
     if (!open) return;
@@ -41,8 +72,18 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
     }
   };
 
+  const handleTransitionEnd = (e: React.TransitionEvent<HTMLElement>) => {
+    if (!open && e.target === sheetRef.current && e.propertyName === 'transform') {
+      setMounted(false);
+    }
+  };
+
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <div className={`cb-sheet-root ${open ? 'is-open' : ''}`} aria-hidden={!open}>
+    <div className={`cb-sheet-root ${visible ? 'is-open' : ''}`} aria-hidden={!open}>
       <div className="cb-veil" onClick={onClose} />
       <section
         ref={sheetRef}
@@ -52,6 +93,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps) {
         aria-label={title}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTransitionEnd={handleTransitionEnd}
       >
         <div className="cb-sheet-head">
           <button
