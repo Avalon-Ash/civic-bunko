@@ -3,12 +3,13 @@
 更新：2026-11-16
 
 ## 目前狀態
-- **線上版**（`main`，已部署）：925 題可刷，尚無口訣。https://avalon-ash.github.io/civic-bunko/
-- **本機 `m2` 分支**（未進 `main`、未 push）：主畫面引導、進度備份、題庫延後載入、24 部法規副本、考點分類、加工驗收腳本、介面顯示加工內容（標記、口訣卡、小圖、逐選項、法條原文、修法提醒）、115 普考行政法 50 題加工。
+- **線上版**（`main`，已部署）：925 題；行政法 250 題＋地方自治 125 題有口訣與圖；看答案模式、正向題優先、私人 repo 同步（使用者已實測成功）、主畫面圖示、載入畫面、回合續接、離線 service worker、新版提示、首頁檢查更新。https://avalon-ash.github.io/civic-bunko/
+- 2026-11-16 使用者回饋已處理：答對不自動跳題（移除快刷開關）、首頁檢查更新、抽屜被分頁列蓋住（Sheet／Dialog 改 portal）。
 - **執行中**（這兩個資料夾只讀不寫）：
-  - `C:\Git\_wt_civic_enrich`（分支 `p2b-enrich`）：批次加工行政法 4 份＋地方自治 5 份，腳本 `.agy-loop.sh`，任何一份失敗就停。
-  - `C:\Git\_wt_civic_modes`（分支 `p3m`）：看答案模式、正向題優先（`docs/dispatch/P3m-study-modes.md`）。
-- 已合併、可清的資料夾：`_wt_civic_ui`、`_wt_civic_ui2`、`_wt_civic_ui3`（使用者同意最後一次清掉）。
+  - `C:Git_wt_civic_p4b`（分支 `p4b`）：每日目標 15 題才蓋章、集章換貓配件（`docs/dispatch/P4b-stamps-rewards.md`）。
+  - `C:Git_wt_civic_enrich`：行政學 → 法學知識 → 國文共 15 份的口訣加工（`.agy-loop.sh`）。
+- 已合併、可清的資料夾：`_wt_civic_ui`、`_wt_civic_ui2`、`_wt_civic_ui3`、`_wt_civic_modes`、`_wt_civic_sync`、`_wt_civic_p4a`（使用者同意最後一次清掉）。
+- 白話版只有 `plain` 不是 null 的加工題才有按鈕；沒加工的科目與純記憶題不會出現。
 
 ## 使用者已決定
 - 進度同步用**私人 repo**；權杖給法要小白也會：一串「同步碼」貼一次（2026-11-16）。主代理不經手權杖。
