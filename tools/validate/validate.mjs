@@ -15,6 +15,7 @@ const warn = (m) => warns.push(m);
 const NEEDS_REVIEW_MAX_RATIO = 0.05;
 const CHOICES = ['A', 'B', 'C', 'D'];
 const BAD_CHARS = /[-�]/;
+const HEADER_LEAK = /考\s*試\s*別|等\s*_*\s*別：|類\s*_*\s*科：|科\s*_*\s*目：|本科目共|禁止使用電子計算器|特\s*種\s*考\s*試|不予計分|本試題為|乙、測驗|甲、申論|作文部分|座號/;
 
 async function declaredMcqCount(file) {
   const doc = await getDocument({ data: new Uint8Array(readFileSync(resolve(root, file))), verbosity: 0 }).promise;
@@ -86,6 +87,7 @@ for (const [paperId, src] of expected) {
     else if (new Set(q.options.map((o) => o.trim())).size !== 4) warn(`${tag} 有重複選項`);
     for (const s of [q.stem, ...(q.options ?? [])]) if (BAD_CHARS.test(String(s))) { err(`${tag} 含自訂字元或亂碼`); break; }
     if (/^\s*\d+\s*$/.test(q.stem) || /第\s*\d+\s*頁|頁次/.test(q.stem)) err(`${tag} 題幹混入頁碼`);
+    if (HEADER_LEAK.test([q.stem, ...q.options].join(''))) err(`${tag} 混入試卷表頭或注意事項`);
   });
   if (src.M && !questions.some((q) => q.correction)) err(`${paperId} 有更正答案 PDF，但沒有任何題目帶 correction`);
   if (!src.M && questions.some((q) => q.correction)) err(`${paperId} 沒有更正答案 PDF，卻有題目帶 correction`);
