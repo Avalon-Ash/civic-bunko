@@ -97,10 +97,21 @@ export interface PaperIndex {
   }>;
 }
 
-// ── 加工層（data/enrich/**，AI 產生，可能不存在）──────────
+// ── 加工層（data/enrich/<PaperId>.json，AI 產生，可能不存在）──
 export type MarkColor = 'red' | 'blue';
+export type VisualTone = 'plain' | 'hot' | 'key';
+export type EnrichVisual =
+  | { kind: 'flow'; lanes: Array<{ steps: Array<{ text: string; tone: VisualTone }> }> }
+  | { kind: 'versus'; left: { title: string; points: string[] }; right: { title: string; points: string[] } };
+export interface LawRef {
+  /** data/laws/index.json 裡的法規名稱 */
+  law: string;
+  /** 條號，例 "26"、"17-1" */
+  article: string;
+}
 export interface Enrich {
   id: QuestionId;
+  /** data/topics.json 的 id，1–2 個 */
   topic: string[];
   /** 口訣 */
   mnemonic: string;
@@ -108,11 +119,38 @@ export interface Enrich {
   trap: string;
   /** 白話情境 */
   plain: string | null;
-  marks: Array<{ start: number; end: number; color: MarkColor }>;
-  options: Record<Choice, { why: string; lawRef: { law: string; article: string } | null }>;
+  /** text 是題幹裡的原文片段 */
+  marks: Array<{ text: string; color: MarkColor }>;
+  options: Record<Choice, { why: string; lawRef: LawRef | null }>;
+  visual: EnrichVisual | null;
+  /** 官方答案或題目前提與現行法不同時的提醒 */
+  lawChanged: string | null;
+  confidence: 'high' | 'low';
+  reviewed: boolean;
+}
+export interface EnrichFile {
+  paperId: PaperId;
   model: string;
   generatedAt: string;
-  reviewed: boolean;
+  items: Enrich[];
+}
+
+// ── 法規副本（data/laws/**，來自全國法規資料庫）──────────
+export interface LawFile {
+  pcode: string;
+  name: string;
+  amendedAt: string | null;
+  url: string;
+  fetchedAt: string;
+  articles: Array<{ no: string; text: string }>;
+}
+export interface LawIndex {
+  laws: Array<{ pcode: string; name: string; amendedAt: string | null; articleCount: number }>;
+}
+export interface TopicInfo {
+  id: string;
+  subjectKey: SubjectKey;
+  name: string;
 }
 
 // ── 個人進度（只存在裝置上）──────────────────────────────

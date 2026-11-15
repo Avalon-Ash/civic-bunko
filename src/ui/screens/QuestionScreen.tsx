@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { dispatch } from '../../core/commands';
 import { FAST_ADVANCE_MS } from '../../core/constants/round';
-import type { Choice, Enrich } from '../../core/types';
+import type { Choice, Enrich, LawRef, TopicInfo } from '../../core/types';
 import type { World } from '../../core/world';
+import { formatLawRef, loadLawArticle, type LawArticleResult } from '../../data/laws';
+import { loadTopics } from '../../data/source';
+import { resolveTopicLabel } from '../../data/sourceLoader';
 import { currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
 import { Burst } from '../kit/Burst';
 import { Button } from '../kit/Button';
@@ -13,6 +16,8 @@ import { ProgressBar } from '../kit/ProgressBar';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { Sheet } from '../kit/Sheet';
 import { Toast } from '../kit/Toast';
+import { Visual } from '../kit/Visual';
+import { splitByMarks } from '../marks';
 import { useWorld } from '../useWorld';
 
 const CHOICES: readonly Choice[] = ['A', 'B', 'C', 'D'];
@@ -23,38 +28,18 @@ const TEXT_MODE_OPTIONS: readonly SegmentedOption<'official' | 'plain'>[] = [
 ];
 
 function renderMarkedStem(stem: string, marks: Enrich['marks']): ReactNode {
-  if (marks.length === 0) return stem;
+  const segments = splitByMarks(stem, marks);
+  if (segments.length === 0) return stem;
 
-  const sorted = [...marks]
-    .map((m) => ({
-      start: Math.max(0, Math.min(stem.length, m.start)),
-      end: Math.max(0, Math.min(stem.length, m.end)),
-      color: m.color,
-    }))
-    .filter((m) => m.end > m.start)
-    .sort((a, b) => a.start - b.start);
-
-  const nodes: ReactNode[] = [];
-  let cursor = 0;
-
-  for (let i = 0; i < sorted.length; i += 1) {
-    const m = sorted[i];
-    if (!m || m.start < cursor) continue;
-    if (m.start > cursor) {
-      nodes.push(stem.slice(cursor, m.start));
-    }
-    nodes.push(
-      <mark key={`${m.start}-${m.end}-${i}`} className={`cb-mark-${m.color}`}>
-        {stem.slice(m.start, m.end)}
-      </mark>,
-    );
-    cursor = m.end;
-  }
-
-  if (cursor < stem.length) {
-    nodes.push(stem.slice(cursor));
-  }
-  return nodes;
+  return segments.map((seg, i) =>
+    seg.color ? (
+      <mark key={`${i}-${seg.color}`} className={`cb-mark-${seg.color}`}>
+        {seg.text}
+      </mark>
+    ) : (
+      <Fragment key={i}>{seg.text}</Fragment>
+    ),
+  );
 }
 
 export interface QuestionScreenProps {
@@ -70,6 +55,9 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
   const [textMode, setTextMode] = useState<'official' | 'plain'>('official');
   const [groupExpanded, setGroupExpanded] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
+  const [lawState, setLawState] = useState<{ status: 'loading' } | LawArticleResult | null>(null);
+  const [topics, setTopics] = useState<TopicInfo[]>([]);
   const [burstChoice, setBurstChoice] = useState<{ choice: Choice; tick: number } | null>(null);
   const [milestoneToast, setMilestoneToast] = useState<string | null>(null);
   const [catSpin, setCatSpin] = useState(false);
@@ -83,12 +71,60 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
   const fast = config?.fast ?? false;
   const combo = view?.combo ?? 0;
 
-  // 換題時重設原文／白話切換、抽屜與粒子狀態
+  useEffect(() => {
+    let active = true;
+    loadTopics().then((list) => {
+      if (active) {
+        setTopics(list);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // 換題時重設原文／白話切換、抽屜、法條頁與粒子狀態
   useEffect(() => {
     setTextMode('official');
     setSheetOpen(false);
+    setActiveLawRef(null);
+    setLawState(null);
     setBurstChoice(null);
   }, [questionId]);
+
+  // 點選條號時延後載入法規原文
+  useEffect(() => {
+    if (!sheetOpen || !activeLawRef) {
+      setLawState(null);
+      return undefined;
+    }
+
+    let cancelled = false;
+    setLawState({ status: 'loading' });
+
+    loadLawArticle(activeLawRef)
+      .then((result) => {
+        if (!cancelled) {
+          setLawState(result);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLawState({
+            status: 'not_found',
+            lawName: activeLawRef.law,
+            amendedAt: null,
+            url: null,
+            articleNo: activeLawRef.article,
+            text: null,
+          });
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sheetOpen, activeLawRef]);
 
   // 連對里程碑横幅與貓咪轉圈
   const prevComboRef = useRef(0);
@@ -131,7 +167,10 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
   const sourceLabel = paper
     ? `${paper.year} ${examLabel}・${paper.subjectName} 第 ${question.no} 題`
     : `第 ${question.no} 題`;
-  const topicLabel = enrich?.topic[0] ?? paper?.subjectName ?? '題目';
+  const firstTopic = enrich?.topic[0];
+  const topicLabel = firstTopic
+    ? resolveTopicLabel(topics, firstTopic)
+    : (paper?.subjectName ?? '題目');
 
   const handlePick = (choice: Choice) => {
     if (isAnswered) return;
@@ -295,13 +334,13 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
         {isAnswered && (
           <div ref={feedbackRef} className="cb-stack-sm cb-mt-md">
             {showCompactFastFeedback && enrich ? (
-              <Card tone="green" className="cb-kou">
+              <Card tone="green" className="cb-kou cb-kou-compact">
                 <div className="cb-row">
                   <Cat size={58} mood="yay" spin={catSpin} interactive />
                   <div className="cb-grow">
                     <div className="cb-kou-head">
                       <small>答對！</small>
-                      {!enrich.reviewed && <Chip tone="plain">AI 解析</Chip>}
+                      {!enrich.reviewed && <span className="cb-ai-tag">AI 解析</span>}
                     </div>
                     <b className="cb-kou-mnemonic">{enrich.mnemonic}</b>
                   </div>
@@ -320,18 +359,36 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
                     <div className="cb-grow">
                       <div className="cb-kou-head">
                         <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
-                        {!enrich.reviewed && <Chip tone="plain">AI 解析</Chip>}
+                        {!enrich.reviewed && <span className="cb-ai-tag">AI 解析</span>}
                       </div>
                       <b className="cb-kou-mnemonic">{enrich.mnemonic}</b>
                     </div>
                   </div>
-                  <div className="cb-trap">
-                    <em>陷阱</em>
-                    <span>{enrich.trap}</span>
-                  </div>
+                  {enrich.visual && <Visual visual={enrich.visual} />}
+                  {enrich.trap && (
+                    <div className="cb-trap">
+                      <em>陷阱</em>
+                      <span>{enrich.trap}</span>
+                    </div>
+                  )}
+                  {enrich.confidence === 'low' && (
+                    <p className="cb-kou-low">這題的說明把握較低，以官方答案為準</p>
+                  )}
+                  {enrich.lawChanged !== null && (
+                    <div className="cb-law-changed">
+                      <span className="cb-law-changed-badge">修法提醒</span>
+                      <span className="cb-grow">{enrich.lawChanged}</span>
+                    </div>
+                  )}
                 </Card>
                 <div className="cb-acts">
-                  <Button variant="ghost" onClick={() => setSheetOpen(true)}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setActiveLawRef(null);
+                      setSheetOpen(true);
+                    }}
+                  >
                     看每個選項
                   </Button>
                   <Button onClick={handleNext}>
@@ -372,30 +429,75 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
       </div>
 
       {enrich && (
-        <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="每個選項的說明">
-          <div className="cb-row cb-wrap cb-mb-sm">
-            <strong className="cb-grow">逐選項解析</strong>
-            {!enrich.reviewed && <Chip tone="plain">AI 解析</Chip>}
-          </div>
-          {CHOICES.map((choice) => {
-            const detail = enrich.options[choice];
-            const isAnswer = question.answer.includes(choice);
-            return (
-              <div key={choice} className={`cb-sheet-line ${isAnswer ? 'is-ok' : ''}`}>
-                <span className="cb-sheet-key">{choice}</span>
-                <div className="cb-grow">
-                  <div>{detail.why}</div>
-                  {detail.lawRef && (
-                    <div className="cb-mt-xs">
-                      <mark className="cb-mark-blue">
-                        {detail.lawRef.law} {detail.lawRef.article}
-                      </mark>
-                    </div>
-                  )}
-                </div>
+        <Sheet
+          open={sheetOpen}
+          onClose={() => {
+            setSheetOpen(false);
+            setActiveLawRef(null);
+          }}
+          title={activeLawRef ? formatLawRef(activeLawRef) : '每個選項的說明'}
+        >
+          {activeLawRef ? (
+            <div className="cb-stack-sm">
+              <div className="cb-row cb-wrap">
+                <Chip tone="plain" onClick={() => setActiveLawRef(null)}>
+                  ← 返回選項
+                </Chip>
+                <strong className="cb-grow">{formatLawRef(activeLawRef)}</strong>
               </div>
-            );
-          })}
+              {!lawState || lawState.status === 'loading' ? (
+                <div className="cb-law-loading">
+                  <Cat size={64} mood="sleepy" interactive={false} />
+                  <span className="cb-sub">正在翻找法條…</span>
+                </div>
+              ) : lawState.status === 'found' ? (
+                <div className="cb-law-view">
+                  <div className="cb-law-meta">
+                    全國法規資料庫・
+                    {lawState.amendedAt ? `修正日期 ${lawState.amendedAt}` : '未載修正日期'}
+                  </div>
+                  <p className="cb-law-text">{lawState.text}</p>
+                </div>
+              ) : (
+                <div className="cb-law-empty">
+                  <div className="cb-law-meta">
+                    全國法規資料庫
+                    {lawState.amendedAt ? `・修正日期 ${lawState.amendedAt}` : ''}
+                  </div>
+                  <p className="cb-sub-strong cb-m0">找不到這一條</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <>
+              <div className="cb-row cb-wrap cb-mb-sm">
+                <strong className="cb-grow">逐選項解析</strong>
+                {!enrich.reviewed && <span className="cb-ai-tag">AI 解析</span>}
+              </div>
+              {CHOICES.map((choice) => {
+                const detail = enrich.options[choice];
+                const isAnswer = question.answer.includes(choice);
+                return (
+                  <div key={choice} className={`cb-sheet-line ${isAnswer ? 'is-ok' : ''}`}>
+                    <span className="cb-sheet-key">{choice}</span>
+                    <div className="cb-grow">
+                      <div>{detail.why}</div>
+                      {detail.lawRef && (
+                        <div className="cb-mt-xs">
+                          <Chip
+                            tone="blue"
+                            onClick={() => setActiveLawRef(detail.lawRef)}
+                          >
+                            {formatLawRef(detail.lawRef)}
+                          </Chip>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </Sheet>
       )}
     </div>
