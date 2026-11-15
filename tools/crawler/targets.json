@@ -1,0 +1,19 @@
+{
+  "baseUrl": "https://wwwq.moex.gov.tw/exam/",
+  "delayMs": 2000,
+  "classMatch": { "className": "一般民政" },
+  "subjects": [
+    { "key": "chinese", "startsWith": "國文" },
+    { "key": "law-english", "startsWith": "法學知識與英文" },
+    { "key": "public-admin", "startsWith": "行政學概要" },
+    { "key": "local-gov", "startsWith": "地方自治概要" },
+    { "key": "admin-law", "startsWith": "行政法概要" }
+  ],
+  "exams": [
+    { "code": "115080", "y": 2026, "year": 115, "exam": "general", "levelIncludes": "普通考試" },
+    { "code": "114080", "y": 2025, "year": 114, "exam": "general", "levelIncludes": "普通考試" },
+    { "code": "113080", "y": 2024, "year": 113, "exam": "general", "levelIncludes": "普通考試" },
+    { "code": "114190", "y": 2025, "year": 114, "exam": "local4", "levelIncludes": "四等" },
+    { "code": "113200", "y": 2024, "year": 113, "exam": "local4", "levelIncludes": "四等" }
+  ]
+}

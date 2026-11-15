@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "command(node tools/crawler/crawl.mjs --dry-run)",
+      "command(node tools/crawler/crawl.mjs)",
+      "command(node tools/crawler/verify.mjs)"
+    ]
+  }
+}
