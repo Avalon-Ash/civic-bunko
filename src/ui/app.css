@@ -365,6 +365,16 @@ h2 {
   background: var(--butter);
 }
 
+.cb-chip-btn.cb-chip-blue {
+  background: var(--blue-bg);
+  border-color: var(--blue);
+  color: var(--blue);
+  box-shadow: 0 2px 0 var(--blue);
+  white-space: normal;
+  text-align: left;
+  padding: 6px 14px;
+}
+
 .cb-pick-grid {
   display: flex;
   flex-wrap: wrap;
@@ -939,8 +949,49 @@ mark {
 .cb-kou-head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.cb-ai-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.cb-kou-low {
+  margin: 0;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-law-changed {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 2px solid var(--ink);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.cb-law-changed-badge {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--on-solid);
+  margin-top: 1px;
 }
 
 .cb-kou small {
@@ -1341,13 +1392,19 @@ mark {
 .cb-sheet-line {
   display: flex;
   gap: 10px;
-  padding: 12px 0;
+  padding: 12px 10px;
   border-bottom: 2px dashed var(--hair);
   font-size: 0.9375rem;
 }
 
 .cb-sheet-line:last-child {
   border-bottom: 0;
+}
+
+.cb-sheet-line.is-ok {
+  background: var(--green-bg);
+  border-radius: 14px;
+  border-bottom-color: transparent;
 }
 
 .cb-sheet-key {
@@ -1601,4 +1658,156 @@ mark {
 .cb-dialog-body {
   font-size: 0.9375rem;
   line-height: 1.55;
+}
+
+/* ── 小圖 Visual（flow／versus）與法條抽屜 ────────────── */
+
+.cb-pic {
+  background: var(--surface-raised);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.cb-lane {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  width: 100%;
+}
+
+.cb-lane.is-off {
+  opacity: 0.6;
+}
+
+.cb-lane-step {
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 2px solid var(--hair);
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.cb-lane-step.is-hot {
+  background: var(--red-bg);
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.cb-lane-step.is-key {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--on-semantic);
+  font-weight: 900;
+}
+
+.cb-lane-arrow {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-weight: 900;
+}
+
+.cb-versus {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+@media (max-width: 339px) {
+  .cb-versus {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cb-versus-card {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  min-width: 0;
+  color: var(--ink);
+}
+
+.cb-versus-card.is-left {
+  background: var(--butter);
+}
+
+.cb-versus-card.is-right {
+  background: var(--mint);
+}
+
+.cb-versus-title {
+  display: block;
+  font-weight: 900;
+  font-size: 0.9375rem;
+  margin-bottom: 6px;
+}
+
+.cb-versus-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cb-vis-step {
+  animation: cb-vis-pop 0.28s var(--spring) both;
+  animation-delay: var(--step-delay, 0ms);
+}
+
+@keyframes cb-vis-pop {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.cb-law-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 12px;
+}
+
+.cb-law-view,
+.cb-law-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 2px;
+}
+
+.cb-law-meta {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-law-text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink);
 }
