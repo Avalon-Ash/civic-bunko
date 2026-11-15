@@ -239,6 +239,7 @@ export type AppEvent =
   | { type: 'answered'; id: QuestionId; pick: Choice; correct: boolean; at: string }
   | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
+  | { type: 'roundRestored' }
   | { type: 'progressChanged'; ids: QuestionId[] }
   | { type: 'settingsChanged'; settings: Settings }
   | { type: 'syncChanged'; sync: SyncState };
@@ -249,6 +250,9 @@ export type UICommand =
   | { type: 'answer'; pick: Choice }
   | { type: 'next' }
   | { type: 'quitRound' }
+  /** 接續上次沒刷完的回合 */
+  | { type: 'resumeRound' }
+  | { type: 'discardSavedRound' }
   | { type: 'retryWrong' }
   /** 用剛看完的同一批題目開作答回合 */
   | { type: 'quizSameSet' }
