@@ -1,0 +1,1223 @@
+{
+  "paperId": "115-general-law-english",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T01:45:00+08:00",
+  "items": [
+    {
+      "id": "115-general-law-english-q01",
+      "topic": ["law-english/constitution-principles"],
+      "mnemonic": "民代任期滿就該改選，這叫「主權在民」（國民主權）。",
+      "trap": "重點在「選民約定與代表性」，別選成正當程序！",
+      "plain": "立委或議員任期到了，沒有正當理由就想自己延任不改選，這樣違背了哪個原則？",
+      "marks": [
+        { "text": "釋字第 499 號", "color": "blue" },
+        { "text": "憲法原則", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "利益迴避是指不能裁判與自己利害相關的事，與任期屆滿改選無關。", "lawRef": null },
+        "B": { "why": "正當程序著重在開會或處罰程序是否公開合理，非本題重點。", "lawRef": null },
+        "C": { "why": "平等原則講的是無正當理由不得差別待遇，並非任期約定核心。", "lawRef": null },
+        "D": { "why": "正確。國家主權屬於人民，民代只是受託代議，期滿就得還權於民改選。", "lawRef": { "law": "中華民國憲法", "article": "2" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "人民授與權力", "tone": "plain" }, { "text": "民代任期屆滿", "tone": "hot" }, { "text": "應即定期改選", "tone": "key" }] },
+          { "steps": [{ "text": "延任不改選", "tone": "hot" }, { "text": "失其代表性", "tone": "plain" }, { "text": "違背國民主權", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q02",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "基本國策多是國家目標，只有「6到12歲基本教育」能直接要！",
+      "trap": "工作權、獎學金、加薪都是施政方針，人民不能直接告國家要。",
+      "plain": "憲法寫了很多照顧人民的目標，哪一項是民眾可以直接拿來要求政府兌現的權利？",
+      "marks": [
+        { "text": "基本國策", "color": "blue" },
+        { "text": "公權利", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "國家提供工作機會屬方針條款，失業者不能直接請求國家分配工作。", "lawRef": null },
+        "B": { "why": "正確。憲法第 160 條與第 21 條明確保障學齡兒童受基本教育的公權利。", "lawRef": { "law": "中華民國憲法", "article": "160" } },
+        "C": { "why": "廣設獎學金屬國家努力目標，學生無法直接依憲法請求發放。", "lawRef": null },
+        "D": { "why": "提高教育工作者待遇屬施政方針，須待立法或預算落實。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "具體公權利", "points": ["6至12歲基本教育", "免納學費", "人民可直接主張"] },
+        "right": { "title": "方針條款", "points": ["給予工作機會", "廣設獎學金、加薪", "僅課予國家努力義務"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q03",
+      "topic": ["law-english/constitution-principles", "law-english/constitution-review"],
+      "mnemonic": "基本國策和修憲條文同屬憲法位階，不能拿國策去判修憲違憲！",
+      "trap": "憲法法庭能審法律、裁判、自治條例，但不能拿基本國策打修憲。",
+      "plain": "憲法裡的「基本國策」到底有多大效力？憲法法庭能用它來審查哪些東西？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "基本國策", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。基本國策具憲法效力，可作為審查一般法律是否違憲的基準。", "lawRef": null },
+        "B": { "why": "這句對。憲法訴訟法下，憲法法庭可審理法院確定終局裁判的合憲性。", "lawRef": null },
+        "C": { "why": "這句對。地方自治條例屬下位法規範，不得牴觸憲法基本國策。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。修憲條文僅受自由民主憲政秩序界限拘束，非依基本國策審查。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "基本國策", "tone": "plain" }, { "text": "可審查對象", "tone": "plain" }, { "text": "法律、裁判、自治條例", "tone": "key" }] },
+          { "steps": [{ "text": "修憲條文", "tone": "hot" }, { "text": "同屬憲法位階", "tone": "plain" }, { "text": "僅限極少數核心界限", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q04",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "宗教內部誰當領袖由教會自己定，國家硬規定資格就踩線！",
+      "trap": "財務公開、噪音罰單、禁假醫療都有公益理由，不算侵犯信仰自由。",
+      "plain": "政府對寺廟或教會訂了各種規定，哪一種做法算是管太多、侵犯宗教自由？",
+      "marks": [
+        { "text": "宗教自由", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "違反。宗教團體內部組織與神職人員資格屬宗教自治核心，國家不得干預。", "lawRef": null },
+        "B": { "why": "不違反。要求公告捐贈財物是為了財產透明與防弊，具正當公益目的。", "lawRef": null },
+        "C": { "why": "不違反。宗教活動的外部行為仍須遵守噪音、環保等一般公共秩序法律。", "lawRef": null },
+        "D": { "why": "不違反。禁止神職人員宣稱香灰有療效，是為了保護國民生命健康。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "國家不得干預", "points": ["內心信仰自由", "宗教組織與領袖資格", "教義與儀式內容"] },
+        "right": { "title": "國家可合理規範", "points": ["捐贈財產公告透明", "噪音與環保管制", "禁止冒充醫療行為"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q05",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "政黨影響國家權力大，受到的憲法限制比一般社團更特別。",
+      "trap": "政黨違憲由憲法法庭宣告解散，規定和一般社團不一樣！",
+      "plain": "跟朋友組讀書會和組政黨，兩者在憲法上的自由與限制都完全一樣嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "結社自由", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。結社自由包含加入、不加入及退出團體的消極與積極自由。", "lawRef": null },
+        "B": { "why": "這句對。結社自由不只保護成立瞬間，也保護團體存續與活動推展。", "lawRef": null },
+        "C": { "why": "這句對。團體對其內部組織架構、章程及成員規範享有自主決定權。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。政黨受憲法增修條文第 5 條特別規範，保障與限制不同於一般社團。", "lawRef": { "law": "中華民國憲法增修條文", "article": "5" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "一般結社團體", "points": ["保障成立、存續、自主", "一般法律與憲法23條限制", "人民團體法規範"] },
+        "right": { "title": "政黨團體", "points": ["享更高政治言論保障", "危害憲政秩序即違憲", "憲法法庭專屬審理解散"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q06",
+      "topic": ["law-english/constitution-rights", "law-english/constitution-principles"],
+      "mnemonic": "選總統收百萬保證金合憲，目的是避免隨便連署浪費資源！",
+      "trap": "非因無政黨提名缺正當性，而是為防止耗費社會資源。",
+      "plain": "想靠連署選總統要先繳一百萬元保證金，這樣會不會對沒政黨推薦的人不公平？",
+      "marks": [
+        { "text": "連署保證金", "color": "blue" },
+        { "text": "選舉原則", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "釋字第 468 號認定該規定具有合理正當目的，並未違反選舉平等原則。", "lawRef": null },
+        "B": { "why": "普通選舉原則指的是選民投票權普及無財產限制，與參選保證金不同。", "lawRef": null },
+        "C": { "why": "理由錯誤。連署參選同樣代表人民政治參與，並非缺乏民主正當性。", "lawRef": null },
+        "D": { "why": "正確。依釋字第 468 號，保證金可防止任意參選耗費社會資源，並未違憲。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "連署選總統", "tone": "plain" }, { "text": "繳100萬保證金", "tone": "hot" }, { "text": "防任意參選浪費資源", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q07",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "服公職保身分和陞遷，但「調職」只要依法，不必事事經你同意！",
+      "trap": "身分保障是指不能隨便免職，不是「調動職務一定要本人點頭」。",
+      "plain": "考上公務員後，長官要把你調到別的單位，如果沒經過你同意就一定違憲嗎？",
+      "marks": [
+        { "text": "並不屬於", "color": "red" },
+        { "text": "應考試服公職權", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這項屬於。應考試權保障人民公平參與國家考試與競爭的機會。", "lawRef": null },
+        "B": { "why": "這項屬於。服公職權保障公務員身分，非依法律不得任意免職。", "lawRef": null },
+        "C": { "why": "這項屬於。公務員依法令規定獲得晉敘與陞遷之權利，受憲法保障。", "lawRef": null },
+        "D": { "why": "這項不屬（本題答案）。機關基於業務需要依法調任，無須先經當事人同意。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "服公職權保障範圍", "points": ["公平參與競試", "身分受保障(防免職)", "依法令晉敘陞遷"] },
+        "right": { "title": "不在此限", "points": ["工作內容與職務調動", "機關得依法合理調任", "不須事事經本人同意"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q08",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "稅要怎麼繳、甚至要減免，通通都要法律講好，不能用命令偷改！",
+      "trap": "別以為「減稅是對人民好」就能隨便用命令發，減免一樣要看法律！",
+      "plain": "政府想幫某個產業減稅給優惠，行政機關能不能自己發個命令就免稅？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "納稅義務", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。憲法第 19 條明定人民有依法律納稅之義務。", "lawRef": { "law": "中華民國憲法", "article": "19" } },
+        "B": { "why": "這句對。憲法第 19 條揭示我國的租稅法律主義原則。", "lawRef": { "law": "中華民國憲法", "article": "19" } },
+        "C": { "why": "這句錯（本題答案）。減免稅捐優惠同樣涉及租稅公平，須有法律或明確授權，不得逕以命令定之。", "lawRef": null },
+        "D": { "why": "這句對。稅捐主體、稅目、稅率、納稅方法等構成要件須由法律或授權法規命令定之。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "租稅法律主義", "tone": "plain" }, { "text": "課稅與減免優惠", "tone": "hot" }, { "text": "均須法律或授權命令", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q09",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "大學生不只有退學才能告，言論自由被校方侵害也能打行政訴訟！",
+      "trap": "釋字 784 號放寬後，不限受教育權才准行政爭訟！",
+      "plain": "公立大學學生在公布欄貼政治海報卻被學校撕掉，學生只能忍氣吞聲找校內申訴嗎？",
+      "marks": [
+        { "text": "公立大學學生", "color": "blue" },
+        { "text": "救濟之管道", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯誤。大學生同樣受憲法基本權利保障，並非只有國民教育才受保障。", "lawRef": null },
+        "B": { "why": "錯誤。依釋字第 784 號，只要權利受學校公權力侵害，經申訴後仍得提起行政爭訟。", "lawRef": null },
+        "C": { "why": "正確。移除海報侵害甲的言論表意自由，甲用盡校內救濟後得依法提起行政訴訟。", "lawRef": null },
+        "D": { "why": "錯誤。被撕海報侵害的是「言論自由（表意自由）」，並非受教育權。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "貼海報遭移除", "tone": "hot" }, { "text": "侵害表意自由", "tone": "key" }, { "text": "申訴後得提行政訴訟", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q10",
+      "topic": ["law-english/constitution-rights"],
+      "mnemonic": "權力受侵害要走法院程序討公道，「訴訟權」就是程序保障的代表！",
+      "trap": "言論集會屬實體自由；訴訟權才是「救濟的程序工具」。",
+      "plain": "基本權利各有分工，哪一種權利主要是幫人民搭起「進法院打官司」的程序大門？",
+      "marks": [
+        { "text": "程序保障功能", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "言論自由主要保護個人表達意見的實體自由，屬防禦權與溝通權。", "lawRef": null },
+        "B": { "why": "正確。訴訟權保障人民接近法院、獲公正審判的程序機制，是典型程序性基本權。", "lawRef": null },
+        "C": { "why": "集會自由保護人民聚集表達訴求的實體行動自由。", "lawRef": null },
+        "D": { "why": "結社自由保護人民成立與參與團體的實體自由。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "實體防禦性基本權", "points": ["言論、集會、結社自由", "防止國家不當干預行動"] },
+        "right": { "title": "程序保障性基本權", "points": ["訴訟權（憲法16條）", "提供請求法院救濟的制度"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q11",
+      "topic": ["law-english/constitution-principles"],
+      "mnemonic": "獨立機關不受行政院長管，等於削弱「行政一體」與「責任政治」。",
+      "trap": "獨立機關本來就是法律設的，所以沒減損法律保留或組織法定原則。",
+      "plain": "像中選會或NCC這種獨立機關，不用事事聽行政院的話，這會讓哪種憲法原則打折扣？",
+      "marks": [
+        { "text": "釋字第 613 號", "color": "blue" },
+        { "text": "獨立行政機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "獨立機關須依法律設立與授權，反而符合法律保留原則。", "lawRef": null },
+        "B": { "why": "獨立機關是依法律設立的組織，並未減損組織法定原則。", "lawRef": null },
+        "C": { "why": "正確。釋字第 613 號指出，獨立機關自主運作會減損行政一體及責任政治原則。", "lawRef": null },
+        "D": { "why": "獨立機關仍須依法行政，且不影響國會內部的國會自律原則。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "獨立機關自主", "tone": "hot" }, { "text": "不受政院指揮", "tone": "plain" }, { "text": "減損行政一體與責任政治", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q12",
+      "topic": ["law-english/constitution-principles"],
+      "mnemonic": "立委113、大法官15、監委29，只有考試委員寫「若干人」！",
+      "trap": "別把其他機關人數套給考試委員，增修條文未定人數！",
+      "plain": null,
+      "marks": [
+        { "text": "並未明文規定", "color": "red" },
+        { "text": "憲法增修條文", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這項有寫。增修條文第 4 條明定立法委員自第七屆起為 113 人。", "lawRef": { "law": "中華民國憲法增修條文", "article": "4" } },
+        "B": { "why": "這項有寫。增修條文第 5 條明定司法院設大法官 15 人。", "lawRef": { "law": "中華民國憲法增修條文", "article": "5" } },
+        "C": { "why": "這項沒寫（本題答案）。增修條文第 6 條僅規定「考試委員若干人」，由法律另定。", "lawRef": { "law": "中華民國憲法增修條文", "article": "6" } },
+        "D": { "why": "這項有寫。增修條文第 7 條明定監察院設監察委員 29 人。", "lawRef": { "law": "中華民國憲法增修條文", "article": "7" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "立委：113人", "tone": "plain" }, { "text": "大法官：15人", "tone": "plain" }, { "text": "監委：29人", "tone": "plain" }] },
+          { "steps": [{ "text": "考試委員", "tone": "hot" }, { "text": "增修條文第6條", "tone": "plain" }, { "text": "寫「若干人」", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q13",
+      "topic": ["law-english/constitution-principles"],
+      "mnemonic": "立法院有權投「不同意」票；違憲的是「拖著不審」讓監察院空轉！",
+      "trap": "立院可投不同意票，真正違憲的是「消極拖延不審」。",
+      "plain": "立法院審查總統提名的監察委員人選時，如果表決全部不同意，這樣算違憲嗎？",
+      "marks": [
+        { "text": "未曾見於", "color": "red" },
+        { "text": "監察委員", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "釋字 632 曾言。確保監察院實質存續與正常運行是所有憲法機關的責任。", "lawRef": null },
+        "B": { "why": "釋字 632 曾言。總統有義務適時提名繼任人選咨請立法院同意。", "lawRef": null },
+        "C": { "why": "釋字 632 曾言。立法院應適時行使同意權，不能消極擱置不審議。", "lawRef": null },
+        "D": { "why": "未曾見於（本題答案）。立法院行使同意權本得決議不同意，真正違憲的是「不審議」。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "合法行使同意權", "points": ["實質審查並表決", "決議全部不同意也合法", "總統可再另提人選"] },
+        "right": { "title": "違憲(釋字632)", "points": ["消極擱置完全不審", "導致監察院停擺空轉", "違反機關忠誠義務"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q14",
+      "topic": ["law-english/constitution-review"],
+      "mnemonic": "法官審案覺得法律違憲，由實際審案的「該合議庭」去聲請釋憲！",
+      "trap": "不是最高法院行政院長官，也不是只派其中一位承辦法官個人去。",
+      "plain": "最高法院三個法官組成的合議庭審案時，覺得要用的法律怪怪的想聲請釋憲，誰當聲請人？",
+      "marks": [
+        { "text": "法規範憲法審查", "color": "blue" },
+        { "text": "聲請人", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "最高法院是整個司法行政機關名稱，實際行使審判權並確信違憲的是承審合議庭。", "lawRef": null },
+        "B": { "why": "正確。憲訴法第 55 條的「各法院」指審理原因案件的審判組織，即該合議庭。", "lawRef": null },
+        "C": { "why": "審判長只是合議庭成員之一，不能單獨以審判長名義代表合議庭聲請。", "lawRef": null },
+        "D": { "why": "合議制案件由合議庭共同審判，非由單一受命法官個人聲請。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "合議庭審理案件", "tone": "plain" }, { "text": "合理確信法律違憲", "tone": "hot" }, { "text": "以該合議庭名義聲請", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q15",
+      "topic": ["law-english/constitution-principles"],
+      "mnemonic": "精省之後，只有「省」失去自治團體地位，縣市直轄市都還在！",
+      "trap": "憲法本文省本自治，增修第 9 條後省改為派出機關。",
+      "plain": "憲法增修條文實施精省後，哪一級行政區的地位和憲法本文原本寫的不一樣了？",
+      "marks": [
+        { "text": "憲法增修條文", "color": "blue" },
+        { "text": "法律地位", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。憲法本文原規定省自治並民選省長，增修條文第 9 條後省不再是自治團體。", "lawRef": { "law": "中華民國憲法增修條文", "article": "9" } },
+        "B": { "why": "縣（市）在憲法本文與增修條文第 9 條中，均維持地方自治團體地位。", "lawRef": { "law": "中華民國憲法增修條文", "article": "9" } },
+        "C": { "why": "直轄市依憲法第 118 條以法律定其自治，增修條文並未改變其自治地位。", "lawRef": { "law": "中華民國憲法", "article": "118" } },
+        "D": { "why": "憲法本文並未明文規定鄉（鎮、市），其自治地位定於地方制度法。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "憲法本文的省", "points": ["省民代表大會訂省自治法", "省長民選、設省議會", "具地方自治團體地位"] },
+        "right": { "title": "增修條文後的省", "points": ["省主席由行政院長提請任命", "非地方自治團體", "屬行政院派出機關"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q16",
+      "topic": ["law-english/jurisprudence"],
+      "mnemonic": "法源順序「法律→習慣→法理」，法理排最後墊底，不是優先！",
+      "trap": "看到「法理應優先適用」馬上打叉！它只能補法律和習慣的空白。",
+      "plain": "法官審民事案件時，如果法條跟民間習慣都找不到答案才用「法理」，法理能搶在法律前面嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "法理", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。民法第 1 條明定法律所未規定且無習慣時，始依法理。", "lawRef": { "law": "民法", "article": "1" } },
+        "B": { "why": "這句對。在民事事件中，法理得作為補充性法源依據。", "lawRef": { "law": "民法", "article": "1" } },
+        "C": { "why": "這句錯（本題答案）。法理居補充地位，適用順位在法律與習慣之後，非優先適用。", "lawRef": { "law": "民法", "article": "1" } },
+        "D": { "why": "這句對。刑法採罪刑法定主義，行為之處罰以法律明文為限，不得依法理定罪。", "lawRef": { "law": "中華民國刑法", "article": "1" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "1. 法律", "tone": "key" }, { "text": "2. 習慣", "tone": "plain" }, { "text": "3. 法理(墊底補充)", "tone": "hot" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q17",
+      "topic": ["law-english/jurisprudence"],
+      "mnemonic": "臺灣法律骨架是「大陸法系」（成文法），不是英美法系！",
+      "trap": "戰後臺灣雖然有借鏡英美制度，但整體法體系仍屬歐陸大陸法系。",
+      "plain": "從清朝、日治到戰後，臺灣的法律一直受不同文化影響，現在到底屬於哪一個法系？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "臺灣法律的發展歷史", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。臺灣歷經原住民規範、清治、日治與戰後體制，呈現多源多元特色。", "lawRef": null },
+        "B": { "why": "這句對。清治時期適用大清律例等傳統中華法系規範。", "lawRef": null },
+        "C": { "why": "這句對。日治時期引進明治維新後仿效歐陸的近代西方法體系。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。戰後臺灣承繼六法全書架構，主要屬於「大陸法系」而非英美法系。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "清治：傳統中國法系", "tone": "plain" }, { "text": "日治：導入近代西方法", "tone": "plain" }, { "text": "戰後：大陸法系為主", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q18",
+      "topic": ["law-english/jurisprudence"],
+      "mnemonic": "大架構「編、章、節」，條文裡面才是「條→項→款→目」。",
+      "trap": "「節」在「條」上面用來分段落，不是條裡面的細項！",
+      "plain": null,
+      "marks": [
+        { "text": "不屬之", "color": "red" },
+        { "text": "「條」以下之劃分", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "屬於條以下。中央法規標準法第 8 條規定條文得分為項、款、目。", "lawRef": { "law": "中央法規標準法", "article": "8" } },
+        "B": { "why": "屬於條以下。項為「條」以下的第一層劃分，不冠數字空二字書寫。", "lawRef": { "law": "中央法規標準法", "article": "8" } },
+        "C": { "why": "屬於條以下。款為項以下之細分，冠以一、二、三等數字。", "lawRef": { "law": "中央法規標準法", "article": "8" } },
+        "D": { "why": "不屬（本題答案）。「節」屬於編、章、節架構，是用來集合多條條文的上位劃分。", "lawRef": { "law": "中央法規標準法", "article": "9" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "條之上(大架構)", "points": ["第某編", "第某章", "第某節"] },
+        "right": { "title": "條以下(條文內)", "points": ["項(空二字)", "款(一、二、三)", "目((一)、(二))"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q19",
+      "topic": ["law-english/jurisprudence"],
+      "mnemonic": "查字典是文義解釋起點，同部法同詞也不必硬套同一意思（本題B或C皆對）。",
+      "trap": "官方更正「B或C均給分」！兩句說法都太絕對而錯誤。",
+      "plain": "看法律條文時，能不能先翻字典看字面意思？同一個詞在整部法裡意思都一模一樣嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "法律解釋", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。罪刑法定明確性要求刑罰用語須讓一般受規範者能理解及預見。", "lawRef": null },
+        "B": { "why": "這句錯（正解之一，官方原答B後更正B或C皆給分）。文義解釋本可參考辭典一般語意。", "lawRef": null },
+        "C": { "why": "這句錯（正解之一，官方更正答B或C均給分）。同一用詞在不同條文仍可能因脈絡而有異。", "lawRef": null },
+        "D": { "why": "這句對。依憲法法庭判決意旨，原住民範圍的解釋得觀察國家歷史發展脈絡。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "官方更正", "tone": "hot" }, { "text": "B：得參辭典", "tone": "key" }, { "text": "C：依脈絡可異義", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q20",
+      "topic": ["law-english/jurisprudence"],
+      "mnemonic": "法位階看誰「不能牴觸誰」；什麼事該用法律定叫「法律保留」！",
+      "trap": "D 講「法律保留原則」（權限），非上下法位階效力。",
+      "plain": "憲法最大、法律其次、命令最小，這叫法位階；那「重要事項不能用命令定」是同一件事嗎？",
+      "marks": [
+        { "text": "不是", "color": "red" },
+        { "text": "法位階理論", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句是。憲法位階最高，法律牴觸憲法無效，屬法位階效力。", "lawRef": { "law": "中央法規標準法", "article": "11" } },
+        "B": { "why": "這句是。法律位階高於命令，命令不得牴觸法律。", "lawRef": { "law": "中央法規標準法", "article": "11" } },
+        "C": { "why": "這句是。行政機關間亦有上下級位階，下級命令不得牴觸上級命令。", "lawRef": { "law": "中央法規標準法", "article": "11" } },
+        "D": { "why": "這句不是（本題答案）。這是中標法第 6 條的「法律保留原則」，非位階高低問題。", "lawRef": { "law": "中央法規標準法", "article": "6" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "法位階理論", "points": ["憲法＞法律＞命令", "下位不得牴觸上位", "中標法第11條"] },
+        "right": { "title": "法律保留原則", "points": ["應以法律定者", "不得以命令定之", "中標法第6條"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q21",
+      "topic": ["law-english/constitution-principles"],
+      "mnemonic": "修憲不能改的是「民主、共和、主權、人權、權力分立」，不是五權！",
+      "trap": "是「權力分立與制衡」，不是特定寫死的「五權分立」不能改。",
+      "plain": "釋字 499 號說憲法有幾個核心靈魂連修憲都不能動，哪一個其實不在此列？",
+      "marks": [
+        { "text": "並非", "color": "red" },
+        { "text": "憲法所賴以存立之基礎", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這項是。釋字 499 號明列民主國原則為憲法賴以存立的本質要素。", "lawRef": null },
+        "B": { "why": "這項是。釋字 499 號明列國民主權原則為不可變更的憲法核心。", "lawRef": null },
+        "C": { "why": "這項是。釋字 499 號明列民主共和國原則為憲法存立基礎。", "lawRef": null },
+        "D": { "why": "這項並非（本題答案）。不可動搖的是「權力分立與制衡」，而非具體的「五權」設計。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "憲法核心(不可改)", "points": ["民主共和國與國民主權", "基本權利保障", "權力分立與制衡原則"] },
+        "right": { "title": "非核心本質", "points": ["具體的「五權分立」架構", "未來修憲仍可調整院數"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q22",
+      "topic": ["law-english/civil"],
+      "mnemonic": "怕長輩過世前急著送財產躲債，「死前 2 年」送繼承人的通通算遺產！",
+      "trap": "民法是「2 年」內，別跟其他稅法年限搞混！",
+      "plain": "爸爸過世前偷偷把房子過戶給兒子，這筆財產在多久內送的，債主還是能追來還債？",
+      "marks": [
+        { "text": "所得遺產", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。民法第 1148 條之 1 規定，繼承開始前 2 年內受贈財產視為所得遺產。", "lawRef": { "law": "民法", "article": "1148-1" } },
+        "B": { "why": "錯誤。法定期間為 2 年內，非 3 年。", "lawRef": { "law": "民法", "article": "1148-1" } },
+        "C": { "why": "錯誤。法定期間為 2 年內，非 5 年。", "lawRef": { "law": "民法", "article": "1148-1" } },
+        "D": { "why": "錯誤。法定期間為 2 年內，非 10 年。", "lawRef": { "law": "民法", "article": "1148-1" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "繼承開始前2年內", "tone": "hot" }, { "text": "繼承人受贈財產", "tone": "plain" }, { "text": "視為所得遺產還債", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q23",
+      "topic": ["law-english/civil"],
+      "mnemonic": "土地被包圍出不去要開路可以，但分割造成的袋地「不用付償金、只能走原分割人地」！",
+      "trap": "分割造成袋地「免付償金」，但僅得通行原分割人地。",
+      "plain": "自己的地沒路通到馬路被鄰居包圍，法律讓你在必要時開路，但一定要付過路費嗎？",
+      "marks": [
+        { "text": "袋地通行權", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯誤。一般袋地須付償金，但若是因分割或一部讓與造成的袋地則「無須支付」。", "lawRef": { "law": "民法", "article": "789" } },
+        "B": { "why": "錯誤。因一部讓與或分割者，「僅得」通行受讓人、讓與人或他分割人的地，非周圍地。", "lawRef": { "law": "民法", "article": "789" } },
+        "C": { "why": "錯誤。數宗土地同屬一人而讓與一部致不通公路者，一樣「無須支付償金」。", "lawRef": { "law": "民法", "article": "789" } },
+        "D": { "why": "正確。依民法第 788 條，有通行權人於必要時得開設道路，但須賠償損害。", "lawRef": { "law": "民法", "article": "788" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "一般袋地(787條)", "points": ["得通行周圍地", "應支付償金", "必要時得開路(788)"] },
+        "right": { "title": "分割袋地(789)", "points": ["僅得走分割或讓與地", "無須支付償金"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q24",
+      "topic": ["law-english/civil"],
+      "mnemonic": "結婚贈與先歸扣：300+100=400萬平分，乙扣100、丙拿200！",
+      "trap": "結婚、分居、營業贈與要「歸扣」，別只算 300 萬！",
+      "plain": "甲留了 300 萬遺產給乙丙兩個小孩，乙結婚時先拿過 100 萬嫁妝或禮金，最後丙能拿多少？",
+      "marks": [
+        { "text": "特種贈與", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "100 萬元是乙扣掉先拿的 100 萬後，最後還能再拿的金額，不是丙的。", "lawRef": null },
+        "B": { "why": "錯誤。直接拿 300 萬除以 2 忘記把乙結婚收到的 100 萬加回去算。", "lawRef": null },
+        "C": { "why": "正確。300+100=400 萬總應繼遺產，兩人平分各 200 萬，丙實拿 200 萬。", "lawRef": { "law": "民法", "article": "1173" } },
+        "D": { "why": "錯誤。計算應先把特種贈與加回遺產總額平分，再從受贈人應繼分扣除。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "加回100變400萬", "tone": "hot" }, { "text": "每人應繼分200萬", "tone": "plain" }, { "text": "丙拿200萬", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q25",
+      "topic": ["law-english/criminal"],
+      "mnemonic": "民間車廠受託驗車開紀錄，是在行使公權力，算刑法「委託公務員」！",
+      "trap": "超商銀行只代收錢、醫院看病屬私經濟，非刑法公務員。",
+      "plain": "哪些在民間或醫院工作的人，因為做的事情帶有政府公權力，出事要照刑法公務員處罰？",
+      "marks": [
+        { "text": "刑法上的公務員", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "超商店長僅提供機械性代收款項服務，未行使公權力，非刑法公務員。", "lawRef": null },
+        "B": { "why": "正確。民間代檢廠受監理機關依法委託驗車並核發合格紀錄，屬委託公務員。", "lawRef": { "law": "中華民國刑法", "article": "10" } },
+        "C": { "why": "金融機構職員僅代收罰鍰金錢，無作成公文書或審查權限，非公務員。", "lawRef": null },
+        "D": { "why": "公立醫院醫師看診屬私經濟醫療行為，並非依法令行使公權力。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "刑法委託公務員", "points": ["受機關依法委託", "執行公權力公共事務", "例：民間汽車代檢廠"] },
+        "right": { "title": "非刑法公務員", "points": ["超商、銀行代收稅罰", "公立醫院門診醫師"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q26",
+      "topic": ["law-english/criminal"],
+      "mnemonic": "起訴書寫什麼不是死板板的，審理中變更法條還是有可能換國民法官審！",
+      "trap": "115年起10年以上也行國民審判，錯在「一律不行」。",
+      "plain": "如果檢察官一開始沒用國民法官法規定的罪名起訴，這件案子就絕對不會有國民法官嗎？",
+      "marks": [
+        { "text": "何者錯誤", "color": "red" },
+        { "text": "國民法官法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這句對。少年刑事案件受保護優先原則限制，不適用國民參與審判。", "lawRef": null },
+        "B": { "why": "這句對。最輕本刑 10 年以上有期徒刑之罪（115 年起施行）應行國民參與審判。", "lawRef": null },
+        "C": { "why": "這句對。國民參與審判僅在地方法院第一審實施，二、三審沒有國民法官。", "lawRef": null },
+        "D": { "why": "這句錯（本題答案）。若審理中變更法條為應行國民審判之罪，仍可能轉由國民法官審理。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "地院第一審案件", "tone": "plain" }, { "text": "故意致死/10年以上", "tone": "hot" }, { "text": "行國民參與審判", "tone": "key" }] },
+          { "steps": [{ "text": "少年刑事案件", "tone": "hot" }, { "text": "例外排除", "tone": "plain" }, { "text": "不行國民審判", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q27",
+      "topic": ["law-english/other-law"],
+      "mnemonic": "總公司分公司算同一家；互相投資「各達三分之一以上」才算關係企業！",
+      "trap": "控制從屬須過半；相互投資達1/3即算（1/2達標）。",
+      "plain": "甲公司跟乙公司之間要到達什麼樣的持股或控制程度，法律上才叫做「關係企業」？",
+      "marks": [
+        { "text": "公司法", "color": "blue" },
+        { "text": "關係企業", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "分公司只是總公司的分支機構，不具獨立法人格，兩者仍是同一家公司。", "lawRef": null },
+        "B": { "why": "單方持股須達「過半數」才構成控制與從屬關係，3 分之 1 尚未達標。", "lawRef": null },
+        "C": { "why": "單純交易金額龐大屬於業務往來，並非公司法定義的關係企業要件。", "lawRef": null },
+        "D": { "why": "正確。兩公司相互投資各達對方有表決權股份 1/3 以上即為相互投資公司（1/2 以上符合）。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "控制與從屬關係", "points": ["持有他公司過半數股份", "或直接間接控制人事財務"] },
+        "right": { "title": "相互投資公司", "points": ["彼此投資對方股份", "各達總數 1/3 以上"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q28",
+      "topic": ["law-english/social-law"],
+      "mnemonic": "老闆自己有下場做事，「得」自願參加勞保，不是強制也不是完全不行！",
+      "trap": "勞工多為強制「應」加保；實際勞動雇主是自願「得」。",
+      "plain": "自己開小店當老闆，每天也跟著員工一起忙進忙出，老闆本人能參加勞工保險嗎？",
+      "marks": [
+        { "text": "勞工保險條例", "color": "blue" },
+        { "text": "雇主", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯誤。只要老闆實際從事勞動，法律就允許自願加保。", "lawRef": null },
+        "B": { "why": "錯誤。雇主不是「應」強制加保的對象，而是自願加保。", "lawRef": null },
+        "C": { "why": "正確。依勞工保險條例第 8 條，實際從事勞動之雇主「得」準用規定參加勞保。", "lawRef": null },
+        "D": { "why": "錯誤。雇主自願加保並沒有「須僱用 15 人以上」的門檻限制。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "應加保(強制)", "points": ["滿5人事業單位受僱勞工", "年滿15歲以上、65歲以下"] },
+        "right": { "title": "得加保(自願)", "points": ["實際從事勞動之雇主", "未滿5人公司受僱勞工"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q29",
+      "topic": ["law-english/social-law"],
+      "mnemonic": "做滿 3 年要裁員得提前 30 天講（10、20、30天原則）！",
+      "trap": "曠工3日解僱無資遣費；欠薪離職免預告；謀職假照給薪。",
+      "plain": "公司在做滿 3 年以上的老員工要被資遣時，老闆最遲要在幾天前通知他？",
+      "marks": [
+        { "text": "勞動基準法", "color": "blue" },
+        { "text": "勞動契約之終止", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。依勞基法第 16 條，繼續工作 3 年以上者，資遣須於 30 日前預告。", "lawRef": null },
+        "B": { "why": "錯誤。無正當理由繼續曠工 3 日被懲戒解僱，勞工不得請求資遣費。", "lawRef": null },
+        "C": { "why": "錯誤。雇主不依契約給付報酬，勞工得「不經預告」直接終止契約。", "lawRef": null },
+        "D": { "why": "錯誤。勞工請謀職假外出找工作，請假期間工資照給。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "3月-1年：10日前", "tone": "plain" }, { "text": "1-3年：20日前", "tone": "plain" }, { "text": "3年以上：30日前", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q30",
+      "topic": ["law-english/social-law"],
+      "mnemonic": "家暴防治牽涉報案、外配、工作、媒體報導，管銀行證券的金管會不在此列！",
+      "trap": "通傳、移民、勞動都與保護被害人有關，金管會不在此列。",
+      "plain": "防治家庭暴力需要很多部會合作，下列哪一個管錢的機關不是家暴法列名的主管機關？",
+      "marks": [
+        { "text": "不是", "color": "red" },
+        { "text": "家庭暴力防治法", "color": "blue" },
+        { "text": "目的事業主管機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "不是（本題答案）。家暴法第 4 條列舉的各目的事業主管機關並未包含金融主管機關。", "lawRef": null },
+        "B": { "why": "是。通訊傳播主管機關負責規範媒體與網路報導不得揭露被害人身分。", "lawRef": null },
+        "C": { "why": "是。移民主管機關負責涉外籍或無戶籍被害人的居留與保護協助。", "lawRef": null },
+        "D": { "why": "是。勞動主管機關負責協助家暴被害人就業服務與職業訓練。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "家暴法目的主管機關", "points": ["衛福、警政、教育、勞動", "新聞/通傳、移民、法務"] },
+        "right": { "title": "未列入機關", "points": ["金融主管機關(金管會)"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q31",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "長途飛完腿痠要「伸展」：stretch your legs！",
+      "trap": "別被 pull 誤導，腿部配「伸展」才防肌肉僵硬。",
+      "plain": null,
+      "marks": [
+        { "text": "long flight", "color": "blue" },
+        { "text": "prevent stiff muscles", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。stretch 指「伸展、拉長」，stretch your legs 意為伸展雙腿。", "lawRef": null },
+        "B": { "why": "explore 指「探索、探險」，無法與雙腿搭配表達防肌肉僵硬。", "lawRef": null },
+        "C": { "why": "provide 指「提供」，語意不符。", "lawRef": null },
+        "D": { "why": "initiate 指「發起、開始」，語意不符。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "長途飛行久坐", "tone": "plain" }, { "text": "防肌肉關節僵硬", "tone": "hot" }, { "text": "stretch 伸展", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q32",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "懸崖救受困登山客是「了不起的」努力：remarkable effort！",
+      "trap": "a/an 無法刪選項，救難行動不會用「普通」或「冷漠」。",
+      "plain": null,
+      "marks": [
+        { "text": "rescue team", "color": "blue" },
+        { "text": "save the stranded hikers", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "normal 指「正常的」，不足以形容懸崖救援的艱辛付出。", "lawRef": null },
+        "B": { "why": "ordinary 指「平凡普通的」，與救援行動的傑出表現相反。", "lawRef": null },
+        "C": { "why": "indifferent 指「漠不關心的」，與努力救人的語意完全矛盾。", "lawRef": null },
+        "D": { "why": "正確。remarkable 指「非凡的、卓越的」，常搭配 effort（努力）。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q33",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "委員會「感謝」大家的評論，選有見地的 thoughtful！",
+      "trap": "感謝評論應配正面詞，刪除負面字 B 與 D！",
+      "plain": null,
+      "marks": [
+        { "text": "thanked", "color": "blue" },
+        { "text": "comments", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。thoughtful 指「深思熟慮的、體貼周到的」，正面形容評論很恰當。", "lawRef": null },
+        "B": { "why": "destructive 指「破壞性的」，屬於負面字詞。", "lawRef": null },
+        "C": { "why": "industrial 指「工業的」，無法修飾會議評論。", "lawRef": null },
+        "D": { "why": "disgraceful 指「丟臉的、可恥的」，屬於負面字詞。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q34",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "不好笑又冒犯人的笑話叫「粗俗的」crude remarks！",
+      "trap": "crude 指言詞「粗俗不得體」，與粗魯冒犯並列。",
+      "plain": null,
+      "marks": [
+        { "text": "offensive remarks", "color": "blue" },
+        { "text": "upset", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。crude 指「粗魯的、粗俗的」，與 offensive（冒犯的）並列恰當。", "lawRef": null },
+        "B": { "why": "faint 指「微弱的、暈眩的」，不常與冒犯並列形容言論。", "lawRef": null },
+        "C": { "why": "moist 指「潮濕的」，語意不符。", "lawRef": null },
+        "D": { "why": "beige 指「米色的」，為顏色詞，語意不符。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q35",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "後句提示 delete（刪除），找同義字 eliminate！",
+      "trap": "別選企業 corporate，看 delete 秒殺！",
+      "plain": null,
+      "marks": [
+        { "text": "photos on the iPad", "color": "blue" },
+        { "text": "delete them", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "corporate 是形容詞「企業的、公司的」，詞性與語意皆不合。", "lawRef": null },
+        "B": { "why": "正確。eliminate 指「消除、移除」，與後句的 delete（刪除）呼應。", "lawRef": null },
+        "C": { "why": "penetrate 指「穿透、滲透」，語意不符。", "lawRef": null },
+        "D": { "why": "tolerate 指「容忍、忍受」，語意不符。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "線索：delete", "tone": "hot" }, { "text": "找同義動詞", "tone": "plain" }, { "text": "eliminate消除", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q36",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "畫作描繪春天女孩坐在樹下，那是「風景畫」landscape！",
+      "trap": "畫作搭春天 springtime，是在畫風景場景。",
+      "plain": null,
+      "marks": [
+        { "text": "painting", "color": "blue" },
+        { "text": "seated beneath a tree", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。landscape 指「風景、景色」，springtime landscape 為春日風景。", "lawRef": null },
+        "B": { "why": "access 指「接近權、通道」，無法用來指畫中的春日景象。", "lawRef": null },
+        "C": { "why": "process 指「過程、程序」，語意不符。", "lawRef": null },
+        "D": { "why": "result 指「結果」，語意不符。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q37",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "associate A with B：把禮物和快樂回憶「聯想在一起」！",
+      "trap": "A、B、D 都是「拆開隔離」，只有 C 是連結！",
+      "plain": null,
+      "marks": [
+        { "text": "gifts", "color": "blue" },
+        { "text": "happy birthday memories", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "disconnect 指「斷開連結」，與把禮物和快樂回憶連在一起相反。", "lawRef": null },
+        "B": { "why": "separate 指「分開、區隔」（常配 from），語意相反。", "lawRef": null },
+        "C": { "why": "正確。associate A with B 指「把 A 與 B 聯想在一起」。", "lawRef": null },
+        "D": { "why": "isolate 指「孤立、隔離」，語意不符。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "連結聯想", "points": ["associate with", "把A與B聯想在一起"] },
+        "right": { "title": "拆開分離", "points": ["disconnect 斷開", "separate 分開", "isolate 隔離"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q38",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "電影太感人悲傷（sad），結局時大家開始「哭泣」weep！",
+      "trap": "看到 sad 找 cry 同義字 weep！",
+      "plain": null,
+      "marks": [
+        { "text": "so sad", "color": "blue" },
+        { "text": "at the ending", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。weep 指「流淚、哭泣」，呼應前面的 so sad（太悲傷）。", "lawRef": null },
+        "B": { "why": "joke 指「開玩笑」，與悲傷電影結局不符。", "lawRef": null },
+        "C": { "why": "yarn 作動詞或名詞指「紗線」或「閒聊長故事」，語意不符。", "lawRef": null },
+        "D": { "why": "laugh 指「大笑」，與悲傷語意相反。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q39",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "半夜聽到腳步聲怕被發現，嚇得一動也不動：「froze in fear」！",
+      "trap": "froze 是 freeze 過去式；大叫會被發現！",
+      "plain": null,
+      "marks": [
+        { "text": "in fear", "color": "blue" },
+        { "text": "avoid being discovered", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。froze（freeze 過去式）指「僵住不動」，freeze in fear 意為嚇呆。", "lawRef": null },
+        "B": { "why": "napped（nap 過去式）指「小睡、打盹」，害怕時不會打盹。", "lawRef": null },
+        "C": { "why": "shouted 指「大叫」，與後文「避免被發現」完全矛盾。", "lawRef": null },
+        "D": { "why": "exposed 指「暴露、揭露」，後面缺受詞且語意不合。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q40",
+      "topic": ["law-english/vocabulary"],
+      "mnemonic": "聖母峰海拔 8,849 公尺，「海拔高度」就是 elevation！",
+      "trap": "山峰海拔用 elevation，非 magnitude！",
+      "plain": null,
+      "marks": [
+        { "text": "8,849 meters", "color": "blue" },
+        { "text": "above sea level", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "longevity 指「長壽、壽命」，與山峰高度無關。", "lawRef": null },
+        "B": { "why": "正確。elevation 指「海拔高度、高地」，peak elevation 即最高海拔。", "lawRef": null },
+        "C": { "why": "magnitude 指「規模、重要性、震級」，不專門指海拔高度。", "lawRef": null },
+        "D": { "why": "submersion 指「淹沒、沉入水中」，與海平面以上相反。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "8,849 meters", "tone": "plain" }, { "text": "海平面以上", "tone": "hot" }, { "text": "elevation 海拔", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q41",
+      "topic": ["law-english/reading"],
+      "mnemonic": "章魚為了躲避天敵，「演化出」許多有趣招數：evolved！",
+      "trap": "章魚沒有放棄招數，inhabited 後應接地點！",
+      "plain": null,
+      "marks": [],
+      "options": {
+        "A": { "why": "abandoned 指「遺棄、放棄」，章魚不會放棄逃生招數。", "lawRef": null },
+        "B": { "why": "正確。evolved 指「演化出、發展出」，符合生物演化逃避天敵的語境。", "lawRef": null },
+        "C": { "why": "inhabited 指「居住於」，受詞通常是地點而非技巧（tricks）。", "lawRef": null },
+        "D": { "why": "denied 指「否認、拒絕」，語意不符。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q42",
+      "topic": ["law-english/reading"],
+      "mnemonic": "偽裝成石頭或其他動物，不只改皮膚顏色，還要改皮膚「質地」texture！",
+      "trap": "不僅改顏色，還改皮膚「質地」，須選能形容表面的詞。",
+      "plain": null,
+      "marks": [],
+      "options": {
+        "A": { "why": "closure 指「關閉、結束」，無法與皮膚特徵搭配。", "lawRef": null },
+        "B": { "why": "inclusion 指「包含、納入」，語意不符。", "lawRef": null },
+        "C": { "why": "member 指「成員」，語意不符。", "lawRef": null },
+        "D": { "why": "正確。texture 指「質地、紋理」，章魚能改變皮膚顏色與表面紋理來擬態。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "擬態像石頭", "tone": "plain" }, { "text": "改皮膚顏色 color", "tone": "plain" }, { "text": "也改 texture", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q43",
+      "topic": ["law-english/reading"],
+      "mnemonic": "擠進窄縫（squeeze into），代表身體極「柔韌」flexible！",
+      "trap": "看到 squeeze into（擠進），指身體柔軟有彈性！",
+      "plain": null,
+      "marks": [],
+      "options": {
+        "A": { "why": "正確。flexible 指「柔韌的、可彎曲的」，呼應後文擠進安全小縫隙。", "lawRef": null },
+        "B": { "why": "intensive 指「密集的、加強的」，不形容動物身體柔軟度。", "lawRef": null },
+        "C": { "why": "physical 指「身體的、物理的」，不能解釋為何能擠進窄縫。", "lawRef": null },
+        "D": { "why": "terrible 指「糟糕的、可怕的」，語意不符。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "squeeze into", "tone": "hot" }, { "text": "擠進小縫隙", "tone": "plain" }, { "text": "flexible 柔韌", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q44",
+      "topic": ["law-english/reading"],
+      "mnemonic": "肢體抽動、呼吸變快、變色，這些都是作夢的「跡象」signs！",
+      "trap": "show signs of 為固定用法，指「顯露…跡象」。",
+      "plain": null,
+      "marks": [],
+      "options": {
+        "A": { "why": "debts 指「債務」，語意完全無關。", "lawRef": null },
+        "B": { "why": "fields 指「領域、田野」，語意不符。", "lawRef": null },
+        "C": { "why": "正確。signs 指「跡象、徵兆」，後句抽動與呼吸加快正是作夢的跡象。", "lawRef": null },
+        "D": { "why": "tests 指「測驗、檢驗」，作夢不會說 show tests of dreaming。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q45",
+      "topic": ["law-english/reading"],
+      "mnemonic": "後面在猜測作夢的「功用與目的」，所以科學家不確定的是「為什麼」why！",
+      "trap": "別選 whether！前文已確定會作夢，後文在猜目的。",
+      "plain": null,
+      "marks": [],
+      "options": {
+        "A": { "why": "前文已說章魚睡覺時確實會作夢，這裡並非懷疑「是否」會作夢。", "lawRef": null },
+        "B": { "why": "後文沒有討論地點，where 不符。", "lawRef": null },
+        "C": { "why": "前文已說明是在 active sleep 階段作夢，並非不知道「何時」。", "lawRef": null },
+        "D": { "why": "正確。後句提出幫助偽裝或複習經驗等原因，故科學家不確定的是「為什麼」作夢。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "確定章魚會作夢", "tone": "plain" }, { "text": "討論目的與功用", "tone": "hot" }, { "text": "疑問是 why", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q46",
+      "topic": ["law-english/reading"],
+      "mnemonic": "拆字：man(心)+tra(工具)，末段又提平衡身心靈！",
+      "trap": "選項 B「歌曲」和 C「科學無法解釋」都與原文相反。",
+      "plain": null,
+      "marks": [
+        { "text": "what is a mantra", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。首段指 tra 意為 instrument（工具），末段指能平衡身心靈。", "lawRef": null },
+        "B": { "why": "錯誤。文章稱 mantra 是詞彙、聲音或短語，並非朗朗上口的歌曲。", "lawRef": null },
+        "C": { "why": "錯誤。末段明言現代科學研究已認可其益處，並非科學無法解釋。", "lawRef": null },
+        "D": { "why": "錯誤。文章未提及 mantra 是用來鼓勵人們繼續前進的句子。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "tra=工具", "tone": "plain" }, { "text": "平衡mind/body", "tone": "plain" }, { "text": "選 A 選項", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q47",
+      "topic": ["law-english/reading"],
+      "mnemonic": "推論題找末段原句：「甚至科學研究也認可唸誦真言的好處」！",
+      "trap": "A 誤解 instrument 為樂器；原文沒說很少人知道。",
+      "plain": null,
+      "marks": [
+        { "text": "inferred", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯誤。instrument 在文中的意思是「心智的工具」，不是影響效果的樂器。", "lawRef": null },
+        "B": { "why": "正確。末段明確指出甚至連科學研究都認可 mantra chanting 帶來益處。", "lawRef": null },
+        "C": { "why": "錯誤。文中雖說流傳數百年，但未推論出「很少人知道」。", "lawRef": null },
+        "D": { "why": "錯誤。文章介紹三種類型各有特質與目的，並未指出彼此之間充滿衝突。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q48",
+      "topic": ["law-english/reading"],
+      "mnemonic": "唸特定神明名字，對應文章裡的「Saguna mantras」！",
+      "trap": "Nirguna 不唸特定神，Bija 偏單音節，別選混！",
+      "plain": null,
+      "marks": [
+        { "text": "God of Destruction", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "Bija mantras 是單音節短字，與元素、脈輪或女神相關，未特別強調唸特定神名。", "lawRef": null },
+        "B": { "why": "正確。文中指 Saguna mantras 聚焦於特定神祇之名並觀想神祇。", "lawRef": null },
+        "C": { "why": "Nirguna mantras 原文明確說明「不唱誦任何特定神祇」。", "lawRef": null },
+        "D": { "why": "One-syllable mantras 就是 Bija 的特徵描述，非文中三大分類之名稱。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "Bija", "tone": "plain" }, { "text": "單音節、能量字", "tone": "plain" }] },
+          { "steps": [{ "text": "Saguna", "tone": "hot" }, { "text": "特定神祇之名", "tone": "key" }] },
+          { "steps": [{ "text": "Nirguna", "tone": "plain" }, { "text": "不唸特定神明", "tone": "plain" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q49",
+      "topic": ["law-english/reading"],
+      "mnemonic": "Derived from 源自於 ＝ Originating（起源於）！",
+      "trap": "B、C、D 皆為負面減少義（下降/刪除/省略）。",
+      "plain": null,
+      "marks": [
+        { "text": "Derived", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "正確。derive from 意為「源自、起源於」，與 originating 最接近。", "lawRef": null },
+        "B": { "why": "Declining 指「下降、婉拒」，語意無關。", "lawRef": null },
+        "C": { "why": "Deleting 指「刪除」，語意無關。", "lawRef": null },
+        "D": { "why": "Omitting 指「省略、遺漏」，語意無關。", "lawRef": null }
+      },
+      "visual": null,
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "115-general-law-english-q50",
+      "topic": ["law-english/reading"],
+      "mnemonic": "末段「give it a try!」，明顯在「鼓勵讀者嘗試」！",
+      "trap": "三種類型前段已講完，末段重點在最後一句邀請嘗試！",
+      "plain": null,
+      "marks": [
+        { "text": "author's intention", "color": "blue" },
+        { "text": "last paragraph", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "回顧三種主要類型是在中間各段，並非最後一段的寫作目的。", "lawRef": null },
+        "B": { "why": "正確。末段提到科學認可好處，並結尾邀請讀者試試看（give it a try）。", "lawRef": null },
+        "C": { "why": "最後一段並未警告讀者練習唱誦有任何潛在風險。", "lawRef": null },
+        "D": { "why": "最後一段著重在推廣好處與鼓勵體驗，並未預測未來發展。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "科學認可益處", "tone": "plain" }, { "text": "give a try!", "tone": "hot" }, { "text": "鼓勵讀者實踐嘗試", "tone": "key" }] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}
