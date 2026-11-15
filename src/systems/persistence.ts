@@ -70,6 +70,9 @@ function isValidSettings(value: unknown): value is Settings {
   if (!isRecord(value)) return false;
   if (value.theme !== 'system' && value.theme !== 'light' && value.theme !== 'dark') return false;
   if (value.lastRound !== null && !isValidRoundConfig(value.lastRound)) return false;
+  if (value.installHintDismissed !== undefined && typeof value.installHintDismissed !== 'boolean') {
+    return false;
+  }
   return true;
 }
 
@@ -112,6 +115,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
             subjectKeys: [...parsed.settings.lastRound.subjectKeys],
           }
         : null,
+      installHintDismissed: parsed.settings.installHintDismissed === true,
     };
   }
 

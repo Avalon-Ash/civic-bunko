@@ -1,4 +1,5 @@
 import { dispatch } from '../../core/commands';
+import { getResultTier } from '../../core/constants/result';
 import type { World } from '../../core/world';
 import { roundSummary } from '../../selectors';
 import { Button } from '../kit/Button';
@@ -12,7 +13,7 @@ export interface ResultScreenProps {
   onHome: () => void;
 }
 
-/** 回合結果畫面：蓋章動畫、答對分數、錯題重刷、再來一回合與回今日。 */
+/** 回合結果畫面：依答對率顯示印章與表情、答對分數、錯題重刷、再來一回合與回今日。 */
 export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
   useWorld(world);
   const summary = roundSummary(world);
@@ -22,15 +23,21 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
   }
 
   const wrongCount = summary.wrongIds.length;
-  const isPerfect = wrongCount === 0;
+  const tier = getResultTier(summary.correct, summary.total);
 
   return (
     <div className="cb-result cb-result-shake">
       <div className="cb-spacer" />
-      <div className="cb-stamp" aria-label={isPerfect ? '全對過關' : '過關成功'}>
-        過關
-        <br />
-        成功
+      <div className="cb-stamp" aria-label={tier.stampLabel}>
+        {tier.stampLines.length === 2 ? (
+          <>
+            {tier.stampLines[0]}
+            <br />
+            {tier.stampLines[1]}
+          </>
+        ) : (
+          tier.stampLines[0]
+        )}
       </div>
       <div className="cb-result-score">
         <h1>
@@ -41,7 +48,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
         </p>
       </div>
       <div className="cb-row cb-center">
-        <Cat size={96} mood={isPerfect ? 'yay' : 'idle'} interactive />
+        <Cat size={96} mood={tier.catMood} interactive />
       </div>
       <div className="cb-spacer" />
       <div className="cb-stack-sm">

@@ -33,10 +33,11 @@ function clampCount(value: number): number {
 
 export interface DrillSetupScreenProps {
   world: World;
+  papersLoading?: boolean;
 }
 
 /** 回合設定畫面：題數步進＋貓掌快選、多選科目、出題模式、快刷開關與可刷題數提示。 */
-export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
+export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
   const settings = getSettings(world);
@@ -102,12 +103,13 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
   };
 
   const handleStart = () => {
-    if (avail === 0) return;
+    if (papersLoading || avail === 0) return;
     dispatch(world, { type: 'startRound', config });
   };
 
-  const startLabel =
-    avail === 0
+  const startLabel = papersLoading
+    ? '題庫載入中…'
+    : avail === 0
       ? '這個範圍目前沒有題目'
       : count > avail
         ? `開始刷 ${avail} 題（全部）`
@@ -181,10 +183,16 @@ export function DrillSetupScreen({ world }: DrillSetupScreenProps) {
       </Card>
 
       <div className="cb-avail-hint" aria-live="polite">
-        這個範圍有 <b>{avail}</b> 題可刷
+        {papersLoading ? (
+          '題庫載入中…'
+        ) : (
+          <>
+            這個範圍有 <b>{avail}</b> 題可刷
+          </>
+        )}
       </div>
 
-      <Button onClick={handleStart} disabled={avail === 0}>
+      <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
         {startLabel}
       </Button>
     </div>
