@@ -123,6 +123,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
               setShowResult(false);
               setTab('quiz');
             }}
+            onGoStamps={() => setTab('stamps')}
           />
         );
       case 'cards':

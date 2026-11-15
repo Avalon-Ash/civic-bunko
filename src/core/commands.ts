@@ -8,6 +8,7 @@ import {
   startRound,
 } from '../systems/round';
 import { dismissInstallHint, setTheme } from '../systems/settings';
+import { disableSync, setSyncCode, syncNow } from '../systems/sync';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
 import type { World } from './world';
@@ -67,6 +68,15 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
     }
     case 'resetProgress':
       resetProgress(world);
+      break;
+    case 'setSyncCode':
+      setSyncCode(world, cmd.code);
+      break;
+    case 'syncNow':
+      syncNow(world);
+      break;
+    case 'disableSync':
+      disableSync(world);
       break;
   }
 }

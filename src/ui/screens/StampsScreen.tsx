@@ -1,11 +1,14 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
 import type { World } from '../../core/world';
 import { activeBank, subjectStats } from '../../selectors';
 import { progressOverview } from '../../selectors/backup';
+import { getSyncState } from '../../selectors/sync';
 import { exportProgress } from '../../systems/persistence';
+import { encodeSyncCode, validateSyncCredentials } from '../../systems/syncCode';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
+import { Cat } from '../kit/Cat';
 import { Dialog } from '../kit/Dialog';
 import { ProgressBar } from '../kit/ProgressBar';
 import { Sheet } from '../kit/Sheet';
@@ -29,13 +32,69 @@ function formatLastAnswered(iso: string | null): string {
   return `${y}/${m}/${day} ${hh}:${mm}`;
 }
 
-/** 集章畫面：顯示各科總題數、已刷題數與答對率，以及最下方的進度備份區塊。 */
+function formatSyncTime(iso: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+async function copyTextWithFallback(
+  text: string,
+  textarea: HTMLTextAreaElement | null,
+  successMessage: string,
+  onMessage: (msg: string) => void,
+): Promise<void> {
+  const selectFallback = () => {
+    if (textarea) {
+      textarea.focus();
+      textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
+    }
+    onMessage('無法自動複製，已全選文字請手動複製');
+  };
+
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      onMessage(successMessage);
+      return;
+    }
+    selectFallback();
+  } catch {
+    selectFallback();
+  }
+}
+
+/** 集章畫面：顯示各科總題數、已刷題數與答對率，以及最下方的同步與備份區塊。 */
 export function StampsScreen({ world, papersLoading = false }: StampsScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
   const stats = bank ? subjectStats(world, bank.id) : [];
   const overview = progressOverview(world);
+  const sync = getSyncState(world);
 
+  const ownerInputId = useId();
+  const repoInputId = useId();
+  const tokenInputId = useId();
+
+  // 同步設定與產生同步碼狀態（權杖只留在元件 state，不寫進儲存）
+  const [syncSheetOpen, setSyncSheetOpen] = useState(false);
+  const [syncCodeText, setSyncCodeText] = useState('');
+  const [syncSheetHint, setSyncSheetHint] = useState<string | null>(null);
+  const [disableOpen, setDisableOpen] = useState(false);
+
+  const [genOpen, setGenOpen] = useState(false);
+  const [genOwner, setGenOwner] = useState('');
+  const [genRepo, setGenRepo] = useState('');
+  const [genToken, setGenToken] = useState('');
+  const [showToken, setShowToken] = useState(false);
+  const [genError, setGenError] = useState<string | null>(null);
+  const [generatedCode, setGeneratedCode] = useState('');
+
+  // 手動備份狀態
   const [exportOpen, setExportOpen] = useState(false);
   const [exportJson, setExportJson] = useState('');
   const [importOpen, setImportOpen] = useState(false);
@@ -44,34 +103,95 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
   const [toast, setToast] = useState<string | null>(null);
 
   const exportTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const generatedTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const syncConfigured =
+    sync.status === 'idle' ||
+    sync.status === 'syncing' ||
+    (sync.status === 'error' && (sync.lastSyncedAt !== null || sync.error !== '同步碼格式不對'));
+
+  const lastSyncLabel = formatSyncTime(sync.lastSyncedAt);
+
+  const handleOpenSyncSheet = () => {
+    setSyncCodeText('');
+    setSyncSheetHint(null);
+    setSyncSheetOpen(true);
+  };
+
+  const handlePasteSyncCode = async () => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text.trim().length > 0) {
+          setSyncCodeText(text.trim());
+          setSyncSheetHint(null);
+          return;
+        }
+      }
+      setSyncSheetHint('無法自動貼上，請長按上方輸入框手動貼上');
+    } catch {
+      setSyncSheetHint('無法自動貼上，請長按上方輸入框手動貼上');
+    }
+  };
+
+  const handleStartSync = () => {
+    dispatch(world, { type: 'setSyncCode', code: syncCodeText });
+    const nextSync = getSyncState(world);
+    if (nextSync.status === 'error' && nextSync.error === '同步碼格式不對') {
+      setSyncSheetHint('同步碼格式不對，請確認有完整貼上');
+      return;
+    }
+    setSyncSheetOpen(false);
+    setSyncCodeText('');
+    setSyncSheetHint(null);
+    setToast('同步開啟了');
+  };
+
+  const handleRetrySync = () => {
+    if (!syncConfigured) {
+      handleOpenSyncSheet();
+      return;
+    }
+    dispatch(world, { type: 'syncNow' });
+  };
+
+  const handleConfirmDisable = () => {
+    dispatch(world, { type: 'disableSync' });
+    setDisableOpen(false);
+    setToast('已停止同步');
+  };
+
+  const handleGenerateCode = () => {
+    const cred = validateSyncCredentials(genOwner.trim(), genRepo.trim(), genToken.trim());
+    if (!cred) {
+      setGenError('請填寫 GitHub 帳號、repo 名稱與權杖（帳號與 repo 不可含 / 或空白）');
+      setGeneratedCode('');
+      return;
+    }
+    setGenError(null);
+    setGeneratedCode(encodeSyncCode(cred));
+  };
+
+  const handleCopyGenerated = () =>
+    copyTextWithFallback(
+      generatedCode,
+      generatedTextareaRef.current,
+      '已複製同步碼',
+      setToast,
+    );
 
   const handleOpenExport = () => {
     setExportJson(exportProgress(world));
     setExportOpen(true);
   };
 
-  const selectExportFallback = () => {
-    const el = exportTextareaRef.current;
-    if (el) {
-      el.focus();
-      el.select();
-      el.setSelectionRange(0, el.value.length);
-    }
-    setToast('無法自動複製，已全選文字請手動複製');
-  };
-
-  const handleCopyExport = async () => {
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(exportJson);
-        setToast('已複製進度備份');
-        return;
-      }
-      selectExportFallback();
-    } catch {
-      selectExportFallback();
-    }
-  };
+  const handleCopyExport = () =>
+    copyTextWithFallback(
+      exportJson,
+      exportTextareaRef.current,
+      '已複製進度備份',
+      setToast,
+    );
 
   const handleImportSubmit = () => {
     try {
@@ -130,40 +250,235 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
       )}
 
       <section className="cb-section">
-        <h2>備份</h2>
+        <h2>同步與備份</h2>
         <Card className="cb-stack-sm">
-          <div className="cb-backup-meta">
-            <div className="cb-backup-row">
-              <span className="cb-sub">已刷題數</span>
-              <strong className="cb-num-tabular">{overview.seenCount} 題</strong>
-            </div>
-            <div className="cb-backup-row">
-              <span className="cb-sub">上次作答時間</span>
-              <strong className="cb-num-tabular">
-                {formatLastAnswered(overview.lastAnsweredAt)}
+          <div className="cb-sync-status">
+            {sync.status === 'off' && <span className="cb-sub-strong">還沒開啟同步</span>}
+            {sync.status === 'syncing' && (
+              <div className="cb-row">
+                <Cat size={36} mood="sleepy" interactive={false} spin className="cb-sync-cat" />
+                <strong className="cb-sub-strong">同步中…</strong>
+              </div>
+            )}
+            {sync.status === 'idle' && (
+              <strong className="cb-sub-strong">
+                {lastSyncLabel ? `已同步・上次 ${lastSyncLabel}` : '已同步'}
               </strong>
-            </div>
+            )}
+            {sync.status === 'error' && (
+              <div className="cb-sync-error-row">
+                <span className="cb-sub-strong cb-grow">
+                  {sync.error ?? '同步失敗，請稍後再試'}
+                </span>
+                <Button variant="butter" className="cb-sync-retry-btn" onClick={handleRetrySync}>
+                  再試一次
+                </Button>
+              </div>
+            )}
           </div>
 
-          <div className="cb-acts">
-            <Button variant="butter" onClick={handleOpenExport}>
-              匯出進度
+          {!syncConfigured ? (
+            <Button variant="primary" onClick={handleOpenSyncSheet}>
+              貼上同步碼
             </Button>
-            <Button
-              variant="mint"
-              onClick={() => {
-                setImportText('');
-                setImportOpen(true);
-              }}
+          ) : (
+            <div className="cb-acts">
+              <Button
+                variant="butter"
+                onClick={() => dispatch(world, { type: 'syncNow' })}
+                disabled={sync.status === 'syncing'}
+              >
+                立即同步
+              </Button>
+              <Button variant="ghost" onClick={() => setDisableOpen(true)}>
+                停止同步
+              </Button>
+            </div>
+          )}
+
+          <div className="cb-sync-divider">
+            <button
+              type="button"
+              className="cb-collapse-toggle"
+              aria-expanded={genOpen}
+              onClick={() => setGenOpen((prev) => !prev)}
             >
-              匯入進度
+              <span>給管理的人：產生同步碼</span>
+              <span className="cb-sub">{genOpen ? '收合' : '展開'}</span>
+            </button>
+
+            {genOpen && (
+              <div className="cb-stack-sm cb-mt-xs">
+                <div className="cb-field">
+                  <label className="cb-field-label" htmlFor={ownerInputId}>
+                    GitHub 帳號或組織
+                  </label>
+                  <input
+                    id={ownerInputId}
+                    type="text"
+                    className="cb-input"
+                    value={genOwner}
+                    onChange={(e) => setGenOwner(e.target.value)}
+                    placeholder="例如 family-owner"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                  />
+                </div>
+
+                <div className="cb-field">
+                  <label className="cb-field-label" htmlFor={repoInputId}>
+                    repo 名稱
+                  </label>
+                  <input
+                    id={repoInputId}
+                    type="text"
+                    className="cb-input"
+                    value={genRepo}
+                    onChange={(e) => setGenRepo(e.target.value)}
+                    placeholder="例如 civic-progress"
+                    autoComplete="off"
+                    autoCapitalize="none"
+                    spellCheck={false}
+                  />
+                </div>
+
+                <div className="cb-field">
+                  <label className="cb-field-label" htmlFor={tokenInputId}>
+                    權杖
+                  </label>
+                  <div className="cb-input-row">
+                    <input
+                      id={tokenInputId}
+                      type={showToken ? 'text' : 'password'}
+                      className="cb-input cb-grow"
+                      value={genToken}
+                      onChange={(e) => setGenToken(e.target.value)}
+                      placeholder="github_pat_..."
+                      autoComplete="off"
+                      autoCapitalize="none"
+                      spellCheck={false}
+                    />
+                    <Button
+                      variant="ghost"
+                      className="cb-token-toggle"
+                      onClick={() => setShowToken((prev) => !prev)}
+                    >
+                      {showToken ? '隱藏' : '顯示'}
+                    </Button>
+                  </div>
+                </div>
+
+                {genError && <p className="cb-sub-strong cb-m0">{genError}</p>}
+
+                <Button variant="butter" onClick={handleGenerateCode}>
+                  產生
+                </Button>
+
+                {generatedCode && (
+                  <div className="cb-stack-xs">
+                    <textarea
+                      ref={generatedTextareaRef}
+                      className="cb-textarea"
+                      readOnly
+                      value={generatedCode}
+                      rows={4}
+                      aria-label="產生的同步碼"
+                    />
+                    <Button variant="mint" onClick={handleCopyGenerated}>
+                      複製
+                    </Button>
+                    <p className="cb-sub cb-m0">這串同步碼等於鑰匙，只傳給家人。</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="cb-sync-divider cb-stack-sm">
+            <h3 className="cb-subheading">手動備份</h3>
+
+            <div className="cb-backup-meta">
+              <div className="cb-backup-row">
+                <span className="cb-sub">已刷題數</span>
+                <strong className="cb-num-tabular">{overview.seenCount} 題</strong>
+              </div>
+              <div className="cb-backup-row">
+                <span className="cb-sub">上次作答時間</span>
+                <strong className="cb-num-tabular">
+                  {formatLastAnswered(overview.lastAnsweredAt)}
+                </strong>
+              </div>
+            </div>
+
+            <div className="cb-acts">
+              <Button variant="butter" onClick={handleOpenExport}>
+                匯出進度
+              </Button>
+              <Button
+                variant="mint"
+                onClick={() => {
+                  setImportText('');
+                  setImportOpen(true);
+                }}
+              >
+                匯入進度
+              </Button>
+            </div>
+            <Button variant="ghost" onClick={() => setResetOpen(true)}>
+              清除全部進度
             </Button>
           </div>
-          <Button variant="ghost" onClick={() => setResetOpen(true)}>
-            清除全部進度
-          </Button>
         </Card>
       </section>
+
+      <Sheet open={syncSheetOpen} onClose={() => setSyncSheetOpen(false)} title="貼上同步碼">
+        <div className="cb-stack-sm">
+          <strong className="cb-install-heading">貼上同步碼</strong>
+          <p className="cb-sub cb-m0">把家人傳給你的同步碼貼在這裡</p>
+          <textarea
+            className="cb-textarea"
+            value={syncCodeText}
+            onChange={(e) => {
+              setSyncCodeText(e.target.value);
+              setSyncSheetHint(null);
+            }}
+            rows={5}
+            placeholder="cb1...."
+            aria-label="同步碼"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+          />
+          {syncSheetHint && <p className="cb-sub-strong cb-m0">{syncSheetHint}</p>}
+          <div className="cb-acts">
+            <Button variant="mint" onClick={handlePasteSyncCode}>
+              貼上
+            </Button>
+            <Button variant="primary" onClick={handleStartSync}>
+              開始同步
+            </Button>
+          </div>
+        </div>
+      </Sheet>
+
+      <Dialog
+        open={disableOpen}
+        onClose={() => setDisableOpen(false)}
+        title="確定要停止同步嗎？"
+      >
+        <div className="cb-stack-sm">
+          <p className="cb-m0">會從這台裝置移除同步碼，進度不會刪。</p>
+          <div className="cb-acts">
+            <Button variant="ghost" onClick={() => setDisableOpen(false)}>
+              取消
+            </Button>
+            <Button variant="primary" onClick={handleConfirmDisable}>
+              停止同步
+            </Button>
+          </div>
+        </div>
+      </Dialog>
 
       <Sheet open={exportOpen} onClose={() => setExportOpen(false)} title="匯出進度">
         <div className="cb-stack-sm">

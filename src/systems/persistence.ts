@@ -122,6 +122,17 @@ function isValidSettings(value: unknown): value is RawSettings {
   return true;
 }
 
+/** 驗證並正規化單筆作答進度（補齊舊版缺少的 views 欄位）；不合法時回傳 null。 */
+export function parseProgressEntry(value: unknown): Progress | null {
+  if (!isValidProgress(value)) {
+    return null;
+  }
+  return {
+    ...value,
+    views: value.views ?? 0,
+  };
+}
+
 function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok: false; error: string } {
   let parsed: unknown;
   try {
@@ -142,13 +153,11 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
 
   const cleanProgress: Record<QuestionId, Progress> = {};
   for (const [id, entry] of Object.entries(parsed.progress)) {
-    if (!isValidProgress(entry)) {
+    const normalized = parseProgressEntry(entry);
+    if (!normalized) {
       return { ok: false, error: `Invalid progress entry for ${id}` };
     }
-    cleanProgress[id] = {
-      ...entry,
-      views: entry.views ?? 0,
-    };
+    cleanProgress[id] = normalized;
   }
 
   let cleanSettings: Settings | undefined;

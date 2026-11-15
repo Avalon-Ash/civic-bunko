@@ -6,10 +6,16 @@ import { createWorld, type World } from './core/world';
 import { loadBankMeta, loadEnrichFiles, loadPapers } from './data/source';
 import { loadBank } from './systems/bankLoader';
 import { attachPersistence } from './systems/persistence';
+import { attachSync } from './systems/sync';
 import { App } from './ui/App';
 
 const world = createWorld();
 attachPersistence(world, window.localStorage);
+attachSync(world, {
+  fetch: window.fetch.bind(window),
+  storage: window.localStorage,
+  now: () => new Date(),
+});
 
 const { banks } = loadBankMeta();
 loadBank(world, banks, []);
