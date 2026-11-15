@@ -1,8 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { dispatch } from '../core/commands';
+import { ACCESSORIES, DAILY_GOAL_QUESTIONS, STAMPS_PER_REWARD } from '../core/constants/daily';
+import type { DayKey } from '../core/types';
 import type { World } from '../core/world';
 import { currentQuestion, getSettings, readView, roundSummary, type RoundSummaryView } from '../selectors';
 import { isInstallHintDismissed } from '../selectors/backup';
+import { stampTotals, todayProgress } from '../selectors/daily';
+import { toLocalDateString } from '../systems/date';
 import { InstallHintSheet } from './components/InstallHintSheet';
 import { UpdateBanner } from './components/UpdateBanner';
 import { TabBar, type TabId } from './kit/TabBar';
@@ -13,7 +17,7 @@ import { QuestionScreen } from './screens/QuestionScreen';
 import { ReadScreen } from './screens/ReadScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { StampsScreen } from './screens/StampsScreen';
-import { TodayScreen } from './screens/TodayScreen';
+import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
 import { useAppVersion } from './useAppVersion';
 import { useWorld } from './useWorld';
 
@@ -38,6 +42,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   const [installSheetOpen, setInstallSheetOpen] = useState<boolean>(
     () => !isStandaloneApp() && !isInstallHintDismissed(world),
   );
+  const [pendingCelebration, setPendingCelebration] = useState<StampCelebration | null>(null);
 
   const settings = getSettings(world);
   const questionView = currentQuestion(world);
@@ -48,6 +53,55 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   const wasInRoundRef = useRef(false);
   const entrySummaryRef = useRef<RoundSummaryView | null>(summary);
   const mainRef = useRef<HTMLElement | null>(null);
+  const prevTodayRef = useRef<{ day: DayKey; count: number }>({
+    day: toLocalDateString(new Date()),
+    count: todayProgress(world, new Date()).count,
+  });
+  const celebratedDaysRef = useRef(new Set<DayKey>());
+
+  // 偵測當天第一次達到每日目標（14 -> 15），僅觸發一次慶祝與配件解鎖提示
+  useEffect(() => {
+    const syncBaseline = () => {
+      const nowDate = new Date();
+      const todayKey = toLocalDateString(nowDate);
+      const count = todayProgress(world, nowDate).count;
+      prevTodayRef.current = { day: todayKey, count };
+    };
+    syncBaseline();
+
+    const unsubProgress = world.bus.on('progressChanged', syncBaseline);
+    const unsubDayLog = world.bus.on('dayLogChanged', (event) => {
+      const todayKey = toLocalDateString(new Date());
+      if (event.day !== todayKey) return;
+
+      const prevCount = prevTodayRef.current.day === todayKey ? prevTodayRef.current.count : 0;
+      prevTodayRef.current = { day: todayKey, count: event.count };
+
+      if (
+        prevCount < DAILY_GOAL_QUESTIONS &&
+        event.count >= DAILY_GOAL_QUESTIONS &&
+        !celebratedDaysRef.current.has(todayKey)
+      ) {
+        celebratedDaysRef.current.add(todayKey);
+        const { total } = stampTotals(world);
+        let unlockedName: string | null = null;
+        if (total > 0 && total % STAMPS_PER_REWARD === 0) {
+          const acc = ACCESSORIES[total / STAMPS_PER_REWARD - 1];
+          unlockedName = acc ? acc.name : null;
+        }
+        setPendingCelebration({ day: todayKey, unlockedName });
+      }
+    });
+
+    return () => {
+      unsubProgress();
+      unsubDayLog();
+    };
+  }, [world]);
+
+  const handleCelebrationDone = useCallback(() => {
+    setPendingCelebration(null);
+  }, []);
 
   useEffect(() => {
     if (!showInstallHint) {
@@ -121,6 +175,8 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
             loadError={loadError}
             showInstallHint={showInstallHint}
             onOpenInstallHint={() => setInstallSheetOpen(true)}
+            celebration={pendingCelebration}
+            onCelebrationDone={handleCelebrationDone}
             onStartQuiz={() => setTab('quiz')}
             onGoSetup={() => {
               setShowResult(false);

@@ -351,4 +351,92 @@ describe('persistence system', () => {
     const storedAfterDiscard = JSON.parse(storage.data[STORAGE_KEY]!) as Record<string, unknown>;
     assert.equal('round' in storedAfterDiscard, false);
   });
+
+  it('round-trips days and accessory, validates invalid values, and backfills legacy saves once', () => {
+    const storage = createMemoryStorage();
+    const world1 = createWorld();
+    attachPersistence(world1, storage);
+
+    for (let i = 1; i <= 3; i += 1) {
+      world1.dayLog.set(`2026-11-0${i}`, 15);
+    }
+    dispatch(world1, { type: 'setAccessory', accessory: 'bow' });
+
+    const exported = exportProgress(world1);
+    const parsedExport = JSON.parse(exported) as { days?: Record<string, number>; settings?: { accessory?: string } };
+    assert.deepEqual(parsedExport.days, {
+      '2026-11-01': 15,
+      '2026-11-02': 15,
+      '2026-11-03': 15,
+    });
+    assert.equal(parsedExport.settings?.accessory, 'bow');
+
+    const world2 = createWorld();
+    const res = importProgress(world2, exported);
+    assert.equal(res.ok, true);
+    assert.equal(world2.dayLog.get('2026-11-02'), 15);
+    assert.equal(world2.settings.accessory, 'bow');
+
+    // Invalid days and invalid accessory must be rejected
+    assert.equal(
+      importProgress(world2, JSON.stringify({ version: 1, progress: {}, days: { '2026-13-01': 5 } })).ok,
+      false,
+    );
+    assert.equal(
+      importProgress(world2, JSON.stringify({ version: 1, progress: {}, days: { '2026-11-01': -1 } })).ok,
+      false,
+    );
+    assert.equal(
+      importProgress(
+        world2,
+        JSON.stringify({ version: 1, progress: {}, settings: { theme: 'light', lastRound: null, accessory: 'cape' } }),
+      ).ok,
+      false,
+    );
+
+    // Legacy save without `days`: backfills once on startup and writes back `days`
+    const legacyStorage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        version: 1,
+        progress: {
+          'q-a1': {
+            seen: 1,
+            correct: 1,
+            views: 0,
+            streak: 1,
+            lastPick: 'A',
+            lastAt: '2026-11-10T12:00:00',
+            due: null,
+          },
+          'q-a2': {
+            seen: 1,
+            correct: 0,
+            views: 0,
+            streak: 0,
+            lastPick: 'B',
+            lastAt: '2026-11-10T14:00:00',
+            due: '2026-11-11',
+          },
+        },
+        settings: { theme: 'light', lastRound: null },
+      }),
+    });
+
+    const legacyWorld1 = createWorld();
+    attachPersistence(legacyWorld1, legacyStorage);
+    assert.equal(legacyWorld1.dayLog.get('2026-11-10'), 2);
+
+    // Storage now persists `days`, so reloading into a new world keeps 2 without re-backfilling
+    const persistedAfterLoad = JSON.parse(legacyStorage.data[STORAGE_KEY]!) as { days?: Record<string, number> };
+    assert.deepEqual(persistedAfterLoad.days, { '2026-11-10': 2 });
+
+    const legacyWorld2 = createWorld();
+    attachPersistence(legacyWorld2, legacyStorage);
+    assert.equal(legacyWorld2.dayLog.get('2026-11-10'), 2);
+
+    // resetProgress clears both progress and dayLog
+    dispatch(legacyWorld2, { type: 'resetProgress' });
+    assert.equal(legacyWorld2.progress.size, 0);
+    assert.equal(legacyWorld2.dayLog.size, 0);
+  });
 });

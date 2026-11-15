@@ -1,9 +1,11 @@
+import { ACCESSORIES } from '../core/constants/daily';
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
-import { subscribe } from '../core/store';
+import { bumpStore, subscribe } from '../core/store';
 import type {
   AskFilter,
   Choice,
+  DayKey,
   Progress,
   QuestionId,
   RoundConfig,
@@ -13,6 +15,7 @@ import type {
   StudyMode,
 } from '../core/types';
 import type { World } from '../core/world';
+import { backfillDayLogFromProgress, clearBackfillMark, parseDaysRecord } from './daily';
 import { validateSavedRound } from './round';
 
 export interface StorageLike {
@@ -29,7 +32,10 @@ interface PersistedPayload {
   progress: Record<QuestionId, Progress>;
   settings?: Settings;
   round?: RoundState;
+  days?: Record<DayKey, number>;
 }
+
+const ACCESSORY_ID_SET = new Set<string>(ACCESSORIES.map((a) => a.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -122,6 +128,13 @@ function isValidSettings(value: unknown): value is RawSettings {
   if (value.theme !== 'system' && value.theme !== 'light' && value.theme !== 'dark') return false;
   if (value.lastRound !== null && !isValidRoundConfig(value.lastRound)) return false;
   if (value.installHintDismissed !== undefined && typeof value.installHintDismissed !== 'boolean') {
+    return false;
+  }
+  if (
+    value.accessory !== undefined &&
+    value.accessory !== null &&
+    (typeof value.accessory !== 'string' || !ACCESSORY_ID_SET.has(value.accessory))
+  ) {
     return false;
   }
   return true;
@@ -221,7 +234,17 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       theme: parsed.settings.theme,
       lastRound: parsed.settings.lastRound ? normalizeRoundConfig(parsed.settings.lastRound) : null,
       installHintDismissed: parsed.settings.installHintDismissed === true,
+      ...(parsed.settings.accessory !== undefined ? { accessory: parsed.settings.accessory } : {}),
     };
+  }
+
+  let cleanDays: Record<DayKey, number> | undefined;
+  if (parsed.days !== undefined) {
+    const daysMap = parseDaysRecord(parsed.days);
+    if (!daysMap) {
+      return { ok: false, error: 'Invalid days object' };
+    }
+    cleanDays = Object.fromEntries(daysMap);
   }
 
   const cleanRound = parsed.round !== undefined ? parseRoundState(parsed.round) : undefined;
@@ -233,6 +256,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       progress: cleanProgress,
       ...(cleanSettings ? { settings: cleanSettings } : {}),
       ...(cleanRound ? { round: cleanRound } : {}),
+      ...(cleanDays ? { days: cleanDays } : {}),
     },
   };
 }
@@ -250,14 +274,16 @@ function serializeWorld(world: World, includeRound: boolean): string {
     version: 1,
     progress: Object.fromEntries(world.progress),
     settings: world.settings,
+    days: Object.fromEntries(world.dayLog),
     ...(roundToSave ? { round: roundToSave } : {}),
   };
   return JSON.stringify(payload);
 }
 
-/** 啟動時從 storage 讀回 progress、settings 與待續接回合（壞資料不丟例外），並訂閱異動自動寫回。 */
+/** 啟動時從 storage 讀回 progress、days、settings 與待續接回合（壞資料不丟例外），並訂閱異動自動寫回。 */
 export function attachPersistence(world: World, storage: StorageLike): () => void {
   let discardedOnLoad = false;
+  let backfilledOnLoad = false;
 
   try {
     const raw = storage.getItem(STORAGE_KEY);
@@ -268,6 +294,14 @@ export function attachPersistence(world: World, storage: StorageLike): () => voi
         world.progress.clear();
         for (const [id, entry] of Object.entries(parsed.data.progress)) {
           world.progress.set(id, entry);
+        }
+        world.dayLog.clear();
+        if (parsed.data.days) {
+          for (const [day, count] of Object.entries(parsed.data.days)) {
+            world.dayLog.set(day, count);
+          }
+        } else if (world.progress.size > 0) {
+          backfilledOnLoad = backfillDayLogFromProgress(world);
         }
         if (parsed.data.settings) {
           world.settings = parsed.data.settings;
@@ -281,6 +315,9 @@ export function attachPersistence(world: World, storage: StorageLike): () => voi
         }
         if (parsed.data.settings) {
           world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+        }
+        if (parsed.data.days || backfilledOnLoad) {
+          bumpStore(world);
         }
       }
     }
@@ -300,7 +337,7 @@ export function attachPersistence(world: World, storage: StorageLike): () => voi
     }
   };
 
-  if (discardedOnLoad) {
+  if (discardedOnLoad || backfilledOnLoad) {
     writeBack();
   }
 
@@ -335,6 +372,16 @@ export function importProgress(world: World, json: string): ImportResult {
     world.progress.set(id, entry);
   }
 
+  world.dayLog.clear();
+  clearBackfillMark(world);
+  if (parsed.data.days) {
+    for (const [day, count] of Object.entries(parsed.data.days)) {
+      world.dayLog.set(day, count);
+    }
+  } else if (world.progress.size > 0) {
+    backfillDayLogFromProgress(world);
+  }
+
   if (parsed.data.settings) {
     world.settings = parsed.data.settings;
   }
@@ -347,9 +394,14 @@ export function importProgress(world: World, json: string): ImportResult {
   return { ok: true };
 }
 
-/** 清除所有作答進度並發出 progressChanged。 */
+/** 清除所有作答進度與每日紀錄並發出 progressChanged。 */
 export function resetProgress(world: World): void {
   const ids = [...world.progress.keys()];
+  const hadDayLog = world.dayLog.size > 0;
   world.progress.clear();
+  world.dayLog.clear();
   world.bus.emit({ type: 'progressChanged', ids });
+  if (ids.length === 0 && hadDayLog) {
+    bumpStore(world);
+  }
 }

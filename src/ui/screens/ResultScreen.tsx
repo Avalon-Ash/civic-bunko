@@ -2,6 +2,7 @@ import { dispatch } from '../../core/commands';
 import { getResultTier } from '../../core/constants/result';
 import type { World } from '../../core/world';
 import { roundSummary } from '../../selectors';
+import { currentAccessory } from '../../selectors/daily';
 import { Button } from '../kit/Button';
 import { Cat } from '../kit/Cat';
 import { CountUp } from '../kit/CountUp';
@@ -17,6 +18,7 @@ export interface ResultScreenProps {
 export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
   useWorld(world);
   const summary = roundSummary(world);
+  const accessory = currentAccessory(world);
 
   if (!summary) {
     return null;
@@ -36,7 +38,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
           <p className="cb-sub cb-result-note">先把這批記熟，再換自己作答試試看。</p>
         </div>
         <div className="cb-row cb-center">
-          <Cat size={96} mood="yay" interactive />
+          <Cat size={96} mood="yay" accessory={accessory} interactive />
         </div>
         <div className="cb-spacer" />
         <div className="cb-stack-sm">
@@ -82,7 +84,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
         </p>
       </div>
       <div className="cb-row cb-center">
-        <Cat size={96} mood={tier.catMood} interactive />
+        <Cat size={96} mood={tier.catMood} accessory={accessory} interactive />
       </div>
       <div className="cb-spacer" />
       <div className="cb-stack-sm">

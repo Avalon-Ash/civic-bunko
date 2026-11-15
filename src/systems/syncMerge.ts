@@ -1,4 +1,4 @@
-import type { Progress, QuestionId } from '../core/types';
+import type { DayKey, Progress, QuestionId } from '../core/types';
 
 function compareTimestamp(a: string, b: string): number {
   const msA = Date.parse(a);
@@ -72,5 +72,23 @@ export function mergeProgress(
     }
   }
 
+  return result;
+}
+
+/**
+ * 合併兩份每日作答紀錄：每個日期取兩邊較大值，確保單調不減且符合交換律。
+ */
+export function mergeDays(
+  local: ReadonlyMap<DayKey, number>,
+  remote: ReadonlyMap<DayKey, number>,
+): Map<DayKey, number> {
+  const result = new Map<DayKey, number>();
+  for (const [day, count] of local) {
+    result.set(day, count);
+  }
+  for (const [day, count] of remote) {
+    const existing = result.get(day);
+    result.set(day, existing === undefined ? count : Math.max(existing, count));
+  }
   return result;
 }

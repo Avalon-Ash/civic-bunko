@@ -1,3 +1,4 @@
+import { attachDaily } from '../systems/daily';
 import { attachRound } from '../systems/round';
 import { attachScheduling } from '../systems/scheduling';
 import { attachSettings } from '../systems/settings';
@@ -5,6 +6,7 @@ import { createBus, type Bus } from './bus';
 import { initStore } from './store';
 import type {
   Bank,
+  DayKey,
   Enrich,
   OfficialQuestion,
   Paper,
@@ -24,6 +26,7 @@ export interface World {
   groups: Map<string, PassageGroup>;
   enrich: Map<QuestionId, Enrich>;
   progress: Map<QuestionId, Progress>;
+  dayLog: Map<DayKey, number>;
   round: RoundState | null;
   savedRound: RoundState | null;
   lastRound: RoundState | null;
@@ -41,6 +44,7 @@ export function createWorld(): World {
     groups: new Map(),
     enrich: new Map(),
     progress: new Map(),
+    dayLog: new Map(),
     round: null,
     savedRound: null,
     lastRound: null,
@@ -57,6 +61,7 @@ export function createWorld(): World {
   };
 
   attachScheduling(world);
+  attachDaily(world);
   attachSettings(world);
   attachRound(world);
   initStore(world);

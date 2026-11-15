@@ -5,6 +5,7 @@ import type { World } from '../../core/world';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { questionPaper, readView } from '../../selectors';
+import { currentAccessory } from '../../selectors/daily';
 import {
   CHOICES,
   CorrectionBox,
@@ -78,6 +79,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
 
   const { question, group, enrich, askType, pass, totalPasses, index, total, views } = view;
   const paper = questionPaper(world, question.paperId);
+  const accessory = currentAccessory(world);
   const sourceLabel = formatQuestionSource(paper, question.no);
   const firstTopic = enrich?.topic[0];
   const topicLabel = firstTopic
@@ -305,6 +307,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
             enrich={enrich}
             tone="butter"
             catMood="idle"
+            catAccessory={accessory}
             label={<span className="cb-read-kou-label">口訣記憶</span>}
           />
         )}

@@ -18,9 +18,9 @@ import {
   roundSummary,
   savedRoundInfo,
   subjectStats,
-  weekActivity,
   wrongCount,
 } from './index';
+import { weekStamps } from './daily';
 import {
   createTestWorld,
   makeConfig,
@@ -185,7 +185,7 @@ describe('selectors', () => {
     assert.equal(questionPaper(world, 'missing-paper'), null);
   });
 
-  it('builds dailyMissions and weekActivity from world state', () => {
+  it('builds dailyMissions and weekStamps from world state', () => {
     const world = createTestWorld();
     const now = new Date('2026-11-18T12:00:00'); // Wednesday
 
@@ -204,18 +204,20 @@ describe('selectors', () => {
       lastAt: '2026-11-18T09:00:00',
       due: '2026-11-18',
     });
+    world.dayLog.set('2026-11-18', 15);
 
     const missionsWithDue = dailyMissions(world, testBank.id, now);
     assert.equal(missionsWithDue[2]?.config.mode, 'due');
     assert.equal(missionsWithDue[2]?.available, 1);
     assert.ok(missionsWithDue.every((m) => m.config.study === 'quiz' && m.config.ask === 'positive'));
 
-    const week = weekActivity(world, now);
+    const week = weekStamps(world, now);
     assert.equal(week.length, 7);
     assert.equal(week[0]?.label, '一');
     assert.equal(week[2]?.isToday, true);
-    assert.equal(week[2]?.done, true);
-    assert.equal(week[3]?.done, false);
+    assert.equal(week[2]?.stamped, true);
+    assert.equal(week[2]?.count, 15);
+    assert.equal(week[3]?.stamped, false);
   });
 
   it('computes askCounts, positiveCoverage, and readView', () => {

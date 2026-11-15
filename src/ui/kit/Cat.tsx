@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { AccessoryId } from '../../core/types';
 
 export type CatMood = 'idle' | 'yay' | 'oops' | 'sleepy';
 
@@ -21,15 +22,181 @@ export interface CatProps {
   mood?: CatMood;
   interactive?: boolean;
   spin?: boolean;
+  accessory?: AccessoryId | null;
   className?: string;
 }
 
-/** 原創角色：八字臉的圓貓。支援四種表情、待機眨眼、點擊壓扁回彈與隨機鼓勵氣泡。 */
+const ACCESSORY_VIEWBOX: Record<AccessoryId, string> = {
+  bow: '35 12 24 20',
+  'straw-hat': '8 1 48 26',
+  scarf: '14 48 36 18',
+  flower: '5 12 20 20',
+  glasses: '8 28 48 24',
+  crown: '15 1 34 22',
+};
+
+function CatAccessoryLayer({ accessory }: { accessory: AccessoryId }) {
+  switch (accessory) {
+    case 'bow':
+      return (
+        <g transform="translate(47 22) rotate(18)">
+          <path
+            d="M-1 0 L-8 -4.5 L-8 4.5 Z"
+            fill="var(--pink-deep)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.2"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M1 0 L8 -4.5 L8 4.5 Z"
+            fill="var(--pink-deep)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.2"
+            strokeLinejoin="round"
+          />
+          <circle
+            cx="0"
+            cy="0"
+            r="2.6"
+            fill="var(--butter)"
+            stroke="var(--cat-line)"
+            strokeWidth="2"
+          />
+        </g>
+      );
+    case 'straw-hat':
+      return (
+        <g>
+          <ellipse
+            cx="32"
+            cy="18"
+            rx="22"
+            ry="4.5"
+            fill="var(--butter)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.4"
+          />
+          <path
+            d="M21 17 L23 7 Q32 4 41 7 L43 17 Z"
+            fill="var(--butter)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.4"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M21.8 14.8 Q32 16.8 42.2 14.8"
+            fill="none"
+            stroke="var(--pink-deep)"
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        </g>
+      );
+    case 'scarf':
+      return (
+        <g>
+          <path
+            d="M36 57.5 L42 57.5 L43 62.5 L35.5 62.5 Z"
+            fill="var(--mint)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.2"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M18 54 Q32 59.5 46 54 L44.5 59.5 Q32 62.5 19.5 59.5 Z"
+            fill="var(--mint)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.2"
+            strokeLinejoin="round"
+          />
+        </g>
+      );
+    case 'flower':
+      return (
+        <g transform="translate(15 22)">
+          <circle cx="0" cy="-4.5" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
+          <circle cx="4.3" cy="-1.4" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
+          <circle cx="2.6" cy="3.6" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
+          <circle cx="-2.6" cy="3.6" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
+          <circle cx="-4.3" cy="-1.4" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
+          <circle cx="0" cy="0" r="2.8" fill="var(--butter)" stroke="var(--cat-line)" strokeWidth="1.8" />
+        </g>
+      );
+    case 'glasses':
+      return (
+        <g>
+          <circle
+            cx="22.5"
+            cy="40"
+            r="6.8"
+            fill="var(--blue)"
+            fillOpacity="0.18"
+            stroke="var(--cat-line)"
+            strokeWidth="2.3"
+          />
+          <circle
+            cx="41.5"
+            cy="40"
+            r="6.8"
+            fill="var(--blue)"
+            fillOpacity="0.18"
+            stroke="var(--cat-line)"
+            strokeWidth="2.3"
+          />
+          <path
+            d="M29.3 40 Q32 38 34.7 40"
+            fill="none"
+            stroke="var(--cat-line)"
+            strokeWidth="2.3"
+            strokeLinecap="round"
+          />
+          <path
+            d="M15.7 39.5 L10 38 M48.3 39.5 L54 38"
+            fill="none"
+            stroke="var(--cat-line)"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+          />
+        </g>
+      );
+    case 'crown':
+      return (
+        <g>
+          <path
+            d="M21 19 L19 7 L27 13 L32 4 L37 13 L45 7 L43 19 Z"
+            fill="var(--butter)"
+            stroke="var(--cat-line)"
+            strokeWidth="2.4"
+            strokeLinejoin="round"
+          />
+          <circle cx="32" cy="14" r="2" fill="var(--pink-deep)" />
+        </g>
+      );
+  }
+}
+
+/** 單獨顯示指定小貓配件的 SVG 圖示，共用 Cat 的幾何造型。 */
+export function AccessoryIcon({ id, size = 36 }: { id: AccessoryId; size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={ACCESSORY_VIEWBOX[id]}
+      aria-hidden="true"
+      className="cb-acc-svg"
+    >
+      <CatAccessoryLayer accessory={id} />
+    </svg>
+  );
+}
+
+/** 原創角色：八字臉的圓貓。支援四種表情、待機眨眼、點擊壓扁回彈、配件疊加與隨機鼓勵氣泡。 */
 export function Cat({
   size = 64,
   mood = 'idle',
   interactive = true,
   spin = false,
+  accessory = null,
   className = '',
 }: CatProps) {
   const [squishing, setSquishing] = useState(false);
@@ -161,6 +328,7 @@ export function Cat({
           strokeLinejoin="round"
         />
       )}
+      {accessory && <CatAccessoryLayer accessory={accessory} />}
     </svg>
   );
 

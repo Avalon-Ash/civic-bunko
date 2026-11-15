@@ -9,7 +9,7 @@ import {
   retryWrong,
   startRound,
 } from '../systems/round';
-import { dismissInstallHint, setTheme } from '../systems/settings';
+import { dismissInstallHint, setAccessory, setTheme } from '../systems/settings';
 import { disableSync, setSyncCode, syncNow } from '../systems/sync';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
@@ -69,6 +69,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'setTheme':
       setTheme(world, cmd.theme);
+      break;
+    case 'setAccessory':
+      setAccessory(world, cmd.accessory);
       break;
     case 'dismissInstallHint':
       dismissInstallHint(world);
