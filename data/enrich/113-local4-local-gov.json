@@ -1,0 +1,656 @@
+{
+  "paperId": "113-local4-local-gov",
+  "model": "gemini-4-hydrogen-high",
+  "generatedAt": "2026-11-16T01:20:00+08:00",
+  "items": [
+    {
+      "id": "113-local4-local-gov-q01",
+      "topic": ["local-gov/entities"],
+      "mnemonic": "直轄市、縣市、鄉鎮市加山地原住民區，村里只是編組不算！",
+      "trap": "看到「區」別全當派駐單位，山地原住民區例外算自治團體。",
+      "plain": "你想寄信給「有自己議會和預算」的地方自治團體，哪一個其實不算？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "非屬", "color": "red" },
+        { "text": "地方自治團體", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "宜蘭市是縣轄市，屬於鄉（鎮、市）層級的地方自治團體。", "lawRef": { "law": "地方制度法", "article": "14" } },
+        "B": { "why": "「村」是鄉底下的行政編組，沒有公法人地位，非自治團體。", "lawRef": { "law": "地方制度法", "article": "3" } },
+        "C": { "why": "連江縣是縣，屬於地方制度法明定的地方自治團體。", "lawRef": { "law": "地方制度法", "article": "14" } },
+        "D": { "why": "茂林區由山地鄉改制為直轄市山地原住民區，仍是自治團體。", "lawRef": { "law": "地方制度法", "article": "83-2" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "是自治團體", "points": ["直轄市、縣（市）", "鄉（鎮、縣轄市）", "直轄市山地原住民區"] },
+        "right": { "title": "非自治團體", "points": ["省（虛級化派出機關）", "一般市轄區", "村、里、鄰（基層編組）"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q02",
+      "topic": ["local-gov/entities", "local-gov/supervision"],
+      "mnemonic": "縣市要改名：縣府提、議會過，內政部轉行政院點頭！",
+      "trap": "縣市改名要送到最頂的行政院「核定」，內政部只是轉報。",
+      "plain": "桃園以前叫桃園縣，如果某個縣想改新名字，最後要誰拍板才算數？",
+      "marks": [
+        { "text": "某縣", "color": "blue" },
+        { "text": "變更名稱", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "改名效力重大，須事前「核定」而非事後「備查」，且機關是行政院。", "lawRef": { "law": "地方制度法", "article": "6" } },
+        "B": { "why": "內政部沒有核定權，只負責把案子轉報給行政院核定。", "lawRef": { "law": "地方制度法", "article": "6" } },
+        "C": { "why": "縣府提請議會通過後，由內政部轉報行政院核定，程序完全正確。", "lawRef": { "law": "地方制度法", "article": "6" } },
+        "D": { "why": "這只是「直轄市、市之區、里」改名的簡便程序，縣市不能直接辦。", "lawRef": { "law": "地方制度法", "article": "6" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "縣政府提案", "tone": "plain" }, { "text": "縣議會通過", "tone": "plain" }, { "text": "內政部轉報", "tone": "hot" }, { "text": "行政院核定", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q03",
+      "topic": ["local-gov/entities", "local-gov/concepts"],
+      "mnemonic": "精省之後省變小，省政府只是行政院派出去的督導！",
+      "trap": "別把行政院底下的部會署，跟地制法講的「派出機關」搞混。",
+      "plain": "台灣還有臺灣省跟福建省，現在的「省政府」在法律上是什麼角色？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "行政院派出機關", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "直轄市政府是地方自治團體的行政機關，不是行政院派出機關。", "lawRef": { "law": "地方制度法", "article": "5" } },
+        "B": { "why": "地方制度法明定「省政府為行政院派出機關，省為非地方自治團體」。", "lawRef": { "law": "地方制度法", "article": "2" } },
+        "C": { "why": "農田水利署是農業部所屬三級行政機關，並非地方制度法的派出機關。", "lawRef": null },
+        "D": { "why": "金管會是行政院所屬二級獨立機關，不是地方制度法的派出機關。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "省政府", "points": ["非地方自治團體", "行政院派出機關", "受行政院指揮監督"] },
+        "right": { "title": "直轄市政府", "points": ["屬地方自治團體", "有獨立公法人地位", "市長由市民直選"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q04",
+      "topic": ["local-gov/executive", "local-gov/election"],
+      "mnemonic": "市長議員里長大家選，一般「區長」是市長派的官！",
+      "trap": "只有直轄市「山地原住民區」長才民選，一般市轄區長是官派！",
+      "plain": "住在「新竹市香山區香山里」的你，去投票所時，哪一個名字不會出現在選票上？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "不是", "color": "red" },
+        { "text": "選舉、罷免", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "新竹市屬於「市」，市長由市民依法直接選舉、罷免。", "lawRef": { "law": "地方制度法", "article": "56" } },
+        "B": { "why": "市議員由市民依法選舉、罷免，可投票決定。", "lawRef": { "law": "地方制度法", "article": "33" } },
+        "C": { "why": "香山區為一般市轄區，區長由新竹市長依法任用，不經民選或罷免。", "lawRef": { "law": "地方制度法", "article": "58" } },
+        "D": { "why": "里長屬於村（里）層級公職，由里民依法選舉、罷免。", "lawRef": { "law": "地方制度法", "article": "59" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "一般市轄區長", "points": ["直轄市、省轄市區長", "由市長依法任用（官派）", "無選舉罷免問題"] },
+        "right": { "title": "山地原住民區長", "points": ["直轄市山地鄉改制區", "由區民依法直選產生", "限定山地原住民參選"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q05",
+      "topic": ["local-gov/entities"],
+      "mnemonic": "地方居民權：選罷創複、用設施、享福利、查資訊，不含國賠！",
+      "trap": "國賠是全國性的權利，寫在憲法和國賠法，沒列在地制法裡。",
+      "plain": "搬進某個縣市成為地方居民，地方制度法特別寫了哪些權利給你？哪項不是寫在這裡？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "地方居民權利", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "請求國家賠償規定在憲法與國家賠償法，非地方制度法列舉的居民權利。", "lawRef": { "law": "國家賠償法", "article": "2" } },
+        "B": { "why": "這句正確：地制法第16條第5款明定居民有依法請求公開政府資訊之權。", "lawRef": { "law": "地方制度法", "article": "16" } },
+        "C": { "why": "這句正確：地制法第16條第3款明定居民對地方公共設施有使用之權。", "lawRef": { "law": "地方制度法", "article": "16" } },
+        "D": { "why": "這句正確：地制法第16條第2款明定居民對自治事項有創制、複決權。", "lawRef": { "law": "地方制度法", "article": "16" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "參政：選罷創複", "tone": "plain" }, { "text": "生活：設施與社福", "tone": "plain" }, { "text": "監督：資訊公開", "tone": "plain" }, { "text": "國賠不在此條", "tone": "hot" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q06",
+      "topic": ["local-gov/legislation"],
+      "mnemonic": "市政府所屬機關和學校組織，市長自己訂「規程」就好！",
+      "trap": "「所營事業」和「所屬機關學校」不一樣！前者才要自治條例。",
+      "plain": "以下四件事，哪一件不用送到市議會表決（自治條例），市政府自己訂規則就能處理？",
+      "marks": [
+        { "text": "無須", "color": "red" },
+        { "text": "自治條例", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "直轄市政府所屬機關及學校的組織規程，由直轄市政府定之，屬自治規則。", "lawRef": { "law": "地方制度法", "article": "62" } },
+        "B": { "why": "這須以自治條例定之：地方自治團體「所營事業機構」組織屬自治條例事項。", "lawRef": { "law": "地方制度法", "article": "28" } },
+        "C": { "why": "這須以自治條例定之：開徵特別稅課涉及限制居民財產義務。", "lawRef": { "law": "地方制度法", "article": "28" } },
+        "D": { "why": "這須以自治條例定之：規定罰鍰處罰限制居民權利義務。", "lawRef": { "law": "地方制度法", "article": "26" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "須用自治條例", "points": ["所營事業機構組織", "課稅、處罰鍰", "創設或限制居民權義"] },
+        "right": { "title": "市府訂規程即可", "points": ["所屬機關組織規程", "市立學校組織規程", "屬自治規則免議會通過"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q07",
+      "topic": ["local-gov/legislation"],
+      "mnemonic": "委辦是幫上級做事，規則一定要「先核定、再發布」！",
+      "trap": "看清順序！「核定後發布」跟「發布後備查」千萬別寫反。",
+      "plain": null,
+      "marks": [
+        { "text": "委辦規則", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "這句正確：山地原住民區準用鄉鎮市規定，可為直轄市委辦事項訂委辦規則。", "lawRef": { "law": "地方制度法", "article": "83-2" } },
+        "B": { "why": "這句正確：直轄市政府得依中央法規授權或法定職權訂定委辦規則。", "lawRef": { "law": "地方制度法", "article": "29" } },
+        "C": { "why": "這句正確：委辦規則名稱準用自治規則的七種名稱（規程、辦法等）。", "lawRef": { "law": "地方制度法", "article": "27" } },
+        "D": { "why": "錯在順序：委辦規則應「先報委辦機關核定，再發布」，不是發布後才報核。", "lawRef": { "law": "地方制度法", "article": "29" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "委辦規則", "points": ["幫上級辦委辦事項", "先報核定 → 再發布", "名稱準用自治規則"] },
+        "right": { "title": "一般自治規則", "points": ["辦自己的自治事項", "先發布 → 再報備查", "並函送地方議會查照"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q08",
+      "topic": ["local-gov/concepts", "local-gov/entities"],
+      "mnemonic": "地方有自主組織權，但設機關還是要議會訂組織自治條例！",
+      "trap": "自主組織權不是行政首長說了算，仍受憲法法律與議會拘束。",
+      "plain": null,
+      "marks": [
+        { "text": "司法院大法官解釋", "color": "blue" },
+        { "text": "地方自治團體", "color": "blue" },
+        { "text": "自主組織權", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯：釋字467號指須依憲法或法律享有制定規章執行權且具自主組織權才是。", "lawRef": null },
+        "B": { "why": "正確：依釋字527號，地方享有自主組織權，仍須依中央準則訂組織自治條例。", "lawRef": null },
+        "C": { "why": "錯：依釋字527號，不得無組織自治條例依據就逕行進用人員。", "lawRef": null },
+        "D": { "why": "錯：組織設與員額編制須由地方立法機關以自治條例決定，非行政機關獨斷。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "憲法法律前提", "tone": "plain" }, { "text": "中央擬訂準則", "tone": "plain" }, { "text": "地方議會立法", "tone": "hot" }, { "text": "組織自治條例", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q09",
+      "topic": ["local-gov/executive", "local-gov/supervision"],
+      "mnemonic": "重病超過一年直接「解職」，不是暫時「停職」而已！",
+      "trap": "「停職」多半是涉刑案或羈押；重病1年是直接「解除職務」。",
+      "plain": "縣長或里長如果出了狀況不能上班，哪一種情況是直接換人（解職），而不是暫時停職？",
+      "marks": [
+        { "text": "並非", "color": "red" },
+        { "text": "停止職務", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這是停職事由：涉貪污罪（圖利除外）一審判徒刑以上即應停職。", "lawRef": { "law": "地方制度法", "article": "78" } },
+        "B": { "why": "這是停職事由：最輕本刑5年以上之罪經一審判有罪即應停職。", "lawRef": { "law": "地方制度法", "article": "78" } },
+        "C": { "why": "非停職而是「解除職務」：罹患重病不能執行職務繼續1年以上者直接解職。", "lawRef": { "law": "地方制度法", "article": "80" } },
+        "D": { "why": "這是停職事由：依刑事訴訟程序被羈押或通緝者應予停職。", "lawRef": { "law": "地方制度法", "article": "78" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "停止職務", "points": ["涉貪污等一審判刑", "最輕5年以上一審有罪", "被羈押或通緝（待確定）"] },
+        "right": { "title": "解除職務", "points": ["重病不能執職滿1年", "無故不執職連續6個月", "判刑確定等直接去職"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q10",
+      "topic": ["local-gov/entities", "local-gov/supervision"],
+      "mnemonic": "山地原住民區比照「鄉鎮市」，解職找直轄市政府、不是原民會！",
+      "trap": "看到「原住民」別選原民會！它比照縣與鄉，直轄市管。",
+      "plain": null,
+      "marks": [
+        { "text": "直轄市山地原住民區", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "這句正確：山地原住民區為地方自治團體，自治準用鄉（鎮、市）規定。", "lawRef": { "law": "地方制度法", "article": "83-2" } },
+        "B": { "why": "依地方制度法準用規定，區長以山地原住民為限，選舉人須住滿4個月以上。", "lawRef": null },
+        "C": { "why": "錯在機關：準用縣與鄉關係，區長遷籍滿4個月應由「直轄市政府」解職。", "lawRef": { "law": "地方制度法", "article": "79" } },
+        "D": { "why": "這句正確：區長出缺所遺任期逾2年者，準用規定應於3個月內完成補選。", "lawRef": { "law": "地方制度法", "article": "82" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "山地原住民區", "tone": "plain" }, { "text": "準用縣與鄉關係", "tone": "hot" }, { "text": "直轄市政府監督解職", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q11",
+      "topic": ["local-gov/executive"],
+      "mnemonic": "「新增業務」要擴編或新設機關，怎會是裁撤理由！",
+      "trap": "看清題目問「調整或裁撤」，新增業務是擴張而不是縮編。",
+      "plain": "地方政府什麼時候會把一個局處縮編或關掉（裁撤）？哪一個反而代表要擴充？",
+      "marks": [
+        { "text": "地方行政機關組織準則", "color": "blue" },
+        { "text": "非屬", "color": "red" },
+        { "text": "調整或裁撤", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "新增業務或功能通常需要「設立」或擴充機關，非調整或裁撤的理由。", "lawRef": null },
+        "B": { "why": "這是調整或裁撤理由：管轄區域調整時，機關須配合整併或調整。", "lawRef": null },
+        "C": { "why": "這是調整或裁撤理由：業務已移撥給其他機關，原機關便無存續必要。", "lawRef": null },
+        "D": { "why": "這是調整或裁撤理由：經專案評估績效不佳者，應檢討調整或裁撤。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "調整或裁撤理由", "points": ["管轄區域調整", "業務移撥他機關", "專案評估績效不佳"] },
+        "right": { "title": "設立或擴充原因", "points": ["新增業務項目或功能", "須另設專責機關處理"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q12",
+      "topic": ["local-gov/council"],
+      "mnemonic": "防跑票買票！議長選舉一律「記名投票」亮票負責。",
+      "trap": "105年修法後直轄市與縣市議長選舉都已改為「記名投票」。",
+      "plain": "直轄市議會跟縣市議會選議長時，議員投下去的選票會不會寫出是誰投的？",
+      "marks": [
+        { "text": "地方議會", "color": "blue" },
+        { "text": "議長", "color": "blue" },
+        { "text": "選舉方式", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯：直轄市議會議長同樣是「記名投票」，並非無記名。", "lawRef": { "law": "地方制度法", "article": "44" } },
+        "B": { "why": "錯：縣（市）議會議長同樣是「記名投票」，並非無記名。", "lawRef": { "law": "地方制度法", "article": "44" } },
+        "C": { "why": "錯：為落實責任政治，地制法第44條已規定一律改為「記名」投票。", "lawRef": { "law": "地方制度法", "article": "44" } },
+        "D": { "why": "正確：直轄市、縣（市）議會議長及代表會主席，均以記名投票互選罷免。", "lawRef": { "law": "地方制度法", "article": "44" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "一般公職選舉", "points": ["民眾選市長、議員", "採「無記名」投票", "保障秘密投票權"] },
+        "right": { "title": "議長／主席互選", "points": ["議員互選正副議長", "採「記名」投票", "對選民公開負責"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q13",
+      "topic": ["local-gov/council"],
+      "mnemonic": "官員不是議會成員，去備詢只能「列席」，不是「出席」！",
+      "trap": "經典一字陷阱！只有議員能「出席」，業務主管是「列席」備詢。",
+      "plain": null,
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "地方行政", "color": "blue" },
+        { "text": "地方立法機關", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "這句正確：定期會開會時，地方行政首長應提出施政報告。", "lawRef": { "law": "地方制度法", "article": "48" } },
+        "B": { "why": "這句正確：定期會開會時，一級單位主管及所屬機關首長應提業務報告。", "lawRef": { "law": "地方制度法", "article": "48" } },
+        "C": { "why": "這句正確：定期會開會時，議員有權向首長或單位主管進行質詢。", "lawRef": { "law": "地方制度法", "article": "48" } },
+        "D": { "why": "錯在「出席」：地制法第48條第2項規定相關業務主管應「列席」備詢。", "lawRef": { "law": "地方制度法", "article": "48" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "出席（議員）", "points": ["議會正式成員", "算入開會法定人數", "有發言與表決權"] },
+        "right": { "title": "列席（業務主管）", "points": ["行政官員受邀或備詢", "不算入法定人數", "無議案表決權"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q14",
+      "topic": ["local-gov/council"],
+      "mnemonic": "地方府會吵架不能倒閣解散！覆議沒過原則就得乖乖接受。",
+      "trap": "別拿中央「行政院vs立法院」套地方，市長不能解散議會！",
+      "plain": "市長覺得議會通過的案子做不到，退回去「覆議」卻還是被議員維持原案，市長能解散議會重選嗎？",
+      "marks": [
+        { "text": "地方政府", "color": "blue" },
+        { "text": "覆議權", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "這句正確：覆議是地方行政機關認為議決窒礙難行時的府會協商機制。", "lawRef": { "law": "地方制度法", "article": "39" } },
+        "B": { "why": "這句正確：覆議須由地方行政機關於30日內移請地方立法機關決定。", "lawRef": { "law": "地方制度法", "article": "39" } },
+        "C": { "why": "錯：我國地方行政機關沒有「解散議會」的權力，覆議維持原案原則應接受。", "lawRef": { "law": "地方制度法", "article": "39" } },
+        "D": { "why": "這句正確：地制法第39條規定須有出席議員、代表三分之二維持原決議。", "lawRef": { "law": "地方制度法", "article": "39" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "政府認窒礙難行", "tone": "plain" }, { "text": "30日內提覆議", "tone": "plain" }, { "text": "2/3維持原案", "tone": "hot" }, { "text": "應接受（無解散權）", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q15",
+      "topic": ["local-gov/concepts"],
+      "mnemonic": "單一制也能把權力分給地方，不是只有中央集權一種走法！",
+      "trap": "看到「必然」「一定」「絕對」等極端詞，先懷疑它是錯的。",
+      "plain": null,
+      "marks": [
+        { "text": "中央與地方分權", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "錯：單一制國家可透過立法將權力下放地方（如英法日及我國），非必然集權。", "lawRef": null },
+        "B": { "why": "這句正確：無論單一制或聯邦制，都能設計中央與地方分權的制度。", "lawRef": null },
+        "C": { "why": "這句正確：單一制國家通常由中央制定法律（如我國地制法）來劃分權限。", "lawRef": null },
+        "D": { "why": "這句正確：聯邦制下各邦保有固有權限，亦可能協議將部分權力交聯邦行使。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "單一制分權", "points": ["主權單一在中央", "中央以法律下放權限", "仍可高度地方分權"] },
+        "right": { "title": "聯邦制分權", "points": ["主權由聯邦與邦共享", "權限由聯邦憲法劃分", "各邦擁有固有權力"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q16",
+      "topic": ["local-gov/cooperation", "local-gov/concepts"],
+      "mnemonic": "「跨域」是要跨出自己家門跟別人合作，不是關起門自己練功！",
+      "trap": "跨「轄區內不同領域」只是內部專業提升，不算跨域治理核心。",
+      "plain": "什麼叫「跨域治理」？下面哪一項其實只是縣市政府「關起門來提升自己能力」，不算跨域？",
+      "marks": [
+        { "text": "非屬", "color": "red" },
+        { "text": "跨域治理", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "這講的是單一地方政府「內部」專業能力強化，並非跨界合作協調。", "lawRef": null },
+        "B": { "why": "這屬於跨域治理：跨部門、公私協力是解決複雜公共問題的重要途徑。", "lawRef": null },
+        "C": { "why": "這屬於跨域治理：處理跨行政轄區（如雙北交通、流域整治）的共同問題。", "lawRef": null },
+        "D": { "why": "這屬於跨域治理：重視中央與地方之間垂直府際協調與資源整合。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "水平：跨縣市合作", "tone": "plain" }, { "text": "垂直：中央地方協調", "tone": "plain" }, { "text": "跨界：公私部門協力", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q17",
+      "topic": ["local-gov/cooperation", "local-gov/legislation"],
+      "mnemonic": "跨縣市污染先協商簽契約；自治罰鍰最多10萬、不能判刑！",
+      "trap": "自治條例罰鍰天花板10萬，也沒有刑罰權，更不能管到別縣。",
+      "plain": "甲縣的自來水被上游鄰縣污染了，甲縣依法可以怎麼合法處理？",
+      "marks": [
+        { "text": "涉及其他地方自治團體區域", "color": "blue" },
+        { "text": "地方制度法", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯：地制法未規定可請求軍方採取職務協助排除水污染。", "lawRef": null },
+        "B": { "why": "正確：跨區域自治事項可依地制法與鄰近縣市協商、簽協議或行政契約。", "lawRef": { "law": "地方制度法", "article": "24-1" } },
+        "C": { "why": "錯：自治條例罰鍰最高以新臺幣10萬元為限，不能訂罰50萬元。", "lawRef": { "law": "地方制度法", "article": "26" } },
+        "D": { "why": "錯：自治條例只能處行政罰（無刑罰權），且效力不及於他縣轄區。", "lawRef": { "law": "地方制度法", "article": "26" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "跨區域自治事項", "tone": "plain" }, { "text": "與鄰縣協商", "tone": "plain" }, { "text": "訂協議或行政契約", "tone": "key" }, { "text": "報共同上級備查", "tone": "plain" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q18",
+      "topic": ["local-gov/entities", "local-gov/supervision"],
+      "mnemonic": "縣市想升格是「得」擬計畫，不是「應」強制大家都要升！",
+      "trap": "「得」與「應」一字之差！縣市主動申請升格是「得」擬訂計畫。",
+      "plain": "某個縣想升格成直轄市，下面哪一句把法條的「可以做」寫成了「一定要做」？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "改制為直轄市", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "錯在「應」字：縣（市）擬改制者，縣（市）政府「得」擬訂改制計畫，非強制。", "lawRef": { "law": "地方制度法", "article": "7-1" } },
+        "B": { "why": "這句正確：縣（市）政府擬訂改制計畫後，應經縣（市）議會同意。", "lawRef": { "law": "地方制度法", "article": "7-1" } },
+        "C": { "why": "這句正確：議會同意後交由內政部審查並報請行政院核定。", "lawRef": { "law": "地方制度法", "article": "7-1" } },
+        "D": { "why": "這句正確：改制計畫最終核定權在行政院。", "lawRef": { "law": "地方制度法", "article": "7-1" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "縣市府「得」擬計畫", "tone": "hot" }, { "text": "縣市議會同意", "tone": "plain" }, { "text": "內政部轉報", "tone": "plain" }, { "text": "行政院核定", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q19",
+      "topic": ["local-gov/finance"],
+      "mnemonic": "自己努力賺錢有績效，上級就「酌增補助款」發獎金鼓勵！",
+      "trap": "反之該收的錢不收會「酌減補助款」，獎懲都從補助款下手。",
+      "plain": "縣市政府很努力開闢地方財源、財政表現很好，中央（上級）依法怎麼獎勵它？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "努力開闢財源", "color": "blue" },
+        { "text": "獎勵措施", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯：發行公債額度受公共債務法上限管制，非開闢財源的獎勵方式。", "lawRef": { "law": "地方制度法", "article": "68" } },
+        "B": { "why": "正確：地制法第69條規定對努力開闢財源具績效者，上級得酌增補助款。", "lawRef": { "law": "地方制度法", "article": "69" } },
+        "C": { "why": "錯：地方稅課徵範圍依地方稅法通則規定，並非上級給的獎勵措施。", "lawRef": { "law": "地方制度法", "article": "67" } },
+        "D": { "why": "錯：規費收費依規費法辦理，並非上級對績效的獎勵措施。", "lawRef": { "law": "地方制度法", "article": "67" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "努力開闢財源", "points": ["積極開源具績效", "上級「酌增」補助款"] },
+        "right": { "title": "怠於徵收財源", "points": ["依法得徵而不徵收", "上級「酌減」補助款"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q20",
+      "topic": ["local-gov/cooperation", "local-gov/concepts"],
+      "mnemonic": "社造靈魂是「由下而上」居民自己來，不是國家由上壓下來！",
+      "trap": "看到「國家力量貫徹」「監督地方」就錯了，剛好與社造相反。",
+      "plain": null,
+      "marks": [
+        { "text": "社區總體營造", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "這句正確：我國社區總體營造概念引進自日本的社區營造（町づくり）。", "lawRef": null },
+        "B": { "why": "這句正確：強調從文化、產業、環境與生活等總體面向進行營造。", "lawRef": null },
+        "C": { "why": "這句正確：核心是鼓勵居民自主討論、決策執行並與公部門協力。", "lawRef": null },
+        "D": { "why": "錯：社造精神是「由下而上」草根參與，非國家貫徹立法或監督地方自治。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "社區總體營造", "points": ["由下而上草根參與", "居民共識與公私協力", "結合文化生活與產業"] },
+        "right": { "title": "傳統由上而下", "points": ["國家命令貫徹執行", "上級監督下級行政", "非社造核心精神"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q21",
+      "topic": ["local-gov/finance"],
+      "mnemonic": "看電影唱KTV的「娛樂稅」，收進縣市政府口袋算地方稅！",
+      "trap": "菸酒稅、證交稅、所得稅全都是國稅，只有娛樂稅是地方稅。",
+      "plain": "平常繳的各種稅裡，哪一種是直接歸直轄市或縣市政府的地方稅收入？",
+      "marks": [
+        { "text": "財政收支劃分法", "color": "blue" },
+        { "text": "地方收入", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯：所得稅屬於國稅（雖部分會統籌分配給地方，但稅目歸中央國稅）。", "lawRef": { "law": "財政收支劃分法", "article": "8" } },
+        "B": { "why": "正確：娛樂稅明定為「直轄市及縣（市）稅」，屬於地方收入。", "lawRef": { "law": "財政收支劃分法", "article": "12" } },
+        "C": { "why": "錯：證券交易稅屬於財政收支劃分法第8條規定的國稅。", "lawRef": { "law": "財政收支劃分法", "article": "8" } },
+        "D": { "why": "錯：菸酒稅屬於財政收支劃分法第8條規定的國稅。", "lawRef": { "law": "財政收支劃分法", "article": "8" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "國稅（中央）", "points": ["所得稅、遺贈稅、關稅", "營業稅、貨物稅、菸酒稅", "證交稅、期交稅"] },
+        "right": { "title": "地方稅（直轄市縣市）", "points": ["土地稅（地價、土增等）", "房屋稅、牌照稅、契稅", "印花稅、娛樂稅、特別稅"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q22",
+      "topic": ["local-gov/council", "local-gov/supervision"],
+      "mnemonic": "議員蹺課連續「兩」會期沒來開定期會，直接解除職權！",
+      "trap": "記清楚是「連續」未出席「定期會」達「二」會期，別記成三或四。",
+      "plain": "地方議員如果領薪水卻一直不去議會開定期會，連續幾次沒出現就會被踢掉？",
+      "marks": [
+        { "text": "地方制度法", "color": "blue" },
+        { "text": "地方民意代表", "color": "blue" },
+        { "text": "定期會", "color": "blue" }
+      ],
+      "options": {
+        "A": { "why": "錯：僅一會期未出席尚未達法定解除職權標準，須連續二會期。", "lawRef": { "law": "地方制度法", "article": "80" } },
+        "B": { "why": "正確：地制法第80條明定連續未出席定期會達「二會期」者解除職權。", "lawRef": { "law": "地方制度法", "article": "80" } },
+        "C": { "why": "錯：達二會期即應解除職權，不必等到三會期。", "lawRef": { "law": "地方制度法", "article": "80" } },
+        "D": { "why": "錯：達二會期即應解除職權，不必等到四會期。", "lawRef": { "law": "地方制度法", "article": "80" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "定期會未出席", "tone": "plain" }, { "text": "連續達二會期", "tone": "hot" }, { "text": "依法解除職權", "tone": "key" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q23",
+      "topic": ["local-gov/cooperation"],
+      "mnemonic": "縣市簽跨區合作契約，報上級「備查」告知就好，免核備！",
+      "trap": "又是「備查」vs「核備/核定」！跨域協議只要事後「備查」。",
+      "plain": "兩個縣市想一起簽約合作推跨區公車或減碳，下面哪一項把程序講得太嚴格了？",
+      "marks": [
+        { "text": "地方政府間合作", "color": "blue" },
+        { "text": "跨域治理", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "這句正確：地制法第24-1條明定可訂行政契約成立區域合作組織。", "lawRef": { "law": "地方制度法", "article": "24-1" } },
+        "B": { "why": "這句正確：地制法第24條明定合辦事業經議會通過後得設組織經營。", "lawRef": { "law": "地方制度法", "article": "24" } },
+        "C": { "why": "錯在「核備」：地制法第24-1條規定應報共同上級業務主管機關「備查」。", "lawRef": { "law": "地方制度法", "article": "24-1" } },
+        "D": { "why": "這句正確：地制法第24-1條第4項規定共同上級機關應優先補助協助。", "lawRef": { "law": "地方制度法", "article": "24-1" } }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "地方政府簽合作契約", "tone": "plain" }, { "text": "涉議會職權經同意", "tone": "plain" }, { "text": "報共同上級「備查」", "tone": "key" }, { "text": "上級應優先補助", "tone": "plain" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q24",
+      "topic": ["local-gov/election"],
+      "mnemonic": "公投四大禁區：「預算、租稅、薪俸、人事」通通不能投！",
+      "trap": "「預算」不能公投！不管是複決還是創制，碰這四項都不行。",
+      "plain": "市民想發起地方性公民投票，哪一件事依法連提案都不行？",
+      "marks": [
+        { "text": "地方性公民投票", "color": "blue" },
+        { "text": "不包括", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "不包括：公投法第2條明定「預算、租稅、薪俸及人事」不得作為公投提案。", "lawRef": { "law": "公民投票法", "article": "2" } },
+        "B": { "why": "這可以公投：地方自治條例之複決，屬地方性公民投票適用事項。", "lawRef": { "law": "公民投票法", "article": "2" } },
+        "C": { "why": "這可以公投：地方自治事項重大政策之創制或複決，屬適用事項。", "lawRef": { "law": "公民投票法", "article": "2" } },
+        "D": { "why": "這可以公投：地方自治條例立法原則之創制，屬地方性公投適用事項。", "lawRef": { "law": "公民投票法", "article": "2" } }
+      },
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "地方公投可投", "points": ["自治條例之複決", "自治條例原則創制", "自治重大政策創複"] },
+        "right": { "title": "公投四大禁區", "points": ["預算、租稅事項", "薪俸、人事事項", "均不得作為公投提案"] }
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    },
+    {
+      "id": "113-local4-local-gov-q25",
+      "topic": ["local-gov/election", "local-gov/finance"],
+      "mnemonic": "地方制度法沒寫「參與式預算」這五個字，是地方自己推動的！",
+      "trap": "別以為所有地方政府在做的政策，地方制度法裡就一定有條文。",
+      "plain": null,
+      "marks": [
+        { "text": "參與式預算", "color": "blue" },
+        { "text": "錯誤", "color": "red" }
+      ],
+      "options": {
+        "A": { "why": "錯：地方制度法並未明文規定「參與式預算」，係地方依自治精神自行推動。", "lawRef": null },
+        "B": { "why": "這句正確：實務上部分縣市確曾以議員建議款（配合款）作為預算來源。", "lawRef": null },
+        "C": { "why": "這句正確：民眾多參與提案投票，後續執行的監督機制仍較欠缺。", "lawRef": null },
+        "D": { "why": "這句正確：參與式預算於1989年始於巴西愉港，對我國影響甚深。", "lawRef": null }
+      },
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [ { "text": "源自巴西愉港經驗", "tone": "plain" }, { "text": "地方自治精神推動", "tone": "key" }, { "text": "地制法並無明文", "tone": "hot" } ] }
+        ]
+      },
+      "lawChanged": null,
+      "confidence": "high",
+      "reviewed": false
+    }
+  ]
+}

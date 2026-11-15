@@ -29,7 +29,6 @@ import { Chip } from '../kit/Chip';
 import { PawPicker } from '../kit/PawPicker';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { Stepper } from '../kit/Stepper';
-import { Switch } from '../kit/Switch';
 import { useWorld } from '../useWorld';
 
 const STUDY_OPTIONS: readonly SegmentedOption<StudyMode>[] = [
@@ -57,7 +56,7 @@ export interface DrillSetupScreenProps {
   papersLoading?: boolean;
 }
 
-/** 回合設定畫面：學習方式、題數步進＋貓掌快選、多選科目、題型篩選、看幾遍／出題模式與快刷開關。 */
+/** 回合設定畫面：學習方式、題數步進＋貓掌快選、多選科目、題型篩選、看幾遍／出題模式。 */
 export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
@@ -86,7 +85,8 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     }
     return m;
   });
-  const [fast, setFast] = useState<boolean>(() => initialLast?.fast ?? true);
+  // 使用者回饋（2026-11-16）：答對也要看完整口訣卡，不自動跳題，所以不再提供快刷開關。
+  const fast = false;
 
   useEffect(() => {
     if (!bank) return;
@@ -298,15 +298,6 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         </div>
       </section>
 
-      {study === 'quiz' && (
-        <Card className="cb-row">
-          <div className="cb-grow">
-            <strong>快刷模式</strong>
-            <div className="cb-sub">答對自動下一題，答錯才停下來看口訣</div>
-          </div>
-          <Switch checked={fast} onChange={setFast} ariaLabel="快刷模式" />
-        </Card>
-      )}
 
       <div className="cb-avail-hint" aria-live="polite">
         {papersLoading ? (

@@ -44,6 +44,25 @@ export function formatAppVersion(isoVersion: string): string {
   return `${y}/${m}/${day} ${hh}:${mm}`;
 }
 
+export type UpdateCheckResult = 'new' | 'latest' | 'offline';
+
+/** 使用者手動檢查更新：向線上要 version.json，並請 service worker 一起檢查。 */
+export async function checkForUpdateNow(): Promise<UpdateCheckResult> {
+  try {
+    const response = await fetch('./version.json', { cache: 'no-store' });
+    if (!response.ok) return 'offline';
+    const payload: unknown = await response.json();
+    const remoteVersion = parseRemoteVersion(payload);
+    if ('serviceWorker' in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration();
+      await registration?.update().catch(() => undefined);
+    }
+    return isNewerVersion(getCurrentAppVersion(), remoteVersion) ? 'new' : 'latest';
+  } catch {
+    return 'offline';
+  }
+}
+
 /** 正式環境中於前景切換與每 10 分鐘檢查 version.json，回傳是否有新版本。 */
 export function useAppVersion(): boolean {
   const [hasUpdate, setHasUpdate] = useState(false);

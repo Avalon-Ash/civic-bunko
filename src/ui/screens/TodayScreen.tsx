@@ -17,6 +17,7 @@ import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
 import { CountUp } from '../kit/CountUp';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
+import { checkForUpdateNow, formatAppVersion, getCurrentAppVersion } from '../useAppVersion';
 import { useWorld } from '../useWorld';
 
 const THEME_OPTIONS: readonly SegmentedOption<ThemeChoice>[] = [
@@ -86,6 +87,22 @@ export function TodayScreen({
     if (!mission) return;
     dispatch(world, { type: 'startRound', config: mission.config });
     onStartQuiz();
+  };
+
+  const [updateNote, setUpdateNote] = useState<string | null>(null);
+  const [checkingUpdate, setCheckingUpdate] = useState(false);
+  const handleCheckUpdate = async () => {
+    if (checkingUpdate) return;
+    setCheckingUpdate(true);
+    setUpdateNote(null);
+    const result = await checkForUpdateNow();
+    if (result === 'new') {
+      setUpdateNote('找到新版本，正在更新…');
+      window.location.reload();
+      return;
+    }
+    setUpdateNote(result === 'latest' ? '已經是最新版了' : '現在連不上網路，晚點再試');
+    setCheckingUpdate(false);
   };
 
   const handleStampTap = (idx: number) => {
@@ -273,6 +290,15 @@ export function TodayScreen({
                 );
               })}
             </div>
+          </section>
+
+          <section className="cb-section cb-update-row">
+            <Button variant="ghost" onClick={() => void handleCheckUpdate()} disabled={checkingUpdate}>
+              {checkingUpdate ? '檢查中…' : '檢查更新'}
+            </Button>
+            <span className="cb-sub" role="status">
+              {updateNote ?? (getCurrentAppVersion() ? `版本 ${formatAppVersion(getCurrentAppVersion())}` : '')}
+            </span>
           </section>
         </>
       ) : (

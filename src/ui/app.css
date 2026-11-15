@@ -2176,3 +2176,11 @@ mark {
   text-align: center;
   padding: 4px 0 8px;
 }
+
+/* 今日：手動檢查更新 */
+.cb-update-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
