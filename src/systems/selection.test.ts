@@ -221,4 +221,52 @@ describe('selection.buildQueue', () => {
     const all = buildQueue(world, makeConfig({ ask: 'all', count: 10 }), now, makeSeededRng(1));
     assert.equal(all.length, 5);
   });
+
+  it('filters by topicIds (multi-topic intersection, excludes unenriched, empty means all, exam unaffected)', () => {
+    const world = createTestWorld();
+    const baseEnrich = world.enrich.get('q-a1')!;
+    world.enrich.set('q-a1', { ...baseEnrich, id: 'q-a1', topic: ['t-1', 't-2'] });
+    world.enrich.set('q-a2', { ...baseEnrich, id: 'q-a2', topic: ['t-2'] });
+    // q-a3, q-b1, q-b2 have no enrich data
+
+    // Filter by ['t-1'] -> only q-a1 (even though it has 2 topics)
+    const t1 = buildQueue(
+      world,
+      makeConfig({ ask: 'all', count: 10, topicIds: ['t-1'] }),
+      now,
+      makeSeededRng(1),
+    );
+    assert.deepEqual(t1, ['q-a1']);
+
+    // Filter by ['t-2'] -> q-a1 and q-a2; unenriched q-a3/q-b1/q-b2 excluded
+    const t2 = buildQueue(
+      world,
+      makeConfig({ ask: 'all', count: 10, topicIds: ['t-2'] }),
+      now,
+      makeSeededRng(1),
+    );
+    assert.deepEqual(new Set(t2), new Set(['q-a1', 'q-a2']));
+
+    // Empty topicIds means unrestricted (all 5 ok questions)
+    const emptyTopicIds = buildQueue(
+      world,
+      makeConfig({ ask: 'all', count: 10, topicIds: [] }),
+      now,
+      makeSeededRng(1),
+    );
+    assert.equal(emptyTopicIds.length, 5);
+
+    // Exam round ignores topicIds
+    const examQueue = buildQueue(
+      world,
+      makeConfig({
+        ask: 'all',
+        topicIds: ['t-1'],
+        exam: { paperId: '115-general-subj-a', minutes: 5 },
+      }),
+      now,
+      makeSeededRng(1),
+    );
+    assert.deepEqual(examQueue, ['q-a1', 'q-a2', 'q-a3']);
+  });
 });

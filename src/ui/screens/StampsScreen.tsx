@@ -1,12 +1,14 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
 import { ACCESSORIES, STAMPS_PER_REWARD } from '../../core/constants/daily';
+import { WEAK_MIN_ANSWERED, WEAK_ROUND_COUNT } from '../../core/constants/weak';
 import type { AccessoryId } from '../../core/types';
 import type { World } from '../../core/world';
-import { activeBank, subjectStats } from '../../selectors';
+import { activeBank, availableCount, subjectStats } from '../../selectors';
 import { progressOverview } from '../../selectors/backup';
 import { currentAccessory, stampTotals } from '../../selectors/daily';
 import { getSyncState } from '../../selectors/sync';
+import { topicStats, weakRoundConfig, weakSummary, weakTopics } from '../../selectors/weak';
 import { exportProgress } from '../../systems/persistence';
 import { encodeSyncCode, validateSyncCredentials } from '../../systems/syncCode';
 import { Button } from '../kit/Button';
@@ -23,6 +25,7 @@ import { useWorld } from '../useWorld';
 export interface StampsScreenProps {
   world: World;
   papersLoading?: boolean;
+  onStartQuiz?: () => void;
 }
 
 function formatLastAnswered(iso: string | null): string {
@@ -97,8 +100,8 @@ function LockIcon() {
   );
 }
 
-/** 集章畫面：顯示我的章與小貓配件、各科總題數與答對率，以及最下方的同步與備份區塊。 */
-export function StampsScreen({ world, papersLoading = false }: StampsScreenProps) {
+/** 集章畫面：顯示我的章與小貓配件、弱點考點、各科總題數與答對率，以及最下方的同步與備份區塊。 */
+export function StampsScreen({ world, papersLoading = false, onStartQuiz }: StampsScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
   const stats = bank ? subjectStats(world, bank.id) : [];
@@ -106,6 +109,21 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
   const sync = getSyncState(world);
   const totals = stampTotals(world);
   const equipped = currentAccessory(world);
+
+  const now = new Date();
+  const weakList = bank ? weakTopics(world, bank.id) : [];
+  const weakAllStats = bank ? topicStats(world, bank.id) : [];
+  const weakInfo = bank
+    ? weakSummary(world, bank.id)
+    : { ready: false, answeredTotal: 0, topicCount: 0 };
+  const weakAllConfig = bank ? weakRoundConfig(world, bank.id) : null;
+  const weakAvail = weakAllConfig ? availableCount(world, weakAllConfig, now) : 0;
+  const weakCount = Math.min(WEAK_ROUND_COUNT, weakAvail);
+  const noMistakesYet =
+    weakInfo.answeredTotal > 0 &&
+    (weakInfo.answeredTotal >= WEAK_ROUND_COUNT ||
+      weakAllStats.some((t) => t.answered >= WEAK_MIN_ANSWERED)) &&
+    weakAllStats.every((t) => t.wrongAttempts === 0);
 
   const [catSpin, setCatSpin] = useState(false);
   const spinTimerRef = useRef<number | null>(null);
@@ -275,6 +293,20 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
     setToast('已清除全部進度');
   };
 
+  const handleStartAllWeak = () => {
+    if (papersLoading || !weakAllConfig || weakCount === 0) return;
+    dispatch(world, { type: 'startRound', config: weakAllConfig });
+    onStartQuiz?.();
+  };
+
+  const handleStartSingleWeak = (topicId: string) => {
+    if (papersLoading || !bank) return;
+    const config = weakRoundConfig(world, bank.id, [topicId]);
+    if (!config) return;
+    dispatch(world, { type: 'startRound', config });
+    onStartQuiz?.();
+  };
+
   return (
     <div className="cb-stack">
       <Toast message={toast} onDismiss={() => setToast(null)} />
@@ -349,6 +381,61 @@ export function StampsScreen({ world, papersLoading = false }: StampsScreenProps
           })}
         </div>
       </Card>
+
+      <section className="cb-section">
+        <h2>弱點考點</h2>
+        {papersLoading ? (
+          <Card>
+            <p className="cb-sub cb-m0">題庫載入中…</p>
+          </Card>
+        ) : weakList.length > 0 && weakAllConfig && weakCount > 0 ? (
+          <div className="cb-stack-sm">
+            <Button onClick={handleStartAllWeak}>刷弱點 {weakCount} 題</Button>
+            <div className="cb-weak-list">
+              {weakList.map((topic) => {
+                const ratio = Math.min(1, Math.max(0, topic.wrongRate));
+                return (
+                  <Card key={topic.id} className="cb-weak-item">
+                    <div className="cb-weak-info">
+                      <div className="cb-weak-head">
+                        <span className="cb-chip cb-chip-plain cb-weak-tag">
+                          {topic.subjectShort}
+                        </span>
+                        <strong className="cb-weak-name">{topic.name}</strong>
+                      </div>
+                      <div className="cb-sub cb-num-tabular">
+                        答錯 {topic.wrongAttempts} 次／作答 {topic.attempts} 次
+                      </div>
+                      <div className="cb-weak-bar" aria-hidden="true">
+                        <div
+                          className="cb-weak-bar-fill"
+                          style={{ transform: `scaleX(${ratio})` }}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      variant="butter"
+                      className="cb-weak-solo-btn"
+                      onClick={() => handleStartSingleWeak(topic.id)}
+                    >
+                      只刷這個
+                    </Button>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <Card className="cb-weak-empty">
+            <Cat size={54} mood={noMistakesYet ? 'yay' : 'idle'} interactive={false} />
+            <p className="cb-sub-strong cb-m0 cb-grow">
+              {noMistakesYet
+                ? '目前沒有明顯的弱點，繼續保持'
+                : '再多刷幾題，我就能找出你常錯的考點'}
+            </p>
+          </Card>
+        )}
+      </section>
 
       {stats.length > 0 ? (
         <div className="cb-stack-sm">

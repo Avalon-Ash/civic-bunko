@@ -13,6 +13,7 @@ import {
   READ_PASSES_DEFAULT,
   READ_PASSES_PRESETS,
 } from '../../core/constants/study';
+import { WEAK_ROUND_COUNT } from '../../core/constants/weak';
 import type { AskFilter, PaperId, RoundConfig, RoundMode, StudyMode, SubjectKey } from '../../core/types';
 import type { World } from '../../core/world';
 import {
@@ -23,6 +24,7 @@ import {
   positiveCoverage,
 } from '../../selectors';
 import { examBest, examPapers, type ExamPaperView } from '../../selectors/exam';
+import { weakRoundConfig, weakSummary } from '../../selectors/weak';
 import { formatExamLabel } from '../components/QuestionParts';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -151,6 +153,11 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   const totalAskCount = counts.positive + counts.negative;
   const coverage = positiveCoverage(world, bank.id, subjectKeys);
   const showUnlockHint = !papersLoading && coverage >= POSITIVE_UNLOCK_RATIO && ask === 'positive';
+  const weakInfo = weakSummary(world, bank.id);
+  const weakConfig = weakRoundConfig(world, bank.id);
+  const weakAvail = weakConfig ? availableCount(world, weakConfig, now) : 0;
+  const weakCount = Math.min(WEAK_ROUND_COUNT, weakAvail);
+  const weakReady = !papersLoading && weakInfo.ready && weakConfig !== null && weakAvail > 0;
 
   const handleStudyChange = (nextStudy: StudyMode) => {
     setStudy(nextStudy);
@@ -207,6 +214,11 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     setExamSheetOpen(false);
   };
 
+  const handleStartWeakRound = () => {
+    if (!weakReady || !weakConfig) return;
+    dispatch(world, { type: 'startRound', config: weakConfig });
+  };
+
   const verb = study === 'read' ? '看' : '刷';
   const startLabel = papersLoading
     ? '題庫載入中…'
@@ -245,6 +257,25 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
           </span>
         </div>
         <span className="cb-go">選考卷</span>
+      </Card>
+
+      <Card
+        tone="mint"
+        className="cb-weak-entry"
+        onClick={handleStartWeakRound}
+        disabled={!weakReady}
+      >
+        <div className="cb-grow">
+          <strong className="cb-weak-entry-title">弱點回合：只刷你最常錯的考點</strong>
+          <span className="cb-sub cb-block">
+            {papersLoading
+              ? '題庫載入中…'
+              : weakReady
+                ? `針對 ${weakInfo.topicCount} 個常錯考點・每次 ${weakCount} 題`
+                : '再多刷幾題就會開放'}
+          </span>
+        </div>
+        <span className="cb-go">開刷</span>
       </Card>
 
       <section className="cb-section">
