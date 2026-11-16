@@ -186,7 +186,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
           />
         );
       case 'cards':
-        return <CardsScreen />;
+        return <CardsScreen world={world} />;
       case 'stamps':
         return <StampsScreen world={world} papersLoading={papersLoading} />;
       case 'quiz':

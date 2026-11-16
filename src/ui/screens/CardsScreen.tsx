@@ -11,8 +11,7 @@ import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { useWorld } from '../useWorld';
 
 export interface CardsScreenProps {
-  /** 待主代理於 App.tsx 傳入 world={world}；未傳入時安全顯示佔位畫面。 */
-  world?: World;
+  world: World;
 }
 
 function CardsPlaceholder() {
@@ -87,8 +86,5 @@ function CardsContent({ world }: { world: World }) {
 
 /** 圖卡畫面：依觀念／新法／申論分類瀏覽圖卡並開啟抽屜研讀；無資料時顯示準備中。 */
 export function CardsScreen({ world }: CardsScreenProps) {
-  if (!world) {
-    return <CardsPlaceholder />;
-  }
   return <CardsContent world={world} />;
 }
