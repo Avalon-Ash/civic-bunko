@@ -90,15 +90,15 @@ tools/parser/       PDF → data/official/<年度>-<考試>-<科目>.json
 tools/laws/         全國法規資料庫 → data/laws/<法規>.json
 tools/enrich/       加工批次的輸入包與合併器 → data/enrich/<題目ID>.json
 tools/validate/     schema、字數上限、官方欄位雜湊、法條引用存在性
-src/                Vite + React + TypeScript + Tailwind，打包時合併 official + enrich
+src/                Vite + React + TypeScript + 純 CSS token，打包時合併 official + enrich
 .github/workflows/  lint → validate → test → build → Pages
 ```
 
-- **技術選型**：沿用 Kyoto-Bunko 的 Vite＋React 19＋TypeScript＋Tailwind 4＋motion（手勢與彈簧動畫）；加 `vite-plugin-pwa` 做離線。爬蟲與解析用 Node（tsx）＋`pdfjs-dist`，和 App 同一套工具鏈但不進 bundle。
+- **技術選型**（實際採用）：Vite 6＋React 19＋TypeScript strict；樣式是純 CSS 與 `src/theme.css` 的 token，動態效果只用 CSS，沒有用 Tailwind、motion 或任何動畫套件；離線用自己寫的 `public/sw.js`，沒有用 `vite-plugin-pwa`。執行期相依只有 `react`、`react-dom`。爬蟲與解析用 Node（tsx）＋`pdfjs-dist`，不進 bundle。
 - **爬蟲獨立**：只在本機手動執行，產物提交進 repo；CI 不連考選部。每次請求間隔 ≥ 2 秒，已有的檔案不重抓。
 - **官方層與加工層分開**：官方層由流水線產生並記錄雜湊，加工層怎麼錯都不會汙染題目與答案。
 - **法條有本機副本**：解析引用的條號要在 `data/laws/` 查得到，驗證腳本自動檢查，減少模型憑印象寫錯條號。
-- **進度只存裝置**：localStorage；提供匯出／匯入 JSON 讓 iPhone 與 iPad 之間搬進度。
+- **進度存裝置，另可同步**：localStorage；匯出／匯入 JSON；另可用「同步碼」把進度與每日題數同步到使用者自己的私人 GitHub repo（`docs/sync-setup.zh-TW.md`）。設定類（配件、卡片已看、模擬考成績）只存裝置，不同步。
 - 考選部試題依著作權法第 9 條不屬著作權標的，可公開放在 GitHub。
 
 ### App 架構：ECS＋SSOT（使用者 11/15 指定）
@@ -206,3 +206,24 @@ npm run build
 - 加工批次抽樣錯誤率超過 10%（代表模型不適合，要換做法）。
 - 任何 commit 以外的 Git 操作、開 GitHub repo、開 Pages、公開或私人的選擇。
 - 時程落後里程碑超過 1 天，需要砍範圍時（附建議砍哪一項）。
+
+## 9. 現況與和原計畫的差異（2026-11-16 更新）
+
+資料格式以 `src/core/types.ts` 為準，§4 的「資料格式（摘要）」是開案時的草稿。
+
+### 已上線
+- 題庫：25 份官方試卷、925 題測驗題、16 題申論／作文題；27 部法規副本。925 題全部有口訣、陷阱、白話、逐選項說明與圖。
+- 刷題：自選科目與題數、模式（混合／新題／錯題／到期）、問法篩選（正向題優先）、快刷、看答案模式（可看幾遍、看完用同一批作答）、選項打亂、錯題重刷、回合續接。
+- 模擬考：整份官方試卷、計時、交卷才看分數與錯題；可回上一題、跳題、改答案；留歷次成績。
+- 圖卡：觀念（新手 5、行政學 8、國文 3）、新法 8、申論與作文架構 16（地方自治 10、國文 6）。
+- 今日：倒數、每日 15 題三個小任務；集章：全部達標才蓋章、集章換小貓配件。
+- 同步（私人 repo＋同步碼）、匯出匯入、離線、新版提示、加到主畫面引導、日夜主題。
+
+### 和開案書不同的地方
+- 分頁是「今日／圖卡／刷題／集章」，但集章頁目前沒有「弱點考點排行」；回合也沒有「高頻回合」「弱點回合」。考點分類（`data/topics.json`）已對照官方命題大綱並標在每一題上，但畫面還沒用到。
+- 沒有做「考前 3 天自動衝刺模式」。
+- 作文原本不做；改成只給答題骨架卡（不是範文）。
+- 加工內容的複查：每批抽查 10–20%，另由 agy 全量交叉檢查「說明是否與官方答案矛盾」，主代理逐筆確認後修正（紀錄在 `docs/HANDOFF.md`）。
+
+### 拆包實際執行
+P0–P3 依 §6 完成（P3a 因 Codex 額度見底改由 agy＋主代理）；之後追加 P4（同步、看答案模式、集章獎勵）、P5a（模擬考、選項打亂）、P5c（圖卡分頁）、P6a（模擬考改答案與歷次成績）。派工單都在 `docs/dispatch/`。
