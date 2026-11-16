@@ -611,4 +611,92 @@ describe('persistence system', () => {
     assert.equal(res.ok, true);
     assert.deepEqual(world2.settings.examHistory, [valid1, valid2]);
   });
+
+  it('round-trips topicIds in savedRound, discards malformed topicIds, and strips topicIds from settings.lastRound', () => {
+    const fixedNow = () => new Date('2026-11-16T10:00:00.000Z');
+    const storage = createMemoryStorage();
+
+    // 1. Saved round preserves config.topicIds across reload and resume
+    const world1 = createWorld();
+    attachPersistence(world1, storage);
+    loadBank(world1, [testBank], testPaperFiles);
+    const baseEnrich = {
+      id: 'q-a1',
+      topic: ['t-1'],
+      mnemonic: 'm',
+      trap: 't',
+      plain: null,
+      marks: [],
+      options: {
+        A: { why: 'a', lawRef: null },
+        B: { why: 'b', lawRef: null },
+        C: { why: 'c', lawRef: null },
+        D: { why: 'd', lawRef: null },
+      },
+      visual: null,
+      lawChanged: null,
+      confidence: 'high' as const,
+      reviewed: false,
+    };
+    world1.enrich.set('q-a1', baseEnrich);
+    world1.enrich.set('q-a2', { ...baseEnrich, id: 'q-a2', topic: ['t-1'] });
+
+    dispatch(
+      world1,
+      { type: 'startRound', config: makeConfig({ ask: 'all', count: 10, topicIds: ['t-1'] }) },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    assert.ok(world1.round !== null);
+
+    const world2 = createWorld();
+    attachPersistence(world2, storage);
+    assert.deepEqual(world2.savedRound?.config.topicIds, ['t-1']);
+    dispatch(world2, { type: 'resumeRound' });
+    assert.deepEqual(world2.round?.config.topicIds, ['t-1']);
+
+    // 2. Malformed topicIds in saved round discards the round without throwing
+    const badTopicIdsValues = ['t-1', 123, null, ['t-1', 42], { id: 't-1' }];
+    for (const badTopicIds of badTopicIdsValues) {
+      const badStorage = createMemoryStorage({
+        [STORAGE_KEY]: JSON.stringify({
+          version: 1,
+          progress: {},
+          settings: { theme: 'system', lastRound: null },
+          round: {
+            config: { ...makeConfig({ subjectKeys: ['subj-a'], count: 2 }), topicIds: badTopicIds },
+            queue: ['q-a1', 'q-a2'],
+            index: 0,
+            pick: null,
+            results: [],
+            combo: 0,
+            finished: false,
+            pass: 1,
+          },
+        }),
+      });
+      const badWorld = createWorld();
+      attachPersistence(badWorld, badStorage);
+      assert.equal(badWorld.savedRound, null);
+    }
+
+    // 3. settings.lastRound strips topicIds when loaded from storage
+    const lastRoundWithTopicsStorage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        version: 1,
+        progress: {},
+        settings: {
+          theme: 'light',
+          lastRound: {
+            ...makeConfig({ subjectKeys: ['subj-a'], count: 5 }),
+            topicIds: ['t-1', 't-2'],
+          },
+        },
+      }),
+    });
+    const cleanWorld = createWorld();
+    attachPersistence(cleanWorld, lastRoundWithTopicsStorage);
+    assert.ok(cleanWorld.settings.lastRound !== null);
+    assert.equal(cleanWorld.settings.lastRound.topicIds, undefined);
+    assert.equal('topicIds' in cleanWorld.settings.lastRound, false);
+  });
 });

@@ -64,4 +64,38 @@ describe('settings system', () => {
     );
     assert.equal(emitted.length, EXAM_HISTORY_MAX + 3);
   });
+
+  it('does not overwrite settings.lastRound when starting a weak round with topicIds', () => {
+    const world = createTestWorld();
+    const baseEnrich = world.enrich.get('q-a1')!;
+    world.enrich.set('q-a1', { ...baseEnrich, id: 'q-a1', topic: ['t-1'] });
+
+    const normalConfig = makeConfig({ subjectKeys: ['subj-a'], count: 3, ask: 'all' });
+    dispatch(
+      world,
+      { type: 'startRound', config: normalConfig },
+      { now: () => new Date('2026-11-15T10:00:00'), rng: makeSeededRng(1) },
+    );
+    assert.deepEqual(world.settings.lastRound, normalConfig);
+
+    const emitted: Settings[] = [];
+    world.bus.on('settingsChanged', (e) => emitted.push(e.settings));
+
+    const weakConfig = makeConfig({
+      subjectKeys: [],
+      count: 10,
+      ask: 'all',
+      topicIds: ['t-1'],
+    });
+    dispatch(
+      world,
+      { type: 'startRound', config: weakConfig },
+      { now: () => new Date('2026-11-15T11:00:00'), rng: makeSeededRng(2) },
+    );
+
+    assert.ok(world.round !== null);
+    assert.deepEqual(world.round.config.topicIds, ['t-1']);
+    assert.deepEqual(world.settings.lastRound, normalConfig);
+    assert.equal(emitted.length, 0);
+  });
 });

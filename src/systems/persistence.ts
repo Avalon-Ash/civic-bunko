@@ -135,6 +135,12 @@ function isValidRoundConfig(value: unknown): value is RawRoundConfig {
   if (value.exam !== undefined && value.exam !== null && !isValidExamConfig(value.exam)) {
     return false;
   }
+  if (
+    value.topicIds !== undefined &&
+    (!Array.isArray(value.topicIds) || !value.topicIds.every((id) => typeof id === 'string'))
+  ) {
+    return false;
+  }
   return true;
 }
 
@@ -162,9 +168,10 @@ function isValidSettings(value: unknown): value is RawSettings {
   return true;
 }
 
-function normalizeRoundConfig(raw: RawRoundConfig): RoundConfig {
+function normalizeRoundConfig(raw: RawRoundConfig, keepTopicIds = true): RoundConfig {
+  const { topicIds, ...rest } = raw;
   return {
-    ...raw,
+    ...rest,
     subjectKeys: [...raw.subjectKeys],
     study: raw.study ?? 'quiz',
     ask: raw.ask ?? 'positive',
@@ -172,6 +179,7 @@ function normalizeRoundConfig(raw: RawRoundConfig): RoundConfig {
     ...(raw.exam !== undefined
       ? { exam: raw.exam ? { paperId: raw.exam.paperId, minutes: raw.exam.minutes } : null }
       : {}),
+    ...(keepTopicIds && topicIds !== undefined ? { topicIds: [...topicIds] } : {}),
   };
 }
 
@@ -380,7 +388,9 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
         : undefined;
     cleanSettings = {
       theme: parsed.settings.theme,
-      lastRound: parsed.settings.lastRound ? normalizeRoundConfig(parsed.settings.lastRound) : null,
+      lastRound: parsed.settings.lastRound
+        ? normalizeRoundConfig(parsed.settings.lastRound, false)
+        : null,
       installHintDismissed: parsed.settings.installHintDismissed === true,
       ...(parsed.settings.accessory !== undefined ? { accessory: parsed.settings.accessory } : {}),
       ...(parsed.settings.shuffleOptions !== undefined ? { shuffleOptions: parsed.settings.shuffleOptions } : {}),

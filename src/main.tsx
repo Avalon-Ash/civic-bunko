@@ -4,7 +4,7 @@ import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
 import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics } from './data/source';
-import { loadBank } from './systems/bankLoader';
+import { loadBank, loadTopicList } from './systems/bankLoader';
 import { loadCards } from './systems/cardLoader';
 import { attachPersistence } from './systems/persistence';
 import { attachSync } from './systems/sync';
@@ -26,14 +26,16 @@ const { banks } = loadBankMeta();
 loadBank(world, banks, []);
 
 // 加工內容載入失敗不影響刷題：當作沒有。
-// 卡片載入失敗也不影響刷題。
+// 卡片與考點清單載入失敗也不影響刷題。
 const papersPromise = Promise.all([
   loadPapers(),
   loadEnrichFiles().catch(() => []),
   loadCardFiles().catch(() => []),
-]).then(([files, enrich, cards]) => {
+  loadTopics().catch(() => []),
+]).then(([files, enrich, cards, topics]) => {
   loadBank(world, banks, files, enrich);
   loadCards(world, cards, files);
+  loadTopicList(world, topics);
 });
 
 function Root({ world: appWorld }: { world: World }) {
@@ -47,16 +49,6 @@ function Root({ world: appWorld }: { world: World }) {
         if (active) {
           setPapersLoading(false);
         }
-        const swReady =
-          import.meta.env.PROD && typeof navigator !== 'undefined' && 'serviceWorker' in navigator
-            ? navigator.serviceWorker.ready.catch(() => undefined)
-            : Promise.resolve();
-        void swReady.then(() => {
-          if (active && (typeof navigator === 'undefined' || navigator.onLine !== false)) {
-            return loadTopics().catch(() => []);
-          }
-          return undefined;
-        });
       })
       .catch(() => {
         if (active) {

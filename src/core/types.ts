@@ -218,6 +218,8 @@ export interface RoundConfig {
   passes: number;
   /** 模擬考：整份試卷照官方題號順序、計時、交卷後才看答案 */
   exam?: { paperId: PaperId; minutes: number } | null;
+  /** 弱點回合：只出考點（data/topics.json 的 id）在這個清單裡的題目；沒有或空陣列＝不限 */
+  topicIds?: string[];
 }
 export interface RoundResult {
   id: QuestionId;

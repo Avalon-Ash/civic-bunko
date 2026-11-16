@@ -540,4 +540,43 @@ describe('round system', () => {
       assert.equal(isFourChoicePerm(orders[id]), true);
     }
   });
+
+  it('drops topicIds on retryWrong and quizSameSet', () => {
+    const world = createTestWorld();
+    const getRound = (): RoundState | null => world.round;
+    const baseEnrich = world.enrich.get('q-a1')!;
+    world.enrich.set('q-a1', { ...baseEnrich, id: 'q-a1', topic: ['t-1'] });
+    world.enrich.set('q-a2', { ...baseEnrich, id: 'q-a2', topic: ['t-1'] });
+
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ ask: 'all', count: 10, topicIds: ['t-1'] }) },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    const active = getRound();
+    assert.ok(active !== null);
+    assert.deepEqual(active.config.topicIds, ['t-1']);
+
+    // Answer first question wrong, second question right, finish round
+    while (getRound()) {
+      const qId = getRound()!.queue[getRound()!.index]!;
+      const right = world.questions.get(qId)!.answer[0]!;
+      const pick = qId === 'q-a1' ? (right === 'A' ? 'D' : 'A') : right;
+      dispatch(world, { type: 'answer', pick }, { now: fixedNow });
+      dispatch(world, { type: 'next' }, { now: fixedNow });
+    }
+
+    dispatch(world, { type: 'retryWrong' }, { now: fixedNow, rng: makeSeededRng(2) });
+    const retried = getRound();
+    assert.ok(retried !== null);
+    assert.deepEqual(retried.queue, ['q-a1']);
+    assert.equal(retried.config.topicIds, undefined);
+    assert.equal('topicIds' in retried.config, false);
+
+    dispatch(world, { type: 'quizSameSet' }, { now: fixedNow, rng: makeSeededRng(3) });
+    const sameSet = getRound();
+    assert.ok(sameSet !== null);
+    assert.equal(sameSet.config.topicIds, undefined);
+    assert.equal('topicIds' in sameSet.config, false);
+  });
 });

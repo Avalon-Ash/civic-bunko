@@ -385,7 +385,7 @@ export function retryWrong(world: World, rng: () => number = Math.random): void 
     return;
   }
 
-  const { exam: _ignoredExam, ...restConfig } = lastRound.config;
+  const { exam: _ignoredExam, topicIds: _ignoredTopicIds, ...restConfig } = lastRound.config;
   const config: RoundConfig = {
     ...restConfig,
     subjectKeys: [...lastRound.config.subjectKeys],
@@ -427,7 +427,7 @@ export function quizSameSet(world: World, rng: () => number = Math.random): void
   }
 
   const queue = shuffle(uniqueIds, rng);
-  const { exam: _ignoredExam, ...restConfig } = lastRound.config;
+  const { exam: _ignoredExam, topicIds: _ignoredTopicIds, ...restConfig } = lastRound.config;
   const config: RoundConfig = {
     ...restConfig,
     subjectKeys: [...lastRound.config.subjectKeys],

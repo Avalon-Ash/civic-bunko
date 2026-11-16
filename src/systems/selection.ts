@@ -35,6 +35,8 @@ export function shuffle<T>(items: readonly T[], rng: () => number): T[] {
 function collectEligibleIds(world: World, config: RoundConfig): QuestionId[] {
   const hasSubjectFilter = config.subjectKeys.length > 0;
   const subjectSet = hasSubjectFilter ? new Set(config.subjectKeys) : null;
+  const topicIds = config.topicIds;
+  const topicSet = topicIds && topicIds.length > 0 ? new Set(topicIds) : null;
   const ids: QuestionId[] = [];
 
   for (const question of world.questions.values()) {
@@ -43,6 +45,10 @@ function collectEligibleIds(world: World, config: RoundConfig): QuestionId[] {
     if (!paper || paper.bankId !== config.bankId) continue;
     if (subjectSet && !subjectSet.has(paper.subjectKey)) continue;
     if (config.ask !== 'all' && askTypeOf(question.stem) !== config.ask) continue;
+    if (topicSet) {
+      const enrich = world.enrich.get(question.id);
+      if (!enrich || !enrich.topic.some((t) => topicSet.has(t))) continue;
+    }
     ids.push(question.id);
   }
 

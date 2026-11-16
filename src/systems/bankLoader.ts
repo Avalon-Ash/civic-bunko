@@ -1,4 +1,5 @@
-import type { Bank, Enrich, EnrichFile, PaperFile } from '../core/types';
+import { bumpStore } from '../core/store';
+import type { Bank, Enrich, EnrichFile, PaperFile, TopicInfo } from '../core/types';
 import type { World } from '../core/world';
 
 /** 將題庫清單、試卷檔案與可選加工資料載入 world，並依題庫發出 bankLoaded 事件。 */
@@ -48,4 +49,10 @@ export function loadBank(
       questionCount,
     });
   }
+}
+
+/** 將考點清單複製一份放入 world.topics，並通知訂閱者更新。 */
+export function loadTopicList(world: World, topics: readonly TopicInfo[]): void {
+  world.topics = topics.map((topic) => ({ ...topic }));
+  bumpStore(world);
 }
