@@ -1,0 +1,580 @@
+{
+  "paperId": "114-local4-law-english",
+  "groups": [
+    {
+      "id": "114-local4-law-english-g1",
+      "segments": [
+        {
+          "en": "A new study published in July 2024 reveals that climate change is causing Earth’s days to lengthen at an unprecedented rate.",
+          "zh": "2024 年 7 月發表的一項新研究指出，氣候變遷正以前所未有的速度讓地球的一天變長。"
+        },
+        {
+          "en": "While Earth’s days have naturally been increasing by a few milliseconds per century due to lunar gravity, the melting of polar ice sheets is 41 this process significantly. 42 Arctic and Antarctic ice melts, the restructuring of mass from poles to equator is further flattening Earth’s shape.",
+          "zh": "地球的一天本來就因為月球引力，每世紀自然增加幾毫秒，但極地冰層融化正大幅（41）這個過程。（42）北極和南極的冰融化，質量從兩極往赤道重新分布，讓地球的形狀變得更扁。"
+        },
+        {
+          "en": "Since 2000, the day length has increased 43 about 1.33 milliseconds per century, up from 0.3-1.0 milliseconds in the 20th century.",
+          "zh": "自 2000 年以來，一天的長度每世紀增加（43）約 1.33 毫秒，高於 20 世紀的 0.3 到 1.0 毫秒。"
+        },
+        {
+          "en": "If greenhouse gas emissions continue unchecked, this rate could 44 2.62 milliseconds per century by 2100.",
+          "zh": "如果溫室氣體排放繼續不受控制，到 2100 年這個速率可能（44）每世紀 2.62 毫秒。"
+        },
+        {
+          "en": "Although people are generally 45 , these changes have important meanings for global timekeeping systems.",
+          "zh": "雖然一般人通常（45），這些變化對全球計時系統有重要的意義。"
+        },
+        {
+          "en": "The changes may require adjustments to Coordinated Universal Time (UTC), potentially affecting satellite navigation, telecommunications, trade, and space travel operations.",
+          "zh": "這些變化可能需要調整世界協調時間（UTC），進而可能影響衛星導航、電信、貿易和太空旅行的運作。"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "unprecedented",
+          "zh": "前所未有的"
+        },
+        {
+          "en": "millisecond",
+          "zh": "毫秒"
+        },
+        {
+          "en": "lunar gravity",
+          "zh": "月球引力"
+        },
+        {
+          "en": "polar ice sheet",
+          "zh": "極地冰層"
+        },
+        {
+          "en": "equator",
+          "zh": "赤道"
+        },
+        {
+          "en": "greenhouse gas emissions",
+          "zh": "溫室氣體排放"
+        },
+        {
+          "en": "unchecked",
+          "zh": "不受控制的"
+        },
+        {
+          "en": "timekeeping",
+          "zh": "計時"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-g2",
+      "segments": [
+        {
+          "en": "Teenagers are often criticized for staying up late and sleeping in, but science shows there’s a biological reason behind this pattern.",
+          "zh": "青少年常因為熬夜、晚起被批評，但科學顯示這種模式背後有生理上的原因。"
+        },
+        {
+          "en": "During adolescence, the brain’s internal clock shifts.",
+          "zh": "青春期時，大腦的生理時鐘會往後移。"
+        },
+        {
+          "en": "Teens naturally begin to feel sleepy later at night—sometimes not until 11 p.m. or even midnight.",
+          "zh": "青少年自然會比較晚才想睡，有時要到晚上 11 點甚至半夜。"
+        },
+        {
+          "en": "At the same time, they still need around eight to ten hours of sleep for healthy development.",
+          "zh": "同時，他們仍然需要大約八到十小時的睡眠才能健康發展。"
+        },
+        {
+          "en": "This shift in sleep cycle, known as “delayed sleep phase,” often clashes with early school schedules.",
+          "zh": "這種睡眠週期的改變稱為「睡眠相位後移」，常常和很早開始的學校作息衝突。"
+        },
+        {
+          "en": "Many schools start before 8 a.m., which means students are frequently forced to function while still sleep-deprived.",
+          "zh": "很多學校早上 8 點前就開始上課，也就是說學生經常被迫在睡眠不足的狀態下活動。"
+        },
+        {
+          "en": "Studies have linked sleep deprivation in teens to poorer academic performance, increased irritability, and even higher rates of depression and anxiety.",
+          "zh": "研究發現，青少年睡眠不足和學業表現較差、比較容易煩躁，甚至憂鬱和焦慮的比例較高有關。"
+        },
+        {
+          "en": "Some schools have experimented with later start times and seen promising results.",
+          "zh": "有些學校試過延後上課時間，看到了不錯的成果。"
+        },
+        {
+          "en": "Students reported feeling more alert, and teachers noticed improvements in both behavior and focus.",
+          "zh": "學生表示覺得比較清醒，老師也注意到行為和專注力都有改善。"
+        },
+        {
+          "en": "Despite this, changes are slow to implement, largely due to concerns about transportation, extracurricular schedules, and resistance from some parents and school officials.",
+          "zh": "儘管如此，改變推行得很慢，主要是因為對交通、課外活動時間的顧慮，以及部分家長和學校主管的反對。"
+        },
+        {
+          "en": "Understanding teen sleep patterns isn’t about making excuses.",
+          "zh": "了解青少年的睡眠模式，不是在替他們找藉口。"
+        },
+        {
+          "en": "It’s about recognizing a real biological need.",
+          "zh": "而是承認一個真實的生理需求。"
+        },
+        {
+          "en": "Ignoring it not only affects learning but can also harm emotional well-being.",
+          "zh": "忽視它不只影響學習，還可能傷害情緒健康。"
+        },
+        {
+          "en": "By aligning school policies with scientific findings, we may improve both education and mental health outcomes for young people.",
+          "zh": "讓學校政策和科學研究結果一致，我們或許能同時改善年輕人的教育成果和心理健康。"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "adolescence",
+          "zh": "青春期"
+        },
+        {
+          "en": "internal clock",
+          "zh": "生理時鐘"
+        },
+        {
+          "en": "sleep-deprived",
+          "zh": "睡眠不足的"
+        },
+        {
+          "en": "irritability",
+          "zh": "易怒、煩躁"
+        },
+        {
+          "en": "anxiety",
+          "zh": "焦慮"
+        },
+        {
+          "en": "alert",
+          "zh": "清醒的、有精神的"
+        },
+        {
+          "en": "extracurricular",
+          "zh": "課外的"
+        },
+        {
+          "en": "align A with B",
+          "zh": "讓 A 和 B 一致"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "114-local4-law-english-q31",
+      "stem": "他們租了一間＿＿湖泊的舒適公寓，來度家庭假期。",
+      "options": {
+        "A": "upgrading：升級",
+        "B": "disregarding：忽視",
+        "C": "overlooking：俯瞰",
+        "D": "overlapping：重疊"
+      },
+      "vocab": [
+        {
+          "en": "rent",
+          "zh": "租"
+        },
+        {
+          "en": "cozy",
+          "zh": "舒適的"
+        },
+        {
+          "en": "vacation",
+          "zh": "假期"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q32",
+      "stem": "在民主國家，沒有人有權利＿＿別人的隱私。",
+      "options": {
+        "A": "invade：侵犯",
+        "B": "lighten：減輕；照亮",
+        "C": "portray：描繪",
+        "D": "reflect：反映"
+      },
+      "vocab": [
+        {
+          "en": "democratic",
+          "zh": "民主的"
+        },
+        {
+          "en": "right",
+          "zh": "權利"
+        },
+        {
+          "en": "privacy",
+          "zh": "隱私"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q33",
+      "stem": "難民＿＿家鄉的暴力和動盪之後，到新的國家尋求安全。",
+      "options": {
+        "A": "embracing：擁抱",
+        "B": "fleeing：逃離",
+        "C": "upholding：維護",
+        "D": "supporting：支持"
+      },
+      "vocab": [
+        {
+          "en": "refugee",
+          "zh": "難民"
+        },
+        {
+          "en": "seek（過去式 sought）",
+          "zh": "尋求"
+        },
+        {
+          "en": "instability",
+          "zh": "動盪"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q34",
+      "stem": "經理要我粗略＿＿一下，多久可以完成這個專案。",
+      "options": {
+        "A": "estimate：估計",
+        "B": "climate：氣候",
+        "C": "closure：關閉",
+        "D": "esteem：尊重"
+      },
+      "vocab": [
+        {
+          "en": "manager",
+          "zh": "經理"
+        },
+        {
+          "en": "rough",
+          "zh": "粗略的"
+        },
+        {
+          "en": "project",
+          "zh": "專案"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q35",
+      "stem": "好的主管應該知道怎麼＿＿員工達成目標。",
+      "options": {
+        "A": "migrate：遷移",
+        "B": "motivate：激勵",
+        "C": "irritate：激怒",
+        "D": "irrigate：灌溉"
+      },
+      "vocab": [
+        {
+          "en": "staff",
+          "zh": "員工"
+        },
+        {
+          "en": "accomplish",
+          "zh": "達成"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q36",
+      "stem": "他的演講不只激勵人心，還很＿＿，充滿大量的數據和真實經驗。",
+      "options": {
+        "A": "vague：模糊的",
+        "B": "boring：無聊的",
+        "C": "talkative：愛說話的",
+        "D": "informative：資訊豐富的"
+      },
+      "vocab": [
+        {
+          "en": "inspiring",
+          "zh": "激勵人心的"
+        },
+        {
+          "en": "packed with",
+          "zh": "充滿"
+        },
+        {
+          "en": "enormous",
+          "zh": "大量的"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q37",
+      "stem": "在自傳裡，這位醫生詳細＿＿了她在難民營當志工的生活。",
+      "options": {
+        "A": "account：敘述；帳戶",
+        "B": "habitat：棲息地",
+        "C": "contract：合約",
+        "D": "rapport：融洽的關係"
+      },
+      "vocab": [
+        {
+          "en": "autobiography",
+          "zh": "自傳"
+        },
+        {
+          "en": "detailed",
+          "zh": "詳細的"
+        },
+        {
+          "en": "refugee camp",
+          "zh": "難民營"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q38",
+      "stem": "這所大學為外縣市來的學生提供負擔得起的＿＿。",
+      "options": {
+        "A": "confrontation：對抗",
+        "B": "accommodation：住宿",
+        "C": "creation：創造",
+        "D": "exception：例外"
+      },
+      "vocab": [
+        {
+          "en": "provide",
+          "zh": "提供"
+        },
+        {
+          "en": "affordable",
+          "zh": "負擔得起的"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q39",
+      "stem": "雖然我們沒辦法用現金買下這間房子，但可以向銀行申請＿＿來支付房價。",
+      "options": {
+        "A": "credit：信用；學分",
+        "B": "loss：損失",
+        "C": "loan：貸款",
+        "D": "value：價值"
+      },
+      "vocab": [
+        {
+          "en": "afford",
+          "zh": "負擔得起"
+        },
+        {
+          "en": "in cash",
+          "zh": "用現金"
+        },
+        {
+          "en": "cover the cost",
+          "zh": "支付費用"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q40",
+      "stem": "看來我整趟火車都得站著，因為找不到任何＿＿座位。",
+      "options": {
+        "A": "vacant：空的",
+        "B": "typical：典型的",
+        "C": "untouchable：碰不得的",
+        "D": "visible：看得見的"
+      },
+      "vocab": [
+        {
+          "en": "remain standing",
+          "zh": "一直站著"
+        },
+        {
+          "en": "throughout",
+          "zh": "整個…期間"
+        },
+        {
+          "en": "journey",
+          "zh": "旅程"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q41",
+      "stem": null,
+      "options": {
+        "A": "sensing：感覺到",
+        "B": "slowing：減慢",
+        "C": "speeding：加快",
+        "D": "stopping：停止"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-local4-law-english-q42",
+      "stem": null,
+      "options": {
+        "A": "Although：雖然",
+        "B": "As：隨著、當…的時候",
+        "C": "Whether：是否",
+        "D": "Where：在…的地方"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-local4-law-english-q43",
+      "stem": null,
+      "options": {
+        "A": "by：（increase by＝增加了多少）",
+        "B": "in：在…裡",
+        "C": "at：在（某一點）",
+        "D": "of：…的"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-local4-law-english-q44",
+      "stem": null,
+      "options": {
+        "A": "destroy：摧毀",
+        "B": "reduce：減少",
+        "C": "reach：達到",
+        "D": "define：定義"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-local4-law-english-q45",
+      "stem": null,
+      "options": {
+        "A": "satisfied：滿意的",
+        "B": "unaware：沒有察覺的",
+        "C": "surprised：驚訝的",
+        "D": "impressive：令人印象深刻的"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-local4-law-english-q46",
+      "stem": "本文主要在講什麼？",
+      "options": {
+        "A": "青少年準時起床上學的策略。",
+        "B": "青少年是否應該盡量早睡。",
+        "C": "社群媒體對青少年睡眠模式的負面影響。",
+        "D": "青少年難以適應很早的學校作息的原因。"
+      },
+      "vocab": [
+        {
+          "en": "strategy",
+          "zh": "策略"
+        },
+        {
+          "en": "impact",
+          "zh": "影響"
+        },
+        {
+          "en": "struggle with",
+          "zh": "難以應付"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q47",
+      "stem": "從本文可以推論出下列何者？",
+      "options": {
+        "A": "青少年故意熬夜來逃避作業。",
+        "B": "延後上課會消除青少年所有的心理健康問題。",
+        "C": "學校抗拒更改上課時間，部分是因為一些時間安排上的顧慮。",
+        "D": "學校太早上課可能完全是過時科學觀念的結果。"
+      },
+      "vocab": [
+        {
+          "en": "infer",
+          "zh": "推論"
+        },
+        {
+          "en": "intentionally",
+          "zh": "故意地"
+        },
+        {
+          "en": "eliminate",
+          "zh": "消除"
+        },
+        {
+          "en": "outdated",
+          "zh": "過時的"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q48",
+      "stem": "根據本文，下列敘述何者正確？",
+      "options": {
+        "A": "睡眠不足的青少年在早上的考試往往表現較好。",
+        "B": "延後上課時間已顯示出對學生有益的可能。",
+        "C": "睡眠相位後移使青少年自然更早入睡。",
+        "D": "所有學校都已經調整作息來配合青少年的睡眠需求。"
+      },
+      "vocab": [
+        {
+          "en": "potential",
+          "zh": "可能性、潛力"
+        },
+        {
+          "en": "accommodate",
+          "zh": "配合、容納"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q49",
+      "stem": "文中 “aligning school policies with scientific findings” 這句話最可能是什麼意思？",
+      "options": {
+        "A": "聘更多科學家到學校工作。",
+        "B": "把自然課排在一天中更早的時間。",
+        "C": "更改校服以反映大腦發展。",
+        "D": "依據研究顯示的最佳做法來執行學校行政。"
+      },
+      "vocab": [
+        {
+          "en": "policy",
+          "zh": "政策"
+        },
+        {
+          "en": "findings",
+          "zh": "研究結果"
+        },
+        {
+          "en": "administration",
+          "zh": "行政"
+        }
+      ]
+    },
+    {
+      "id": "114-local4-law-english-q50",
+      "stem": "下列何者最能形容本文的語氣？",
+      "options": {
+        "A": "提供資訊且支持的。",
+        "B": "輕蔑且懷疑的。",
+        "C": "漠不關心且沒有人情味的。",
+        "D": "好辯且指責的。"
+      },
+      "vocab": [
+        {
+          "en": "supportive",
+          "zh": "支持的"
+        },
+        {
+          "en": "dismissive",
+          "zh": "輕蔑的"
+        },
+        {
+          "en": "skeptical",
+          "zh": "懷疑的"
+        },
+        {
+          "en": "indifferent",
+          "zh": "漠不關心的"
+        },
+        {
+          "en": "accusatory",
+          "zh": "指責的"
+        }
+      ]
+    }
+  ]
+}

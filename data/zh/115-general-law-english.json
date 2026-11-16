@@ -1,0 +1,596 @@
+{
+  "paperId": "115-general-law-english",
+  "groups": [
+    {
+      "id": "115-general-law-english-g1",
+      "segments": [
+        {
+          "en": "Octopuses are masters of disguise and escape.",
+          "zh": "章魚是偽裝和逃脫的高手。"
+        },
+        {
+          "en": "The soft-bodied cephalopods are tasty, easy-to-eat treats for marine predators, so they've 41 a number of interesting tricks for evading their hunters.",
+          "zh": "這種身體柔軟的頭足類動物，對海洋掠食者來說是美味又容易入口的點心，所以牠們（41）不少有趣的招數來躲避獵捕者。"
+        },
+        {
+          "en": "For one, they're able to change not only the color but also the 42 of their skin.",
+          "zh": "首先，牠們不只能改變皮膚的顏色，還能改變皮膚的（42）。"
+        },
+        {
+          "en": "This allows them to instantly camouflage themselves as almost anything, from rocks to other animals.",
+          "zh": "這讓牠們能瞬間偽裝成幾乎任何東西，從岩石到其他動物都行。"
+        },
+        {
+          "en": "What's more, they're extremely 43 and use this capability to squeeze into safe hiding spaces or escape dangerous situations.",
+          "zh": "此外，牠們非常（43），並利用這個能力擠進安全的藏身處，或逃離危險的處境。"
+        },
+        {
+          "en": "If these two approaches fail, almost all octopus species are capable of producing jets of black ink to confuse and distract their predators.",
+          "zh": "如果這兩招都失敗，幾乎所有種類的章魚都能噴出黑色墨汁，來迷惑、分散掠食者的注意。"
+        },
+        {
+          "en": "Even at rest, octopuses do something a bit surprising--they dream in their sleep.",
+          "zh": "即使在休息時，章魚也會做一件有點令人意外的事——牠們睡覺時會做夢。"
+        },
+        {
+          "en": "Like human sleep, octopus sleep has two stages: quiet and active.",
+          "zh": "和人類的睡眠一樣，章魚的睡眠有兩個階段：安靜期和活躍期。"
+        },
+        {
+          "en": "And just as humans do, octopuses show 44 of dreaming during active sleep.",
+          "zh": "而且就像人類一樣，章魚在活躍睡眠期會出現做夢的（44）。"
+        },
+        {
+          "en": "Their limbs twitch, they breathe more rapidly, and colors flash across their skin.",
+          "zh": "牠們的腕足會抽動、呼吸變快，皮膚上還會閃過各種顏色。"
+        },
+        {
+          "en": "Scientists aren't sure 45 octopuses dream.",
+          "zh": "科學家不確定章魚（45）做夢。"
+        },
+        {
+          "en": "Some suggest it might help them improve their camouflage techniques, and others think it could enable them to review and learn from past experiences.",
+          "zh": "有人認為這可能幫助牠們改進偽裝技巧，也有人認為這能讓牠們回顧過去的經驗並從中學習。"
+        },
+        {
+          "en": "Perhaps one day, scientists will be able to fully understand these complex creatures.",
+          "zh": "也許有一天，科學家能完全了解這些複雜的生物。"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "disguise",
+          "zh": "偽裝"
+        },
+        {
+          "en": "cephalopod",
+          "zh": "頭足類動物"
+        },
+        {
+          "en": "predator",
+          "zh": "掠食者"
+        },
+        {
+          "en": "evade",
+          "zh": "躲避"
+        },
+        {
+          "en": "camouflage",
+          "zh": "偽裝、保護色"
+        },
+        {
+          "en": "squeeze",
+          "zh": "擠"
+        },
+        {
+          "en": "limb",
+          "zh": "肢體（這裡指腕足）"
+        },
+        {
+          "en": "twitch",
+          "zh": "抽動"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-g2",
+      "segments": [
+        {
+          "en": "A mantra is a word, sound, or phrase repeated to focus the mind or express a strong belief.",
+          "zh": "真言（mantra）是為了集中心神或表達強烈信念而反覆念誦的字、聲音或短語。"
+        },
+        {
+          "en": "Derived from the ancient Sanskrit language, “man” means “mind” and “tra” means “instrument.”",
+          "zh": "這個字源自古老的梵語，“man” 的意思是「心」，“tra” 的意思是「工具」。"
+        },
+        {
+          "en": "There are three main types of mantras, each of which has different qualities and purposes.",
+          "zh": "真言主要有三種，每一種有不同的特質和目的。"
+        },
+        {
+          "en": "Bija mantras are short one-syllable words that contain a great deal of vibrational energy.",
+          "zh": "種子真言（Bija）是單音節的短字，蘊含大量的振動能量。"
+        },
+        {
+          "en": "They are often chanted alone, but can be found in longer mantras.",
+          "zh": "它們常被單獨念誦，但也會出現在較長的真言裡。"
+        },
+        {
+          "en": "Each mantra is associated with goddesses, the five elements of nature, or the seven chakra energy centers.",
+          "zh": "每個真言都和女神、自然的五種元素，或七個脈輪能量中心有關。"
+        },
+        {
+          "en": "Saguna mantras focus on the name of a particular god or goddess and involve the visualization of the deity.",
+          "zh": "有相真言（Saguna）專注在特定男神或女神的名字，並且要在心中觀想這位神祇。"
+        },
+        {
+          "en": "Thus, the chanting is more than repeating words but calling upon qualities that the deity represents.",
+          "zh": "因此，念誦不只是重複字句，而是召喚這位神祇所代表的特質。"
+        },
+        {
+          "en": "The whole process is personalized, allowing the chanter to connect directly with the deity.",
+          "zh": "整個過程是個人化的，讓念誦者能直接和神祇連結。"
+        },
+        {
+          "en": "Nirguna mantras are older than the other two types.",
+          "zh": "無相真言（Nirguna）比另外兩種更古老。"
+        },
+        {
+          "en": "They do not chant any particular deity, which makes it much more abstract and difficult to interpret.",
+          "zh": "它們不念誦任何特定的神祇，因此抽象得多，也更難解讀。"
+        },
+        {
+          "en": "These mantras relate to the universal truths and concepts like consciousness and peace.",
+          "zh": "這些真言和普遍的真理，以及意識、平靜這類概念有關。"
+        },
+        {
+          "en": "Transcending the physical world, they are not recommended for beginners.",
+          "zh": "它們超越了物質世界，不建議初學者使用。"
+        },
+        {
+          "en": "Chanting mantras has been practiced for centuries.",
+          "zh": "念誦真言已經有好幾個世紀的歷史。"
+        },
+        {
+          "en": "Nowadays, even scientific studies recognize benefits of mantra chanting.",
+          "zh": "現在，連科學研究都認可念誦真言的好處。"
+        },
+        {
+          "en": "If you are looking for the balance between the mind, body, and spirit, you can give chanting mantras a try!",
+          "zh": "如果你正在尋求心、身、靈的平衡，可以試試念誦真言！"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "mantra",
+          "zh": "真言、咒語"
+        },
+        {
+          "en": "derived from",
+          "zh": "源自"
+        },
+        {
+          "en": "Sanskrit",
+          "zh": "梵語"
+        },
+        {
+          "en": "syllable",
+          "zh": "音節"
+        },
+        {
+          "en": "chant",
+          "zh": "念誦"
+        },
+        {
+          "en": "deity",
+          "zh": "神祇"
+        },
+        {
+          "en": "visualization",
+          "zh": "觀想（在心中想像）"
+        },
+        {
+          "en": "abstract",
+          "zh": "抽象的"
+        },
+        {
+          "en": "transcend",
+          "zh": "超越"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "115-general-law-english-q31",
+      "stem": "長途飛行之後，你可以＿＿雙腿、把腳趾往上勾，來預防肌肉和關節僵硬。",
+      "options": {
+        "A": "stretch：伸展",
+        "B": "explore：探索",
+        "C": "provide：提供",
+        "D": "initiate：發起"
+      },
+      "vocab": [
+        {
+          "en": "toe",
+          "zh": "腳趾"
+        },
+        {
+          "en": "stiff",
+          "zh": "僵硬的"
+        },
+        {
+          "en": "joint",
+          "zh": "關節"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q32",
+      "stem": "救難隊做了＿＿的努力，救出受困在懸崖上的登山客。",
+      "options": {
+        "A": "normal：正常的",
+        "B": "ordinary：普通的",
+        "C": "indifferent：漠不關心的",
+        "D": "remarkable：非凡的、了不起的"
+      },
+      "vocab": [
+        {
+          "en": "rescue team",
+          "zh": "救難隊"
+        },
+        {
+          "en": "stranded",
+          "zh": "受困的"
+        },
+        {
+          "en": "cliff",
+          "zh": "懸崖"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q33",
+      "stem": "研討會委員會感謝與會者和評論人提出＿＿的意見。",
+      "options": {
+        "A": "thoughtful：用心的、深思熟慮的",
+        "B": "destructive：破壞性的",
+        "C": "industrial：工業的",
+        "D": "disgraceful：可恥的"
+      },
+      "vocab": [
+        {
+          "en": "conference committee",
+          "zh": "研討會委員會"
+        },
+        {
+          "en": "participant",
+          "zh": "與會者"
+        },
+        {
+          "en": "comment",
+          "zh": "意見、評論"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q34",
+      "stem": "那位喜劇演員一點都不好笑；他＿＿又冒犯人的言論讓一些觀眾不高興。",
+      "options": {
+        "A": "crude：粗俗的",
+        "B": "faint：微弱的",
+        "C": "moist：潮濕的",
+        "D": "beige：米色的"
+      },
+      "vocab": [
+        {
+          "en": "comedian",
+          "zh": "喜劇演員"
+        },
+        {
+          "en": "offensive remarks",
+          "zh": "冒犯人的言論"
+        },
+        {
+          "en": "upset",
+          "zh": "使不高興"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q35",
+      "stem": "我想＿＿ iPad 上的照片。你可以告訴我怎麼刪掉嗎？",
+      "options": {
+        "A": "corporate：公司的",
+        "B": "eliminate：清除",
+        "C": "penetrate：穿透",
+        "D": "tolerate：容忍"
+      },
+      "vocab": [
+        {
+          "en": "delete",
+          "zh": "刪除"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q36",
+      "stem": "這幅畫描繪了一片春天的＿＿，有個年輕的農家女孩坐在樹下。",
+      "options": {
+        "A": "landscape：風景",
+        "B": "access：通道",
+        "C": "process：過程",
+        "D": "result：結果"
+      },
+      "vocab": [
+        {
+          "en": "depict",
+          "zh": "描繪"
+        },
+        {
+          "en": "peasant",
+          "zh": "農民"
+        },
+        {
+          "en": "beneath",
+          "zh": "在…下面"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q37",
+      "stem": "我常常把很多禮物和快樂的生日回憶＿＿在一起。",
+      "options": {
+        "A": "disconnect：切斷",
+        "B": "separate：分開",
+        "C": "associate：聯想、連結（associate A with B）",
+        "D": "isolate：隔離"
+      },
+      "vocab": [
+        {
+          "en": "memory",
+          "zh": "回憶"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q38",
+      "stem": "這部電影太悲傷了，觀眾在結局時開始＿＿。",
+      "options": {
+        "A": "weep：哭泣",
+        "B": "joke：開玩笑",
+        "C": "yarn：紗線",
+        "D": "laugh：笑"
+      },
+      "vocab": [
+        {
+          "en": "audience",
+          "zh": "觀眾"
+        },
+        {
+          "en": "ending",
+          "zh": "結局"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q39",
+      "stem": "深夜突然聽到腳步聲靠近，她嚇得＿＿，以免被發現。",
+      "options": {
+        "A": "froze：僵住不動（freeze 的過去式）",
+        "B": "napped：打盹",
+        "C": "shouted：大叫",
+        "D": "exposed：暴露"
+      },
+      "vocab": [
+        {
+          "en": "unexpectedly",
+          "zh": "突然地、出乎意料地"
+        },
+        {
+          "en": "in fear",
+          "zh": "害怕地"
+        },
+        {
+          "en": "avoid being discovered",
+          "zh": "避免被發現"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q40",
+      "stem": "聖母峰最高＿＿ 8,849 公尺，是海平面以上世界最高的山。",
+      "options": {
+        "A": "longevity：長壽",
+        "B": "elevation：海拔",
+        "C": "magnitude：規模、震級",
+        "D": "submersion：浸沒"
+      },
+      "vocab": [
+        {
+          "en": "peak",
+          "zh": "頂峰"
+        },
+        {
+          "en": "Mount Everest",
+          "zh": "聖母峰"
+        },
+        {
+          "en": "sea level",
+          "zh": "海平面"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q41",
+      "stem": null,
+      "options": {
+        "A": "abandoned：放棄",
+        "B": "evolved：演化出",
+        "C": "inhabited：居住於",
+        "D": "denied：否認"
+      },
+      "vocab": []
+    },
+    {
+      "id": "115-general-law-english-q42",
+      "stem": null,
+      "options": {
+        "A": "closure：關閉",
+        "B": "inclusion：包含",
+        "C": "member：成員",
+        "D": "texture：質地、紋理"
+      },
+      "vocab": []
+    },
+    {
+      "id": "115-general-law-english-q43",
+      "stem": null,
+      "options": {
+        "A": "flexible：柔軟有彈性的",
+        "B": "intensive：密集的",
+        "C": "physical：身體的",
+        "D": "terrible：糟糕的"
+      },
+      "vocab": []
+    },
+    {
+      "id": "115-general-law-english-q44",
+      "stem": null,
+      "options": {
+        "A": "debts：債務",
+        "B": "fields：領域；田野",
+        "C": "signs：跡象",
+        "D": "tests：測驗"
+      },
+      "vocab": []
+    },
+    {
+      "id": "115-general-law-english-q45",
+      "stem": null,
+      "options": {
+        "A": "whether：是否",
+        "B": "where：在哪裡",
+        "C": "when：何時",
+        "D": "why：為什麼"
+      },
+      "vocab": []
+    },
+    {
+      "id": "115-general-law-english-q46",
+      "stem": "根據本文，什麼是真言？",
+      "options": {
+        "A": "連結心、身、靈的工具。",
+        "B": "表達你神聖信仰的動聽歌曲。",
+        "C": "能產生科學無法解釋之效果的聲音。",
+        "D": "用來鼓勵你繼續前進的短語。"
+      },
+      "vocab": [
+        {
+          "en": "instrument",
+          "zh": "工具；樂器"
+        },
+        {
+          "en": "catchy",
+          "zh": "朗朗上口的"
+        },
+        {
+          "en": "divine",
+          "zh": "神聖的"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q47",
+      "stem": "從本文可以推論出什麼？",
+      "options": {
+        "A": "樂器會影響念誦真言的效果。",
+        "B": "念誦真言帶來的好處有科學證據支持。",
+        "C": "念誦真言雖然歷史悠久，卻很少人知道。",
+        "D": "不同種類的真言之間，衝突多於相似。"
+      },
+      "vocab": [
+        {
+          "en": "infer",
+          "zh": "推論"
+        },
+        {
+          "en": "evidence",
+          "zh": "證據"
+        },
+        {
+          "en": "similarity",
+          "zh": "相似之處"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q48",
+      "stem": "根據本文，念誦「毀滅之神」的名字，應該歸在哪一種真言？",
+      "options": {
+        "A": "種子真言（Bija）。",
+        "B": "有相真言（Saguna）。",
+        "C": "無相真言（Nirguna）。",
+        "D": "單音節真言。"
+      },
+      "vocab": [
+        {
+          "en": "destruction",
+          "zh": "毀滅"
+        },
+        {
+          "en": "be placed under",
+          "zh": "歸在…之下"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q49",
+      "stem": "下列何者和文中 “Derived” 的意思最接近？",
+      "options": {
+        "A": "起源於。",
+        "B": "衰退。",
+        "C": "刪除。",
+        "D": "省略。"
+      },
+      "vocab": [
+        {
+          "en": "originate",
+          "zh": "起源"
+        },
+        {
+          "en": "decline",
+          "zh": "衰退"
+        },
+        {
+          "en": "omit",
+          "zh": "省略"
+        }
+      ]
+    },
+    {
+      "id": "115-general-law-english-q50",
+      "stem": "最後一段作者的用意是什麼？",
+      "options": {
+        "A": "回顧三種主要的真言。",
+        "B": "鼓勵讀者練習念誦真言。",
+        "C": "告知讀者念誦的潛在風險。",
+        "D": "預測念誦真言的發展。"
+      },
+      "vocab": [
+        {
+          "en": "intention",
+          "zh": "用意"
+        },
+        {
+          "en": "potential risk",
+          "zh": "潛在風險"
+        },
+        {
+          "en": "predict",
+          "zh": "預測"
+        }
+      ]
+    }
+  ]
+}

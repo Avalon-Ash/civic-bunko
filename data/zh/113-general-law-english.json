@@ -1,0 +1,616 @@
+{
+  "paperId": "113-general-law-english",
+  "groups": [
+    {
+      "id": "113-general-law-english-g1",
+      "segments": [
+        {
+          "en": "A recent study from Brazil finds a connection between vegetarianism and mental health issues.",
+          "zh": "巴西最近一項研究發現，吃素和心理健康問題之間有關聯。"
+        },
+        {
+          "en": "The study, in which 14,216 people between 35 to 74 years old were surveyed, shows that individuals following vegetarian diets are more 41 to depression.",
+          "zh": "這項研究調查了 14,216 名 35 到 74 歲的人，結果顯示吃素的人比較（41）得到憂鬱症。"
+        },
+        {
+          "en": "In fact, those who don’t eat meat are twice more likely to have a depressive episode than meat consumers.",
+          "zh": "事實上，不吃肉的人出現憂鬱發作的機率，是吃肉者的兩倍。"
+        },
+        {
+          "en": "While there is evidence 42 to a lack of meat consumption causing more mental health issues, there are some conflicting studies that find no correlation between vegetarian diets and mood effects.",
+          "zh": "雖然有證據（42）不吃肉會造成較多心理健康問題，但也有一些結論相反的研究，發現吃素和情緒影響之間沒有關聯。"
+        },
+        {
+          "en": "According to these studies, it might be too straightforward to 43 that the former is causing the latter via nutritional deficiency.",
+          "zh": "依這些研究，直接（43）前者是透過營養不足造成後者，可能想得太簡單了。"
+        },
+        {
+          "en": "A healthy diet goes 44 identifying as a vegetarian or non-vegetarian.",
+          "zh": "健康的飲食（44）「自認是素食者或非素食者」這件事。"
+        },
+        {
+          "en": "There are other 45 not examined but are plausibly linked to both vegetarianism and depression.",
+          "zh": "還有其他沒被檢視的（45），可能同時和吃素、憂鬱症都有關。"
+        },
+        {
+          "en": "One thing for sure is that a balanced intake accompanied by regular exercise is essential in maintaining physical and mental health.",
+          "zh": "可以確定的是，均衡攝取加上規律運動，是維持身心健康的關鍵。"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "vegetarian",
+          "zh": "素食的；素食者"
+        },
+        {
+          "en": "depression",
+          "zh": "憂鬱症"
+        },
+        {
+          "en": "correlation",
+          "zh": "關聯"
+        },
+        {
+          "en": "deficiency",
+          "zh": "缺乏、不足"
+        },
+        {
+          "en": "plausibly",
+          "zh": "很有可能地"
+        },
+        {
+          "en": "intake",
+          "zh": "攝取量"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-g2",
+      "segments": [
+        {
+          "en": "Most food staples are inexpensive, plant-based foods, usually full of calories for energy.",
+          "zh": "大多數主食是便宜的植物性食物，通常富含提供能量的熱量。"
+        },
+        {
+          "en": "There are more than 50,000 edible plants in the world, but just 15 of them provide 90 percent of the world’s food energy intake.",
+          "zh": "世界上可食用的植物超過 5 萬種，但其中只有 15 種，就提供了全世界 90% 的食物能量攝取。"
+        },
+        {
+          "en": "Rice, corn, and wheat make up two-thirds of this.",
+          "zh": "稻米、玉米和小麥占了其中的三分之二。"
+        },
+        {
+          "en": "Food staples traditionally depend on what plants are native to a region.",
+          "zh": "主食傳統上取決於一個地區原生哪些植物。"
+        },
+        {
+          "en": "Rice is a food staple for more than 3.5 billion people around the world, particularly in Asia, Latin America, and parts of Africa.",
+          "zh": "稻米是全世界超過 35 億人的主食，尤其是在亞洲、拉丁美洲和非洲部分地區。"
+        },
+        {
+          "en": "Rice has been cultivated in Asia for thousands of years.",
+          "zh": "亞洲種植稻米已經有數千年。"
+        },
+        {
+          "en": "Scientists believe people first domesticated rice in India or Southeast Asia.",
+          "zh": "科學家認為，人類最早是在印度或東南亞馴化稻米。"
+        },
+        {
+          "en": "Rice arrived in Japan in about 3,000 years ago.",
+          "zh": "稻米大約在 3,000 年前傳到日本。"
+        },
+        {
+          "en": "The Portuguese most likely introduced it into South America in the 16th century.",
+          "zh": "葡萄牙人很可能在 16 世紀把它引進南美洲。"
+        },
+        {
+          "en": "Today, the world’s largest rice producers are China, India, and Indonesia.",
+          "zh": "現在世界上最大的稻米生產國是中國、印度和印尼。"
+        },
+        {
+          "en": "Outside of Asia, Brazil is the largest rice producer.",
+          "zh": "在亞洲以外，巴西是最大的稻米生產國。"
+        },
+        {
+          "en": "Corn is native to Central America, where it was domesticated by the Aztecs and Mayans.",
+          "zh": "玉米原產於中美洲，由阿茲特克人和馬雅人馴化。"
+        },
+        {
+          "en": "The United States is the world’s largest corn grower, producing more than 40 percent of the world’s corn.",
+          "zh": "美國是世界最大的玉米種植國，產量占全世界四成以上。"
+        },
+        {
+          "en": "Corn is often used to produce corn oil, sweeteners such as corn syrup, and cornstarch, which is used as a sweetener and thickening agent in home cooking.",
+          "zh": "玉米常用來製造玉米油、玉米糖漿之類的甜味劑，以及玉米澱粉；玉米澱粉在家庭烹飪中用來當甜味劑和增稠劑。"
+        },
+        {
+          "en": "Also, alcohol from fermented corn is the source of bourbon whiskey.",
+          "zh": "此外，玉米發酵產生的酒精是波本威士忌的原料。"
+        },
+        {
+          "en": "Wheat was first domesticated in the Middle East.",
+          "zh": "小麥最早在中東被馴化。"
+        },
+        {
+          "en": "Wheat grows well in temperate climates, even those with a short growing season.",
+          "zh": "小麥在溫帶氣候長得很好，即使生長季很短的地方也一樣。"
+        },
+        {
+          "en": "Today, China, India, the United States, Russia, and France are among the largest wheat producers in the world.",
+          "zh": "現在中國、印度、美國、俄羅斯和法國都名列世界最大的小麥生產國。"
+        },
+        {
+          "en": "The majority of breads are made with wheat flour.",
+          "zh": "大多數麵包是用小麥麵粉做的。"
+        },
+        {
+          "en": "Wheat flour is also used in pasta, pastries, crackers, breakfast cereals, and noodles.",
+          "zh": "小麥麵粉也用來做義大利麵、糕點、餅乾、早餐穀片和麵條。"
+        },
+        {
+          "en": "In addition to cereal grains, roots, and tubers are common food staples, particularly in tropical regions.",
+          "zh": "除了穀類之外，根類和塊莖類也是常見的主食，尤其在熱帶地區。"
+        },
+        {
+          "en": "Yams are an important food in the rainforests of West Africa.",
+          "zh": "山藥是西非雨林地區的重要食物。"
+        },
+        {
+          "en": "Potatoes are native to the cold climate of the Andes Mountains.",
+          "zh": "馬鈴薯原產於安地斯山脈的寒冷氣候。"
+        },
+        {
+          "en": "They were introduced to Europe by explorers of the 16th century and are now a food staple in Europe and parts of the Americas.",
+          "zh": "它們在 16 世紀由探險家引進歐洲，現在是歐洲和美洲部分地區的主食。"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "food staple",
+          "zh": "主食"
+        },
+        {
+          "en": "edible",
+          "zh": "可食用的"
+        },
+        {
+          "en": "domesticate",
+          "zh": "馴化（把野生的變成人工栽種）"
+        },
+        {
+          "en": "native to",
+          "zh": "原產於"
+        },
+        {
+          "en": "temperate",
+          "zh": "溫帶的；溫和的"
+        },
+        {
+          "en": "fermented",
+          "zh": "發酵的"
+        },
+        {
+          "en": "tuber",
+          "zh": "塊莖"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "113-general-law-english-q31",
+      "stem": "研究者在自己的文章裡，只要有需要，就應該＿＿資料的來源。",
+      "options": {
+        "A": "decay：腐爛",
+        "B": "grind：研磨",
+        "C": "quote：引用",
+        "D": "tease：取笑"
+      },
+      "vocab": [
+        {
+          "en": "researcher",
+          "zh": "研究者"
+        },
+        {
+          "en": "source",
+          "zh": "來源"
+        },
+        {
+          "en": "wherever necessary",
+          "zh": "凡是有需要的地方"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q32",
+      "stem": "為了怎麼教育孩子大＿＿一場之後，這對夫妻不幸離婚了。",
+      "options": {
+        "A": "query：疑問",
+        "B": "quarter：四分之一",
+        "C": "quota：配額",
+        "D": "quarrel：爭吵"
+      },
+      "vocab": [
+        {
+          "en": "bitter",
+          "zh": "激烈的；苦的"
+        },
+        {
+          "en": "educate",
+          "zh": "教育"
+        },
+        {
+          "en": "get divorced",
+          "zh": "離婚"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q33",
+      "stem": "這家公司的新款汽車電池，在設計和功能上都＿＿競爭對手。",
+      "options": {
+        "A": "divorced：離婚的",
+        "B": "pregnant：懷孕的",
+        "C": "superior：優於…的（superior to）",
+        "D": "volcanic：火山的"
+      },
+      "vocab": [
+        {
+          "en": "battery",
+          "zh": "電池"
+        },
+        {
+          "en": "competitor",
+          "zh": "競爭對手"
+        },
+        {
+          "en": "function",
+          "zh": "功能"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q34",
+      "stem": "一般認為地中海飲食能促進心臟健康，並且＿＿血糖值。",
+      "options": {
+        "A": "induce：引起",
+        "B": "suspect：懷疑",
+        "C": "deposit：存放；訂金",
+        "D": "regulate：調節"
+      },
+      "vocab": [
+        {
+          "en": "Mediterranean diet",
+          "zh": "地中海飲食"
+        },
+        {
+          "en": "promote",
+          "zh": "促進"
+        },
+        {
+          "en": "blood sugar level",
+          "zh": "血糖值"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q35",
+      "stem": "環境因素和＿＿因素，都可能促成人類癌症的發生。",
+      "options": {
+        "A": "frequent：頻繁的",
+        "B": "genetic：遺傳的",
+        "C": "positive：正面的",
+        "D": "restful：令人放鬆的"
+      },
+      "vocab": [
+        {
+          "en": "factor",
+          "zh": "因素"
+        },
+        {
+          "en": "contribute to",
+          "zh": "促成"
+        },
+        {
+          "en": "cancer",
+          "zh": "癌症"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q36",
+      "stem": "他在這個領域的＿＿和專業，讓他升上了領導職位。",
+      "options": {
+        "A": "confrontation：對抗",
+        "B": "conflict：衝突",
+        "C": "conference：會議",
+        "D": "competence：能力"
+      },
+      "vocab": [
+        {
+          "en": "expertise",
+          "zh": "專業知識"
+        },
+        {
+          "en": "earn",
+          "zh": "贏得"
+        },
+        {
+          "en": "promotion",
+          "zh": "升遷"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q37",
+      "stem": "談判失敗之後，這兩個國家最後＿＿戰爭。",
+      "options": {
+        "A": "resisted：抵抗",
+        "B": "refrained：克制（refrain from）",
+        "C": "resorted：訴諸（resort to）",
+        "D": "retracted：撤回"
+      },
+      "vocab": [
+        {
+          "en": "nation",
+          "zh": "國家"
+        },
+        {
+          "en": "negotiation",
+          "zh": "談判"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q38",
+      "stem": "這間不錯的公寓到捷運站的＿＿很好，所以賣到很高的價錢。",
+      "options": {
+        "A": "decoration：裝潢",
+        "B": "garden：花園",
+        "C": "studio：工作室；套房",
+        "D": "access：通道；到達的方便性"
+      },
+      "vocab": [
+        {
+          "en": "apartment",
+          "zh": "公寓"
+        },
+        {
+          "en": "MRT station",
+          "zh": "捷運站"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q39",
+      "stem": "發起這場罷工，是為了替員工＿＿更好的薪資和工作條件。",
+      "options": {
+        "A": "deceive：欺騙",
+        "B": "demand：要求",
+        "C": "deploy：部署",
+        "D": "depart：離開"
+      },
+      "vocab": [
+        {
+          "en": "strike",
+          "zh": "罷工"
+        },
+        {
+          "en": "wage",
+          "zh": "薪資"
+        },
+        {
+          "en": "working conditions",
+          "zh": "工作條件"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q40",
+      "stem": "要訂飯店房間，你需要先用信用卡付 50% 的＿＿。",
+      "options": {
+        "A": "decision：決定",
+        "B": "defense：防禦",
+        "C": "demand：要求",
+        "D": "deposit：訂金"
+      },
+      "vocab": [
+        {
+          "en": "book",
+          "zh": "預訂"
+        },
+        {
+          "en": "in advance",
+          "zh": "事先"
+        },
+        {
+          "en": "credit card",
+          "zh": "信用卡"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q41",
+      "stem": null,
+      "options": {
+        "A": "attainable：可達成的",
+        "B": "conceivable：可想像的",
+        "C": "susceptible：容易受…影響的（susceptible to）",
+        "D": "tangible：有形的、摸得到的"
+      },
+      "vocab": []
+    },
+    {
+      "id": "113-general-law-english-q42",
+      "stem": null,
+      "options": {
+        "A": "point：動詞原形",
+        "B": "points：第三人稱單數",
+        "C": "pointed：過去式／過去分詞",
+        "D": "pointing：現在分詞（evidence pointing to＝指向…的證據）"
+      },
+      "vocab": []
+    },
+    {
+      "id": "113-general-law-english-q43",
+      "stem": null,
+      "options": {
+        "A": "assume：假定、認定",
+        "B": "perform：執行；表演",
+        "C": "execute：執行",
+        "D": "transform：轉變"
+      },
+      "vocab": []
+    },
+    {
+      "id": "113-general-law-english-q44",
+      "stem": null,
+      "options": {
+        "A": "except for：除了…以外",
+        "B": "less than：少於",
+        "C": "nothing but：只不過是",
+        "D": "far beyond：遠遠超出"
+      },
+      "vocab": []
+    },
+    {
+      "id": "113-general-law-english-q45",
+      "stem": null,
+      "options": {
+        "A": "propaganda：（政治）宣傳",
+        "B": "formations：形成；隊形",
+        "C": "variables：變數、變因",
+        "D": "brochures：小冊子"
+      },
+      "vocab": []
+    },
+    {
+      "id": "113-general-law-english-q46",
+      "stem": "根據本文，下列敘述何者「不」正確？",
+      "options": {
+        "A": "人類最早在中美洲種植玉米。",
+        "B": "馬鈴薯最早在歐洲被馴化。",
+        "C": "小麥最早在中東栽種。",
+        "D": "印度或東南亞的人最早種植稻米。"
+      },
+      "vocab": [
+        {
+          "en": "NOT true",
+          "zh": "不正確"
+        },
+        {
+          "en": "cultivate",
+          "zh": "栽種"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q47",
+      "stem": "根據本文，下列何者最能說明主食在人類社會中扮演的角色？",
+      "options": {
+        "A": "主要為了出口而製造的產品。",
+        "B": "大宗商品買賣的集散城鎮。",
+        "C": "用來把紙張釘在一起的小段金屬線（釘書針）。",
+        "D": "構成一個族群飲食主要部分的食物。"
+      },
+      "vocab": [
+        {
+          "en": "staple",
+          "zh": "主食；也有「釘書針」的意思"
+        },
+        {
+          "en": "exportation",
+          "zh": "出口"
+        },
+        {
+          "en": "commodity",
+          "zh": "商品"
+        },
+        {
+          "en": "dominant",
+          "zh": "主要的"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q48",
+      "stem": "根據本文，下列何者「沒有」被提到是玉米製成的產品？",
+      "options": {
+        "A": "玉米油。",
+        "B": "酒。",
+        "C": "甜味劑。",
+        "D": "早餐穀片。"
+      },
+      "vocab": [
+        {
+          "en": "liquor",
+          "zh": "烈酒"
+        },
+        {
+          "en": "sweetener",
+          "zh": "甜味劑"
+        },
+        {
+          "en": "cereal",
+          "zh": "穀片；穀類"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q49",
+      "stem": "下列何者和文中 “temperate” 這個字的意思最接近？",
+      "options": {
+        "A": "溫和的。",
+        "B": "無趣的；鈍的。",
+        "C": "嚴酷的。",
+        "D": "節儉的。"
+      },
+      "vocab": [
+        {
+          "en": "closest in meaning",
+          "zh": "意思最接近"
+        },
+        {
+          "en": "mild",
+          "zh": "溫和的"
+        },
+        {
+          "en": "harsh",
+          "zh": "嚴酷的"
+        },
+        {
+          "en": "thrifty",
+          "zh": "節儉的"
+        }
+      ]
+    },
+    {
+      "id": "113-general-law-english-q50",
+      "stem": "下列何者最可能是本文的出處？",
+      "options": {
+        "A": "地理雜誌。",
+        "B": "室內設計手冊。",
+        "C": "展覽小冊子。",
+        "D": "產品使用手冊。"
+      },
+      "vocab": [
+        {
+          "en": "source",
+          "zh": "出處、來源"
+        },
+        {
+          "en": "geographic",
+          "zh": "地理的"
+        },
+        {
+          "en": "pamphlet",
+          "zh": "小冊子"
+        },
+        {
+          "en": "manual",
+          "zh": "使用手冊"
+        }
+      ]
+    }
+  ]
+}

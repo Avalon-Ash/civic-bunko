@@ -1,0 +1,576 @@
+{
+  "paperId": "114-general-law-english",
+  "groups": [
+    {
+      "id": "114-general-law-english-g1",
+      "segments": [
+        {
+          "en": "Maglev trains, a fusion of “magnetic” and “levitation,” utilize magnetism to offer a fast and smooth railway service.",
+          "zh": "磁浮列車（maglev）這個字是「磁力」和「懸浮」的結合，它利用磁力提供快速又平穩的鐵路服務。"
+        },
+        {
+          "en": "Instead of wheels, these trains have special electromagnetic systems 41 them up and move them forward.",
+          "zh": "這種列車沒有輪子，而是有特殊的電磁系統（41）它們往上推，並帶動它們前進。"
+        },
+        {
+          "en": "They zoom along the tracks at incredible speeds, far exceeding those of traditional trains.",
+          "zh": "它們以驚人的速度沿著軌道飛馳，遠遠超過傳統列車。"
+        },
+        {
+          "en": "They can achieve speeds above 300 miles per hour, 42 bullet trains usually go around 200 miles per hour.",
+          "zh": "它們的時速可以超過 300 英里，（42）子彈列車通常大約是時速 200 英里。"
+        },
+        {
+          "en": "What makes maglev trains special is that they don’t touch the ground, so there is no friction, which means they can go extremely fast without any 43 .",
+          "zh": "磁浮列車特別的地方在於不接觸地面，所以沒有摩擦力，也就是說可以在沒有任何（43）的情況下跑得非常快。"
+        },
+        {
+          "en": "Right now, there are only a limited number of these amazing trains in 44 , but they are expected to become more popular in the future.",
+          "zh": "目前只有少數這種驚人的列車在（44）中，但預期將來會更普及。"
+        },
+        {
+          "en": "They operate quietly, are cost-effective to maintain, and produce minimal pollution 45 to certain other types of trains.",
+          "zh": "它們運行安靜、維護成本划算，而且和某些其他類型的列車（45），產生的污染極少。"
+        },
+        {
+          "en": "In fact, it is predicted that they may be even as popular as air transportation one day!",
+          "zh": "事實上，有人預測它們有一天可能和航空運輸一樣普及！"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "magnetic",
+          "zh": "磁力的"
+        },
+        {
+          "en": "levitation",
+          "zh": "懸浮"
+        },
+        {
+          "en": "electromagnetic",
+          "zh": "電磁的"
+        },
+        {
+          "en": "exceed",
+          "zh": "超過"
+        },
+        {
+          "en": "friction",
+          "zh": "摩擦力"
+        },
+        {
+          "en": "cost-effective",
+          "zh": "划算的"
+        },
+        {
+          "en": "minimal",
+          "zh": "極少的"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-g2",
+      "segments": [
+        {
+          "en": "We all have the same number of hours each day, and it’s up to us to decide how we spend them.",
+          "zh": "我們每個人每天都有同樣多的時間，怎麼用由我們自己決定。"
+        },
+        {
+          "en": "According to “the 5-hour rule,” how we choose to spend those hours might mean the difference between success and mediocrity.",
+          "zh": "依照「五小時法則」，我們選擇怎麼用這些時間，可能就是成功與平庸的差別。"
+        },
+        {
+          "en": "There are 24 hours in a day.",
+          "zh": "一天有 24 小時。"
+        },
+        {
+          "en": "The average person sleeps around eight hours, with the Dutch sleeping the most and the Singaporeans the least.",
+          "zh": "一般人大約睡八小時，其中荷蘭人睡最多，新加坡人睡最少。"
+        },
+        {
+          "en": "After we subtract 7 hours of working time, we’re down to 9 remaining hours.",
+          "zh": "扣掉 7 小時的工作時間後，只剩 9 小時。"
+        },
+        {
+          "en": "Much of those 9 hours are taken up by shopping, housework, unpaid labor (e.g. care work), eating and drinking.",
+          "zh": "這 9 小時裡，有很多被購物、家事、無酬勞動（例如照顧工作）、吃喝占掉。"
+        },
+        {
+          "en": "Of course, there are massive cultural differences.",
+          "zh": "當然，文化差異非常大。"
+        },
+        {
+          "en": "For instance, people in France, Greece, Italy and Spain report spending more time eating than people in most other European countries.",
+          "zh": "例如，法國、希臘、義大利和西班牙的人表示，他們花在吃飯的時間比大多數其他歐洲國家的人多。"
+        },
+        {
+          "en": "The country where people spend the least time eating and drinking is the USA (63 minutes).",
+          "zh": "花最少時間吃喝的國家是美國（63 分鐘）。"
+        },
+        {
+          "en": "Most people have at least a few hours to do with what they want.",
+          "zh": "大多數人至少有幾個小時可以做自己想做的事。"
+        },
+        {
+          "en": "For more than half of the population, those hours are wasted away on non-work-related phone worship.",
+          "zh": "對超過一半的人來說，這些時間都浪費在和工作無關的滑手機上。"
+        },
+        {
+          "en": "But these are not the people who will become the entrepreneurs, innovators, and success stories of tomorrow.",
+          "zh": "但這些人不會成為明日的創業家、創新者和成功故事的主角。"
+        },
+        {
+          "en": "The “5-hour rule” is the rule where we spend one hour a day learning, reflecting, and thinking.",
+          "zh": "「五小時法則」是每天花一小時學習、反思和思考。"
+        },
+        {
+          "en": "We do this five times a week, which makes up the “5-hour” rule.",
+          "zh": "一星期做五次，合起來就是「五小時」法則。"
+        },
+        {
+          "en": "The rule dates to Benjamin Franklin, who would devote an hour each day specifically to learning something new.",
+          "zh": "這個法則可以追溯到班傑明．富蘭克林，他每天會特別撥出一小時學新東西。"
+        },
+        {
+          "en": "Today, Elon Musk, Oprah Winfrey, and Bill Gates all employ some version of the 5-hour rule.",
+          "zh": "現在，伊隆．馬斯克、歐普拉．溫芙蕾和比爾．蓋茲都採用某種版本的五小時法則。"
+        },
+        {
+          "en": "So, why not give the 5-hour rule a go?",
+          "zh": "所以，何不試試五小時法則？"
+        },
+        {
+          "en": "At worst, it will make you a bit more interesting at the next family gathering.",
+          "zh": "最差的情況，它會讓你在下次家庭聚會上變得有趣一點。"
+        },
+        {
+          "en": "At best, it might make you a few million dollars.",
+          "zh": "最好的情況，它可能讓你賺進幾百萬美元。"
+        }
+      ],
+      "vocab": [
+        {
+          "en": "mediocrity",
+          "zh": "平庸"
+        },
+        {
+          "en": "subtract",
+          "zh": "扣掉、減去"
+        },
+        {
+          "en": "unpaid labor",
+          "zh": "無酬勞動"
+        },
+        {
+          "en": "entrepreneur",
+          "zh": "創業家"
+        },
+        {
+          "en": "innovator",
+          "zh": "創新者"
+        },
+        {
+          "en": "reflect",
+          "zh": "反思"
+        },
+        {
+          "en": "devote",
+          "zh": "投入、撥出（時間）"
+        },
+        {
+          "en": "give it a go",
+          "zh": "試試看"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "114-general-law-english-q31",
+      "stem": "學校正在加強努力，教育學生認識濫用藥物的負面＿＿。",
+      "options": {
+        "A": "decorations：裝飾",
+        "B": "percentages：百分比",
+        "C": "monuments：紀念碑",
+        "D": "consequences：後果"
+      },
+      "vocab": [
+        {
+          "en": "additional",
+          "zh": "額外的"
+        },
+        {
+          "en": "drug abuse",
+          "zh": "藥物濫用"
+        },
+        {
+          "en": "negative",
+          "zh": "負面的"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q32",
+      "stem": "＿＿聽到腳步聲靠近，就逃離了現場。",
+      "options": {
+        "A": "burgers：漢堡",
+        "B": "bulges：鼓起的地方",
+        "C": "butchers：肉販",
+        "D": "burglars：竊賊"
+      },
+      "vocab": [
+        {
+          "en": "flee（過去式 fled）",
+          "zh": "逃離"
+        },
+        {
+          "en": "scene",
+          "zh": "現場"
+        },
+        {
+          "en": "approaching footsteps",
+          "zh": "靠近的腳步聲"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q33",
+      "stem": "連續不斷的降雨＿＿了老橋的結構，使它不適合車輛通行。",
+      "options": {
+        "A": "compiles：彙編",
+        "B": "examines：檢查",
+        "C": "eliminates：消除",
+        "D": "weakens：削弱"
+      },
+      "vocab": [
+        {
+          "en": "constant",
+          "zh": "持續不斷的"
+        },
+        {
+          "en": "structure",
+          "zh": "結構"
+        },
+        {
+          "en": "vehicle",
+          "zh": "車輛"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q34",
+      "stem": "走進擁擠的房間時，我們會忍不住尋找＿＿面孔來緩解緊張。",
+      "options": {
+        "A": "familiar：熟悉的",
+        "B": "panic：恐慌",
+        "C": "horrible：可怕的",
+        "D": "severe：嚴重的"
+      },
+      "vocab": [
+        {
+          "en": "crowded",
+          "zh": "擁擠的"
+        },
+        {
+          "en": "cannot help but",
+          "zh": "忍不住"
+        },
+        {
+          "en": "nerves",
+          "zh": "緊張"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q35",
+      "stem": "很多年輕人濫用藥物，卻沒想到嚴重的＿＿。",
+      "options": {
+        "A": "dominance：支配",
+        "B": "convenience：便利",
+        "C": "consequence：後果",
+        "D": "acquaintance：認識的人"
+      },
+      "vocab": [
+        {
+          "en": "abuse",
+          "zh": "濫用"
+        },
+        {
+          "en": "severe",
+          "zh": "嚴重的"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q36",
+      "stem": "這起攻擊事件仍然成謎，當局還沒有透露＿＿。",
+      "options": {
+        "A": "motive：動機",
+        "B": "package：包裹",
+        "C": "prisoner：囚犯",
+        "D": "moment：片刻"
+      },
+      "vocab": [
+        {
+          "en": "mysterious",
+          "zh": "神祕的"
+        },
+        {
+          "en": "authorities",
+          "zh": "當局"
+        },
+        {
+          "en": "reveal",
+          "zh": "透露"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q37",
+      "stem": "超過 50% 的成員說自己＿＿參加那些活動，只有 32% 是固定參加。",
+      "options": {
+        "A": "occasionally：偶爾",
+        "B": "generously：慷慨地",
+        "C": "remarkably：顯著地",
+        "D": "tremendously：極大地"
+      },
+      "vocab": [
+        {
+          "en": "claim",
+          "zh": "聲稱"
+        },
+        {
+          "en": "participate in",
+          "zh": "參加"
+        },
+        {
+          "en": "regularly",
+          "zh": "固定地、定期地"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q38",
+      "stem": "運動員用極大的勇氣和＿＿，突破人體的極限。",
+      "options": {
+        "A": "attachment：依附；附件",
+        "B": "determination：決心",
+        "C": "depression：憂鬱",
+        "D": "significance：重要性"
+      },
+      "vocab": [
+        {
+          "en": "athlete",
+          "zh": "運動員"
+        },
+        {
+          "en": "courage",
+          "zh": "勇氣"
+        },
+        {
+          "en": "overcome",
+          "zh": "克服"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q39",
+      "stem": "學生透過望遠鏡觀察＿＿表面，可以更了解月球的特徵。",
+      "options": {
+        "A": "civil：公民的；民事的",
+        "B": "grave：嚴重的；墳墓",
+        "C": "lunar：月球的",
+        "D": "tasty：好吃的"
+      },
+      "vocab": [
+        {
+          "en": "feature",
+          "zh": "特徵"
+        },
+        {
+          "en": "observe",
+          "zh": "觀察"
+        },
+        {
+          "en": "telescope",
+          "zh": "望遠鏡"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q40",
+      "stem": "每個學生都是獨特的＿＿，在能力、興趣、潛力和學習風格上各不相同。",
+      "options": {
+        "A": "association：協會",
+        "B": "individual：個體、個人",
+        "C": "recreation：休閒",
+        "D": "supplement：補充品"
+      },
+      "vocab": [
+        {
+          "en": "unique",
+          "zh": "獨特的"
+        },
+        {
+          "en": "potential",
+          "zh": "潛力"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q41",
+      "stem": null,
+      "options": {
+        "A": "pushed：過去式／過去分詞",
+        "B": "pushes：第三人稱單數",
+        "C": "that push：關係子句、主動（systems that push＝會推的系統）",
+        "D": "that are pushed：關係子句、被動（被推的）"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-general-law-english-q42",
+      "stem": null,
+      "options": {
+        "A": "that：關係代名詞／連接詞",
+        "B": "what：什麼；…的東西",
+        "C": "which：關係代名詞",
+        "D": "while：而、然而（表示對比）"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-general-law-english-q43",
+      "stem": null,
+      "options": {
+        "A": "ambassador：大使",
+        "B": "conference：會議",
+        "C": "participle：分詞",
+        "D": "resistance：阻力"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-general-law-english-q44",
+      "stem": null,
+      "options": {
+        "A": "biography：傳記",
+        "B": "detective：偵探",
+        "C": "operation：運作、營運（in operation＝運行中）",
+        "D": "sacrifice：犧牲"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-general-law-english-q45",
+      "stem": null,
+      "options": {
+        "A": "compared：相比（compared to＝和…相比）",
+        "B": "educated：受過教育的",
+        "C": "perfumed：有香味的",
+        "D": "whistled：吹口哨"
+      },
+      "vocab": []
+    },
+    {
+      "id": "114-general-law-english-q46",
+      "stem": "下列何者是文中「五小時法則」的主要概念？",
+      "options": {
+        "A": "每天花五小時做家事。",
+        "B": "每天花五小時做實驗。",
+        "C": "每天花五小時反思新事物。",
+        "D": "每天花一小時學習，一星期五天。"
+      },
+      "vocab": [
+        {
+          "en": "main concept",
+          "zh": "主要概念"
+        },
+        {
+          "en": "experiment",
+          "zh": "實驗"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q47",
+      "stem": "根據本文，下列敘述何者正確？",
+      "options": {
+        "A": "大多數人在工作和睡覺之後沒有空閒時間。",
+        "B": "只有美國人在工作和睡覺之後有空閒時間。",
+        "C": "每個人都把空閒時間花在沒有生產力的活動上。",
+        "D": "一般人有九小時可用於個人活動的空閒時間。"
+      },
+      "vocab": [
+        {
+          "en": "average person",
+          "zh": "一般人"
+        },
+        {
+          "en": "non-productive",
+          "zh": "沒有生產力的"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q48",
+      "stem": "根據本文，哪個國家的居民花在吃喝的時間最少？",
+      "options": {
+        "A": "美國。",
+        "B": "西班牙。",
+        "C": "法國。",
+        "D": "新加坡。"
+      },
+      "vocab": [
+        {
+          "en": "resident",
+          "zh": "居民"
+        },
+        {
+          "en": "the least amount of",
+          "zh": "最少的"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q49",
+      "stem": "根據本文，「五小時法則」被認為是誰創的？",
+      "options": {
+        "A": "比爾．蓋茲。",
+        "B": "伊隆．馬斯克。",
+        "C": "歐普拉．溫芙蕾。",
+        "D": "班傑明．富蘭克林。"
+      },
+      "vocab": [
+        {
+          "en": "be credited with",
+          "zh": "被認為是…的功勞"
+        }
+      ]
+    },
+    {
+      "id": "114-general-law-english-q50",
+      "stem": "根據本文，關於遵循「五小時法則」的人，可以推論出什麼？",
+      "options": {
+        "A": "他們可能不會經歷失敗。",
+        "B": "他們可能常常外食來省時間。",
+        "C": "他們可能建立成功的事業。",
+        "D": "他們可能沒有時間社交。"
+      },
+      "vocab": [
+        {
+          "en": "infer",
+          "zh": "推論"
+        },
+        {
+          "en": "establish",
+          "zh": "建立"
+        },
+        {
+          "en": "social interaction",
+          "zh": "社交互動"
+        }
+      ]
+    }
+  ]
+}
