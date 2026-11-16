@@ -18,6 +18,7 @@ import type {
   Settings,
   StudyCard,
   SyncState,
+  TopicInfo,
 } from './types';
 
 export interface World {
@@ -26,6 +27,8 @@ export interface World {
   questions: Map<QuestionId, OfficialQuestion>;
   groups: Map<string, PassageGroup>;
   enrich: Map<QuestionId, Enrich>;
+  /** data/topics.json 的考點清單（bankLoader 載入） */
+  topics: TopicInfo[];
   cards: StudyCard[];
   progress: Map<QuestionId, Progress>;
   dayLog: Map<DayKey, number>;
@@ -45,6 +48,7 @@ export function createWorld(): World {
     questions: new Map(),
     groups: new Map(),
     enrich: new Map(),
+    topics: [],
     cards: [],
     progress: new Map(),
     dayLog: new Map(),
