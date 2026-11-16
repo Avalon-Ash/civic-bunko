@@ -475,7 +475,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
               {answeredCount === 0
                 ? `還有 ${unansweredCount} 題沒寫。一題都沒寫就交卷，會直接離開這次模擬考。`
                 : unansweredCount > 0
-                  ? `還有 ${unansweredCount} 題沒寫，現在交卷只會計算已作答的題目。`
+                  ? `還有 ${unansweredCount} 題沒寫，沒寫的題目不計分，確定要交卷嗎？`
                   : '全部題目都寫完了，確定現在交卷嗎？'}
             </p>
             <div className="cb-acts">

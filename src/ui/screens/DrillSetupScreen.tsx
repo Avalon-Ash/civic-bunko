@@ -371,6 +371,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
       </section>
 
 
+      {study !== 'read' && (
       <Card className="cb-row cb-switch-card">
         <div className="cb-grow">
           <strong className="cb-block">選項打亂</strong>
@@ -382,6 +383,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
           ariaLabel="選項打亂"
         />
       </Card>
+      )}
 
       <div className="cb-avail-hint" aria-live="polite">
         {papersLoading ? (

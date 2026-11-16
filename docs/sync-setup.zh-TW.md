@@ -19,8 +19,9 @@
 3. Token name 填 `civic-bunko sync`。
 4. Expiration 選到考試之後（例如 90 天）。
 5. Repository access 選 **Only select repositories**，然後只選 `civic-bunko-data`。
-6. Permissions → Repository permissions → **Contents** 改成 **Read and write**。其他都不要動。
-7. 按 **Generate token**，把出現的那串 `github_pat_…` 複製起來。這串只會顯示一次。
+6. Permissions 區塊按 **Add permissions**，在清單裡勾 **Contents**；加進來後把它右邊的 **Read-only** 改成 **Read and write**。其他都不要加（**Metadata: Read-only** 是 GitHub 自動帶的，留著就好）。
+7. 按 **Generate token**。GitHub 會跳出確認視窗，列出這個權杖的權限：確認只有 `civic-bunko-data` 一個 repo、Contents 是 Read and write、Metadata 是 Read-only，再按一次 **Generate token**。
+8. 把出現的那串 `github_pat_…` 複製起來。這串只會顯示一次。
 
 這個權杖只碰得到那一個私人 repo，就算外流，別人最多只能改進度檔，碰不到你其他的 repo。
 

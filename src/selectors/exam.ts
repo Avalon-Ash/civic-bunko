@@ -76,7 +76,7 @@ export function examPapers(world: World, bankId: BankId): ExamPaperView[] {
       item: {
         paperId: paper.id,
         subjectKey: paper.subjectKey,
-        subjectName: paper.subjectName,
+        subjectName: bank.subjects[order]?.name ?? paper.subjectName,
         year: paper.year,
         exam: paper.exam,
         count,
