@@ -1,0 +1,220 @@
+{
+  "deck": "concept-public-admin",
+  "title": "行政學觀念",
+  "cards": [
+    {
+      "id": "concept-pa-evolution",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "行政學理論三時期",
+      "hook": "傳統重效率、修正重人、整合看環境。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "傳統時期", "tone": "plain" },
+            { "text": "修正時期", "tone": "hot" },
+            { "text": "整合時期", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "傳統時期", "lines": ["約 1887–1930 年，追求效率", "重視制度與結構，把人當機器", "代表：泰勒、費堯、韋伯"] },
+        { "heading": "修正時期", "lines": ["約 1930–1960 年，行為科學興起", "重視人的心理與非正式組織", "代表：梅堯（霍桑實驗）、巴納德、賽蒙"] },
+        { "heading": "整合時期", "lines": ["約 1960 年以後", "系統理論：組織是開放系統", "權變理論：沒有萬靈丹，看情境"] },
+        { "heading": "之後的發展", "lines": ["1968 年新公共行政：社會公平", "1980 年代新公共管理：師法企業", "2000 年新公共服務：公民優先"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-classic",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "傳統時期三大學派",
+      "hook": "泰勒管工人、費堯管主管、韋伯管制度。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "泰勒", "tone": "hot" },
+            { "text": "科學管理", "tone": "plain" }
+          ] },
+          { "steps": [
+            { "text": "費堯", "tone": "hot" },
+            { "text": "行政管理", "tone": "plain" }
+          ] },
+          { "steps": [
+            { "text": "韋伯", "tone": "hot" },
+            { "text": "官僚體制", "tone": "plain" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "泰勒", "lines": ["科學管理之父，著重基層工作效率", "動作與時間研究，找出最佳方法", "按件計酬，用金錢激勵"] },
+        { "heading": "費堯", "lines": ["著重中上層的管理", "管理五功能：計畫組織指揮協調控制", "提出十四項管理原則"] },
+        { "heading": "古立克", "lines": ["提出 POSDCORB 七項行政功能", "計畫、組織、人事、指揮", "協調、報告、預算"] },
+        { "heading": "韋伯", "lines": ["理念型官僚體制：依法辦事、層級節制", "專業分工、用人唯才、對事不對人", "權威三種：傳統、超人、合法理性"] },
+        { "heading": "共同缺點", "lines": ["把組織當成封閉系統", "忽略人的心理與非正式組織"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-motivation",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "激勵理論兩大類",
+      "hook": "內容理論講「要什麼」；過程理論講「怎麼被激勵」。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "內容理論", "points": ["馬斯洛、赫茲伯格", "阿德福、麥克里蘭"] },
+        "right": { "title": "過程理論", "points": ["佛洛姆：期望", "亞當斯：公平"] }
+      },
+      "faces": [
+        { "heading": "馬斯洛", "lines": ["需求層級，由低到高五層", "生理、安全、社會、尊重、自我實現", "低層滿足了才追求高層"] },
+        { "heading": "赫茲伯格", "lines": ["雙因子（激勵保健）理論", "保健因子：薪水、環境，只能防不滿", "激勵因子：成就、賞識，才帶來滿足"] },
+        { "heading": "其他內容理論", "lines": ["阿德福 ERG：生存、關係、成長", "麥克里蘭：成就、權力、親和需求"] },
+        { "heading": "過程理論", "lines": ["佛洛姆：期望理論（期望、工具、價值）", "亞當斯：公平理論，和別人比", "洛克：目標設定理論"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-three-new",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "三個「新」學派",
+      "hook": "NPA 重公平、NPM 重績效、NPS 重公民。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "新公共行政", "tone": "hot" },
+            { "text": "社會公平", "tone": "key" }
+          ] },
+          { "steps": [
+            { "text": "新公共管理", "tone": "hot" },
+            { "text": "師法企業", "tone": "key" }
+          ] },
+          { "steps": [
+            { "text": "新公共服務", "tone": "hot" },
+            { "text": "公民優先", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "新公共行政", "lines": ["1968 年明諾布魯克會議，瓦爾多發起", "反對價值中立，主張社會公平", "行政人員要主動關懷弱勢"] },
+        { "heading": "新公共管理", "lines": ["1980 年代起，師法企業", "顧客導向、績效與結果導向", "政府領航而不操槳（企業型政府）"] },
+        { "heading": "新公共服務", "lines": ["丹哈特夫婦提出，批評新公共管理", "服務的是公民，不是顧客", "政府是服務，而不是領航"] },
+        { "heading": "黑堡宣言", "lines": ["1980 年代萬斯來等人提出", "行政人員是公共利益的受託者", "和新公共行政同樣重視公平正義"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-budget",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "預算制度演進",
+      "hook": "控制、管理、計畫、排優先，一路演進。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "項目列舉", "tone": "plain" },
+            { "text": "績效預算", "tone": "hot" },
+            { "text": "設計計畫", "tone": "hot" },
+            { "text": "零基預算", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "項目列舉預算", "lines": ["按支出項目逐項編列", "重點：控制，防止浪費與弊端", "最早、最傳統的做法"] },
+        { "heading": "績效預算", "lines": ["按工作計畫編列，計算單位成本", "重點：管理與效率", "1949 年美國胡佛委員會倡議"] },
+        { "heading": "設計計畫預算", "lines": ["PPBS：把目標、計畫、預算連起來", "重點：長期規劃，用成本效益分析", "1960 年代美國國防部先採行"] },
+        { "heading": "零基預算", "lines": ["ZBB：每年從零開始檢討", "重點：排定計畫的優先順序", "1970 年代卡特總統推行"] },
+        { "heading": "之後", "lines": ["1990 年代：成果（企業化）預算", "重視施政成果與授權彈性"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-policy",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "政策過程五階段",
+      "hook": "問題、規劃、合法化、執行、評估。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "問題認定", "tone": "plain" },
+            { "text": "政策規劃", "tone": "plain" },
+            { "text": "政策合法化", "tone": "hot" }
+          ] },
+          { "steps": [
+            { "text": "政策執行", "tone": "hot" },
+            { "text": "政策評估", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "問題認定", "lines": ["先確認要解決的是什麼問題", "第三類型錯誤：用對方法解決錯的問題"] },
+        { "heading": "政策規劃", "lines": ["設計解決問題的方案", "評估可行性：政治、經濟、行政等"] },
+        { "heading": "政策合法化", "lines": ["方案取得法定地位", "例：立法機關審議通過、首長核定"] },
+        { "heading": "政策執行", "lines": ["由上而下：重視上級的指揮與控制", "由下而上：重視基層人員的裁量"] },
+        { "heading": "政策評估", "lines": ["預評估、過程評估、結果評估", "看政策有沒有達成目標，要不要調整"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-leadership",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "領導理論演進",
+      "hook": "先看特質、再看行為、後來看情境。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "特質論", "tone": "plain" },
+            { "text": "行為論", "tone": "plain" },
+            { "text": "權變論", "tone": "hot" },
+            { "text": "轉換型領導", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "特質論", "lines": ["領導者天生有特殊的人格特質", "又稱偉人論；缺點是忽略情境"] },
+        { "heading": "行為論", "lines": ["看領導者做了什麼", "懷特與李皮特：民主、權威、放任", "布雷克與毛頓：管理格道（關心人或事）"] },
+        { "heading": "權變論", "lines": ["沒有最好的領導方式，看情境", "費德勒：關係、任務結構、職位權力", "赫賽與布蘭查：看部屬的成熟度"] },
+        { "heading": "轉換型領導", "lines": ["柏恩斯提出，相對於交易型領導", "用願景與魅力激發部屬超越自我"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-responsibility",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "行政責任怎麼確保",
+      "hook": "內部或外部、正式或非正式，四格記起來。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "正式", "points": ["內部：層級監督", "外部：議會、司法"] },
+        "right": { "title": "非正式", "points": ["內部：專業倫理", "外部：媒體、公民"] }
+      },
+      "faces": [
+        { "heading": "內部正式", "lines": ["行政機關自己的層級監督", "人事、主計、政風的雙重隸屬"] },
+        { "heading": "外部正式", "lines": ["議會監督、司法審查", "監察院（行政監察員）、選舉"] },
+        { "heading": "內部非正式", "lines": ["專業倫理、代表性官僚", "個人的倫理自覺"] },
+        { "heading": "外部非正式", "lines": ["公民參與、傳播媒體", "資訊公開、利益團體"] },
+        { "heading": "兩種看法", "lines": ["費納：靠外部控制才可靠", "傅立德：靠內在的專業與良知"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    }
+  ]
+}

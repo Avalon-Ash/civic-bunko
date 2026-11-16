@@ -1,0 +1,138 @@
+{
+  "deck": "essay-chinese",
+  "title": "國文作文與短文架構",
+  "cards": [
+    {
+      "id": "essay-115-general-chinese-1",
+      "kind": "essay",
+      "subjectKey": "chinese",
+      "title": "鉤癮模式與活動規劃",
+      "hook": "四階段：觸發、行動、獎賞、投入。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "觸發", "tone": "plain" },
+            { "text": "行動", "tone": "plain" },
+            { "text": "獎賞", "tone": "hot" },
+            { "text": "投入", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "四個階段", "lines": ["觸發：廣告、提醒讓人開始接觸", "行動：點擊、滑動等簡單操作", "獎賞：不確定的回報；投入：花更多時間"] },
+        { "heading": "短文：舉一例", "lines": ["選一個例子，四階段逐一對應", "例：集點活動、手遊每日登入獎勵", "限 250 字，只舉一個例子"] },
+        { "heading": "作文：活動設計", "lines": ["先說活動的目的與對象", "照四階段寫出具體做法", "例：社區閱讀、運動打卡、環保集點"] },
+        { "heading": "作文：內涵", "lines": ["把「上癮」導向好習慣的養成", "注意倫理：不操弄、尊重自主"] },
+        { "heading": "作文：結論", "lines": ["好的設計讓人自發持續參與", "工具是中性的，關鍵在規劃者的初衷"] }
+      ],
+      "lawRefs": [],
+      "essay": { "paperId": "115-general-chinese", "no": 1 }
+    },
+    {
+      "id": "essay-114-general-chinese-1",
+      "kind": "essay",
+      "subjectKey": "chinese",
+      "title": "外來種與多元文化",
+      "hook": "短文答威脅與共存；作文談多元文化。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "短文 20 分", "points": ["威脅：生態、經濟", "共存的優缺點"] },
+        "right": { "title": "作文 60 分", "points": ["多元文化的省思", "從番薯談起"] }
+      },
+      "faces": [
+        { "heading": "短文：威脅", "lines": ["生態：原生動物死傷、疫病、生態浩劫", "經濟：損失可達全球經濟的 5%", "預防最有效、最省成本"] },
+        { "heading": "短文：共存", "lines": ["優點：豐富食物與產業，如臺灣鯛", "缺點：管理不當就變成入侵種", "限 300 字，數字與例子取自文章"] },
+        { "heading": "作文：破題", "lines": ["從番薯說起：外來也能變成本土", "多元文化讓生活更豐富"] },
+        { "heading": "作文：論述", "lines": ["正面：交流帶來創新與包容", "反面：衝突、誤解與適應的困難", "關鍵：謹慎選擇、互相尊重"] },
+        { "heading": "作文：結論", "lines": ["臺灣是移民社會，多元是資產", "以開放而審慎的態度面對"] }
+      ],
+      "lawRefs": [],
+      "essay": { "paperId": "114-general-chinese", "no": 1 }
+    },
+    {
+      "id": "essay-114-local4-chinese-1",
+      "kind": "essay",
+      "subjectKey": "chinese",
+      "title": "虎鯨與善意政策",
+      "hook": "短文舉三種心理；作文談善意要有配套。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "虎鯨案", "points": ["只禁演", "沒有安置配套"] },
+        "right": { "title": "AFDC 案", "points": ["補助沒有期限", "養成依賴"] }
+      },
+      "faces": [
+        { "heading": "短文：三因素", "lines": ["同情心：虎鯨母子的處境令人不忍", "罪惡感：是人類的娛樂造成牠們的痛苦", "正義感：憤怒業者與政府的失責"] },
+        { "heading": "短文：提醒", "lines": ["至少寫三點：每點一句原因、一句說明", "限 400 字，引用文章裡的畫面"] },
+        { "heading": "作文：破題", "lines": ["善意沒有規劃，可能變成殘忍", "兩個案例的共同問題：缺少配套"] },
+        { "heading": "作文：分析", "lines": ["虎鯨：只禁演，沒有安置與強制手段", "AFDC：沒有期限與誘因設計，養成依賴", "應注意：事前評估、配套、退場與檢討"] },
+        { "heading": "作文：結論", "lines": ["好政策要有善意，也要有周延的規劃", "扣回公務：執行前先想清楚後果"] }
+      ],
+      "lawRefs": [],
+      "essay": { "paperId": "114-local4-chinese", "no": 1 }
+    },
+    {
+      "id": "essay-113-general-chinese-1",
+      "kind": "essay",
+      "subjectKey": "chinese",
+      "title": "超越過去的自己",
+      "hook": "不跟別人比，跟昨天的自己比。",
+      "visual": null,
+      "faces": [
+        { "heading": "破題", "lines": ["引海明威：高貴是超越過去的自己", "立場：比較的對象是自己，不是別人"] },
+        { "heading": "什麼是超越", "lines": ["見聞更廣、技能更熟、更了解自己", "不只是成績進步，也包含心態成熟"] },
+        { "heading": "我的經驗", "lines": ["寫一件具體的事：原本做不到什麼", "過程中的挫折與堅持", "例：準備考試、學新技能、改掉壞習慣"] },
+        { "heading": "體悟", "lines": ["成長來自每天一點點的累積", "懂得欣賞別人，不再被比較綁住"] },
+        { "heading": "結論", "lines": ["期許持續精進，把超越變成習慣", "扣回公務：終身學習，把服務做得更好"] }
+      ],
+      "lawRefs": [],
+      "essay": { "paperId": "113-general-chinese", "no": 1 }
+    },
+    {
+      "id": "essay-113-local4-chinese-1",
+      "kind": "essay",
+      "subjectKey": "chinese",
+      "title": "南轅北轍：效率與效能",
+      "hook": "馬好、錢多、車夫強，方向卻錯了。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "效率", "points": ["把事做好", "方法與速度"] },
+        "right": { "title": "效能", "points": ["做對的事", "方向與目標"] }
+      },
+      "faces": [
+        { "heading": "先下定義", "lines": ["效率：把事做好，講方法與速度", "效能：做對的事，講方向與目標", "作答時要引用文章裡的定義"] },
+        { "heading": "分析行動", "lines": ["馬好、旅費多、車夫技術好", "這些都是效率高的條件", "但方向往北，離楚國越來越遠"] },
+        { "heading": "結論", "lines": ["效率高，效能卻是零", "方向錯了，越努力離目標越遠"] },
+        { "heading": "作答提醒", "lines": ["限 300 字：定義、分析、結論各一段", "不要重講故事，直接分析"] }
+      ],
+      "lawRefs": [],
+      "essay": { "paperId": "113-local4-chinese", "no": 1 }
+    },
+    {
+      "id": "essay-113-local4-chinese-2",
+      "kind": "essay",
+      "subjectKey": "chinese",
+      "title": "把對的事做好",
+      "hook": "先選對方向，再用好方法；兩個都要。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "做對的事", "tone": "hot" },
+            { "text": "把事做好", "tone": "hot" },
+            { "text": "創造成功", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "破題", "lines": ["埋頭苦幹不等於有收穫", "做對的事是方向，把事做好是方法"] },
+        { "heading": "做對的事", "lines": ["先問目標是什麼、為誰而做", "例：先確認需求再動手，避免白做"] },
+        { "heading": "把事做好", "lines": ["方法、紀律與細節決定品質", "例：分工、時程、檢查，讓成果可靠"] },
+        { "heading": "如何兼顧", "lines": ["先定方向，再求效率；過程中定期檢視", "發現方向偏了，要有勇氣修正", "團隊要溝通目標，避免各做各的"] },
+        { "heading": "結論", "lines": ["方向與方法兼備，努力才會有成果", "扣回公務：依法、便民、有效"] }
+      ],
+      "lawRefs": [],
+      "essay": { "paperId": "113-local4-chinese", "no": 2 }
+    }
+  ]
+}

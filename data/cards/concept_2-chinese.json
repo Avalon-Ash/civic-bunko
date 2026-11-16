@@ -1,0 +1,78 @@
+{
+  "deck": "concept-chinese",
+  "title": "國文觀念",
+  "cards": [
+    {
+      "id": "concept-zh-essay-structure",
+      "kind": "concept",
+      "subjectKey": "chinese",
+      "title": "作文四段寫法",
+      "hook": "起、承、轉、合：破題、舉例、反思、收束。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "起：破題", "tone": "key" },
+            { "text": "承：舉例", "tone": "plain" },
+            { "text": "轉：反思", "tone": "hot" },
+            { "text": "合：結論", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "起：破題", "lines": ["前兩三句就回應題目，表明立場", "可以用定義、名言或一個畫面開頭"] },
+        { "heading": "承：舉例", "lines": ["用一到兩個具體例子支持論點", "個人經驗加上時事或公務情境最穩"] },
+        { "heading": "轉：反思", "lines": ["換個角度：困難、反例或限制", "說明怎麼克服，讓論點更完整"] },
+        { "heading": "合：結論", "lines": ["回扣題目，重申核心看法", "拉到公務員的角色或未來期許"] },
+        { "heading": "動筆前", "lines": ["先花 5 分鐘列大綱再寫", "字跡工整、分段清楚、不離題"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-zh-reading",
+      "kind": "concept",
+      "subjectKey": "chinese",
+      "title": "閱讀題解題步驟",
+      "hook": "先看題目問什麼，再回文章找證據。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [
+            { "text": "看題幹", "tone": "plain" },
+            { "text": "找主旨", "tone": "hot" },
+            { "text": "刪去法", "tone": "key" }
+          ] }
+        ]
+      },
+      "faces": [
+        { "heading": "先看題幹", "lines": ["先讀題目與選項，知道要找什麼", "圈出「不」「錯誤」「最」等關鍵字"] },
+        { "heading": "找主旨", "lines": ["主旨常在首段、末段或轉折之後", "注意「然而」「但」「其實」後面的話"] },
+        { "heading": "刪去法", "lines": ["說得太絕對（都、一定）的要小心", "文章沒提到的推論不要選", "和文章意思相反的先刪掉"] },
+        { "heading": "文言文", "lines": ["先看注釋與題目，抓人物與事件", "不懂的字先跳過，看上下文推意思"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-zh-official-doc",
+      "kind": "concept",
+      "subjectKey": "chinese",
+      "title": "公文用語",
+      "hook": "對上稱「鈞」、平行稱「貴」、自稱「本」。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "上行文", "points": ["稱對方：鈞", "期望語：請鑒核"] },
+        "right": { "title": "平行文", "points": ["稱對方：貴", "期望語：請查照"] }
+      },
+      "faces": [
+        { "heading": "公文六類", "lines": ["令、呈、咨、函、公告、其他公文", "呈：對總統有所呈請或報告", "咨：總統與立法院、監察院往復"] },
+        { "heading": "函最常用", "lines": ["各機關之間公文往復用函", "人民與機關的申請、答復也用函", "結構三段：主旨、說明、辦法"] },
+        { "heading": "稱謂", "lines": ["有隸屬：下對上稱「鈞」、上對下稱「貴」", "無隸屬：對上級稱「大」、平行稱「貴」", "自稱「本」；對人民稱「台端」"] },
+        { "heading": "期望語", "lines": ["上行：請鑒核、請核示", "平行：請查照、請查照見復", "下行：希查照、希照辦"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    }
+  ]
+}
