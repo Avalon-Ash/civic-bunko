@@ -2,6 +2,8 @@ import { importProgress, resetProgress } from '../systems/persistence';
 import {
   answerQuestion,
   discardSavedRound,
+  examGoto,
+  examPick,
   nextQuestion,
   quitRound,
   quizSameSet,
@@ -55,6 +57,16 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       }
       break;
     }
+    case 'examPick':
+      if (examPick(world, cmd.pick)) {
+        bumpStore(world);
+      }
+      break;
+    case 'examGoto':
+      if (examGoto(world, cmd.index)) {
+        bumpStore(world);
+      }
+      break;
     case 'resumeRound': {
       if (resumeRound(world)) {
         bumpStore(world);

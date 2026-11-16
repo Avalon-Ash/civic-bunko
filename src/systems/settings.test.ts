@@ -1,8 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
+import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type { Settings } from '../core/types';
-import { createTestWorld, makeConfig, makeSeededRng } from '../testing/fixture';
+import { createTestWorld, makeConfig, makeSeededRng, testPaperA } from '../testing/fixture';
 
 describe('settings system', () => {
   it('updates theme and remembers lastRound on roundStarted', () => {
@@ -33,5 +34,34 @@ describe('settings system', () => {
     assert.equal(world.settings.installHintDismissed, true);
     assert.equal(emitted.length, 3);
     assert.equal(emitted[2]?.installHintDismissed, true);
+  });
+
+  it('appends examFinished records to settings.examHistory up to EXAM_HISTORY_MAX', () => {
+    const world = createTestWorld();
+    const emitted: Settings[] = [];
+    world.bus.on('settingsChanged', (e) => emitted.push(e.settings));
+
+    for (let i = 0; i < EXAM_HISTORY_MAX + 3; i += 1) {
+      world.bus.emit({
+        type: 'examFinished',
+        record: {
+          paperId: testPaperA.id,
+          at: `2026-11-16T10:${String(i).padStart(2, '0')}:00.000Z`,
+          total: 50,
+          answered: 50,
+          correct: i % 51,
+          score: Math.round(((i % 51) / 50) * 100),
+        },
+      });
+    }
+
+    const history = world.settings.examHistory ?? [];
+    assert.equal(history.length, EXAM_HISTORY_MAX);
+    assert.equal(history[0]?.at, '2026-11-16T10:03:00.000Z');
+    assert.equal(
+      history[EXAM_HISTORY_MAX - 1]?.at,
+      `2026-11-16T10:${String(EXAM_HISTORY_MAX + 2).padStart(2, '0')}:00.000Z`,
+    );
+    assert.equal(emitted.length, EXAM_HISTORY_MAX + 3);
   });
 });

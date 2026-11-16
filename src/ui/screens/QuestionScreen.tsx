@@ -8,7 +8,7 @@ import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
-import { examClock } from '../../selectors/exam';
+import { examClock, examSheet } from '../../selectors/exam';
 import { LawArticlePanel, OptionExplainList } from '../components/OptionExplain';
 import {
   CHOICES,
@@ -32,8 +32,7 @@ import { Toast } from '../kit/Toast';
 import { useWorld } from '../useWorld';
 
 const MILESTONE_COMBOS = new Set([5, 10, 20, 30]);
-const EXAM_ADVANCE_MS = 220;
-const EXAM_ADVANCE_REDUCED_MS = 80;
+const EXAM_ADVANCE_MS = 400;
 
 function formatCountdown(seconds: number): string {
   const safe = Math.max(0, Math.floor(seconds));
@@ -63,10 +62,19 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
   const [catSpin, setCatSpin] = useState(false);
   const [nowTick, setNowTick] = useState(() => Date.now());
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
+  const [examNavOpen, setExamNavOpen] = useState(false);
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const feedbackRef = useRef<HTMLDivElement | null>(null);
   const timedOutRef = useRef(false);
+  const examAdvanceTimerRef = useRef<number | null>(null);
+
+  const clearExamAdvanceTimer = useCallback(() => {
+    if (examAdvanceTimerRef.current !== null) {
+      window.clearTimeout(examAdvanceTimerRef.current);
+      examAdvanceTimerRef.current = null;
+    }
+  }, []);
 
   const questionId = view?.question.id;
   const pick = view?.pick ?? null;
@@ -86,27 +94,33 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
     };
   }, []);
 
-  // 換題時重設原文／白話切換、抽屜與粒子狀態
+  // 換題時重設原文／白話切換、抽屜與粒子狀態，並清除待執行跳題計時器
   useEffect(() => {
+    clearExamAdvanceTimer();
     setTextMode('official');
     setSheetOpen(false);
     setActiveLawRef(null);
     setBurstChoice(null);
-  }, [questionId]);
+  }, [questionId, clearExamAdvanceTimer]);
 
   // 模擬考每秒更新倒數
   useEffect(() => {
     if (!isExam) {
+      clearExamAdvanceTimer();
       timedOutRef.current = false;
       setSubmitDialogOpen(false);
+      setExamNavOpen(false);
       return undefined;
     }
     setNowTick(Date.now());
     const id = window.setInterval(() => {
       setNowTick(Date.now());
     }, 1000);
-    return () => window.clearInterval(id);
-  }, [isExam]);
+    return () => {
+      window.clearInterval(id);
+      clearExamAdvanceTimer();
+    };
+  }, [isExam, clearExamAdvanceTimer]);
 
   const clock = isExam ? examClock(world, new Date(nowTick)) : null;
 
@@ -116,24 +130,12 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
       return;
     }
     timedOutRef.current = true;
+    clearExamAdvanceTimer();
+    setExamNavOpen(false);
     setSubmitDialogOpen(false);
     onExamTimeout?.();
     dispatch(world, { type: 'quitRound' });
-  }, [isExam, clock?.expired, world, onExamTimeout]);
-
-  // 模擬考選完選項後短暫標示再自動跳下一題
-  useEffect(() => {
-    if (!isExam || pick === null) {
-      return undefined;
-    }
-    const reduced =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const timer = window.setTimeout(() => {
-      dispatch(world, { type: 'next' });
-    }, reduced ? EXAM_ADVANCE_REDUCED_MS : EXAM_ADVANCE_MS);
-    return () => window.clearTimeout(timer);
-  }, [isExam, world, questionId, pick]);
+  }, [isExam, clock?.expired, world, onExamTimeout, clearExamAdvanceTimer]);
 
   // 連對里程碑横幅與貓咪轉圈（模擬考不觸發）
   const prevComboRef = useRef(0);
@@ -185,15 +187,30 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
       ? resolveTopicLabel(topics, firstTopic)
       : (paper?.subjectName ?? '題目');
 
-  const answeredCount = index + (isAnswered ? 1 : 0);
+  const sheet = isExam ? examSheet(world) : null;
+  const answeredCount = isExam ? (sheet?.answered ?? 0) : index + (isAnswered ? 1 : 0);
   const unansweredCount = Math.max(0, total - answeredCount);
 
   const handlePick = (choice: Choice) => {
-    if (isAnswered) return;
     if (isExam) {
-      dispatch(world, { type: 'answer', pick: choice });
+      clearExamAdvanceTimer();
+      dispatch(world, { type: 'examPick', pick: choice });
+      if (index + 1 < total) {
+        const reduced =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduced) {
+          dispatch(world, { type: 'examGoto', index: index + 1 });
+        } else {
+          examAdvanceTimerRef.current = window.setTimeout(() => {
+            examAdvanceTimerRef.current = null;
+            dispatch(world, { type: 'examGoto', index: index + 1 });
+          }, EXAM_ADVANCE_MS);
+        }
+      }
       return;
     }
+    if (isAnswered) return;
     const correct = question.answer.includes(choice);
     if (correct) {
       setBurstChoice((prev) => ({ choice, tick: (prev?.tick ?? 0) + 1 }));
@@ -208,6 +225,36 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
     });
   };
 
+  const handleExamPrev = () => {
+    clearExamAdvanceTimer();
+    if (index > 0) {
+      dispatch(world, { type: 'examGoto', index: index - 1 });
+    }
+  };
+
+  const handleExamNext = () => {
+    clearExamAdvanceTimer();
+    if (index + 1 < total) {
+      dispatch(world, { type: 'examGoto', index: index + 1 });
+    }
+  };
+
+  const handleOpenExamNav = () => {
+    clearExamAdvanceTimer();
+    setExamNavOpen(true);
+  };
+
+  const handleExamGoto = (targetIndex: number) => {
+    clearExamAdvanceTimer();
+    dispatch(world, { type: 'examGoto', index: targetIndex });
+    setExamNavOpen(false);
+  };
+
+  const handleOpenSubmitDialog = () => {
+    clearExamAdvanceTimer();
+    setSubmitDialogOpen(true);
+  };
+
   const handleNext = () => {
     if (!isAnswered) return;
     dispatch(world, { type: 'next' });
@@ -218,6 +265,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
   };
 
   const handleConfirmSubmit = () => {
+    clearExamAdvanceTimer();
     setSubmitDialogOpen(false);
     dispatch(world, { type: 'quitRound' });
   };
@@ -266,7 +314,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
           <span className="cb-q-counter cb-exam-counter">
             第 <b>{index + 1}</b> / {total} 題
           </span>
-          <Chip tone="butter" onClick={() => setSubmitDialogOpen(true)}>
+          <Chip tone="butter" onClick={handleOpenSubmitDialog}>
             交卷
           </Chip>
         </div>
@@ -355,7 +403,8 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                 <button
                   type="button"
                   className={`cb-card cb-press cb-opt ${stateClass}`.trim()}
-                  disabled={isAnswered}
+                  disabled={!isExam && isAnswered}
+                  aria-pressed={isExam ? pick === choice : undefined}
                   onClick={() => handlePick(choice)}
                 >
                   <span className="cb-opt-key">{choice}</span>
@@ -366,6 +415,22 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
             );
           })}
         </div>
+
+        {isExam && (
+          <div className="cb-acts cb-exam-nav cb-mt-md">
+            <Button variant="ghost" disabled={index === 0} onClick={handleExamPrev}>
+              上一題
+            </Button>
+            <Button variant="ghost" onClick={handleOpenExamNav}>
+              題號
+            </Button>
+            {index + 1 < total ? (
+              <Button onClick={handleExamNext}>下一題</Button>
+            ) : (
+              <Button onClick={handleOpenSubmitDialog}>交卷</Button>
+            )}
+          </div>
+        )}
 
         {!isExam && isAnswered && (
           <div ref={feedbackRef} className="cb-stack-sm cb-mt-md">
@@ -461,6 +526,44 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
               onSelectLaw={setActiveLawRef}
             />
           )}
+        </Sheet>
+      )}
+
+      {isExam && sheet && (
+        <Sheet
+          open={examNavOpen}
+          onClose={() => setExamNavOpen(false)}
+          title="題號總覽"
+        >
+          <div className="cb-stack-sm">
+            <div className="cb-exam-sheet-head">
+              <strong className="cb-num-tabular">
+                已作答 {sheet.answered} / {sheet.total}
+              </strong>
+            </div>
+            <div className="cb-exam-grid">
+              {sheet.items.map((item) => (
+                <button
+                  key={item.index}
+                  type="button"
+                  className={[
+                    'cb-exam-cell',
+                    'cb-press',
+                    'cb-num-tabular',
+                    item.picked ? 'is-picked' : '',
+                    item.current ? 'is-current' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  aria-current={item.current ? 'true' : undefined}
+                  aria-label={`第 ${item.no} 題${item.picked ? '，已作答' : '，未作答'}${item.current ? '，目前題目' : ''}`}
+                  onClick={() => handleExamGoto(item.index)}
+                >
+                  {item.no}
+                </button>
+              ))}
+            </div>
+          </div>
         </Sheet>
       )}
 

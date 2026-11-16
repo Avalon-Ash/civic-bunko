@@ -1,3 +1,4 @@
+import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type { AccessoryId, ThemeChoice } from '../core/types';
 import type { World } from '../core/world';
 import { unlockedAccessories } from './daily';
@@ -67,9 +68,9 @@ export function markCardSeen(world: World, id: string): void {
   });
 }
 
-/** 訂閱 roundStarted，自動記住最後一次回合設定並發出 settingsChanged。 */
+/** 訂閱 roundStarted 與 examFinished，自動記住最後一次回合設定與模擬考歷次成績並發出 settingsChanged。 */
 export function attachSettings(world: World): () => void {
-  return world.bus.on('roundStarted', (event) => {
+  const unsubRound = world.bus.on('roundStarted', (event) => {
     world.settings = {
       ...world.settings,
       lastRound: {
@@ -82,4 +83,24 @@ export function attachSettings(world: World): () => void {
       settings: { ...world.settings },
     });
   });
+
+  const unsubExam = world.bus.on('examFinished', (event) => {
+    const prev = world.settings.examHistory ?? [];
+    const next = [...prev, { ...event.record }];
+    const trimmed =
+      next.length > EXAM_HISTORY_MAX ? next.slice(next.length - EXAM_HISTORY_MAX) : next;
+    world.settings = {
+      ...world.settings,
+      examHistory: trimmed,
+    };
+    world.bus.emit({
+      type: 'settingsChanged',
+      settings: { ...world.settings },
+    });
+  });
+
+  return () => {
+    unsubRound();
+    unsubExam();
+  };
 }

@@ -1,4 +1,5 @@
 import { ACCESSORIES } from '../core/constants/daily';
+import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import { bumpStore, subscribe } from '../core/store';
@@ -6,6 +7,7 @@ import type {
   AskFilter,
   Choice,
   DayKey,
+  ExamRecord,
   Progress,
   QuestionId,
   RoundConfig,
@@ -55,8 +57,9 @@ interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
   passes?: number;
 }
 
-interface RawSettings extends Omit<Settings, 'lastRound'> {
+interface RawSettings extends Omit<Settings, 'lastRound' | 'examHistory'> {
   lastRound: RawRoundConfig | null;
+  examHistory?: unknown;
 }
 
 function isValidProgress(value: unknown): value is RawProgress {
@@ -200,6 +203,78 @@ function parseOptionOrder(value: unknown): Record<QuestionId, Choice[]> | undefi
   return clean;
 }
 
+function parseExamPicks(
+  value: unknown,
+  queue: readonly QuestionId[],
+): Record<QuestionId, Choice> | undefined {
+  if (!isRecord(value)) return undefined;
+  const queueSet = new Set(queue);
+  const clean: Record<QuestionId, Choice> = {};
+  for (const [id, pick] of Object.entries(value)) {
+    if (!queueSet.has(id) || !isChoice(pick)) {
+      return undefined;
+    }
+    clean[id] = pick;
+  }
+  return clean;
+}
+
+function parseExamRecord(value: unknown): ExamRecord | null {
+  if (!isRecord(value)) return null;
+  if (typeof value.paperId !== 'string' || value.paperId.length === 0) return null;
+  if (!isValidStartedAt(value.at)) return null;
+  if (typeof value.total !== 'number' || !Number.isInteger(value.total) || value.total <= 0) {
+    return null;
+  }
+  if (
+    typeof value.answered !== 'number' ||
+    !Number.isInteger(value.answered) ||
+    value.answered < 0 ||
+    value.answered > value.total
+  ) {
+    return null;
+  }
+  if (
+    typeof value.correct !== 'number' ||
+    !Number.isInteger(value.correct) ||
+    value.correct < 0 ||
+    value.correct > value.answered
+  ) {
+    return null;
+  }
+  if (
+    typeof value.score !== 'number' ||
+    !Number.isInteger(value.score) ||
+    value.score < 0 ||
+    value.score > 100
+  ) {
+    return null;
+  }
+  return {
+    paperId: value.paperId,
+    at: value.at,
+    total: value.total,
+    answered: value.answered,
+    correct: value.correct,
+    score: value.score,
+  };
+}
+
+function parseExamHistory(value: unknown): ExamRecord[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const valid: ExamRecord[] = [];
+  for (const entry of value) {
+    const parsed = parseExamRecord(entry);
+    if (parsed) {
+      valid.push(parsed);
+    }
+  }
+  if (valid.length > EXAM_HISTORY_MAX) {
+    return valid.slice(valid.length - EXAM_HISTORY_MAX);
+  }
+  return valid;
+}
+
 function parseRoundState(value: unknown): RoundState | undefined {
   if (!isRecord(value)) return undefined;
   if (!isValidRoundConfig(value.config)) return undefined;
@@ -235,6 +310,12 @@ function parseRoundState(value: unknown): RoundState | undefined {
     if (!cleanOptionOrder) return undefined;
   }
 
+  let cleanExamPicks: Record<QuestionId, Choice> | undefined;
+  if (value.examPicks !== undefined) {
+    cleanExamPicks = parseExamPicks(value.examPicks, value.queue);
+    if (!cleanExamPicks) return undefined;
+  }
+
   return {
     config,
     queue: [...value.queue],
@@ -246,6 +327,7 @@ function parseRoundState(value: unknown): RoundState | undefined {
     pass: value.pass,
     ...(value.startedAt !== undefined ? { startedAt: value.startedAt } : {}),
     ...(cleanOptionOrder ? { optionOrder: cleanOptionOrder } : {}),
+    ...(cleanExamPicks ? { examPicks: cleanExamPicks } : config.exam ? { examPicks: {} } : {}),
   };
 }
 
@@ -292,6 +374,10 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
     if (!isValidSettings(parsed.settings)) {
       return { ok: false, error: 'Invalid settings object' };
     }
+    const cleanExamHistory =
+      parsed.settings.examHistory !== undefined
+        ? parseExamHistory(parsed.settings.examHistory)
+        : undefined;
     cleanSettings = {
       theme: parsed.settings.theme,
       lastRound: parsed.settings.lastRound ? normalizeRoundConfig(parsed.settings.lastRound) : null,
@@ -299,6 +385,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       ...(parsed.settings.accessory !== undefined ? { accessory: parsed.settings.accessory } : {}),
       ...(parsed.settings.shuffleOptions !== undefined ? { shuffleOptions: parsed.settings.shuffleOptions } : {}),
       ...(parsed.settings.cardsSeen !== undefined ? { cardsSeen: [...parsed.settings.cardsSeen] } : {}),
+      ...(cleanExamHistory !== undefined ? { examHistory: cleanExamHistory } : {}),
     };
   }
 
