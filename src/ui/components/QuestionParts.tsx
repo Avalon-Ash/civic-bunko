@@ -1,11 +1,12 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
-import type { AccessoryId, Choice, Correction, Enrich, ExamKind, Paper, PassageGroup } from '../../core/types';
+import type { AccessoryId, Choice, Correction, Enrich, ExamKind, GroupZh, Paper, PassageGroup } from '../../core/types';
 import { Card, type CardTone } from '../kit/Card';
 import { Cat, type CatMood } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import type { SegmentedOption } from '../kit/Segmented';
 import { Visual } from '../kit/Visual';
 import { splitByMarks } from '../marks';
+import { BilingualSegments, GroupVocabCollapse } from './Bilingual';
 
 export const CHOICES: readonly Choice[] = ['A', 'B', 'C', 'D'];
 
@@ -47,13 +48,22 @@ export function MarkedStem({
   );
 }
 
-/** 題組共用文章可收合卡片。 */
-export function PassageCard({ group }: { group: PassageGroup }) {
+export interface PassageCardProps {
+  group: PassageGroup;
+  groupZh?: GroupZh | null;
+  bilingual?: boolean;
+}
+
+/** 題組共用文章可收合卡片（支援逐句中英對照與可收合單字表）。 */
+export function PassageCard({ group, groupZh = null, bilingual = false }: PassageCardProps) {
   const [expanded, setExpanded] = useState(true);
 
   useEffect(() => {
     setExpanded(true);
   }, [group.id]);
+
+  const showSegments = Boolean(bilingual && groupZh && groupZh.segments.length > 0);
+  const showVocab = Boolean(bilingual && groupZh && groupZh.vocab.length > 0);
 
   return (
     <Card className="cb-passage-card">
@@ -66,7 +76,16 @@ export function PassageCard({ group }: { group: PassageGroup }) {
         <span>題組文章（第 {group.fromNo}–{group.toNo} 題）</span>
         <span className="cb-sub">{expanded ? '收合' : '展開'}</span>
       </button>
-      {expanded && <p className="cb-passage-text">{group.text}</p>}
+      {expanded && (
+        showSegments && groupZh ? (
+          <BilingualSegments segments={groupZh.segments} />
+        ) : (
+          <p className="cb-passage-text">{group.text}</p>
+        )
+      )}
+      {expanded && showVocab && groupZh && (
+        <GroupVocabCollapse groupId={group.id} vocab={groupZh.vocab} />
+      )}
     </Card>
   );
 }

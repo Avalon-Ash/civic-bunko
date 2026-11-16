@@ -57,9 +57,10 @@ interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
   passes?: number;
 }
 
-interface RawSettings extends Omit<Settings, 'lastRound' | 'examHistory'> {
+interface RawSettings extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual'> {
   lastRound: RawRoundConfig | null;
   examHistory?: unknown;
+  bilingual?: unknown;
 }
 
 function isValidProgress(value: unknown): value is RawProgress {
@@ -395,6 +396,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       ...(parsed.settings.accessory !== undefined ? { accessory: parsed.settings.accessory } : {}),
       ...(parsed.settings.shuffleOptions !== undefined ? { shuffleOptions: parsed.settings.shuffleOptions } : {}),
       ...(parsed.settings.cardsSeen !== undefined ? { cardsSeen: [...parsed.settings.cardsSeen] } : {}),
+      ...(typeof parsed.settings.bilingual === 'boolean' ? { bilingual: parsed.settings.bilingual } : {}),
       ...(cleanExamHistory !== undefined ? { examHistory: cleanExamHistory } : {}),
     };
   }

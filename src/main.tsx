@@ -3,11 +3,12 @@ import { createRoot } from 'react-dom/client';
 import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
-import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics } from './data/source';
+import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics, loadZhFiles } from './data/source';
 import { loadBank, loadTopicList } from './systems/bankLoader';
 import { loadCards } from './systems/cardLoader';
 import { attachPersistence } from './systems/persistence';
 import { attachSync } from './systems/sync';
+import { loadZh } from './systems/zhLoader';
 import { App } from './ui/App';
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
@@ -32,10 +33,12 @@ const papersPromise = Promise.all([
   loadEnrichFiles().catch(() => []),
   loadCardFiles().catch(() => []),
   loadTopics().catch(() => []),
-]).then(([files, enrich, cards, topics]) => {
+  loadZhFiles().catch(() => []),
+]).then(([files, enrich, cards, topics, zhFiles]) => {
   loadBank(world, banks, files, enrich);
   loadCards(world, cards, files);
   loadTopicList(world, topics);
+  loadZh(world, zhFiles);
 });
 
 function Root({ world: appWorld }: { world: World }) {

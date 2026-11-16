@@ -6,11 +6,13 @@ import type {
   BankId,
   Choice,
   Enrich,
+  GroupZh,
   OfficialQuestion,
   Paper,
   PaperId,
   PassageGroup,
   QuestionId,
+  QuestionZh,
   RoundConfig,
   RoundState,
   Settings,
@@ -28,6 +30,8 @@ export interface CurrentQuestionView {
   question: OfficialQuestion;
   group: PassageGroup | null;
   enrich: Enrich | null;
+  zh: QuestionZh | null;
+  groupZh: GroupZh | null;
   index: number;
   total: number;
   pick: Choice | null;
@@ -40,6 +44,8 @@ export interface ReadQuestionView {
   question: OfficialQuestion;
   group: PassageGroup | null;
   enrich: Enrich | null;
+  zh: QuestionZh | null;
+  groupZh: GroupZh | null;
   askType: AskType;
   pass: number;
   totalPasses: number;
@@ -115,6 +121,8 @@ export function currentQuestion(world: World): CurrentQuestionView | null {
 
   const group = question.groupId ? (world.groups.get(question.groupId) ?? null) : null;
   const enrich = world.enrich.get(questionId) ?? null;
+  const zh = world.zh.get(questionId) ?? null;
+  const groupZh = question.groupId ? (world.groupZh.get(question.groupId) ?? null) : null;
   const pick = round.pick;
   const isCorrect = pick === null ? null : question.answer.includes(pick);
   const rawOrder = round.optionOrder?.[questionId];
@@ -125,6 +133,8 @@ export function currentQuestion(world: World): CurrentQuestionView | null {
     question,
     group,
     enrich,
+    zh,
+    groupZh,
     index: round.index,
     total: round.queue.length,
     pick,
@@ -153,12 +163,16 @@ export function readView(world: World): ReadQuestionView | null {
 
   const group = question.groupId ? (world.groups.get(question.groupId) ?? null) : null;
   const enrich = world.enrich.get(questionId) ?? null;
+  const zh = world.zh.get(questionId) ?? null;
+  const groupZh = question.groupId ? (world.groupZh.get(question.groupId) ?? null) : null;
   const views = world.progress.get(questionId)?.views ?? 0;
 
   return {
     question,
     group,
     enrich,
+    zh,
+    groupZh,
     askType: askTypeOf(question.stem),
     pass: round.pass,
     totalPasses: Math.max(1, round.config.passes),
@@ -404,7 +418,15 @@ export function getSettings(world: World): Settings {
     ...(world.settings.cardsSeen !== undefined
       ? { cardsSeen: [...world.settings.cardsSeen] }
       : {}),
+    ...(world.settings.bilingual !== undefined
+      ? { bilingual: world.settings.bilingual }
+      : {}),
   };
+}
+
+/** 英文題中英對照是否開啟（未設定時預設開啟）。 */
+export function bilingualOn(world: World): boolean {
+  return world.settings.bilingual !== false;
 }
 
 /** 取得進行中回合的設定複本；未進行回合時回傳 null。 */

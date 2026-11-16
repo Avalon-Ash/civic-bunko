@@ -6,9 +6,16 @@ import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
-import { currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
+import { bilingualOn, currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
 import { examClock, examSheet } from '../../selectors/exam';
+import {
+  BilingualToggle,
+  OptionTextWithZh,
+  OptionZhToggleButton,
+  QuestionVocabCard,
+  StemTranslation,
+} from '../components/Bilingual';
 import { LawArticlePanel, OptionExplainList } from '../components/OptionExplain';
 import {
   CHOICES,
@@ -54,6 +61,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
   const isExam = Boolean(config?.exam);
 
   const [textMode, setTextMode] = useState<'official' | 'plain'>('official');
+  const [showOptionZh, setShowOptionZh] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
   const [topics, setTopics] = useState<TopicInfo[]>([]);
@@ -94,10 +102,11 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
     };
   }, []);
 
-  // 換題時重設原文／白話切換、抽屜與粒子狀態，並清除待執行跳題計時器
+  // 換題時重設原文／白話切換、選項中文顯示、抽屜與粒子狀態，並清除待執行跳題計時器
   useEffect(() => {
     clearExamAdvanceTimer();
     setTextMode('official');
+    setShowOptionZh(false);
     setSheetOpen(false);
     setActiveLawRef(null);
     setBurstChoice(null);
@@ -174,10 +183,14 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
     return null;
   }
 
-  const { question, group, enrich, index, total, optionOrder } = view;
+  const { question, group, enrich, zh, groupZh, index, total, optionOrder } = view;
   const paper = questionPaper(world, question.paperId);
   const accessory = currentAccessory(world);
   const isAnswered = pick !== null;
+  const bilingualEnabled = bilingualOn(world);
+  const hasZh = Boolean(zh || groupZh);
+  const showZh = !isExam && bilingualEnabled && hasZh;
+  const showOptTranslation = Boolean(showZh && zh && (isAnswered || showOptionZh));
 
   const sourceLabel = formatQuestionSource(paper, question.no);
   const firstTopic = enrich?.topic[0];
@@ -350,9 +363,16 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
               className="cb-ml-auto"
             />
           )}
+          {!isExam && hasZh && (
+            <BilingualToggle
+              on={bilingualEnabled}
+              onToggle={() => dispatch(world, { type: 'setBilingual', on: !bilingualEnabled })}
+              className={enrich?.plain ? '' : 'cb-ml-auto'}
+            />
+          )}
         </div>
 
-        {group && <PassageCard group={group} />}
+        {group && <PassageCard group={group} groupZh={isExam ? null : groupZh} bilingual={showZh} />}
 
         <p className="cb-stem">
           {!isExam && textMode === 'plain' && enrich?.plain ? (
@@ -363,6 +383,8 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
             <MarkedStem stem={question.stem} marks={enrich?.marks ?? []} />
           )}
         </p>
+
+        {showZh && <StemTranslation stem={zh?.stem} />}
 
         <div className="cb-mt-sm">
           <Chip tone="plain">{sourceLabel}</Chip>
@@ -408,13 +430,25 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                   onClick={() => handlePick(choice)}
                 >
                   <span className="cb-opt-key">{choice}</span>
-                  <span className="cb-grow">{optText}</span>
+                  <span className="cb-grow">
+                    <OptionTextWithZh
+                      text={optText}
+                      zh={showOptTranslation ? zh?.options[choice] : null}
+                    />
+                  </span>
                 </button>
                 {showBurst && <Burst key={burstChoice.tick} onDone={handleBurstDone} />}
               </div>
             );
           })}
         </div>
+
+        {!isExam && showZh && zh && !isAnswered && (
+          <OptionZhToggleButton
+            open={showOptionZh}
+            onToggle={() => setShowOptionZh((prev) => !prev)}
+          />
+        )}
 
         {isExam && (
           <div className="cb-acts cb-exam-nav cb-mt-md">
@@ -435,18 +469,21 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
         {!isExam && isAnswered && (
           <div ref={feedbackRef} className="cb-stack-sm cb-mt-md">
             {showCompactFastFeedback && enrich ? (
-              <Card tone="green" className="cb-kou cb-kou-compact">
-                <div className="cb-row">
-                  <Cat size={58} mood="yay" spin={catSpin} accessory={accessory} interactive />
-                  <div className="cb-grow">
-                    <div className="cb-kou-head">
-                      <small>答對！</small>
-                      {!enrich.reviewed && <span className="cb-ai-tag">AI 解析</span>}
+              <>
+                <Card tone="green" className="cb-kou cb-kou-compact">
+                  <div className="cb-row">
+                    <Cat size={58} mood="yay" spin={catSpin} accessory={accessory} interactive />
+                    <div className="cb-grow">
+                      <div className="cb-kou-head">
+                        <small>答對！</small>
+                        {!enrich.reviewed && <span className="cb-ai-tag">AI 解析</span>}
+                      </div>
+                      <b className="cb-kou-mnemonic">{enrich.mnemonic}</b>
                     </div>
-                    <b className="cb-kou-mnemonic">{enrich.mnemonic}</b>
                   </div>
-                </div>
-              </Card>
+                </Card>
+                {showZh && zh && <QuestionVocabCard vocab={zh.vocab} />}
+              </>
             ) : enrich ? (
               <>
                 <EnrichCard
@@ -460,6 +497,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                     <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
                   }
                 />
+                {showZh && zh && <QuestionVocabCard vocab={zh.vocab} />}
                 <div className="cb-acts">
                   <Button
                     variant="ghost"
@@ -495,6 +533,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                     </div>
                   </div>
                 </Card>
+                {showZh && zh && <QuestionVocabCard vocab={zh.vocab} />}
                 {!fast || !isCorrect ? (
                   <div className="cb-acts">
                     <Button onClick={handleNext}>

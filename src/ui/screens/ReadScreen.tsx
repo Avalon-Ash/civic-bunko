@@ -4,8 +4,14 @@ import type { TopicInfo } from '../../core/types';
 import type { World } from '../../core/world';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
-import { questionPaper, readView } from '../../selectors';
+import { bilingualOn, questionPaper, readView } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
+import {
+  BilingualToggle,
+  OptionTextWithZh,
+  QuestionVocabCard,
+  StemTranslation,
+} from '../components/Bilingual';
 import {
   CHOICES,
   CorrectionBox,
@@ -77,7 +83,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
     return null;
   }
 
-  const { question, group, enrich, askType, pass, totalPasses, index, total, views } = view;
+  const { question, group, enrich, zh, groupZh, askType, pass, totalPasses, index, total, views } = view;
   const paper = questionPaper(world, question.paperId);
   const accessory = currentAccessory(world);
   const sourceLabel = formatQuestionSource(paper, question.no);
@@ -85,6 +91,9 @@ export function ReadScreen({ world }: ReadScreenProps) {
   const topicLabel = firstTopic
     ? resolveTopicLabel(topics, firstTopic)
     : (paper?.subjectName ?? '題目');
+  const bilingualEnabled = bilingualOn(world);
+  const hasZh = Boolean(zh || groupZh);
+  const showZh = bilingualEnabled && hasZh;
 
   const handleNext = () => {
     dispatch(world, { type: 'next' });
@@ -165,6 +174,12 @@ export function ReadScreen({ world }: ReadScreenProps) {
                 ariaLabel="題目版本切換"
               />
             )}
+            {hasZh && (
+              <BilingualToggle
+                on={bilingualEnabled}
+                onToggle={() => dispatch(world, { type: 'setBilingual', on: !bilingualEnabled })}
+              />
+            )}
             {views > 0 && (
               <span
                 className="cb-view-dots"
@@ -186,7 +201,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
           </div>
         </div>
 
-        {group && <PassageCard group={group} />}
+        {group && <PassageCard group={group} groupZh={groupZh} bilingual={showZh} />}
 
         <p className="cb-stem">
           {textMode === 'plain' && enrich?.plain ? (
@@ -195,6 +210,8 @@ export function ReadScreen({ world }: ReadScreenProps) {
             <MarkedStem stem={question.stem} marks={enrich?.marks ?? []} />
           )}
         </p>
+
+        {showZh && <StemTranslation stem={zh?.stem} />}
 
         {askType === 'negative' && (
           <p className="cb-read-ask-hint">這題問的是哪一句錯</p>
@@ -217,7 +234,9 @@ export function ReadScreen({ world }: ReadScreenProps) {
                 <Card key={choice} tone="green" className="cb-read-right">
                   <div className="cb-read-opt-row">
                     <span className="cb-opt-key cb-read-key-ok">{choice}</span>
-                    <span className="cb-grow cb-read-opt-text">{optText}</span>
+                    <span className="cb-grow cb-read-opt-text">
+                      <OptionTextWithZh text={optText} zh={showZh ? zh?.options[choice] : null} />
+                    </span>
                   </div>
                 </Card>
               );
@@ -245,7 +264,9 @@ export function ReadScreen({ world }: ReadScreenProps) {
                       return (
                         <div key={choice} className="cb-read-wrong-item">
                           <span className="cb-opt-key cb-read-key-dim">{choice}</span>
-                          <span className="cb-grow">{optText}</span>
+                          <span className="cb-grow">
+                            <OptionTextWithZh text={optText} zh={showZh ? zh?.options[choice] : null} />
+                          </span>
                           <span className="cb-read-wrong-tag">錯</span>
                         </div>
                       );
@@ -271,7 +292,9 @@ export function ReadScreen({ world }: ReadScreenProps) {
                         ✓
                       </span>
                       <span className="cb-opt-key cb-read-key-ok">{choice}</span>
-                      <span className="cb-grow">{optText}</span>
+                      <span className="cb-grow">
+                        <OptionTextWithZh text={optText} zh={showZh ? zh?.options[choice] : null} />
+                      </span>
                     </div>
                   );
                 })}
@@ -291,7 +314,12 @@ export function ReadScreen({ world }: ReadScreenProps) {
                     <div key={choice} className="cb-stack-xs">
                       <div className="cb-read-false-item">
                         <span className="cb-opt-key cb-read-key-dim">{choice}</span>
-                        <span className="cb-grow cb-read-strike">{optText}</span>
+                        <span className="cb-grow">
+                          <span className="cb-read-strike">{optText}</span>
+                          {showZh && zh?.options[choice] && (
+                            <span className="cb-zh-opt-zh">{zh.options[choice]}</span>
+                          )}
+                        </span>
                       </div>
                       {why && <p className="cb-read-why">{why}</p>}
                     </div>
@@ -311,6 +339,8 @@ export function ReadScreen({ world }: ReadScreenProps) {
             label={<span className="cb-read-kou-label">口訣記憶</span>}
           />
         )}
+
+        {showZh && zh && <QuestionVocabCard vocab={zh.vocab} />}
       </div>
 
       <div className="cb-read-next-wrap">

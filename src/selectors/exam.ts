@@ -5,10 +5,12 @@ import type {
   Enrich,
   ExamKind,
   ExamRecord,
+  GroupZh,
   OfficialQuestion,
   PaperId,
   PassageGroup,
   QuestionId,
+  QuestionZh,
   SubjectKey,
 } from '../core/types';
 import type { World } from '../core/world';
@@ -182,6 +184,8 @@ export interface ExamQuestionDetailView {
   question: OfficialQuestion;
   group: PassageGroup | null;
   enrich: Enrich | null;
+  zh: QuestionZh | null;
+  groupZh: GroupZh | null;
 }
 
 /** 依題目 ID 讀取完整題目、題組文章與加工解析（供模擬考結果檢視錯題抽屜使用）。 */
@@ -195,7 +199,9 @@ export function examQuestionDetail(
   }
   const group = question.groupId ? (world.groups.get(question.groupId) ?? null) : null;
   const enrich = world.enrich.get(questionId) ?? null;
-  return { question, group, enrich };
+  const zh = world.zh.get(questionId) ?? null;
+  const groupZh = question.groupId ? (world.groupZh.get(question.groupId) ?? null) : null;
+  return { question, group, enrich, zh, groupZh };
 }
 
 /** 讀取模擬考題號總覽與作答進度；非模擬考回合回傳 null。 */

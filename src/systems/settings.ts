@@ -54,6 +54,18 @@ export function setShuffleOptions(world: World, on: boolean): void {
   });
 }
 
+/** 開關「英文題中英對照」，並發出 settingsChanged。 */
+export function setBilingual(world: World, on: boolean): void {
+  world.settings = {
+    ...world.settings,
+    bilingual: on,
+  };
+  world.bus.emit({
+    type: 'settingsChanged',
+    settings: { ...world.settings },
+  });
+}
+
 /** 把卡片記成看過；已經記過就不動作。 */
 export function markCardSeen(world: World, id: string): void {
   const seen = world.settings.cardsSeen ?? [];

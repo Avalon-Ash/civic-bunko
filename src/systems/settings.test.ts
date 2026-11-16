@@ -98,4 +98,22 @@ describe('settings system', () => {
     assert.deepEqual(world.settings.lastRound, normalConfig);
     assert.equal(emitted.length, 0);
   });
+
+  it('toggles settings.bilingual via setBilingual command and emits settingsChanged', () => {
+    const world = createTestWorld();
+    const emitted: Settings[] = [];
+    world.bus.on('settingsChanged', (e) => emitted.push(e.settings));
+
+    assert.equal(world.settings.bilingual, undefined);
+
+    dispatch(world, { type: 'setBilingual', on: false });
+    assert.equal(world.settings.bilingual, false);
+    assert.equal(emitted.length, 1);
+    assert.equal(emitted[0]?.bilingual, false);
+
+    dispatch(world, { type: 'setBilingual', on: true });
+    assert.equal(world.settings.bilingual, true);
+    assert.equal(emitted.length, 2);
+    assert.equal(emitted[1]?.bilingual, true);
+  });
 });

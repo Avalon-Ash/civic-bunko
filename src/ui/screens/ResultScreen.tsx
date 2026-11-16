@@ -4,9 +4,15 @@ import { getResultTier } from '../../core/constants/result';
 import type { LawRef, QuestionId } from '../../core/types';
 import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
-import { questionPaper, roundSummary } from '../../selectors';
+import { bilingualOn, questionPaper, roundSummary } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
 import { examHistory, examQuestionDetail, examResult } from '../../selectors/exam';
+import {
+  BilingualToggle,
+  OptionTextWithZh,
+  QuestionVocabCard,
+  StemTranslation,
+} from '../components/Bilingual';
 import { LawArticlePanel, OptionExplainList } from '../components/OptionExplain';
 import {
   CHOICES,
@@ -75,6 +81,9 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
             : `比上次少 ${Math.abs(scoreDiff)} 分`;
     const inspectedWrong = inspectId ? exam.wrong.find((w) => w.id === inspectId) ?? null : null;
     const detail = inspectId ? examQuestionDetail(world, inspectId) : null;
+    const bilingualEnabled = bilingualOn(world);
+    const hasDetailZh = Boolean(detail && (detail.zh || detail.groupZh));
+    const showDetailZh = bilingualEnabled && hasDetailZh;
 
     const closeSheet = () => {
       setInspectId(null);
@@ -206,9 +215,18 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                     </span>
                   )}
                   {detail.question.correction && <Chip tone="orange">官方更正</Chip>}
+                  {hasDetailZh && (
+                    <BilingualToggle
+                      on={bilingualEnabled}
+                      onToggle={() => dispatch(world, { type: 'setBilingual', on: !bilingualEnabled })}
+                      className="cb-ml-auto"
+                    />
+                  )}
                 </div>
 
-                {detail.group && <PassageCard group={detail.group} />}
+                {detail.group && (
+                  <PassageCard group={detail.group} groupZh={detail.groupZh} bilingual={showDetailZh} />
+                )}
 
                 <p className="cb-stem cb-m0">
                   <MarkedStem
@@ -216,6 +234,8 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                     marks={detail.enrich?.marks ?? []}
                   />
                 </p>
+
+                {showDetailZh && <StemTranslation stem={detail.zh?.stem} />}
 
                 <div className="cb-opts">
                   {CHOICES.map((choice, idx) => {
@@ -226,7 +246,12 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                     return (
                       <div key={choice} className={`cb-card cb-opt ${cls}`}>
                         <span className="cb-opt-key">{choice}</span>
-                        <span className="cb-grow">{optText}</span>
+                        <span className="cb-grow">
+                          <OptionTextWithZh
+                            text={optText}
+                            zh={showDetailZh ? detail.zh?.options[choice] : null}
+                          />
+                        </span>
                       </div>
                     );
                   })}
@@ -262,6 +287,8 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                     </div>
                   </Card>
                 )}
+
+                {showDetailZh && detail.zh && <QuestionVocabCard vocab={detail.zh.vocab} />}
               </div>
             )
           )}
