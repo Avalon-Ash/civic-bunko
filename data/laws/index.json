@@ -143,6 +143,24 @@
    "name": "中華民國刑法",
    "amendedAt": "民國 115 年 07 月 22 日",
    "articleCount": 422
+  },
+  {
+   "pcode": "A0030155",
+   "name": "公務員懲戒法",
+   "amendedAt": "民國 109 年 06 月 10 日",
+   "articleCount": 103
+  },
+  {
+   "pcode": "G0340108",
+   "name": "地方稅法通則",
+   "amendedAt": "民國 114 年 01 月 03 日",
+   "articleCount": 10
+  },
+  {
+   "pcode": "G0340107",
+   "name": "規費法",
+   "amendedAt": "民國 106 年 06 月 14 日",
+   "articleCount": 22
   }
  ]
 }
