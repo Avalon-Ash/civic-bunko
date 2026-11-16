@@ -239,6 +239,20 @@ export interface RoundState {
   startedAt?: string;
   /** 選項打亂時，每題四個選項的顯示順序（值仍是官方代號）；沒打亂就沒有 */
   optionOrder?: Record<QuestionId, Choice[]>;
+  /** 模擬考：每題目前選的答案（交卷前可以改）；其他回合沒有 */
+  examPicks?: Record<QuestionId, Choice>;
+}
+/** 一次模擬考的成績（只存在裝置上） */
+export interface ExamRecord {
+  paperId: PaperId;
+  /** 交卷時間（ISO） */
+  at: string;
+  /** 整份題數 */
+  total: number;
+  answered: number;
+  correct: number;
+  /** round(correct / total × 100) */
+  score: number;
 }
 
 // ── 每日紀錄與集章 ──────────────────────────────────────
@@ -260,6 +274,8 @@ export interface Settings {
   shuffleOptions?: boolean;
   /** 看過的卡片 ID */
   cardsSeen?: string[];
+  /** 模擬考歷次成績，舊到新；上限在 constants/exam.ts */
+  examHistory?: ExamRecord[];
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────
@@ -285,6 +301,7 @@ export type AppEvent =
   | { type: 'answered'; id: QuestionId; pick: Choice; correct: boolean; at: string }
   | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
+  | { type: 'examFinished'; record: ExamRecord }
   | { type: 'roundRestored' }
   | { type: 'cardsLoaded'; count: number }
   | { type: 'progressChanged'; ids: QuestionId[] }
@@ -298,6 +315,10 @@ export type UICommand =
   | { type: 'answer'; pick: Choice }
   | { type: 'next' }
   | { type: 'quitRound' }
+  /** 模擬考：記下（或改掉）目前這題的答案，不計分、不換題 */
+  | { type: 'examPick'; pick: Choice }
+  /** 模擬考：跳到第 index 題（從 0 開始） */
+  | { type: 'examGoto'; index: number }
   /** 接續上次沒刷完的回合 */
   | { type: 'resumeRound' }
   | { type: 'discardSavedRound' }

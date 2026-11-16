@@ -22,7 +22,7 @@ import {
   getSettings,
   positiveCoverage,
 } from '../../selectors';
-import { examPapers, type ExamPaperView } from '../../selectors/exam';
+import { examBest, examPapers, type ExamPaperView } from '../../selectors/exam';
 import { formatExamLabel } from '../components/QuestionParts';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -415,6 +415,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
                 <div className="cb-stack-xs" role="group" aria-label={group.subjectName}>
                   {group.items.map((paper) => {
                     const active = selectedPaperId === paper.paperId;
+                    const best = examBest(world, paper.paperId);
                     return (
                       <button
                         key={paper.paperId}
@@ -427,7 +428,16 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
                           {paper.year} 年{formatExamLabel(paper.exam)}・{paper.count} 題・
                           {paper.minutes} 分鐘
                         </span>
-                        {active && <span className="cb-chip cb-chip-mint">已選</span>}
+                        {(best !== null || active) && (
+                          <span className="cb-exam-paper-meta">
+                            {best !== null && (
+                              <span className="cb-chip cb-chip-plain cb-num-tabular">
+                                最高 {best} 分
+                              </span>
+                            )}
+                            {active && <span className="cb-chip cb-chip-mint">已選</span>}
+                          </span>
+                        )}
                       </button>
                     );
                   })}

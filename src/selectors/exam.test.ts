@@ -15,7 +15,7 @@ import {
   testQuestionsA,
   testQuestionsB,
 } from '../testing/fixture';
-import { examClock, examPapers, examQuestionDetail, examResult } from './exam';
+import { examBest, examClock, examHistory, examPapers, examQuestionDetail, examResult, examSheet } from './exam';
 
 describe('exam selectors', () => {
   it('lists examPapers ordered by subject then year desc, computes minutes, and excludes empty papers', () => {
@@ -163,9 +163,9 @@ describe('exam selectors', () => {
       { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
       { now, rng: makeSeededRng(1) },
     );
-    dispatch(world, { type: 'answer', pick: 'A' }, { now }); // q-a1 right
-    dispatch(world, { type: 'next' }, { now });
-    dispatch(world, { type: 'answer', pick: 'D' }, { now }); // q-a2 wrong (answer is ['B','C'])
+    dispatch(world, { type: 'examPick', pick: 'A' }); // q-a1 right
+    dispatch(world, { type: 'examGoto', index: 1 });
+    dispatch(world, { type: 'examPick', pick: 'D' }); // q-a2 wrong (answer is ['B','C'])
     dispatch(world, { type: 'quitRound' }, { now });
 
     const res = examResult(world);
@@ -183,5 +183,120 @@ describe('exam selectors', () => {
     assert.equal(detail?.question.id, 'q-a1');
     assert.equal(detail?.enrich?.mnemonic, '測試口訣 1');
     assert.equal(examQuestionDetail(world, 'missing-q'), null);
+  });
+
+  it('computes examSheet for active exam rounds and null otherwise', () => {
+    const world = createTestWorld();
+    const now = () => new Date('2026-11-16T10:00:00.000Z');
+
+    assert.equal(examSheet(world), null);
+
+    // Non-exam round returns null
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now, rng: makeSeededRng(1) },
+    );
+    assert.equal(examSheet(world), null);
+
+    // Exam round on testPaperA (q-a1 no=1, q-a2 no=2, q-a3 no=3)
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
+      { now, rng: makeSeededRng(1) },
+    );
+    dispatch(world, { type: 'examPick', pick: 'A' });
+    dispatch(world, { type: 'examGoto', index: 2 });
+
+    assert.deepEqual(examSheet(world), {
+      index: 2,
+      total: 3,
+      answered: 1,
+      items: [
+        { index: 0, no: 1, picked: true, current: false },
+        { index: 1, no: 2, picked: false, current: false },
+        { index: 2, no: 3, picked: false, current: true },
+      ],
+    });
+  });
+
+  it('computes examHistory (newest-first, filtered, skips missing papers) and examBest', () => {
+    const world = createTestWorld();
+    assert.deepEqual(examHistory(world), []);
+    assert.equal(examBest(world, testPaperA.id), null);
+
+    world.bus.emit({
+      type: 'examFinished',
+      record: {
+        paperId: testPaperA.id,
+        at: '2026-11-16T08:00:00.000Z',
+        total: 3,
+        answered: 3,
+        correct: 1,
+        score: 33,
+      },
+    });
+    world.bus.emit({
+      type: 'examFinished',
+      record: {
+        paperId: 'deleted-paper-id',
+        at: '2026-11-16T08:30:00.000Z',
+        total: 10,
+        answered: 10,
+        correct: 10,
+        score: 100,
+      },
+    });
+    world.bus.emit({
+      type: 'examFinished',
+      record: {
+        paperId: testPaperB.id,
+        at: '2026-11-16T09:00:00.000Z',
+        total: 2,
+        answered: 2,
+        correct: 2,
+        score: 100,
+      },
+    });
+    world.bus.emit({
+      type: 'examFinished',
+      record: {
+        paperId: testPaperA.id,
+        at: '2026-11-16T10:00:00.000Z',
+        total: 3,
+        answered: 3,
+        correct: 3,
+        score: 100,
+      },
+    });
+    world.bus.emit({
+      type: 'examFinished',
+      record: {
+        paperId: testPaperA.id,
+        at: '2026-11-16T11:00:00.000Z',
+        total: 3,
+        answered: 3,
+        correct: 2,
+        score: 67,
+      },
+    });
+
+    const all = examHistory(world);
+    assert.equal(all.length, 4);
+    assert.deepEqual(
+      all.map((item) => ({ paperId: item.paperId, score: item.score, subjectName: item.subjectName, year: item.year, exam: item.exam })),
+      [
+        { paperId: testPaperA.id, score: 67, subjectName: '測試科目甲', year: 115, exam: 'general' },
+        { paperId: testPaperA.id, score: 100, subjectName: '測試科目甲', year: 115, exam: 'general' },
+        { paperId: testPaperB.id, score: 100, subjectName: '測試科目乙', year: 115, exam: 'general' },
+        { paperId: testPaperA.id, score: 33, subjectName: '測試科目甲', year: 115, exam: 'general' },
+      ],
+    );
+
+    const onlyA = examHistory(world, testPaperA.id);
+    assert.deepEqual(onlyA.map((item) => item.score), [67, 100, 33]);
+    assert.equal(examBest(world, testPaperA.id), 100);
+    assert.equal(examBest(world, testPaperB.id), 100);
+    assert.equal(examBest(world, 'unattempted-paper'), null);
   });
 });

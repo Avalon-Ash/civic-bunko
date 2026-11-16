@@ -4,6 +4,7 @@ import type {
   Choice,
   Enrich,
   ExamKind,
+  ExamRecord,
   OfficialQuestion,
   PaperId,
   PassageGroup,
@@ -43,6 +44,26 @@ export interface ExamResultView {
   correct: number;
   score: number;
   wrong: ExamWrongItem[];
+}
+
+export interface ExamSheetItem {
+  index: number;
+  no: number;
+  picked: boolean;
+  current: boolean;
+}
+
+export interface ExamSheetView {
+  index: number;
+  total: number;
+  answered: number;
+  items: ExamSheetItem[];
+}
+
+export interface ExamHistoryItem extends ExamRecord {
+  subjectName: string;
+  year: number;
+  exam: ExamKind;
 }
 
 /** 依科目順序與年度新到舊列出指定題庫內有題目的模擬考試卷。 */
@@ -175,4 +196,77 @@ export function examQuestionDetail(
   const group = question.groupId ? (world.groups.get(question.groupId) ?? null) : null;
   const enrich = world.enrich.get(questionId) ?? null;
   return { question, group, enrich };
+}
+
+/** 讀取模擬考題號總覽與作答進度；非模擬考回合回傳 null。 */
+export function examSheet(world: World): ExamSheetView | null {
+  const round = world.round;
+  if (!round || round.finished || !round.config.exam) {
+    return null;
+  }
+
+  const examPicks = round.examPicks ?? {};
+  let answered = 0;
+  const items: ExamSheetItem[] = round.queue.map((id, i) => {
+    const picked = examPicks[id] !== undefined;
+    if (picked) {
+      answered += 1;
+    }
+    const question = world.questions.get(id);
+    return {
+      index: i,
+      no: question?.no ?? i + 1,
+      picked,
+      current: i === round.index,
+    };
+  });
+
+  return {
+    index: round.index,
+    total: round.queue.length,
+    answered,
+    items,
+  };
+}
+
+/** 依新到舊列出模擬考歷次成績，附上科目名稱、年度與考試別；試卷已不存在的紀錄略過。 */
+export function examHistory(world: World, paperId?: PaperId): ExamHistoryItem[] {
+  const history = world.settings.examHistory ?? [];
+  const items: ExamHistoryItem[] = [];
+
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    const record = history[i];
+    if (!record) continue;
+    if (paperId !== undefined && record.paperId !== paperId) continue;
+
+    const paper = world.papers.get(record.paperId);
+    if (!paper) continue;
+
+    const bank = world.banks.find((b) => b.id === paper.bankId);
+    const subjectName =
+      bank?.subjects.find((s) => s.key === paper.subjectKey)?.name ?? paper.subjectName;
+
+    items.push({
+      ...record,
+      subjectName,
+      year: paper.year,
+      exam: paper.exam,
+    });
+  }
+
+  items.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
+  return items;
+}
+
+/** 讀取指定試卷的歷史最高分；沒考過回傳 null。 */
+export function examBest(world: World, paperId: PaperId): number | null {
+  const history = world.settings.examHistory ?? [];
+  let best: number | null = null;
+  for (const record of history) {
+    if (record.paperId !== paperId) continue;
+    if (best === null || record.score > best) {
+      best = record.score;
+    }
+  }
+  return best;
 }

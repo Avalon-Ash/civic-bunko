@@ -2391,7 +2391,8 @@ mark {
 .cb-exam-paper-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex-wrap: wrap;
+  gap: 8px 10px;
   width: 100%;
   min-height: var(--tap-min);
   padding: 12px 14px;
@@ -2400,6 +2401,14 @@ mark {
   font-weight: 700;
   font-size: 0.9375rem;
   background: var(--surface-raised);
+}
+
+.cb-exam-paper-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin-left: auto;
 }
 
 .cb-exam-paper-btn.is-selected {
@@ -2490,4 +2499,92 @@ mark {
   .cb-exam-score-num {
     font-size: 2.75rem;
   }
+
+  .cb-exam-nav {
+    gap: 8px;
+  }
+
+  .cb-exam-nav .cb-btn {
+    padding: 8px 6px;
+    font-size: 0.9375rem;
+  }
+}
+
+.cb-exam-nav .cb-btn {
+  white-space: nowrap;
+}
+
+.cb-exam-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cb-exam-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 420px) {
+  .cb-exam-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.cb-exam-cell {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  border-radius: 14px;
+  border: 2px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  display: grid;
+  place-items: center;
+}
+
+.cb-exam-cell.is-picked {
+  background: var(--butter);
+  border-color: var(--line);
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.cb-exam-cell.is-current {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 2.5px var(--ink);
+  color: var(--ink);
+  font-weight: 900;
+}
+
+.cb-exam-compare {
+  margin-top: 4px;
+  font-size: var(--text-small);
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.cb-exam-history-card {
+  padding: 6px 14px;
+}
+
+.cb-exam-history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cb-exam-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 2px dashed var(--hair);
+}
+
+.cb-exam-history-row:last-child {
+  border-bottom: 0;
 }

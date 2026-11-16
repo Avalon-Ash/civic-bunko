@@ -6,7 +6,7 @@ import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
 import { questionPaper, roundSummary } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
-import { examQuestionDetail, examResult } from '../../selectors/exam';
+import { examHistory, examQuestionDetail, examResult } from '../../selectors/exam';
 import { LawArticlePanel, OptionExplainList } from '../components/OptionExplain';
 import {
   CHOICES,
@@ -23,6 +23,19 @@ import { Chip } from '../kit/Chip';
 import { CountUp } from '../kit/CountUp';
 import { Sheet } from '../kit/Sheet';
 import { useWorld } from '../useWorld';
+
+const EXAM_HISTORY_DISPLAY_LIMIT = 5;
+
+function formatExamRecordDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${y}/${m}/${day} ${hh}:${mm}`;
+}
 
 export interface ResultScreenProps {
   world: World;
@@ -48,6 +61,18 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
     const paper = questionPaper(world, exam.paperId);
     const unanswered = Math.max(0, exam.total - exam.answered);
     const tier = getResultTier(exam.correct, exam.total);
+    const history = examHistory(world, exam.paperId);
+    const prevRecord = history.length >= 2 ? history[1] : undefined;
+    const recentHistory = history.slice(0, EXAM_HISTORY_DISPLAY_LIMIT);
+    const scoreDiff = prevRecord ? exam.score - prevRecord.score : null;
+    const compareText =
+      scoreDiff === null
+        ? null
+        : scoreDiff > 0
+          ? `比上次多 ${scoreDiff} 分`
+          : scoreDiff === 0
+            ? '和上次一樣'
+            : `比上次少 ${Math.abs(scoreDiff)} 分`;
     const inspectedWrong = inspectId ? exam.wrong.find((w) => w.id === inspectId) ?? null : null;
     const detail = inspectId ? examQuestionDetail(world, inspectId) : null;
 
@@ -78,9 +103,30 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                 答對 {exam.correct} / {exam.total}
                 {unanswered > 0 ? `，沒寫 ${unanswered} 題` : ''}
               </p>
+              {compareText && (
+                <p className="cb-exam-compare cb-m0 cb-num-tabular">{compareText}</p>
+              )}
             </div>
           </div>
         </Card>
+
+        {recentHistory.length > 0 && (
+          <section className="cb-section">
+            <h2>這份的紀錄</h2>
+            <Card className="cb-exam-history-card">
+              <div className="cb-exam-history-list">
+                {recentHistory.map((item, idx) => (
+                  <div key={`${item.at}-${idx}`} className="cb-exam-history-row">
+                    <span className="cb-sub cb-num-tabular">
+                      {formatExamRecordDate(item.at)}
+                    </span>
+                    <strong className="cb-num-tabular">{item.score} 分</strong>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </section>
+        )}
 
         {exam.wrong.length > 0 ? (
           <section className="cb-section">

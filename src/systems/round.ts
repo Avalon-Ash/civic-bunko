@@ -1,4 +1,4 @@
-import type { Choice, RoundConfig, RoundState } from '../core/types';
+import type { Choice, RoundConfig, RoundResult, RoundState } from '../core/types';
 import type { World } from '../core/world';
 import { buildExamQueue, buildOptionOrders, buildQueue, shuffle } from './selection';
 
@@ -71,6 +71,7 @@ export function startRound(
       finished: false,
       pass: 1,
       startedAt: now().toISOString(),
+      examPicks: {},
     };
 
     world.bus.emit({
@@ -116,14 +117,20 @@ export function startRound(
   });
 }
 
-/** 作答目前題目；看答案模式不接受作答，同一題只能作答一次。 */
+/** 作答目前題目；看答案模式與模擬考不接受作答，同一題只能作答一次。 */
 export function answerQuestion(
   world: World,
   pick: Choice,
   now: () => Date,
 ): void {
   const round = world.round;
-  if (!round || round.finished || round.config.study === 'read' || round.pick !== null) {
+  if (
+    !round ||
+    round.finished ||
+    round.config.study === 'read' ||
+    round.config.exam ||
+    round.pick !== null
+  ) {
     return;
   }
 
@@ -151,14 +158,57 @@ export function answerQuestion(
   });
 }
 
-/** 前進下一題；作答模式未作答時不動，看答案模式會發 viewed 並在多遍間重新洗牌。 */
+/** 模擬考：記下（或覆蓋）目前這題的答案，不計分、不發 answered、不換題。 */
+export function examPick(world: World, pick: Choice): boolean {
+  const round = world.round;
+  if (!round || round.finished || !round.config.exam) {
+    return false;
+  }
+
+  const questionId = round.queue[round.index];
+  if (questionId === undefined || !world.questions.has(questionId)) {
+    return false;
+  }
+
+  if (!round.examPicks) {
+    round.examPicks = {};
+  }
+  round.examPicks[questionId] = pick;
+  round.pick = pick;
+  return true;
+}
+
+/** 模擬考：跳到指定題目（index 夾在 0..queue.length-1），並帶回該題已選答案。 */
+export function examGoto(world: World, index: number): boolean {
+  const round = world.round;
+  if (
+    !round ||
+    round.finished ||
+    !round.config.exam ||
+    round.queue.length === 0 ||
+    !Number.isFinite(index)
+  ) {
+    return false;
+  }
+
+  const clamped = Math.max(0, Math.min(round.queue.length - 1, Math.floor(index)));
+  const targetId = round.queue[clamped];
+  const nextPick = targetId !== undefined ? (round.examPicks?.[targetId] ?? null) : null;
+  const changed = clamped !== round.index || round.pick !== nextPick;
+
+  round.index = clamped;
+  round.pick = nextPick;
+  return changed;
+}
+
+/** 前進下一題；作答模式未作答時不動，模擬考不使用此指令，看答案模式會發 viewed 並在多遍間重新洗牌。 */
 export function nextQuestion(
   world: World,
   now: () => Date,
   rng: () => number = Math.random,
 ): RoundStepOutcome {
   const round = world.round;
-  if (!round || round.finished) {
+  if (!round || round.finished || round.config.exam) {
     return 'noop';
   }
 
@@ -221,7 +271,7 @@ export function nextQuestion(
   return 'finished';
 }
 
-/** 中途結束回合；看答案模式或一題都沒答直接丟棄不發事件，否則保留已作答結果結束。 */
+/** 中途結束回合或模擬考交卷；看答案模式或一題都沒答直接丟棄不發事件，模擬考交卷時才依序結算並發 examFinished。 */
 export function quitRound(
   world: World,
   now: () => Date,
@@ -231,6 +281,72 @@ export function quitRound(
     return 'noop';
   }
 
+  if (round.config.exam) {
+    const examPicks = round.examPicks ?? {};
+    const at = now().toISOString();
+    const results: RoundResult[] = [];
+
+    for (const questionId of round.queue) {
+      const pick = examPicks[questionId];
+      if (!pick) continue;
+      const question = world.questions.get(questionId);
+      if (!question) continue;
+      const correct = question.answer.includes(pick);
+      results.push({ id: questionId, pick, correct });
+    }
+
+    if (results.length === 0) {
+      world.round = null;
+      return 'discarded';
+    }
+
+    for (const res of results) {
+      round.results.push(res);
+      world.bus.emit({
+        type: 'answered',
+        id: res.id,
+        pick: res.pick,
+        correct: res.correct,
+        at,
+      });
+    }
+
+    const finishedRound: RoundState = {
+      ...round,
+      queue: [...round.queue],
+      results: [...results],
+      examPicks: { ...examPicks },
+      finished: true,
+    };
+
+    world.lastRound = finishedRound;
+    world.round = null;
+
+    world.bus.emit({
+      type: 'roundFinished',
+      results: [...results],
+      at,
+    });
+
+    const total = finishedRound.queue.length;
+    const correct = results.filter((r) => r.correct).length;
+    const score = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+    world.bus.emit({
+      type: 'examFinished',
+      record: {
+        paperId: round.config.exam.paperId,
+        at,
+        total,
+        answered: results.length,
+        correct,
+        score,
+      },
+    });
+
+    return 'finished';
+  }
+
   if (round.config.study === 'read' || round.results.length === 0) {
     world.round = null;
     return 'discarded';
@@ -238,7 +354,7 @@ export function quitRound(
 
   const finishedRound: RoundState = {
     ...round,
-    queue: round.config.exam ? [...round.queue] : round.results.map((r) => r.id),
+    queue: round.results.map((r) => r.id),
     finished: true,
   };
 
@@ -366,6 +482,11 @@ export function resumeRound(world: World): boolean {
           ),
         }
       : {}),
+    ...(saved.examPicks
+      ? { examPicks: { ...saved.examPicks } }
+      : saved.config.exam
+        ? { examPicks: {} }
+        : {}),
   };
   world.savedRound = null;
   world.bus.emit({ type: 'roundRestored' });

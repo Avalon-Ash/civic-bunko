@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
+import { getVersion } from '../core/store';
 import type { Choice, RoundState } from '../core/types';
 import { createTestWorld, makeConfig, makeSeededRng, testPaperA } from '../testing/fixture';
 
@@ -362,15 +363,15 @@ describe('round system', () => {
     assert.equal(getRound(), null);
     assert.equal(getLastRound(), null);
 
-    // Answer 2 of 3 (q-a1 wrong, q-a2 right), then quitRound -> preserves full 3-question queue in lastRound
+    // Answer 2 of 3 via examPick/examGoto (q-a1 wrong, q-a2 right), then quitRound -> preserves full 3-question queue in lastRound
     dispatch(
       world,
       { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
       { now: fixedNow, rng: makeSeededRng(1) },
     );
-    dispatch(world, { type: 'answer', pick: 'D' }, { now: fixedNow }); // q-a1 answer is ['A']
-    dispatch(world, { type: 'next' }, { now: fixedNow });
-    dispatch(world, { type: 'answer', pick: 'B' }, { now: fixedNow }); // q-a2 answer is ['B','C']
+    dispatch(world, { type: 'examPick', pick: 'D' }, { now: fixedNow }); // q-a1 answer is ['A']
+    dispatch(world, { type: 'examGoto', index: 1 });
+    dispatch(world, { type: 'examPick', pick: 'B' }, { now: fixedNow }); // q-a2 answer is ['B','C']
     dispatch(world, { type: 'quitRound' }, { now: fixedNow });
 
     assert.equal(getRound(), null);
@@ -395,6 +396,109 @@ describe('round system', () => {
     assert.equal(sameSet.config.exam, undefined);
     assert.equal(sameSet.queue.length, 3);
     assert.ok(sameSet.optionOrder !== undefined);
+  });
+
+  it('supports examPick overwrite, examGoto clamping, ignores answer/next, and scores in queue order on quitRound', () => {
+    const world = createTestWorld();
+    const getRound = (): RoundState | null => world.round;
+    const startTime = () => new Date('2026-11-16T09:00:00.000Z');
+    const submitTime = () => new Date('2026-11-16T09:12:34.000Z');
+    const answeredEvents: Array<{ id: string; pick: Choice; correct: boolean; at: string }> = [];
+    const examFinishedEvents: Array<{
+      paperId: string;
+      at: string;
+      total: number;
+      answered: number;
+      correct: number;
+      score: number;
+    }> = [];
+    world.bus.on('answered', (e) => {
+      answeredEvents.push({ id: e.id, pick: e.pick, correct: e.correct, at: e.at });
+    });
+    world.bus.on('examFinished', (e) => {
+      examFinishedEvents.push({ ...e.record });
+    });
+
+    // Outside exam round, examPick and examGoto are no-ops
+    dispatch(world, { type: 'examPick', pick: 'A' });
+    dispatch(world, { type: 'examGoto', index: 1 });
+    assert.equal(getRound(), null);
+
+    // Start exam round on testPaperA (queue: ['q-a1', 'q-a2', 'q-a3'])
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
+      { now: startTime, rng: makeSeededRng(1) },
+    );
+    assert.deepEqual(getRound()?.examPicks, {});
+
+    // answer and next do nothing in exam mode
+    const verBeforeNoop = getVersion(world);
+    dispatch(world, { type: 'answer', pick: 'A' }, { now: startTime });
+    dispatch(world, { type: 'next' }, { now: startTime });
+    assert.equal(getVersion(world), verBeforeNoop);
+    assert.equal(getRound()?.index, 0);
+    assert.equal(getRound()?.pick, null);
+    assert.equal(getRound()?.results.length, 0);
+    assert.equal(answeredEvents.length, 0);
+
+    // examPick records pick without emitting answered or advancing, and bumps store
+    const verBeforePick = getVersion(world);
+    dispatch(world, { type: 'examPick', pick: 'D' });
+    assert.ok(getVersion(world) > verBeforePick);
+    assert.equal(getRound()?.index, 0);
+    assert.equal(getRound()?.pick, 'D');
+    assert.equal(getRound()?.examPicks?.['q-a1'], 'D');
+    assert.equal(answeredEvents.length, 0);
+    assert.equal(getRound()?.results.length, 0);
+
+    // Overwrite pick on same question
+    dispatch(world, { type: 'examPick', pick: 'A' }); // q-a1 right answer
+    assert.equal(getRound()?.pick, 'A');
+    assert.equal(getRound()?.examPicks?.['q-a1'], 'A');
+
+    // examGoto clamps high and jumps to last question (index 2: q-a3), bumping store
+    const verBeforeGoto = getVersion(world);
+    dispatch(world, { type: 'examGoto', index: 99 });
+    assert.ok(getVersion(world) > verBeforeGoto);
+    assert.equal(getRound()?.index, 2);
+    assert.equal(getRound()?.pick, null);
+
+    // Pick on q-a3 (wrong: 'A', right is 'C')
+    dispatch(world, { type: 'examPick', pick: 'A' });
+    assert.equal(getRound()?.examPicks?.['q-a3'], 'A');
+
+    // examGoto clamps low back to 0 and restores pick 'A'
+    dispatch(world, { type: 'examGoto', index: -5 });
+    assert.equal(getRound()?.index, 0);
+    assert.equal(getRound()?.pick, 'A');
+
+    // Submit via quitRound: emits answered in queue order (q-a1, then q-a3) with submitTime
+    dispatch(world, { type: 'quitRound' }, { now: submitTime });
+    assert.equal(getRound(), null);
+    assert.deepEqual(answeredEvents, [
+      { id: 'q-a1', pick: 'A', correct: true, at: '2026-11-16T09:12:34.000Z' },
+      { id: 'q-a3', pick: 'A', correct: false, at: '2026-11-16T09:12:34.000Z' },
+    ]);
+    assert.deepEqual(examFinishedEvents, [
+      {
+        paperId: testPaperA.id,
+        at: '2026-11-16T09:12:34.000Z',
+        total: 3,
+        answered: 2,
+        correct: 1,
+        score: Math.round((1 / 3) * 100),
+      },
+    ]);
+
+    // Quit with empty examPicks does NOT emit examFinished
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
+      { now: startTime, rng: makeSeededRng(1) },
+    );
+    dispatch(world, { type: 'quitRound' }, { now: submitTime });
+    assert.equal(examFinishedEvents.length, 1);
   });
 
   it('generates optionOrder permutations only for quiz rounds when shuffleOptions is enabled', () => {

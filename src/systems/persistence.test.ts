@@ -443,7 +443,7 @@ describe('persistence system', () => {
   it('round-trips exam config, startedAt, optionOrder, and shuffleOptions, and discards malformed saved rounds', () => {
     const fixedNow = () => new Date('2026-11-16T08:00:00.000Z');
 
-    // 1. Exam round round-trip preserves config.exam and startedAt
+    // 1. Exam round round-trip preserves config.exam, startedAt, and examPicks
     const examStorage = createMemoryStorage();
     const worldExam1 = createWorld();
     attachPersistence(worldExam1, examStorage);
@@ -457,12 +457,22 @@ describe('persistence system', () => {
       },
       { now: fixedNow, rng: makeSeededRng(1) },
     );
+    dispatch(worldExam1, { type: 'examPick', pick: 'A' });
+    dispatch(worldExam1, { type: 'examGoto', index: 2 });
+    dispatch(worldExam1, { type: 'examPick', pick: 'C' });
+    dispatch(worldExam1, { type: 'examGoto', index: 0 });
     assert.ok(worldExam1.round !== null);
 
     const worldExam2 = createWorld();
     attachPersistence(worldExam2, examStorage);
     assert.deepEqual(worldExam2.savedRound?.config.exam, { paperId: testPaperA.id, minutes: 4 });
     assert.equal(worldExam2.savedRound?.startedAt, '2026-11-16T08:00:00.000Z');
+    assert.deepEqual(worldExam2.savedRound?.examPicks, { 'q-a1': 'A', 'q-a3': 'C' });
+    assert.equal(worldExam2.savedRound?.pick, 'A');
+
+    dispatch(worldExam2, { type: 'resumeRound' });
+    assert.deepEqual(worldExam2.round?.examPicks, { 'q-a1': 'A', 'q-a3': 'C' });
+    assert.equal(worldExam2.round?.pick, 'A');
 
     // 2. Shuffled quiz round round-trip preserves settings.shuffleOptions and round.optionOrder
     const shuffleStorage = createMemoryStorage();
@@ -513,6 +523,27 @@ describe('persistence system', () => {
       { ...baseRound, optionOrder: { 'q-a1': ['A', 'B', 'C'] } },
       // optionOrder with non-choice value
       { ...baseRound, optionOrder: { 'q-a1': ['A', 'B', 'C', 'E'] } },
+      // examPicks with key not in queue
+      {
+        ...baseRound,
+        config: { ...baseRound.config, exam: { paperId: testPaperA.id, minutes: 4 } },
+        startedAt: '2026-11-16T08:00:00.000Z',
+        examPicks: { 'q-not-in-queue': 'A' },
+      },
+      // examPicks with invalid choice
+      {
+        ...baseRound,
+        config: { ...baseRound.config, exam: { paperId: testPaperA.id, minutes: 4 } },
+        startedAt: '2026-11-16T08:00:00.000Z',
+        examPicks: { 'q-a1': 'E' },
+      },
+      // examPicks not an object
+      {
+        ...baseRound,
+        config: { ...baseRound.config, exam: { paperId: testPaperA.id, minutes: 4 } },
+        startedAt: '2026-11-16T08:00:00.000Z',
+        examPicks: 'bad',
+      },
     ];
 
     for (const badRound of malformedRounds) {
@@ -528,5 +559,56 @@ describe('persistence system', () => {
       attachPersistence(badWorld, badStorage);
       assert.equal(badWorld.savedRound, null);
     }
+  });
+
+  it('round-trips examHistory and drops only malformed examHistory entries', () => {
+    const valid1 = {
+      paperId: testPaperA.id,
+      at: '2026-11-16T08:00:00.000Z',
+      total: 3,
+      answered: 3,
+      correct: 2,
+      score: 67,
+    };
+    const valid2 = {
+      paperId: testPaperB.id,
+      at: '2026-11-16T09:00:00.000Z',
+      total: 2,
+      answered: 2,
+      correct: 2,
+      score: 100,
+    };
+
+    const storage = createMemoryStorage({
+      [STORAGE_KEY]: JSON.stringify({
+        version: 1,
+        progress: {},
+        settings: {
+          theme: 'light',
+          lastRound: null,
+          examHistory: [
+            valid1,
+            { paperId: '', at: '2026-11-16T08:30:00.000Z', total: 3, answered: 3, correct: 1, score: 33 },
+            { paperId: testPaperA.id, at: 'not-a-date', total: 3, answered: 3, correct: 1, score: 33 },
+            { paperId: testPaperA.id, at: '2026-11-16T08:40:00.000Z', total: 3, answered: 4, correct: 1, score: 33 },
+            { paperId: testPaperA.id, at: '2026-11-16T08:45:00.000Z', total: 3, answered: 2, correct: 3, score: 100 },
+            { paperId: testPaperA.id, at: '2026-11-16T08:50:00.000Z', total: 3, answered: 2, correct: 1, score: 105 },
+            'not-an-object',
+            valid2,
+          ],
+        },
+      }),
+    });
+
+    const world1 = createWorld();
+    attachPersistence(world1, storage);
+    assert.equal(world1.settings.theme, 'light');
+    assert.deepEqual(world1.settings.examHistory, [valid1, valid2]);
+
+    const exported = exportProgress(world1);
+    const world2 = createWorld();
+    const res = importProgress(world2, exported);
+    assert.equal(res.ok, true);
+    assert.deepEqual(world2.settings.examHistory, [valid1, valid2]);
   });
 });
