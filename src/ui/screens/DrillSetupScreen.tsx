@@ -13,6 +13,7 @@ import {
   READ_PASSES_DEFAULT,
   READ_PASSES_PRESETS,
 } from '../../core/constants/study';
+import { FREQ_ROUND_COUNT } from '../../core/constants/frequent';
 import { WEAK_ROUND_COUNT } from '../../core/constants/weak';
 import type { AskFilter, PaperId, RoundConfig, RoundMode, StudyMode, SubjectKey } from '../../core/types';
 import type { World } from '../../core/world';
@@ -24,6 +25,7 @@ import {
   positiveCoverage,
 } from '../../selectors';
 import { examBest, examPapers, type ExamPaperView } from '../../selectors/exam';
+import { frequentRoundConfig, frequentTopics } from '../../selectors/frequent';
 import { weakRoundConfig, weakSummary } from '../../selectors/weak';
 import { formatExamLabel } from '../components/QuestionParts';
 import { Button } from '../kit/Button';
@@ -158,6 +160,11 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   const weakAvail = weakConfig ? availableCount(world, weakConfig, now) : 0;
   const weakCount = Math.min(WEAK_ROUND_COUNT, weakAvail);
   const weakReady = !papersLoading && weakInfo.ready && weakConfig !== null && weakAvail > 0;
+  const freqTopicCount = frequentTopics(world, bank.id).length;
+  const freqConfig = frequentRoundConfig(world, bank.id);
+  const freqAvail = freqConfig ? availableCount(world, freqConfig, now) : 0;
+  const freqCount = Math.min(FREQ_ROUND_COUNT, freqAvail);
+  const freqReady = !papersLoading && freqConfig !== null && freqAvail > 0;
 
   const handleStudyChange = (nextStudy: StudyMode) => {
     setStudy(nextStudy);
@@ -219,6 +226,11 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     dispatch(world, { type: 'startRound', config: weakConfig });
   };
 
+  const handleStartFreqRound = () => {
+    if (!freqReady || !freqConfig) return;
+    dispatch(world, { type: 'startRound', config: freqConfig });
+  };
+
   const verb = study === 'read' ? '看' : '刷';
   const startLabel = papersLoading
     ? '題庫載入中…'
@@ -273,6 +285,25 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
               : weakReady
                 ? `針對 ${weakInfo.topicCount} 個常錯考點・每次 ${weakCount} 題`
                 : '再多刷幾題就會開放'}
+          </span>
+        </div>
+        <span className="cb-go">開刷</span>
+      </Card>
+
+      <Card
+        tone="pink"
+        className="cb-weak-entry"
+        onClick={handleStartFreqRound}
+        disabled={!freqReady}
+      >
+        <div className="cb-grow">
+          <strong className="cb-weak-entry-title">高頻回合：只刷歷年最常考的考點</strong>
+          <span className="cb-sub cb-block">
+            {papersLoading
+              ? '題庫載入中…'
+              : freqReady
+                ? `每科題數最多的考點，共 ${freqTopicCount} 個・每次 ${freqCount} 題`
+                : '目前沒有可用的題目'}
           </span>
         </div>
         <span className="cb-go">開刷</span>
