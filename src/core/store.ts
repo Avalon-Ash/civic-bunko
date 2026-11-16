@@ -6,6 +6,7 @@ const ALL_EVENT_TYPES: readonly EventType[] = [
   'roundStarted',
   'answered',
   'roundFinished',
+  'cardsLoaded',
   'progressChanged',
   'settingsChanged',
   'syncChanged',

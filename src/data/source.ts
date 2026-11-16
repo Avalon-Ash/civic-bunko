@@ -1,4 +1,4 @@
-import type { Bank, EnrichFile, PaperFile, PaperIndex, TopicInfo } from '../core/types';
+import type { Bank, CardFile, EnrichFile, PaperFile, PaperIndex, TopicInfo } from '../core/types';
 import { loadModulesSafely } from './sourceLoader';
 
 export interface BankMeta {
@@ -30,6 +30,15 @@ const paperModules = import.meta.glob<PaperFile>(
 const enrichModules = import.meta.glob<EnrichFile>('../../data/enrich/*.json', {
   import: 'default',
 });
+
+const cardModules = import.meta.glob<CardFile>('../../data/cards/*.json', {
+  import: 'default',
+});
+
+/** 平行延後載入所有卡片檔；載入失敗時視為沒有。 */
+export async function loadCardFiles(): Promise<CardFile[]> {
+  return loadModulesSafely(Object.values(cardModules));
+}
 
 /** 同步讀取已隨主程式打包的題庫登記檔與試卷索引。 */
 export function loadBankMeta(): BankMeta {

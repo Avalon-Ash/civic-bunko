@@ -1,0 +1,29 @@
+{
+  "deck": "essay-local-gov",
+  "title": "地方自治申論架構",
+  "cards": [
+    {
+      "id": "essay-113-general-local-gov-1",
+      "kind": "essay",
+      "subjectKey": "local-gov",
+      "title": "覆議與復議",
+      "hook": "覆議是府對會的制衡；復議是議會自己重新討論。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "覆議", "points": ["行政機關提出", "依據：地方制度法"] },
+        "right": { "title": "復議", "points": ["議員、代表提出", "依據：議事規則"] }
+      },
+      "faces": [
+        { "heading": "破題", "lines": ["兩者都是重新審議已議決的案子", "差別在誰提、依據什麼、效果如何"] },
+        { "heading": "覆議", "lines": ["行政機關認為議決案窒礙難行", "送達 30 日內敘明理由送請覆議", "出席三分之二維持原案，就要接受"] },
+        { "heading": "復議", "lines": ["議會內部的議事程序", "議員對已議決的案子提請再討論", "要件依各議會的議事規則"] },
+        { "heading": "比較", "lines": ["提出者：行政機關／議員、代表", "性質：府會制衡／議會自律", "依據：地方制度法／議事規則"] },
+        { "heading": "結論", "lines": ["覆議處理府會爭議", "復議讓議會自己修正決議"] }
+      ],
+      "lawRefs": [
+        { "law": "地方制度法", "article": "39" }
+      ],
+      "essay": { "paperId": "113-general-local-gov", "no": 1 }
+    }
+  ]
+}

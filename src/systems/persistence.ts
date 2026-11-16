@@ -137,6 +137,13 @@ function isValidSettings(value: unknown): value is RawSettings {
   ) {
     return false;
   }
+  if (value.shuffleOptions !== undefined && typeof value.shuffleOptions !== 'boolean') return false;
+  if (
+    value.cardsSeen !== undefined &&
+    !(Array.isArray(value.cardsSeen) && value.cardsSeen.every((id) => typeof id === 'string'))
+  ) {
+    return false;
+  }
   return true;
 }
 
@@ -235,6 +242,8 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       lastRound: parsed.settings.lastRound ? normalizeRoundConfig(parsed.settings.lastRound) : null,
       installHintDismissed: parsed.settings.installHintDismissed === true,
       ...(parsed.settings.accessory !== undefined ? { accessory: parsed.settings.accessory } : {}),
+      ...(parsed.settings.shuffleOptions !== undefined ? { shuffleOptions: parsed.settings.shuffleOptions } : {}),
+      ...(parsed.settings.cardsSeen !== undefined ? { cardsSeen: [...parsed.settings.cardsSeen] } : {}),
     };
   }
 

@@ -41,6 +41,32 @@ export function dismissInstallHint(world: World): void {
   });
 }
 
+/** 開關「選項打亂」，並發出 settingsChanged。 */
+export function setShuffleOptions(world: World, on: boolean): void {
+  world.settings = {
+    ...world.settings,
+    shuffleOptions: on,
+  };
+  world.bus.emit({
+    type: 'settingsChanged',
+    settings: { ...world.settings },
+  });
+}
+
+/** 把卡片記成看過；已經記過就不動作。 */
+export function markCardSeen(world: World, id: string): void {
+  const seen = world.settings.cardsSeen ?? [];
+  if (seen.includes(id)) return;
+  world.settings = {
+    ...world.settings,
+    cardsSeen: [...seen, id],
+  };
+  world.bus.emit({
+    type: 'settingsChanged',
+    settings: { ...world.settings },
+  });
+}
+
 /** 訂閱 roundStarted，自動記住最後一次回合設定並發出 settingsChanged。 */
 export function attachSettings(world: World): () => void {
   return world.bus.on('roundStarted', (event) => {

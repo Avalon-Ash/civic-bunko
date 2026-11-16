@@ -3,8 +3,9 @@ import { createRoot } from 'react-dom/client';
 import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
-import { loadBankMeta, loadEnrichFiles, loadPapers, loadTopics } from './data/source';
+import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics } from './data/source';
 import { loadBank } from './systems/bankLoader';
+import { loadCards } from './systems/cardLoader';
 import { attachPersistence } from './systems/persistence';
 import { attachSync } from './systems/sync';
 import { App } from './ui/App';
@@ -25,8 +26,14 @@ const { banks } = loadBankMeta();
 loadBank(world, banks, []);
 
 // 加工內容載入失敗不影響刷題：當作沒有。
-const papersPromise = Promise.all([loadPapers(), loadEnrichFiles().catch(() => [])]).then(([files, enrich]) => {
+// 卡片載入失敗也不影響刷題。
+const papersPromise = Promise.all([
+  loadPapers(),
+  loadEnrichFiles().catch(() => []),
+  loadCardFiles().catch(() => []),
+]).then(([files, enrich, cards]) => {
   loadBank(world, banks, files, enrich);
+  loadCards(world, cards, files);
 });
 
 function Root({ world: appWorld }: { world: World }) {

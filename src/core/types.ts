@@ -153,6 +153,35 @@ export interface TopicInfo {
   name: string;
 }
 
+// ── 卡片（data/cards/<deck>.json，主代理撰寫）──────────────
+/** concept＝前置觀念；newlaw＝新法必考；essay＝申論架構 */
+export type CardKind = 'concept' | 'newlaw' | 'essay';
+export interface CardFace {
+  heading: string;
+  /** 每行一個重點，字數上限在 constants/cards.ts */
+  lines: string[];
+}
+export interface StudyCard {
+  id: string;
+  kind: CardKind;
+  subjectKey: SubjectKey | null;
+  title: string;
+  /** 一句話重點，卡片收合時只看得到這句 */
+  hook: string;
+  visual: EnrichVisual | null;
+  faces: CardFace[];
+  lawRefs: LawRef[];
+  /** 申論卡對應的官方申論題 */
+  essay: { paperId: PaperId; no: number } | null;
+  /** 申論題原文：由 cardLoader 從官方層填入，卡片檔裡不寫 */
+  essayText?: string;
+}
+export interface CardFile {
+  deck: string;
+  title: string;
+  cards: StudyCard[];
+}
+
 // ── 個人進度（只存在裝置上）──────────────────────────────
 export interface Progress {
   seen: number;
@@ -187,6 +216,8 @@ export interface RoundConfig {
   ask: AskFilter;
   /** 看答案模式：這批題目看幾遍 */
   passes: number;
+  /** 模擬考：整份試卷照官方題號順序、計時、交卷後才看答案 */
+  exam?: { paperId: PaperId; minutes: number } | null;
 }
 export interface RoundResult {
   id: QuestionId;
@@ -204,6 +235,10 @@ export interface RoundState {
   finished: boolean;
   /** 看答案模式：目前第幾遍（從 1 開始）；作答模式固定為 1 */
   pass: number;
+  /** 模擬考開始時間（ISO）；其他回合沒有 */
+  startedAt?: string;
+  /** 選項打亂時，每題四個選項的顯示順序（值仍是官方代號）；沒打亂就沒有 */
+  optionOrder?: Record<QuestionId, Choice[]>;
 }
 
 // ── 每日紀錄與集章 ──────────────────────────────────────
@@ -221,6 +256,10 @@ export interface Settings {
   installHintDismissed?: boolean;
   /** 貓目前戴的配件；必須是已解鎖的 */
   accessory?: AccessoryId | null;
+  /** 作答時打亂四個選項的顯示順序（模擬考不打亂） */
+  shuffleOptions?: boolean;
+  /** 看過的卡片 ID */
+  cardsSeen?: string[];
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────
@@ -247,6 +286,7 @@ export type AppEvent =
   | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string }
   | { type: 'roundRestored' }
+  | { type: 'cardsLoaded'; count: number }
   | { type: 'progressChanged'; ids: QuestionId[] }
   | { type: 'dayLogChanged'; day: DayKey; count: number }
   | { type: 'settingsChanged'; settings: Settings }
@@ -267,6 +307,8 @@ export type UICommand =
   | { type: 'setTheme'; theme: ThemeChoice }
   | { type: 'setAccessory'; accessory: AccessoryId | null }
   | { type: 'dismissInstallHint' }
+  | { type: 'setShuffleOptions'; on: boolean }
+  | { type: 'markCardSeen'; id: string }
   | { type: 'importProgress'; json: string }
   | { type: 'resetProgress' }
   | { type: 'setSyncCode'; code: string }

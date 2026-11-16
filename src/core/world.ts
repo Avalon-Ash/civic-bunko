@@ -16,6 +16,7 @@ import type {
   QuestionId,
   RoundState,
   Settings,
+  StudyCard,
   SyncState,
 } from './types';
 
@@ -25,6 +26,7 @@ export interface World {
   questions: Map<QuestionId, OfficialQuestion>;
   groups: Map<string, PassageGroup>;
   enrich: Map<QuestionId, Enrich>;
+  cards: StudyCard[];
   progress: Map<QuestionId, Progress>;
   dayLog: Map<DayKey, number>;
   round: RoundState | null;
@@ -43,6 +45,7 @@ export function createWorld(): World {
     questions: new Map(),
     groups: new Map(),
     enrich: new Map(),
+    cards: [],
     progress: new Map(),
     dayLog: new Map(),
     round: null,

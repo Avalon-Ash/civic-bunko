@@ -9,7 +9,13 @@ import {
   retryWrong,
   startRound,
 } from '../systems/round';
-import { dismissInstallHint, setAccessory, setTheme } from '../systems/settings';
+import {
+  dismissInstallHint,
+  markCardSeen,
+  setAccessory,
+  setShuffleOptions,
+  setTheme,
+} from '../systems/settings';
 import { disableSync, setSyncCode, syncNow } from '../systems/sync';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
@@ -75,6 +81,12 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'dismissInstallHint':
       dismissInstallHint(world);
+      break;
+    case 'setShuffleOptions':
+      setShuffleOptions(world, cmd.on);
+      break;
+    case 'markCardSeen':
+      markCardSeen(world, cmd.id);
       break;
     case 'importProgress': {
       const result = importProgress(world, cmd.json);

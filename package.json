@@ -11,7 +11,7 @@
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"tools/**/*.test.mjs\"",
     "crawl": "node tools/crawler/crawl.mjs",
     "parse": "node tools/parser/parse.mjs",
-    "validate": "node tools/validate/validate.mjs"
+    "validate": "node tools/validate/validate.mjs && node tools/validate/enrich.mjs && node tools/validate/cards.mjs"
   },
   "dependencies": {
     "react": "^19.0.1",
