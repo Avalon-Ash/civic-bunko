@@ -1217,7 +1217,7 @@ mark {
   position: absolute;
   bottom: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%);
+  translate: calc(-50% + var(--cb-bubble-shift, 0px)) 0;
   background: var(--surface-raised);
   color: var(--ink);
   border: 2px solid var(--line);
@@ -1225,14 +1225,21 @@ mark {
   padding: 6px 12px;
   font-size: var(--text-small);
   font-weight: 700;
-  white-space: nowrap;
-  max-width: min(240px, 72vw);
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.45;
+  text-align: center;
+  width: max-content;
+  max-width: min(240px, calc(100vw - 16px));
+  white-space: normal;
+  overflow-wrap: anywhere;
   box-shadow: 0 3px 0 var(--line);
   z-index: 12;
   pointer-events: none;
   animation: cb-pop 0.25s var(--spring);
+}
+
+.cb-cat-bubble.is-below {
+  bottom: auto;
+  top: calc(100% + 8px);
 }
 
 /* ── Burst 粒子噴發 ─────────────────────────────────────── */

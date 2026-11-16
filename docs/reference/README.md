@@ -1,0 +1,53 @@
+# 參考資料
+
+- `outline-general-admin-2026-09-17.pdf`：考選部「公務人員普考或相當特種考試四等考試（行政類科）部分應試專業科目命題大綱」，115/09/17 版。來源：考選部全球資訊網 → 應考人專區 → 考試資訊 → 命題大綱（`wHandMenuFile.ashx?file_id=5445`；舊的 `file_id=5223`、`4890` 已失效）。下載日 2026-11-16。
+
+## `data/topics.json` 對照（2026-11-16）
+
+官方大綱每個細項對應到的分類 ID。本專案分得比官方細；官方沒有獨立列出的（國家賠償列在「專業知識及核心能力」第六點）照樣保留。
+
+### 行政法概要（PDF 普-3、普-4）
+| 官方 | 分類 |
+| :-- | :-- |
+| 一、基本概念及原則：法源、法律原則、依法行政與裁量、公權力與私經濟行政、法律關係 | `admin-law/principles` |
+| 二(一)(二) 行政組織之態樣、管轄 | `admin-law/organization` |
+| 二(三) 公務員法（服務法、考績法、懲戒法、保障法） | `admin-law/civil-service` |
+| 二(四) 公物 | `admin-law/public-property` |
+| 三(一) 行政命令 | `admin-law/rules` |
+| 三(二) 行政處分 | `admin-law/disposition` |
+| 三(三) 行政契約 | `admin-law/contract` |
+| 三(四) 行政事實行為 | `admin-law/factual-acts` |
+| 三(五) 行政罰法 | `admin-law/penalty` |
+| 三(六) 行政執行法 | `admin-law/enforcement` |
+| 三(七) 行政程序（含資訊公開） | `admin-law/procedure` |
+| 四(一) 訴願法 | `admin-law/appeal` |
+| 四(二) 行政訴訟法概要 | `admin-law/litigation` |
+| 核心能力六：國家賠償 | `admin-law/state-liability` |
+
+### 行政學概要（PDF 普-14、普-15）
+| 官方 | 分類 |
+| :-- | :-- |
+| 一(一)(二) 公共行政的意涵、基礎學說 | `public-admin/foundations` |
+| 一(三) 行政革新與政府再造 | `public-admin/reform` |
+| 二 行政組織理論：組織結構、我國行政組織 | `public-admin/organization` |
+| 二 組織文化、非正式組織；六(一) 領導、激勵 | `public-admin/behavior` |
+| 三(一) 公務人員制度 | `public-admin/personnel` |
+| 三(二) 政府預算與財務行政 | `public-admin/budget` |
+| 四 政策分析與決策理論：公共政策、民意與決策 | `public-admin/policy` |
+| 五 行政環境：公共關係、府際關係、系絡、第三部門與跨部門治理、行政文化 | `public-admin/governance` |
+| 六 行政運作與管理技術：溝通、危機與衝突管理、績效與生產力 | `public-admin/decision` |
+| 七 行政倫理：行政責任、倫理理論與規範 | `public-admin/ethics` |
+
+### 地方自治概要（PDF 普-18、普-19）
+| 官方 | 分類 |
+| :-- | :-- |
+| 一 基本概念：地方政府與地方自治意涵、體系、自治權與公民權 | `local-gov/concepts` |
+| 二(一) 自治團體；二(五) 人民權利義務；四(二) 行政區劃；五(五) 原住民自治 | `local-gov/entities` |
+| 二(二) 自治法令體系 | `local-gov/legislation` |
+| 二(三) 自治團體權利與自治事項 | `local-gov/affairs` |
+| 二(四) 自治團體責任與自治監督；三(四) 中央與地方關係 | `local-gov/supervision` |
+| 二(六) 地方選舉與罷免；五(三) 公民參與 | `local-gov/election` |
+| 三(一) 地方行政機關 | `local-gov/executive` |
+| 三(二) 地方立法機關；三(三) 府會關係 | `local-gov/council` |
+| 五(一) 自治財政與地方公共產業 | `local-gov/finance` |
+| 四 地方治理（基本概念、績效、透明度、社區總體營造）；三(三)、五(二) 府際關係；五(四) 發展潮流 | `local-gov/cooperation` |

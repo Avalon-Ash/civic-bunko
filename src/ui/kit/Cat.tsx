@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { AccessoryId } from '../../core/types';
 
 export type CatMood = 'idle' | 'yay' | 'oops' | 'sleepy';
@@ -202,6 +202,24 @@ export function Cat({
   const [squishing, setSquishing] = useState(false);
   const [bubble, setBubble] = useState<string | null>(null);
   const lastIndexRef = useRef(-1);
+  const bubbleRef = useRef<HTMLSpanElement | null>(null);
+
+  // 泡泡以小貓為中心；靠近螢幕邊緣時往內推，頂到上緣時改放在小貓下方。
+  useLayoutEffect(() => {
+    const el = bubbleRef.current;
+    if (!bubble || !el) return;
+    el.style.setProperty('--cb-bubble-shift', '0px');
+    el.classList.remove('is-below');
+    const margin = 8;
+    const rect = el.getBoundingClientRect();
+    const viewport = document.documentElement.clientWidth;
+    let shift = 0;
+    if (rect.left < margin) shift = margin - rect.left;
+    else if (rect.right > viewport - margin) shift = viewport - margin - rect.right;
+    el.style.setProperty('--cb-bubble-shift', `${Math.round(shift)}px`);
+    if (rect.top < margin) el.classList.add('is-below');
+  }, [bubble]);
+
 
   useEffect(() => {
     if (!bubble) return;
@@ -345,7 +363,7 @@ export function Cat({
   return (
     <span className={`cb-cat-host ${className}`.trim()}>
       {bubble && (
-        <span className="cb-cat-bubble" role="status" aria-live="polite">
+        <span ref={bubbleRef} className="cb-cat-bubble" role="status" aria-live="polite">
           {bubble}
         </span>
       )}

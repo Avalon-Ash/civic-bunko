@@ -1,7 +1,7 @@
 {
-  "note": "考點分類的唯一來源。大項依考選部命題大綱的架構整理，細項由主代理訂定（官方命題大綱 PDF 自動下載失敗，尚未逐字對照）。",
+  "note": "考點分類的唯一來源。行政法、行政學、地方自治三科已對照考選部 115/09/17 版命題大綱（docs/reference/outline-general-admin-2026-09-17.pdf，對照表在 docs/reference/README.md）：官方每個細項都有對應分類，本檔分得比官方細。法學知識與英文、國文是共同科目，不在該彙編內，分類由主代理訂定。",
   "topics": [
-    { "id": "admin-law/principles", "subjectKey": "admin-law", "name": "行政法基本原則與法源" },
+    { "id": "admin-law/principles", "subjectKey": "admin-law", "name": "法源、法律原則與法律關係" },
     { "id": "admin-law/organization", "subjectKey": "admin-law", "name": "行政組織與管轄" },
     { "id": "admin-law/civil-service", "subjectKey": "admin-law", "name": "公務員法" },
     { "id": "admin-law/public-property", "subjectKey": "admin-law", "name": "公物與營造物" },
@@ -23,19 +23,19 @@
     { "id": "public-admin/personnel", "subjectKey": "public-admin", "name": "人事行政" },
     { "id": "public-admin/budget", "subjectKey": "public-admin", "name": "財務行政與預算" },
     { "id": "public-admin/policy", "subjectKey": "public-admin", "name": "公共政策" },
-    { "id": "public-admin/decision", "subjectKey": "public-admin", "name": "決策、溝通與行政運作" },
-    { "id": "public-admin/governance", "subjectKey": "public-admin", "name": "府際關係、治理與公民參與" },
+    { "id": "public-admin/decision", "subjectKey": "public-admin", "name": "行政運作：溝通、危機與績效" },
+    { "id": "public-admin/governance", "subjectKey": "public-admin", "name": "行政環境：府際、跨部門治理" },
     { "id": "public-admin/ethics", "subjectKey": "public-admin", "name": "行政責任與行政倫理" },
 
     { "id": "local-gov/concepts", "subjectKey": "local-gov", "name": "地方自治基本概念與理論" },
-    { "id": "local-gov/entities", "subjectKey": "local-gov", "name": "地方自治團體與居民權利義務" },
+    { "id": "local-gov/entities", "subjectKey": "local-gov", "name": "自治團體、行政區劃與居民權利" },
     { "id": "local-gov/affairs", "subjectKey": "local-gov", "name": "自治事項、委辦事項與權限劃分" },
     { "id": "local-gov/legislation", "subjectKey": "local-gov", "name": "自治法規" },
     { "id": "local-gov/executive", "subjectKey": "local-gov", "name": "地方行政機關" },
     { "id": "local-gov/council", "subjectKey": "local-gov", "name": "地方立法機關與府會關係" },
     { "id": "local-gov/finance", "subjectKey": "local-gov", "name": "地方財政" },
     { "id": "local-gov/supervision", "subjectKey": "local-gov", "name": "自治監督與中央地方關係" },
-    { "id": "local-gov/cooperation", "subjectKey": "local-gov", "name": "跨域治理與地方發展" },
+    { "id": "local-gov/cooperation", "subjectKey": "local-gov", "name": "地方治理、跨域合作與社區營造" },
     { "id": "local-gov/election", "subjectKey": "local-gov", "name": "地方選舉、罷免與公民參與" },
 
     { "id": "law-english/constitution-principles", "subjectKey": "law-english", "name": "憲法基本原則與國家機關" },
