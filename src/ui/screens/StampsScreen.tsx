@@ -8,6 +8,7 @@ import { activeBank, availableCount, subjectStats } from '../../selectors';
 import { progressOverview } from '../../selectors/backup';
 import { currentAccessory, stampTotals } from '../../selectors/daily';
 import { getSyncState } from '../../selectors/sync';
+import { frequentRoundConfig, frequentTopics } from '../../selectors/frequent';
 import { topicStats, weakRoundConfig, weakSummary, weakTopics } from '../../selectors/weak';
 import { exportProgress } from '../../systems/persistence';
 import { encodeSyncCode, validateSyncCredentials } from '../../systems/syncCode';
@@ -124,6 +125,9 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
     (weakInfo.answeredTotal >= WEAK_ROUND_COUNT ||
       weakAllStats.some((t) => t.answered >= WEAK_MIN_ANSWERED)) &&
     weakAllStats.every((t) => t.wrongAttempts === 0);
+
+  const freqList = bank ? frequentTopics(world, bank.id) : [];
+  const [freqOpen, setFreqOpen] = useState(false);
 
   const [catSpin, setCatSpin] = useState(false);
   const spinTimerRef = useRef<number | null>(null);
@@ -307,6 +311,14 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
     onStartQuiz?.();
   };
 
+  const handleStartSingleFreq = (topicId: string) => {
+    if (papersLoading || !bank) return;
+    const config = frequentRoundConfig(world, bank.id, [topicId]);
+    if (!config) return;
+    dispatch(world, { type: 'startRound', config });
+    onStartQuiz?.();
+  };
+
   return (
     <div className="cb-stack">
       <Toast message={toast} onDismiss={() => setToast(null)} />
@@ -436,6 +448,54 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
           </Card>
         )}
       </section>
+
+      {!papersLoading && freqList.length > 0 ? (
+        <section className="cb-section">
+          <h2>高頻考點</h2>
+          <Button
+            variant="butter"
+            aria-expanded={freqOpen}
+            onClick={() => setFreqOpen((v) => !v)}
+          >
+            {freqOpen ? '收起高頻考點' : `看每科最常考的 ${freqList.length} 個考點`}
+          </Button>
+          {freqOpen ? (
+            <div className="cb-weak-list">
+              {freqList.map((topic) => {
+                const ratio = topic.total > 0 ? Math.min(1, topic.answered / topic.total) : 0;
+                return (
+                  <Card key={topic.id} className="cb-weak-item">
+                    <div className="cb-weak-info">
+                      <div className="cb-weak-head">
+                        <span className="cb-chip cb-chip-plain cb-weak-tag">
+                          {topic.subjectShort}
+                        </span>
+                        <strong className="cb-weak-name">{topic.name}</strong>
+                      </div>
+                      <div className="cb-sub cb-num-tabular">
+                        歷年 {topic.total} 題・你刷過 {topic.answered} 題
+                      </div>
+                      <div className="cb-weak-bar" aria-hidden="true">
+                        <div
+                          className="cb-weak-bar-fill cb-freq-bar-fill"
+                          style={{ transform: `scaleX(${ratio})` }}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      variant="butter"
+                      className="cb-weak-solo-btn"
+                      onClick={() => handleStartSingleFreq(topic.id)}
+                    >
+                      只刷這個
+                    </Button>
+                  </Card>
+                );
+              })}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
 
       {stats.length > 0 ? (
         <div className="cb-stack-sm">
