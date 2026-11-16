@@ -15,6 +15,7 @@ import {
   dismissInstallHint,
   markCardSeen,
   setAccessory,
+  setBilingual,
   setShuffleOptions,
   setTheme,
 } from '../systems/settings';
@@ -96,6 +97,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'setShuffleOptions':
       setShuffleOptions(world, cmd.on);
+      break;
+    case 'setBilingual':
+      setBilingual(world, cmd.on);
       break;
     case 'markCardSeen':
       markCardSeen(world, cmd.id);

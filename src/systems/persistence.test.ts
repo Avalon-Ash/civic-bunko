@@ -699,4 +699,44 @@ describe('persistence system', () => {
     assert.equal(cleanWorld.settings.lastRound.topicIds, undefined);
     assert.equal('topicIds' in cleanWorld.settings.lastRound, false);
   });
+
+  it('round-trips settings.bilingual and drops non-boolean bilingual field without failing settings', () => {
+    const storage = createMemoryStorage();
+    const world1 = createWorld();
+    attachPersistence(world1, storage);
+
+    dispatch(world1, { type: 'setBilingual', on: false });
+    const world2 = createWorld();
+    attachPersistence(world2, storage);
+    assert.equal(world2.settings.bilingual, false);
+
+    const exportedFalse = exportProgress(world2);
+    const world3 = createWorld();
+    assert.equal(importProgress(world3, exportedFalse).ok, true);
+    assert.equal(world3.settings.bilingual, false);
+
+    dispatch(world3, { type: 'setBilingual', on: true });
+    const exportedTrue = exportProgress(world3);
+    const world4 = createWorld();
+    assert.equal(importProgress(world4, exportedTrue).ok, true);
+    assert.equal(world4.settings.bilingual, true);
+
+    for (const badValue of ['yes', 1, null, { on: true }]) {
+      const badJson = JSON.stringify({
+        version: 1,
+        progress: {},
+        settings: {
+          theme: 'dark',
+          lastRound: null,
+          bilingual: badValue,
+        },
+      });
+      const target = createWorld();
+      const res = importProgress(target, badJson);
+      assert.equal(res.ok, true);
+      assert.equal(target.settings.theme, 'dark');
+      assert.equal('bilingual' in target.settings, false);
+      assert.equal(target.settings.bilingual, undefined);
+    }
+  });
 });

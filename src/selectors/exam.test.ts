@@ -5,11 +5,13 @@ import { EXAM_SECONDS_PER_QUESTION, EXAM_WARN_SECONDS } from '../core/constants/
 import type { Paper, PaperFile } from '../core/types';
 import { createWorld } from '../core/world';
 import { loadBank } from '../systems/bankLoader';
+import { loadZh } from '../systems/zhLoader';
 import {
   createTestWorld,
   makeConfig,
   makeSeededRng,
   testBank,
+  testGroup,
   testPaperA,
   testPaperB,
   testQuestionsA,
@@ -298,5 +300,37 @@ describe('exam selectors', () => {
     assert.equal(examBest(world, testPaperA.id), 100);
     assert.equal(examBest(world, testPaperB.id), 100);
     assert.equal(examBest(world, 'unattempted-paper'), null);
+  });
+
+  it('includes zh and groupZh (or null when missing) in examQuestionDetail', () => {
+    const world = createTestWorld();
+    loadZh(world, [
+      {
+        paperId: testPaperA.id,
+        groups: [
+          {
+            id: testGroup.id,
+            segments: [{ en: 'Passage.', zh: '短文。' }],
+            vocab: [],
+          },
+        ],
+        items: [
+          {
+            id: 'q-a1',
+            stem: '第一題中譯',
+            options: { A: '甲', B: '乙', C: '丙', D: '丁' },
+            vocab: [],
+          },
+        ],
+      },
+    ]);
+
+    const withZh = examQuestionDetail(world, 'q-a1');
+    assert.equal(withZh?.zh?.stem, '第一題中譯');
+    assert.equal(withZh?.groupZh?.id, testGroup.id);
+
+    const withoutZh = examQuestionDetail(world, 'q-a3');
+    assert.equal(withoutZh?.zh, null);
+    assert.equal(withoutZh?.groupZh, null);
   });
 });

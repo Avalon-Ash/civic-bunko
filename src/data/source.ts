@@ -1,4 +1,4 @@
-import type { Bank, CardFile, EnrichFile, PaperFile, PaperIndex, TopicInfo } from '../core/types';
+import type { Bank, CardFile, EnrichFile, PaperFile, PaperIndex, TopicInfo, ZhFile } from '../core/types';
 import { loadModulesSafely } from './sourceLoader';
 
 export interface BankMeta {
@@ -32,6 +32,10 @@ const enrichModules = import.meta.glob<EnrichFile>('../../data/enrich/*.json', {
 });
 
 const cardModules = import.meta.glob<CardFile>('../../data/cards/*.json', {
+  import: 'default',
+});
+
+const zhModules = import.meta.glob<ZhFile>('../../data/zh/*.json', {
   import: 'default',
 });
 
@@ -74,4 +78,9 @@ export async function loadPapers(): Promise<PaperFile[]> {
 /** 平行延後載入所有加工解析 JSON 分片；找不到檔案或載入失敗時視為沒有。 */
 export async function loadEnrichFiles(): Promise<EnrichFile[]> {
   return loadModulesSafely(Object.values(enrichModules));
+}
+
+/** 平行延後載入所有英文題中譯 JSON 分片；找不到檔案或載入失敗時視為沒有。 */
+export async function loadZhFiles(): Promise<ZhFile[]> {
+  return loadModulesSafely(Object.values(zhModules));
 }

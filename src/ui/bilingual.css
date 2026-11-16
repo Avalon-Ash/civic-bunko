@@ -1,0 +1,186 @@
+/* 英文題中英對照專用樣式：全類別以 cb-zh- 開頭，只使用中性色與 theme.css token。 */
+
+.cb-zh-segments {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cb-zh-segment {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.cb-zh-seg-en {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ink);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cb-zh-seg-zh {
+  margin: 0;
+  font-size: var(--text-small);
+  line-height: 1.55;
+  color: var(--ink-soft);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cb-zh-stem {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  overflow-wrap: break-word;
+  word-break: break-word;
+  animation: cb-zh-fade 0.18s ease-out;
+}
+
+.cb-zh-opt-en {
+  display: block;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cb-zh-opt-zh {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--text-small);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  animation: cb-zh-fade 0.18s ease-out;
+}
+
+.cb-zh-opt-btn-wrap {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 10px;
+}
+
+.cb-zh-opt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--hair);
+  background: var(--surface);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--hair);
+}
+
+.cb-zh-opt-btn[aria-pressed='true'] {
+  border-color: var(--line);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.cb-zh-vocab-box {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--hair);
+  min-width: 0;
+}
+
+.cb-zh-vocab-toggle {
+  width: 100%;
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink);
+  text-align: left;
+}
+
+.cb-zh-vocab-state {
+  color: var(--ink-soft);
+  font-weight: 700;
+  flex: none;
+}
+
+.cb-zh-vocab-list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cb-zh-vocab-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  font-size: var(--text-small);
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.cb-zh-vocab-en {
+  font-weight: 700;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.cb-zh-vocab-zh {
+  color: var(--ink-soft);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.cb-zh-q-vocab {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--surface);
+  min-width: 0;
+}
+
+.cb-zh-vocab-title {
+  display: block;
+  font-size: var(--text-small);
+  font-weight: 900;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+}
+
+@keyframes cb-zh-fade {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-zh-stem,
+  .cb-zh-opt-zh {
+    animation: none;
+  }
+}

@@ -19,6 +19,8 @@ import type {
   StudyCard,
   SyncState,
   TopicInfo,
+  GroupZh,
+  QuestionZh,
 } from './types';
 
 export interface World {
@@ -29,6 +31,10 @@ export interface World {
   enrich: Map<QuestionId, Enrich>;
   /** data/topics.json 的考點清單（bankLoader 載入） */
   topics: TopicInfo[];
+  /** 英文題中譯，以題目 ID 為鍵（zhLoader 載入） */
+  zh: Map<QuestionId, QuestionZh>;
+  /** 英文題組逐句對照，以題組 ID 為鍵 */
+  groupZh: Map<string, GroupZh>;
   cards: StudyCard[];
   progress: Map<QuestionId, Progress>;
   dayLog: Map<DayKey, number>;
@@ -49,6 +55,8 @@ export function createWorld(): World {
     groups: new Map(),
     enrich: new Map(),
     topics: [],
+    zh: new Map(),
+    groupZh: new Map(),
     cards: [],
     progress: new Map(),
     dayLog: new Map(),

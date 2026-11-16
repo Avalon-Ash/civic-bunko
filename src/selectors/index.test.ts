@@ -6,6 +6,7 @@ import {
   askCounts,
   availableCount,
   bankTotals,
+  bilingualOn,
   currentQuestion,
   currentRoundConfig,
   dailyMissions,
@@ -20,6 +21,7 @@ import {
   subjectStats,
   wrongCount,
 } from './index';
+import { loadZh } from '../systems/zhLoader';
 import { weekStamps } from './daily';
 import {
   createTestWorld,
@@ -354,5 +356,82 @@ describe('selectors', () => {
     );
     const defaultView = currentQuestion(world);
     assert.deepEqual(defaultView?.optionOrder, ['A', 'B', 'C', 'D']);
+  });
+
+  it('defaults bilingualOn to true, reflects setBilingual, and returns zh/groupZh in currentQuestion and readView', () => {
+    const world = createTestWorld();
+    const now = () => new Date('2026-11-16T10:00:00');
+
+    assert.equal(bilingualOn(world), true);
+    assert.equal(getSettings(world).bilingual, undefined);
+
+    dispatch(world, { type: 'setBilingual', on: false });
+    assert.equal(bilingualOn(world), false);
+    assert.equal(getSettings(world).bilingual, false);
+
+    dispatch(world, { type: 'setBilingual', on: true });
+    assert.equal(bilingualOn(world), true);
+
+    loadZh(world, [
+      {
+        paperId: testPaperA.id,
+        groups: [
+          {
+            id: testGroup.id,
+            segments: [{ en: 'Test group.', zh: '測試題組翻譯。' }],
+            vocab: [{ en: 'test', zh: '測試' }],
+          },
+        ],
+        items: [
+          {
+            id: 'q-a1',
+            stem: '第一題中譯',
+            options: { A: '選項A', B: '選項B', C: '選項C', D: '選項D' },
+            vocab: [{ en: 'item', zh: '項目' }],
+          },
+        ],
+      },
+    ]);
+
+    // Quiz mode: check present and absent zh/groupZh
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 3, ask: 'all' }) },
+      { now, rng: makeSeededRng(1) },
+    );
+
+    const seenQuiz = new Map<string, ReturnType<typeof currentQuestion>>();
+    while (world.round) {
+      const view = currentQuestion(world)!;
+      seenQuiz.set(view.question.id, view);
+      dispatch(world, { type: 'answer', pick: view.question.answer[0]! }, { now });
+      dispatch(world, { type: 'next' }, { now });
+    }
+
+    assert.equal(seenQuiz.get('q-a1')?.zh?.stem, '第一題中譯');
+    assert.equal(seenQuiz.get('q-a1')?.groupZh?.id, testGroup.id);
+    assert.equal(seenQuiz.get('q-a2')?.zh, null);
+    assert.equal(seenQuiz.get('q-a2')?.groupZh?.id, testGroup.id);
+    assert.equal(seenQuiz.get('q-a3')?.zh, null);
+    assert.equal(seenQuiz.get('q-a3')?.groupZh, null);
+
+    // Read mode: check present and absent zh/groupZh
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ study: 'read', subjectKeys: ['subj-a'], count: 3, ask: 'all', passes: 1 }) },
+      { now, rng: makeSeededRng(2) },
+    );
+
+    const seenRead = new Map<string, ReturnType<typeof readView>>();
+    while (world.round) {
+      const view = readView(world)!;
+      seenRead.set(view.question.id, view);
+      dispatch(world, { type: 'next' }, { now });
+    }
+
+    assert.equal(seenRead.get('q-a1')?.zh?.stem, '第一題中譯');
+    assert.equal(seenRead.get('q-a1')?.groupZh?.id, testGroup.id);
+    assert.equal(seenRead.get('q-a3')?.zh, null);
+    assert.equal(seenRead.get('q-a3')?.groupZh, null);
   });
 });

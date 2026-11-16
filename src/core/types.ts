@@ -135,6 +135,32 @@ export interface EnrichFile {
   items: Enrich[];
 }
 
+// ── 英文題中譯（data/zh/<PaperId>.json，主代理撰寫）──────────
+export interface VocabEntry {
+  en: string;
+  zh: string;
+}
+export interface QuestionZh {
+  id: QuestionId;
+  /** 題幹中譯；克漏字題（題幹是「請依下文…」）為 null。填空題的空格寫成「＿＿」 */
+  stem: string | null;
+  /** 選項中譯；單字題是「英文：中文意思」 */
+  options: Record<Choice, string>;
+  vocab: VocabEntry[];
+}
+export interface GroupZh {
+  /** 題組 ID（PassageGroup.id） */
+  id: string;
+  /** 逐句對照；en 依序接起來就是官方原文 */
+  segments: Array<{ en: string; zh: string }>;
+  vocab: VocabEntry[];
+}
+export interface ZhFile {
+  paperId: PaperId;
+  groups: GroupZh[];
+  items: QuestionZh[];
+}
+
 // ── 法規副本（data/laws/**，來自全國法規資料庫）──────────
 export interface LawFile {
   pcode: string;
@@ -276,6 +302,8 @@ export interface Settings {
   shuffleOptions?: boolean;
   /** 看過的卡片 ID */
   cardsSeen?: string[];
+  /** 英文題顯示中英對照；沒設定視為開啟 */
+  bilingual?: boolean;
   /** 模擬考歷次成績，舊到新；上限在 constants/exam.ts */
   examHistory?: ExamRecord[];
 }
@@ -331,6 +359,7 @@ export type UICommand =
   | { type: 'setAccessory'; accessory: AccessoryId | null }
   | { type: 'dismissInstallHint' }
   | { type: 'setShuffleOptions'; on: boolean }
+  | { type: 'setBilingual'; on: boolean }
   | { type: 'markCardSeen'; id: string }
   | { type: 'importProgress'; json: string }
   | { type: 'resetProgress' }
