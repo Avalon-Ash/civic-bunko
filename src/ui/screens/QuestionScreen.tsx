@@ -3,11 +3,12 @@ import { dispatch } from '../../core/commands';
 import { FAST_ADVANCE_MS } from '../../core/constants/round';
 import type { Choice, LawRef, TopicInfo } from '../../core/types';
 import type { World } from '../../core/world';
-import { formatLawRef, loadLawArticle, type LawArticleResult } from '../../data/laws';
+import { formatLawRef } from '../../data/laws';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
+import { LawArticleView } from '../components/LawArticleView';
 import {
   CHOICES,
   CorrectionBox,
@@ -43,7 +44,6 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
   const [textMode, setTextMode] = useState<'official' | 'plain'>('official');
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
-  const [lawState, setLawState] = useState<{ status: 'loading' } | LawArticleResult | null>(null);
   const [topics, setTopics] = useState<TopicInfo[]>([]);
   const [burstChoice, setBurstChoice] = useState<{ choice: Choice; tick: number } | null>(null);
   const [milestoneToast, setMilestoneToast] = useState<string | null>(null);
@@ -75,43 +75,8 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
     setTextMode('official');
     setSheetOpen(false);
     setActiveLawRef(null);
-    setLawState(null);
     setBurstChoice(null);
   }, [questionId]);
-
-  // 點選條號時延後載入法規原文
-  useEffect(() => {
-    if (!sheetOpen || !activeLawRef) {
-      setLawState(null);
-      return undefined;
-    }
-
-    let cancelled = false;
-    setLawState({ status: 'loading' });
-
-    loadLawArticle(activeLawRef)
-      .then((result) => {
-        if (!cancelled) {
-          setLawState(result);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setLawState({
-            status: 'not_found',
-            lawName: activeLawRef.law,
-            amendedAt: null,
-            url: null,
-            articleNo: activeLawRef.article,
-            text: null,
-          });
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [sheetOpen, activeLawRef]);
 
   // 連對里程碑横幅與貓咪轉圈
   const prevComboRef = useRef(0);
@@ -383,36 +348,11 @@ export function QuestionScreen({ world }: QuestionScreenProps) {
           title={activeLawRef ? formatLawRef(activeLawRef) : '每個選項的說明'}
         >
           {activeLawRef ? (
-            <div className="cb-stack-sm">
-              <div className="cb-row cb-wrap">
-                <Chip tone="plain" onClick={() => setActiveLawRef(null)}>
-                  ← 返回選項
-                </Chip>
-                <strong className="cb-grow">{formatLawRef(activeLawRef)}</strong>
-              </div>
-              {!lawState || lawState.status === 'loading' ? (
-                <div className="cb-law-loading">
-                  <Cat size={64} mood="sleepy" interactive={false} />
-                  <span className="cb-sub">正在翻找法條…</span>
-                </div>
-              ) : lawState.status === 'found' ? (
-                <div className="cb-law-view">
-                  <div className="cb-law-meta">
-                    全國法規資料庫・
-                    {lawState.amendedAt ? `修正日期 ${lawState.amendedAt}` : '未載修正日期'}
-                  </div>
-                  <p className="cb-law-text">{lawState.text}</p>
-                </div>
-              ) : (
-                <div className="cb-law-empty">
-                  <div className="cb-law-meta">
-                    全國法規資料庫
-                    {lawState.amendedAt ? `・修正日期 ${lawState.amendedAt}` : ''}
-                  </div>
-                  <p className="cb-sub-strong cb-m0">找不到這一條</p>
-                </div>
-              )}
-            </div>
+            <LawArticleView
+              lawRef={activeLawRef}
+              onBack={() => setActiveLawRef(null)}
+              backLabel="← 返回選項"
+            />
           ) : (
             <>
               <div className="cb-row cb-wrap cb-mb-sm">

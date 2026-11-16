@@ -1,0 +1,464 @@
+/* 圖卡分頁樣式：顏色、字級與曲線全部取自 src/theme.css token。
+   四色語意僅條號標籤使用藍，其餘皆採中性色與粉彩 token。 */
+
+.cb-card-seg {
+  width: 100%;
+}
+
+.cb-card-seg .cb-seg-btn {
+  min-width: 0;
+  padding: 0 10px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .cb-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cb-card.cb-card-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 8px;
+  height: 100%;
+  text-align: left;
+  padding: 15px 16px;
+}
+
+.cb-card.cb-card-item.is-seen {
+  background: var(--surface-raised);
+}
+
+.cb-card-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.cb-card-item-subj {
+  min-height: 24px;
+  padding: 1px 10px;
+}
+
+.cb-card-seen-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--pink);
+  color: var(--ink);
+  flex: none;
+}
+
+.cb-card-paw-fill {
+  fill: var(--pink-deep);
+}
+
+.cb-card-item-title {
+  display: block;
+  font-size: 1.0625rem;
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.cb-card-item-hook {
+  margin: 0;
+  font-size: var(--text-small);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  word-break: break-word;
+}
+
+/* ── 圖卡底部抽屜（盡量高，並保留 safe-area）──────────────── */
+
+.cb-sheet:has(.cb-card-sheet-body) {
+  max-height: 92dvh;
+  min-height: min(76dvh, 560px);
+}
+
+.cb-card-sheet-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding-bottom: max(4px, env(safe-area-inset-bottom, 0px));
+}
+
+.cb-card-sheet-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cb-card-sheet-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cb-card-seen-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--line);
+  background: var(--pink);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cb-card-sheet-title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 900;
+  line-height: 1.3;
+  color: var(--ink);
+  letter-spacing: 0.01em;
+}
+
+.cb-card-sheet-hook {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* ── 觀念卡／新法卡翻面區 ───────────────────────────────── */
+
+.cb-card-face-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cb-card-face-stage {
+  touch-action: pan-y;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+}
+
+.cb-card-face {
+  background: var(--surface-raised);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 168px;
+}
+
+.cb-card-face.is-slide-next {
+  animation: cb-card-slide-next 0.26s var(--spring);
+}
+
+.cb-card-face.is-slide-prev {
+  animation: cb-card-slide-prev 0.26s var(--spring);
+}
+
+@keyframes cb-card-slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cb-card-slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cb-card-face-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cb-card-face-heading {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 900;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.cb-card-face-count {
+  flex: none;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-card-face-lines {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: var(--text-body);
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.cb-card-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.cb-card-dot-hit {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  display: grid;
+  place-items: center;
+}
+
+.cb-card-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: var(--radius-pill);
+  background: var(--hair);
+  border: 2px solid var(--line);
+  transition: width 0.2s var(--spring), background-color 0.2s ease;
+}
+
+.cb-card-dot-hit.is-active .cb-card-dot {
+  width: 24px;
+  background: var(--pink);
+}
+
+.cb-card-finish-wrap {
+  position: relative;
+}
+
+/* ── 申論架構卡 ─────────────────────────────────────────── */
+
+.cb-card-essay-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cb-card-essay-source {
+  background: var(--surface-sunken);
+  border: 2px solid var(--hair);
+  border-radius: var(--radius-option);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cb-card-essay-paper {
+  font-size: var(--text-small);
+  font-weight: 900;
+  color: var(--ink-soft);
+}
+
+.cb-card-essay-prompt {
+  width: 100%;
+  min-height: var(--tap-min);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cb-card-essay-prompt-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.cb-card-essay-prompt-text.is-expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.cb-card-essay-prompt-hint {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-card-essay-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cb-card-essay-section-title {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.cb-card-hide-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cb-card-essay-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cb-card-essay-block {
+  width: 100%;
+  text-align: left;
+  background: var(--surface-raised);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-option);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cb-card-essay-block.is-maskable {
+  min-height: var(--tap-min);
+  box-shadow: 0 3px 0 var(--line);
+}
+
+.cb-card-essay-block.is-masked {
+  background: var(--butter);
+}
+
+.cb-card-essay-block-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.cb-card-essay-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--mint);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  font-weight: 900;
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-card-essay-heading {
+  flex: 1;
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.cb-card-essay-lines {
+  gap: 6px;
+  font-size: 0.9375rem;
+}
+
+.cb-card-essay-block.is-revealed .cb-card-essay-lines {
+  animation: cb-card-reveal 0.22s var(--spring);
+}
+
+@keyframes cb-card-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── 相關法條區 ─────────────────────────────────────────── */
+
+.cb-card-laws {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 2px dashed var(--hair);
+}
+
+.cb-card-laws-label {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 359px) {
+  .cb-card-seg .cb-seg-btn {
+    padding: 0 6px;
+    font-size: 0.75rem;
+  }
+
+  .cb-card-face {
+    padding: 14px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-card-face.is-slide-next,
+  .cb-card-face.is-slide-prev,
+  .cb-card-essay-block.is-revealed .cb-card-essay-lines {
+    animation: none;
+  }
+
+  .cb-card-dot {
+    transition: none;
+  }
+}
