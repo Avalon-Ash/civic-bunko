@@ -439,4 +439,94 @@ describe('persistence system', () => {
     assert.equal(legacyWorld2.progress.size, 0);
     assert.equal(legacyWorld2.dayLog.size, 0);
   });
+
+  it('round-trips exam config, startedAt, optionOrder, and shuffleOptions, and discards malformed saved rounds', () => {
+    const fixedNow = () => new Date('2026-11-16T08:00:00.000Z');
+
+    // 1. Exam round round-trip preserves config.exam and startedAt
+    const examStorage = createMemoryStorage();
+    const worldExam1 = createWorld();
+    attachPersistence(worldExam1, examStorage);
+    loadBank(worldExam1, [testBank], testPaperFiles);
+
+    dispatch(
+      worldExam1,
+      {
+        type: 'startRound',
+        config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 4 } }),
+      },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    assert.ok(worldExam1.round !== null);
+
+    const worldExam2 = createWorld();
+    attachPersistence(worldExam2, examStorage);
+    assert.deepEqual(worldExam2.savedRound?.config.exam, { paperId: testPaperA.id, minutes: 4 });
+    assert.equal(worldExam2.savedRound?.startedAt, '2026-11-16T08:00:00.000Z');
+
+    // 2. Shuffled quiz round round-trip preserves settings.shuffleOptions and round.optionOrder
+    const shuffleStorage = createMemoryStorage();
+    const worldShuf1 = createWorld();
+    attachPersistence(worldShuf1, shuffleStorage);
+    loadBank(worldShuf1, [testBank], testPaperFiles);
+
+    dispatch(worldShuf1, { type: 'setShuffleOptions', on: true });
+    dispatch(
+      worldShuf1,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now: fixedNow, rng: makeSeededRng(7) },
+    );
+    const savedOrders = worldShuf1.round?.optionOrder;
+    assert.ok(savedOrders !== undefined);
+
+    const worldShuf2 = createWorld();
+    attachPersistence(worldShuf2, shuffleStorage);
+    assert.equal(worldShuf2.settings.shuffleOptions, true);
+    assert.deepEqual(worldShuf2.savedRound?.optionOrder, savedOrders);
+
+    // 3. Malformed exam, startedAt, or optionOrder in saved round discards the entire round
+    const baseRound = {
+      config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }),
+      queue: ['q-a1', 'q-a2'],
+      index: 0,
+      pick: null,
+      results: [],
+      combo: 0,
+      finished: false,
+      pass: 1,
+    };
+
+    const malformedRounds = [
+      // Exam missing startedAt
+      { ...baseRound, config: { ...baseRound.config, exam: { paperId: testPaperA.id, minutes: 4 } } },
+      // Exam with invalid minutes
+      {
+        ...baseRound,
+        config: { ...baseRound.config, exam: { paperId: testPaperA.id, minutes: 0 } },
+        startedAt: '2026-11-16T08:00:00.000Z',
+      },
+      // Invalid startedAt string
+      { ...baseRound, startedAt: 'not-a-date' },
+      // optionOrder with duplicate choices
+      { ...baseRound, optionOrder: { 'q-a1': ['A', 'A', 'B', 'C'] } },
+      // optionOrder with wrong length
+      { ...baseRound, optionOrder: { 'q-a1': ['A', 'B', 'C'] } },
+      // optionOrder with non-choice value
+      { ...baseRound, optionOrder: { 'q-a1': ['A', 'B', 'C', 'E'] } },
+    ];
+
+    for (const badRound of malformedRounds) {
+      const badStorage = createMemoryStorage({
+        [STORAGE_KEY]: JSON.stringify({
+          version: 1,
+          progress: {},
+          settings: { theme: 'system', lastRound: null },
+          round: badRound,
+        }),
+      });
+      const badWorld = createWorld();
+      attachPersistence(badWorld, badStorage);
+      assert.equal(badWorld.savedRound, null);
+    }
+  });
 });

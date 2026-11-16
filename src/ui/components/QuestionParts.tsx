@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
-import type { AccessoryId, Choice, Correction, Enrich, Paper, PassageGroup } from '../../core/types';
+import type { AccessoryId, Choice, Correction, Enrich, ExamKind, Paper, PassageGroup } from '../../core/types';
 import { Card, type CardTone } from '../kit/Card';
 import { Cat, type CatMood } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
@@ -14,11 +14,15 @@ export const TEXT_MODE_OPTIONS: readonly SegmentedOption<'official' | 'plain'>[]
   { value: 'plain', label: '白話' },
 ];
 
+/** 格式化考試別顯示名稱（general＝普考、local4＝地特四等）。 */
+export function formatExamLabel(exam: ExamKind): string {
+  return exam === 'general' ? '普考' : '地特四等';
+}
+
 /** 格式化題目來源標籤（年度・考試・科目・題號）。 */
 export function formatQuestionSource(paper: Paper | null, questionNo: number): string {
   if (!paper) return `第 ${questionNo} 題`;
-  const examLabel = paper.exam === 'general' ? '普考' : '地特四等';
-  return `${paper.year} ${examLabel}・${paper.subjectName} 第 ${questionNo} 題`;
+  return `${paper.year} ${formatExamLabel(paper.exam)}・${paper.subjectName} 第 ${questionNo} 題`;
 }
 
 /** 依 marks 渲染四色標記題幹。 */

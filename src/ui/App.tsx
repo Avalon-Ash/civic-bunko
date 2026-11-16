@@ -10,6 +10,7 @@ import { toLocalDateString } from '../systems/date';
 import { InstallHintSheet } from './components/InstallHintSheet';
 import { UpdateBanner } from './components/UpdateBanner';
 import { TabBar, type TabId } from './kit/TabBar';
+import { Toast } from './kit/Toast';
 import { isStandaloneApp } from './platform';
 import { CardsScreen } from './screens/CardsScreen';
 import { DrillSetupScreen } from './screens/DrillSetupScreen';
@@ -43,6 +44,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
     () => !isStandaloneApp() && !isInstallHintDismissed(world),
   );
   const [pendingCelebration, setPendingCelebration] = useState<StampCelebration | null>(null);
+  const [examToast, setExamToast] = useState<string | null>(null);
 
   const settings = getSettings(world);
   const questionView = currentQuestion(world);
@@ -101,6 +103,10 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
   const handleCelebrationDone = useCallback(() => {
     setPendingCelebration(null);
+  }, []);
+
+  const handleExamTimeout = useCallback(() => {
+    setExamToast('時間到，已交卷');
   }, []);
 
   useEffect(() => {
@@ -191,7 +197,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
         return <StampsScreen world={world} papersLoading={papersLoading} />;
       case 'quiz':
         if (questionView) {
-          return <QuestionScreen world={world} />;
+          return <QuestionScreen world={world} onExamTimeout={handleExamTimeout} />;
         }
         if (readQuestion) {
           return <ReadScreen world={world} />;
@@ -216,6 +222,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
   return (
     <div className="cb-shell">
+      <Toast message={examToast} onDismiss={() => setExamToast(null)} />
       <TabBar active={tab} onSelect={handleTabSelect} />
       <main
         ref={mainRef}

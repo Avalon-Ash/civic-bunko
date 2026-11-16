@@ -1,6 +1,6 @@
 import type { Choice, RoundConfig, RoundState } from '../core/types';
 import type { World } from '../core/world';
-import { buildQueue, shuffle } from './selection';
+import { buildExamQueue, buildOptionOrders, buildQueue, shuffle } from './selection';
 
 export type RoundStepOutcome = 'noop' | 'advanced' | 'finished' | 'discarded';
 
@@ -12,6 +12,10 @@ export function validateSavedRound(world: World): boolean {
   }
   if (world.questions.size === 0) {
     return false;
+  }
+  if (saved.config.exam && !world.papers.has(saved.config.exam.paperId)) {
+    world.savedRound = null;
+    return true;
   }
   const allExist = saved.queue.every((id) => world.questions.has(id));
   if (!allExist) {
@@ -37,16 +41,60 @@ export function startRound(
   now: () => Date,
   rng: () => number,
 ): void {
+  const examConfig = config.exam ?? null;
+  if (examConfig) {
+    const queue = buildExamQueue(world, examConfig.paperId);
+    if (queue.length === 0) {
+      return;
+    }
+
+    const normalizedConfig: RoundConfig = {
+      ...config,
+      subjectKeys: [...config.subjectKeys],
+      fast: false,
+      study: 'quiz',
+      passes: 1,
+      exam: {
+        paperId: examConfig.paperId,
+        minutes: examConfig.minutes,
+      },
+    };
+
+    world.savedRound = null;
+    world.round = {
+      config: normalizedConfig,
+      queue,
+      index: 0,
+      pick: null,
+      results: [],
+      combo: 0,
+      finished: false,
+      pass: 1,
+      startedAt: now().toISOString(),
+    };
+
+    world.bus.emit({
+      type: 'roundStarted',
+      config: normalizedConfig,
+      queue: [...queue],
+    });
+    return;
+  }
+
   const queue = buildQueue(world, config, now(), rng);
   if (queue.length === 0) {
     return;
   }
 
+  const { exam: _ignoredExam, ...restConfig } = config;
   const normalizedConfig: RoundConfig = {
-    ...config,
+    ...restConfig,
     subjectKeys: [...config.subjectKeys],
     passes: Math.max(1, Math.floor(config.passes)),
   };
+
+  const shouldShuffleOptions =
+    normalizedConfig.study === 'quiz' && world.settings.shuffleOptions === true;
 
   world.savedRound = null;
   world.round = {
@@ -58,6 +106,7 @@ export function startRound(
     combo: 0,
     finished: false,
     pass: 1,
+    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(queue, rng) } : {}),
   };
 
   world.bus.emit({
@@ -189,7 +238,7 @@ export function quitRound(
 
   const finishedRound: RoundState = {
     ...round,
-    queue: round.results.map((r) => r.id),
+    queue: round.config.exam ? [...round.queue] : round.results.map((r) => r.id),
     finished: true,
   };
 
@@ -205,8 +254,8 @@ export function quitRound(
   return 'finished';
 }
 
-/** 用上一回合（lastRound）答錯的題目開新回合，沿用原設定且 count 為錯題數。 */
-export function retryWrong(world: World): void {
+/** 用上一回合（lastRound）答錯的題目開新回合，沿用原設定（不帶模擬考）且 count 為錯題數。 */
+export function retryWrong(world: World, rng: () => number = Math.random): void {
   const lastRound = world.lastRound;
   if (!lastRound) {
     return;
@@ -220,11 +269,14 @@ export function retryWrong(world: World): void {
     return;
   }
 
+  const { exam: _ignoredExam, ...restConfig } = lastRound.config;
   const config: RoundConfig = {
-    ...lastRound.config,
+    ...restConfig,
     subjectKeys: [...lastRound.config.subjectKeys],
     count: wrongIds.length,
   };
+
+  const shouldShuffleOptions = world.settings.shuffleOptions === true;
 
   world.savedRound = null;
   world.round = {
@@ -236,6 +288,7 @@ export function retryWrong(world: World): void {
     combo: 0,
     finished: false,
     pass: 1,
+    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(wrongIds, rng) } : {}),
   };
 
   world.bus.emit({
@@ -245,8 +298,8 @@ export function retryWrong(world: World): void {
   });
 }
 
-/** 用上一回合（lastRound）同一批題目開一個作答（quiz）新回合，去除重複並重新洗牌。 */
-export function quizSameSet(world: World, rng: () => number): void {
+/** 用上一回合（lastRound）同一批題目開一個作答（quiz）新回合，去除重複並重新洗牌（不帶模擬考）。 */
+export function quizSameSet(world: World, rng: () => number = Math.random): void {
   const lastRound = world.lastRound;
   if (!lastRound) {
     return;
@@ -258,11 +311,14 @@ export function quizSameSet(world: World, rng: () => number): void {
   }
 
   const queue = shuffle(uniqueIds, rng);
+  const { exam: _ignoredExam, ...restConfig } = lastRound.config;
   const config: RoundConfig = {
-    ...lastRound.config,
+    ...restConfig,
     subjectKeys: [...lastRound.config.subjectKeys],
     study: 'quiz',
   };
+
+  const shouldShuffleOptions = world.settings.shuffleOptions === true;
 
   world.savedRound = null;
   world.round = {
@@ -274,6 +330,7 @@ export function quizSameSet(world: World, rng: () => number): void {
     combo: 0,
     finished: false,
     pass: 1,
+    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(queue, rng) } : {}),
   };
 
   world.bus.emit({
@@ -298,9 +355,17 @@ export function resumeRound(world: World): boolean {
     config: {
       ...saved.config,
       subjectKeys: [...saved.config.subjectKeys],
+      ...(saved.config.exam ? { exam: { ...saved.config.exam } } : {}),
     },
     queue: [...saved.queue],
     results: saved.results.map((r) => ({ ...r })),
+    ...(saved.optionOrder
+      ? {
+          optionOrder: Object.fromEntries(
+            Object.entries(saved.optionOrder).map(([id, order]) => [id, [...order]]),
+          ),
+        }
+      : {}),
   };
   world.savedRound = null;
   world.bus.emit({ type: 'roundRestored' });

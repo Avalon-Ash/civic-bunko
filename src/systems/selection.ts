@@ -1,7 +1,9 @@
-import type { Progress, QuestionId, RoundConfig } from '../core/types';
+import type { Choice, PaperId, Progress, QuestionId, RoundConfig } from '../core/types';
 import type { World } from '../core/world';
 import { askTypeOf } from './askType';
 import { isDue } from './date';
+
+const OFFICIAL_CHOICES: readonly Choice[] = ['A', 'B', 'C', 'D'];
 
 function isNewQuestion(progress: Progress | undefined): boolean {
   return progress === undefined || progress.seen === 0;
@@ -94,6 +96,33 @@ function partitionForMode(
   return [dueTier, wrongTier, viewedOnlyTier, unseenTier, restTier];
 }
 
+/** 模擬考組題：回傳指定試卷所有 parseStatus === 'ok' 的題目，依題號由小到大排序、不洗牌。 */
+export function buildExamQueue(world: World, paperId: PaperId): QuestionId[] {
+  if (!world.papers.has(paperId)) {
+    return [];
+  }
+  const questions = [];
+  for (const question of world.questions.values()) {
+    if (question.paperId === paperId && question.parseStatus === 'ok') {
+      questions.push(question);
+    }
+  }
+  questions.sort((a, b) => a.no - b.no || a.id.localeCompare(b.id));
+  return questions.map((q) => q.id);
+}
+
+/** 為序列裡每一題產生四個選項代號的洗牌排列。 */
+export function buildOptionOrders(
+  queue: readonly QuestionId[],
+  rng: () => number,
+): Record<QuestionId, Choice[]> {
+  const orders: Record<QuestionId, Choice[]> = {};
+  for (const id of queue) {
+    orders[id] = shuffle(OFFICIAL_CHOICES, rng);
+  }
+  return orders;
+}
+
 /** 依設定篩選題目並洗牌，回傳不重複、最多 config.count 題的題號陣列。 */
 export function buildQueue(
   world: World,
@@ -101,6 +130,10 @@ export function buildQueue(
   now: Date,
   rng: () => number,
 ): QuestionId[] {
+  if (config.exam) {
+    return buildExamQueue(world, config.exam.paperId);
+  }
+
   const limit = Math.max(0, Math.floor(config.count));
   if (limit === 0) return [];
 

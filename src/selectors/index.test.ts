@@ -324,4 +324,35 @@ describe('selectors', () => {
       total: 20,
     });
   });
+
+  it('returns optionOrder in currentQuestion and preserves shuffleOptions in getSettings', () => {
+    const world = createTestWorld();
+    const now = () => new Date('2026-11-15T10:00:00');
+
+    assert.equal(getSettings(world).shuffleOptions, undefined);
+    dispatch(world, { type: 'setShuffleOptions', on: true });
+    assert.equal(getSettings(world).shuffleOptions, true);
+
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now, rng: makeSeededRng(5) },
+    );
+
+    const view = currentQuestion(world);
+    assert.ok(view !== null);
+    assert.equal(view.optionOrder.length, 4);
+    assert.deepEqual(new Set(view.optionOrder), new Set(['A', 'B', 'C', 'D']));
+    assert.deepEqual(view.optionOrder, world.round!.optionOrder![view.question.id]);
+
+    // When shuffleOptions is false, optionOrder defaults to ['A', 'B', 'C', 'D']
+    dispatch(world, { type: 'setShuffleOptions', on: false });
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now, rng: makeSeededRng(5) },
+    );
+    const defaultView = currentQuestion(world);
+    assert.deepEqual(defaultView?.optionOrder, ['A', 'B', 'C', 'D']);
+  });
 });

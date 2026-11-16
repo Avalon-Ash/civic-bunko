@@ -85,6 +85,15 @@ function isValidProgress(value: unknown): value is RawProgress {
   return true;
 }
 
+function isValidExamConfig(value: unknown): value is { paperId: string; minutes: number } {
+  if (!isRecord(value)) return false;
+  if (typeof value.paperId !== 'string' || value.paperId.length === 0) return false;
+  if (typeof value.minutes !== 'number' || !Number.isFinite(value.minutes) || value.minutes <= 0) {
+    return false;
+  }
+  return true;
+}
+
 function isValidRoundConfig(value: unknown): value is RawRoundConfig {
   if (!isRecord(value)) return false;
   if (typeof value.bankId !== 'string') return false;
@@ -118,6 +127,9 @@ function isValidRoundConfig(value: unknown): value is RawRoundConfig {
     value.passes !== undefined &&
     (typeof value.passes !== 'number' || !Number.isInteger(value.passes) || value.passes < 1)
   ) {
+    return false;
+  }
+  if (value.exam !== undefined && value.exam !== null && !isValidExamConfig(value.exam)) {
     return false;
   }
   return true;
@@ -154,12 +166,38 @@ function normalizeRoundConfig(raw: RawRoundConfig): RoundConfig {
     study: raw.study ?? 'quiz',
     ask: raw.ask ?? 'positive',
     passes: raw.passes ?? READ_PASSES_DEFAULT,
+    ...(raw.exam !== undefined
+      ? { exam: raw.exam ? { paperId: raw.exam.paperId, minutes: raw.exam.minutes } : null }
+      : {}),
   };
 }
 
 function isValidRoundResult(value: unknown): value is RoundResult {
   if (!isRecord(value)) return false;
   return typeof value.id === 'string' && isChoice(value.pick) && typeof value.correct === 'boolean';
+}
+
+function isValidStartedAt(value: unknown): value is string {
+  return (
+    typeof value === 'string' &&
+    /^\d{4}-\d{2}-\d{2}/.test(value) &&
+    !Number.isNaN(Date.parse(value))
+  );
+}
+
+function parseOptionOrder(value: unknown): Record<QuestionId, Choice[]> | undefined {
+  if (!isRecord(value)) return undefined;
+  const clean: Record<QuestionId, Choice[]> = {};
+  for (const [id, order] of Object.entries(value)) {
+    if (!Array.isArray(order) || order.length !== 4 || !order.every(isChoice)) {
+      return undefined;
+    }
+    if (new Set(order).size !== 4) {
+      return undefined;
+    }
+    clean[id] = [...order];
+  }
+  return clean;
 }
 
 function parseRoundState(value: unknown): RoundState | undefined {
@@ -182,8 +220,23 @@ function parseRoundState(value: unknown): RoundState | undefined {
   if (typeof value.finished !== 'boolean' || value.finished) return undefined;
   if (typeof value.pass !== 'number' || !Number.isInteger(value.pass) || value.pass < 1) return undefined;
 
+  const config = normalizeRoundConfig(value.config);
+
+  if (config.exam && value.startedAt === undefined) {
+    return undefined;
+  }
+  if (value.startedAt !== undefined && !isValidStartedAt(value.startedAt)) {
+    return undefined;
+  }
+
+  let cleanOptionOrder: Record<QuestionId, Choice[]> | undefined;
+  if (value.optionOrder !== undefined) {
+    cleanOptionOrder = parseOptionOrder(value.optionOrder);
+    if (!cleanOptionOrder) return undefined;
+  }
+
   return {
-    config: normalizeRoundConfig(value.config),
+    config,
     queue: [...value.queue],
     index: value.index,
     pick: value.pick,
@@ -191,6 +244,8 @@ function parseRoundState(value: unknown): RoundState | undefined {
     combo: value.combo,
     finished: false,
     pass: value.pass,
+    ...(value.startedAt !== undefined ? { startedAt: value.startedAt } : {}),
+    ...(cleanOptionOrder ? { optionOrder: cleanOptionOrder } : {}),
   };
 }
 

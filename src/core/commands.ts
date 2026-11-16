@@ -68,7 +68,7 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     }
     case 'retryWrong':
-      retryWrong(world);
+      retryWrong(world, rng);
       break;
     case 'quizSameSet':
       quizSameSet(world, rng);
