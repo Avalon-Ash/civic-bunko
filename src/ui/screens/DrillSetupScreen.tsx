@@ -13,7 +13,7 @@ import {
   READ_PASSES_DEFAULT,
   READ_PASSES_PRESETS,
 } from '../../core/constants/study';
-import type { AskFilter, RoundConfig, RoundMode, StudyMode, SubjectKey } from '../../core/types';
+import type { AskFilter, PaperId, RoundConfig, RoundMode, StudyMode, SubjectKey } from '../../core/types';
 import type { World } from '../../core/world';
 import {
   activeBank,
@@ -22,13 +22,17 @@ import {
   getSettings,
   positiveCoverage,
 } from '../../selectors';
+import { examPapers, type ExamPaperView } from '../../selectors/exam';
+import { formatExamLabel } from '../components/QuestionParts';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import { PawPicker } from '../kit/PawPicker';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
+import { Sheet } from '../kit/Sheet';
 import { Stepper } from '../kit/Stepper';
+import { Switch } from '../kit/Switch';
 import { useWorld } from '../useWorld';
 
 const STUDY_OPTIONS: readonly SegmentedOption<StudyMode>[] = [
@@ -87,6 +91,8 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   });
   // 使用者回饋（2026-11-16）：答對也要看完整口訣卡，不自動跳題，所以不再提供快刷開關。
   const fast = false;
+  const [examSheetOpen, setExamSheetOpen] = useState(false);
+  const [selectedPaperId, setSelectedPaperId] = useState<PaperId | null>(null);
 
   useEffect(() => {
     if (!bank) return;
@@ -102,6 +108,25 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         </Card>
       </div>
     );
+  }
+
+  const papers = examPapers(world, bank.id);
+  const selectedPaper = papers.find((p) => p.paperId === selectedPaperId) ?? null;
+
+  const groupedPapers: Array<{ subjectKey: SubjectKey; subjectName: string; items: ExamPaperView[] }> = [];
+  const groupIndex = new Map<SubjectKey, number>();
+  for (const paper of papers) {
+    const existingIdx = groupIndex.get(paper.subjectKey);
+    if (existingIdx !== undefined) {
+      groupedPapers[existingIdx]?.items.push(paper);
+    } else {
+      groupIndex.set(paper.subjectKey, groupedPapers.length);
+      groupedPapers.push({
+        subjectKey: paper.subjectKey,
+        subjectName: paper.subjectName,
+        items: [paper],
+      });
+    }
   }
 
   const effectiveMode: RoundMode =
@@ -154,6 +179,34 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     dispatch(world, { type: 'startRound', config });
   };
 
+  const handleOpenExamSheet = () => {
+    if (papersLoading || papers.length === 0) return;
+    setSelectedPaperId(null);
+    setExamSheetOpen(true);
+  };
+
+  const handleStartExam = () => {
+    if (papersLoading || !selectedPaper) return;
+    dispatch(world, {
+      type: 'startRound',
+      config: {
+        bankId: bank.id,
+        subjectKeys: [selectedPaper.subjectKey],
+        count: selectedPaper.count,
+        mode: 'mixed',
+        fast: false,
+        study: 'quiz',
+        ask: 'all',
+        passes: 1,
+        exam: {
+          paperId: selectedPaper.paperId,
+          minutes: selectedPaper.minutes,
+        },
+      },
+    });
+    setExamSheetOpen(false);
+  };
+
   const verb = study === 'read' ? '看' : '刷';
   const startLabel = papersLoading
     ? '題庫載入中…'
@@ -174,6 +227,25 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   return (
     <div className="cb-stack">
       <h1>刷題</h1>
+
+      <Card
+        tone="butter"
+        className="cb-exam-entry"
+        onClick={handleOpenExamSheet}
+        disabled={papersLoading || papers.length === 0}
+      >
+        <div className="cb-grow">
+          <strong className="cb-exam-entry-title">模擬考：整份考卷、計時、交卷才看答案</strong>
+          <span className="cb-sub cb-block">
+            {papersLoading
+              ? '試卷載入中…'
+              : papers.length > 0
+                ? `共 ${papers.length} 份官方歷屆試卷可選`
+                : '目前沒有可用的試卷'}
+          </span>
+        </div>
+        <span className="cb-go">選考卷</span>
+      </Card>
 
       <section className="cb-section">
         <h2>怎麼刷</h2>
@@ -299,6 +371,18 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
       </section>
 
 
+      <Card className="cb-row cb-switch-card">
+        <div className="cb-grow">
+          <strong className="cb-block">選項打亂</strong>
+          <span className="cb-sub">每題四個選項換位置，代號不變</span>
+        </div>
+        <Switch
+          checked={Boolean(settings.shuffleOptions)}
+          onChange={(on) => dispatch(world, { type: 'setShuffleOptions', on })}
+          ariaLabel="選項打亂"
+        />
+      </Card>
+
       <div className="cb-avail-hint" aria-live="polite">
         {papersLoading ? (
           '題庫載入中…'
@@ -312,6 +396,51 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
       <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
         {startLabel}
       </Button>
+
+      <Sheet
+        open={examSheetOpen}
+        onClose={() => setExamSheetOpen(false)}
+        title="選擇模擬考試卷"
+      >
+        <div className="cb-stack-sm">
+          <strong className="cb-install-heading">選擇模擬考試卷</strong>
+          <p className="cb-sub cb-m0">照官方題號依序作答，交卷後才看分數與解析。</p>
+
+          <div className="cb-stack-sm">
+            {groupedPapers.map((group) => (
+              <section key={group.subjectKey} className="cb-stack-xs">
+                <h3 className="cb-subheading">{group.subjectName}</h3>
+                <div className="cb-stack-xs" role="group" aria-label={group.subjectName}>
+                  {group.items.map((paper) => {
+                    const active = selectedPaperId === paper.paperId;
+                    return (
+                      <button
+                        key={paper.paperId}
+                        type="button"
+                        aria-pressed={active}
+                        className={`cb-card cb-press cb-exam-paper-btn ${active ? 'is-selected' : ''}`.trim()}
+                        onClick={() => setSelectedPaperId(paper.paperId)}
+                      >
+                        <span className="cb-grow">
+                          {paper.year} 年{formatExamLabel(paper.exam)}・{paper.count} 題・
+                          {paper.minutes} 分鐘
+                        </span>
+                        {active && <span className="cb-chip cb-chip-mint">已選</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          <div className="cb-exam-sheet-foot">
+            <Button onClick={handleStartExam} disabled={!selectedPaper}>
+              {selectedPaper ? `開始（${selectedPaper.minutes} 分鐘）` : '開始'}
+            </Button>
+          </div>
+        </div>
+      </Sheet>
     </div>
   );
 }

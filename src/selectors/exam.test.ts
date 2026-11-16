@@ -1,0 +1,187 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { dispatch } from '../core/commands';
+import { EXAM_SECONDS_PER_QUESTION, EXAM_WARN_SECONDS } from '../core/constants/exam';
+import type { Paper, PaperFile } from '../core/types';
+import { createWorld } from '../core/world';
+import { loadBank } from '../systems/bankLoader';
+import {
+  createTestWorld,
+  makeConfig,
+  makeSeededRng,
+  testBank,
+  testPaperA,
+  testPaperB,
+  testQuestionsA,
+  testQuestionsB,
+} from '../testing/fixture';
+import { examClock, examPapers, examQuestionDetail, examResult } from './exam';
+
+describe('exam selectors', () => {
+  it('lists examPapers ordered by subject then year desc, computes minutes, and excludes empty papers', () => {
+    const world = createWorld();
+    const olderPaperA: Paper = {
+      ...testPaperA,
+      id: '113-local4-subj-a',
+      year: 113,
+      exam: 'local4',
+    };
+    const emptyPaperB: Paper = {
+      ...testPaperB,
+      id: '114-general-subj-b',
+      year: 114,
+      exam: 'general',
+    };
+    const files: PaperFile[] = [
+      // Insert subj-b before subj-a and 113 before 115 to verify sorting
+      { paper: testPaperB, groups: [], questions: testQuestionsB, essays: [] },
+      {
+        paper: emptyPaperB,
+        groups: [],
+        questions: [
+          {
+            id: 'q-empty-bad',
+            paperId: emptyPaperB.id,
+            no: 1,
+            stem: '待確認題目',
+            options: ['A', 'B', 'C', 'D'],
+            answer: ['A'],
+            correction: null,
+            groupId: null,
+            parseStatus: 'needs_review',
+          },
+        ],
+        essays: [],
+      },
+      {
+        paper: olderPaperA,
+        groups: [],
+        questions: [
+          {
+            id: 'q-old-1',
+            paperId: olderPaperA.id,
+            no: 1,
+            stem: '舊試題 1',
+            options: ['A', 'B', 'C', 'D'],
+            answer: ['A'],
+            correction: null,
+            groupId: null,
+            parseStatus: 'ok',
+          },
+        ],
+        essays: [],
+      },
+      { paper: testPaperA, groups: [], questions: testQuestionsA, essays: [] },
+    ];
+
+    loadBank(world, [testBank], files);
+    const papers = examPapers(world, testBank.id);
+
+    assert.equal(papers.length, 3);
+    assert.deepEqual(
+      papers.map((p) => p.paperId),
+      [testPaperA.id, olderPaperA.id, testPaperB.id],
+    );
+    // testPaperA has 3 ok questions (q-a4-bad excluded)
+    assert.equal(papers[0]?.count, 3);
+    assert.equal(
+      papers[0]?.minutes,
+      Math.ceil((3 * EXAM_SECONDS_PER_QUESTION) / 60),
+    );
+    assert.equal(papers[2]?.count, 2);
+  });
+
+  it('computes examClock including warn threshold, wall-clock expiration, and null outside exam', () => {
+    const world = createTestWorld();
+    const startNow = () => new Date('2026-11-16T10:00:00.000Z');
+
+    assert.equal(examClock(world, startNow()), null);
+
+    // Non-exam round returns null
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 2 }) },
+      { now: startNow, rng: makeSeededRng(1) },
+    );
+    assert.equal(examClock(world, startNow()), null);
+
+    // Exam round with 10 minutes (600 seconds)
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 10 } }) },
+      { now: startNow, rng: makeSeededRng(1) },
+    );
+
+    const atStart = examClock(world, new Date('2026-11-16T10:00:00.000Z'));
+    assert.deepEqual(atStart, {
+      remainingSeconds: 600,
+      totalSeconds: 600,
+      warn: false,
+      expired: false,
+    });
+
+    // At exactly EXAM_WARN_SECONDS remaining (600 - 300 = 300s elapsed -> 10:05:00)
+    const warnMs = startNow().getTime() + (600 - EXAM_WARN_SECONDS) * 1000;
+    const atWarn = examClock(world, new Date(warnMs));
+    assert.deepEqual(atWarn, {
+      remainingSeconds: EXAM_WARN_SECONDS,
+      totalSeconds: 600,
+      warn: true,
+      expired: false,
+    });
+
+    // Past expiration (10:15:00 -> clamped to 0)
+    const afterExpire = examClock(world, new Date('2026-11-16T10:15:00.000Z'));
+    assert.deepEqual(afterExpire, {
+      remainingSeconds: 0,
+      totalSeconds: 600,
+      warn: true,
+      expired: true,
+    });
+  });
+
+  it('computes examResult with full paper count as denominator and builds wrong list', () => {
+    const world = createTestWorld();
+    const now = () => new Date('2026-11-16T10:00:00.000Z');
+
+    assert.equal(examResult(world), null);
+
+    // Non-exam finished round -> examResult stays null
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 1 }) },
+      { now, rng: makeSeededRng(1) },
+    );
+    const nonExamQ = world.questions.get(world.round!.queue[0]!)!;
+    dispatch(world, { type: 'answer', pick: nonExamQ.answer[0]! }, { now });
+    dispatch(world, { type: 'next' }, { now });
+    assert.equal(examResult(world), null);
+
+    // Exam round on testPaperA (3 ok questions): answer 1 right (q-a1), 1 wrong (q-a2), leave 1 unanswered (q-a3)
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
+      { now, rng: makeSeededRng(1) },
+    );
+    dispatch(world, { type: 'answer', pick: 'A' }, { now }); // q-a1 right
+    dispatch(world, { type: 'next' }, { now });
+    dispatch(world, { type: 'answer', pick: 'D' }, { now }); // q-a2 wrong (answer is ['B','C'])
+    dispatch(world, { type: 'quitRound' }, { now });
+
+    const res = examResult(world);
+    assert.ok(res !== null);
+    assert.equal(res.paperId, testPaperA.id);
+    assert.equal(res.total, 3);
+    assert.equal(res.answered, 2);
+    assert.equal(res.correct, 1);
+    assert.equal(res.score, Math.round((1 / 3) * 100));
+    assert.deepEqual(res.wrong, [
+      { id: 'q-a2', no: 2, pick: 'D', answer: ['B', 'C'] },
+    ]);
+
+    const detail = examQuestionDetail(world, 'q-a1');
+    assert.equal(detail?.question.id, 'q-a1');
+    assert.equal(detail?.enrich?.mnemonic, '測試口訣 1');
+    assert.equal(examQuestionDetail(world, 'missing-q'), null);
+  });
+});

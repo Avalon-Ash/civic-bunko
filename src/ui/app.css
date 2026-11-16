@@ -2363,3 +2363,124 @@ mark {
 .cb-acc-svg {
   display: block;
 }
+
+/* ── 模擬考與選項打亂 ───────────────────────────────────── */
+
+.cb-exam-entry {
+  gap: 12px;
+}
+
+.cb-exam-entry-title {
+  display: block;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.cb-switch-card {
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cb-exam-paper-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 12px 14px;
+  border-radius: var(--radius-option);
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  background: var(--surface-raised);
+}
+
+.cb-exam-paper-btn.is-selected {
+  background: var(--butter);
+  border-color: var(--line);
+}
+
+.cb-exam-sheet-foot {
+  position: sticky;
+  bottom: 0;
+  padding-top: 10px;
+  padding-bottom: 4px;
+  background: var(--surface);
+}
+
+.cb-exam-topbar {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.cb-exam-timer {
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: 0.875rem;
+  font-weight: 900;
+}
+
+.cb-exam-timer.is-warn {
+  background: var(--pink);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.cb-exam-counter {
+  font-size: 0.9375rem;
+  color: var(--ink);
+}
+
+.cb-opt.is-exam-picked {
+  background: var(--butter);
+  border-color: var(--line);
+}
+
+.cb-opt.is-exam-picked .cb-opt-key {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--on-solid);
+}
+
+.cb-exam-score-card {
+  padding: 18px 16px;
+}
+
+.cb-exam-score-main {
+  text-align: center;
+}
+
+.cb-exam-score-num {
+  font-size: 3.25rem;
+  line-height: 1;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.cb-exam-score-unit {
+  font-size: 1.25rem;
+  font-weight: 900;
+  margin-left: 4px;
+}
+
+.cb-exam-wrong-item {
+  padding: 12px 14px;
+}
+
+.cb-exam-wrong-stem {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+@media (max-width: 359px) {
+  .cb-exam-score-num {
+    font-size: 2.75rem;
+  }
+}

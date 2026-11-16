@@ -1,8 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
-import type { RoundState } from '../core/types';
-import { createTestWorld, makeConfig, makeSeededRng } from '../testing/fixture';
+import type { Choice, RoundState } from '../core/types';
+import { createTestWorld, makeConfig, makeSeededRng, testPaperA } from '../testing/fixture';
 
 describe('round system', () => {
   const fixedNow = () => new Date('2026-11-15T14:00:00');
@@ -297,5 +297,143 @@ describe('round system', () => {
     );
     assert.equal(world.savedRound, null);
     assert.ok(world.round !== null);
+  });
+
+  it('starts exam round ordered by question number without shuffling, sets startedAt, ignores count/mode/ask/study, and skips missing/empty papers', () => {
+    const world = createTestWorld();
+    const getRound = (): RoundState | null => world.round;
+    // Reverse insertion order of testPaperA questions in world.questions to prove sorting by no
+    const reversedA = [...world.questions.entries()].filter(([, q]) => q.paperId === testPaperA.id).reverse();
+    for (const [id] of reversedA) {
+      world.questions.delete(id);
+    }
+    for (const [id, q] of reversedA) {
+      world.questions.set(id, q);
+    }
+
+    // Missing paper does not start a round
+    dispatch(
+      world,
+      {
+        type: 'startRound',
+        config: makeConfig({ exam: { paperId: 'non-existent', minutes: 10 } }),
+      },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    assert.equal(getRound(), null);
+
+    // Enable shuffleOptions and pass read/negative/count=1: exam must ignore them and force quiz, full ok list by no, no optionOrder
+    dispatch(world, { type: 'setShuffleOptions', on: true });
+    dispatch(
+      world,
+      {
+        type: 'startRound',
+        config: makeConfig({
+          count: 1,
+          mode: 'wrong',
+          ask: 'negative',
+          study: 'read',
+          exam: { paperId: testPaperA.id, minutes: 5 },
+        }),
+      },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+
+    const examRound = getRound();
+    assert.ok(examRound !== null);
+    assert.deepEqual(examRound.queue, ['q-a1', 'q-a2', 'q-a3']);
+    assert.equal(examRound.config.study, 'quiz');
+    assert.equal(examRound.startedAt, fixedNow().toISOString());
+    assert.equal(examRound.optionOrder, undefined);
+  });
+
+  it('preserves full exam queue on quitRound when answered, discards on 0 answered, and drops exam on retryWrong/quizSameSet', () => {
+    const world = createTestWorld();
+    const getRound = (): RoundState | null => world.round;
+    const getLastRound = (): RoundState | null => world.lastRound;
+
+    // Quit with 0 answered -> discarded
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    dispatch(world, { type: 'quitRound' }, { now: fixedNow });
+    assert.equal(getRound(), null);
+    assert.equal(getLastRound(), null);
+
+    // Answer 2 of 3 (q-a1 wrong, q-a2 right), then quitRound -> preserves full 3-question queue in lastRound
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ exam: { paperId: testPaperA.id, minutes: 5 } }) },
+      { now: fixedNow, rng: makeSeededRng(1) },
+    );
+    dispatch(world, { type: 'answer', pick: 'D' }, { now: fixedNow }); // q-a1 answer is ['A']
+    dispatch(world, { type: 'next' }, { now: fixedNow });
+    dispatch(world, { type: 'answer', pick: 'B' }, { now: fixedNow }); // q-a2 answer is ['B','C']
+    dispatch(world, { type: 'quitRound' }, { now: fixedNow });
+
+    assert.equal(getRound(), null);
+    const finishedExam = getLastRound();
+    assert.ok(finishedExam !== null);
+    assert.deepEqual(finishedExam.queue, ['q-a1', 'q-a2', 'q-a3']);
+    assert.equal(finishedExam.results.length, 2);
+
+    // retryWrong produces normal round without exam
+    dispatch(world, { type: 'setShuffleOptions', on: true });
+    dispatch(world, { type: 'retryWrong' }, { now: fixedNow, rng: makeSeededRng(9) });
+    const retried = getRound();
+    assert.ok(retried !== null);
+    assert.equal(retried.config.exam, undefined);
+    assert.deepEqual(retried.queue, ['q-a1']);
+    assert.ok(retried.optionOrder?.['q-a1'] !== undefined);
+
+    // quizSameSet on an exam lastRound also drops exam
+    dispatch(world, { type: 'quizSameSet' }, { now: fixedNow, rng: makeSeededRng(11) });
+    const sameSet = getRound();
+    assert.ok(sameSet !== null);
+    assert.equal(sameSet.config.exam, undefined);
+    assert.equal(sameSet.queue.length, 3);
+    assert.ok(sameSet.optionOrder !== undefined);
+  });
+
+  it('generates optionOrder permutations only for quiz rounds when shuffleOptions is enabled', () => {
+    const isFourChoicePerm = (order: Choice[] | undefined): boolean => {
+      if (!order || order.length !== 4) return false;
+      return new Set(order).size === 4 && ['A', 'B', 'C', 'D'].every((c) => order.includes(c as Choice));
+    };
+
+    const world = createTestWorld();
+
+    // Off by default -> no optionOrder
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ subjectKeys: ['subj-a'], count: 3 }) },
+      { now: fixedNow, rng: makeSeededRng(2) },
+    );
+    assert.equal(world.round?.optionOrder, undefined);
+
+    // Turn on shuffleOptions
+    dispatch(world, { type: 'setShuffleOptions', on: true });
+
+    // Read mode -> still no optionOrder
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ study: 'read', subjectKeys: ['subj-a'], count: 3 }) },
+      { now: fixedNow, rng: makeSeededRng(2) },
+    );
+    assert.equal(world.round?.optionOrder, undefined);
+
+    // Quiz mode -> optionOrder generated for every question in queue
+    dispatch(
+      world,
+      { type: 'startRound', config: makeConfig({ study: 'quiz', subjectKeys: ['subj-a'], count: 3 }) },
+      { now: fixedNow, rng: makeSeededRng(3) },
+    );
+    const orders = world.round?.optionOrder;
+    assert.ok(orders !== undefined);
+    for (const id of world.round!.queue) {
+      assert.equal(isFourChoicePerm(orders[id]), true);
+    }
   });
 });

@@ -22,6 +22,8 @@ import { askTypeOf } from '../systems/askType';
 import { isDue, localDaysUntil } from '../systems/date';
 import { countAvailable } from '../systems/selection';
 
+const DEFAULT_OPTION_ORDER: readonly Choice[] = ['A', 'B', 'C', 'D'];
+
 export interface CurrentQuestionView {
   question: OfficialQuestion;
   group: PassageGroup | null;
@@ -31,6 +33,7 @@ export interface CurrentQuestionView {
   pick: Choice | null;
   isCorrect: boolean | null;
   combo: number;
+  optionOrder: Choice[];
 }
 
 export interface ReadQuestionView {
@@ -114,6 +117,9 @@ export function currentQuestion(world: World): CurrentQuestionView | null {
   const enrich = world.enrich.get(questionId) ?? null;
   const pick = round.pick;
   const isCorrect = pick === null ? null : question.answer.includes(pick);
+  const rawOrder = round.optionOrder?.[questionId];
+  const optionOrder: Choice[] =
+    rawOrder && rawOrder.length === 4 ? [...rawOrder] : [...DEFAULT_OPTION_ORDER];
 
   return {
     question,
@@ -124,6 +130,7 @@ export function currentQuestion(world: World): CurrentQuestionView | null {
     pick,
     isCorrect,
     combo: round.combo,
+    optionOrder,
   };
 }
 
@@ -378,12 +385,25 @@ export function getSettings(world: World): Settings {
       ? {
           ...world.settings.lastRound,
           subjectKeys: [...world.settings.lastRound.subjectKeys],
+          ...(world.settings.lastRound.exam !== undefined
+            ? {
+                exam: world.settings.lastRound.exam
+                  ? { ...world.settings.lastRound.exam }
+                  : null,
+              }
+            : {}),
         }
       : null,
     ...(world.settings.installHintDismissed !== undefined
       ? { installHintDismissed: world.settings.installHintDismissed }
       : {}),
     ...(world.settings.accessory !== undefined ? { accessory: world.settings.accessory } : {}),
+    ...(world.settings.shuffleOptions !== undefined
+      ? { shuffleOptions: world.settings.shuffleOptions }
+      : {}),
+    ...(world.settings.cardsSeen !== undefined
+      ? { cardsSeen: [...world.settings.cardsSeen] }
+      : {}),
   };
 }
 
@@ -396,6 +416,9 @@ export function currentRoundConfig(world: World): RoundConfig | null {
   return {
     ...round.config,
     subjectKeys: [...round.config.subjectKeys],
+    ...(round.config.exam !== undefined
+      ? { exam: round.config.exam ? { ...round.config.exam } : null }
+      : {}),
   };
 }
 
