@@ -25,4 +25,4 @@
 - `docs/HANDOFF.md`：只放待決定、待辦、目前誰在哪個資料夾跑。做完就刪。
 - `docs/plans/civic-bunko.md`：目標、架構、里程碑、拆包表、驗收。
 - `docs/dispatch/<包ID>.md`：派工單。
-- `docs/WORKLOG.md`：完成紀錄（平常不讀）。
+- 完成紀錄不另外寫檔：看 `git log` 與開案書 §9。

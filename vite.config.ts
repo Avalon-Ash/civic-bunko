@@ -8,8 +8,13 @@ const version = new Date().toISOString();
 function versionFile(): Plugin {
   return {
     name: 'civic-bunko-version-file',
-    generateBundle() {
+    generateBundle(_options, bundle) {
       this.emitFile({ type: 'asset', fileName: 'version.json', source: JSON.stringify({ version }) + '\n' });
+      // 離線快取用的資產清單：App 啟動後照這份補抓缺的檔案、清掉舊版殘留（src/data/offline.ts）
+      const files = Object.keys(bundle)
+        .filter((name) => name.startsWith('assets/'))
+        .sort();
+      this.emitFile({ type: 'asset', fileName: 'precache.json', source: JSON.stringify({ version, files }) + '\n' });
     },
   };
 }

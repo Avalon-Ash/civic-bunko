@@ -269,7 +269,8 @@ function parseExamRecord(value: unknown): ExamRecord | null {
   };
 }
 
-function parseExamHistory(value: unknown): ExamRecord[] | undefined {
+/** 解析模擬考歷次成績；不是陣列回傳 undefined，壞掉的單筆略過，超過上限只留最後幾筆。 */
+export function parseExamHistory(value: unknown): ExamRecord[] | undefined {
   if (!Array.isArray(value)) return undefined;
   const valid: ExamRecord[] = [];
   for (const entry of value) {

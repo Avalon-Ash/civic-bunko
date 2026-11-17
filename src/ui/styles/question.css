@@ -1,0 +1,343 @@
+/* ── 題目畫面（窄版單欄 / ≥700px 兩欄）────────────────── */
+
+.cb-question-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cb-q-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cb-q-counter {
+  font-size: var(--text-small);
+  color: var(--ink-soft);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-q-stem-col,
+.cb-q-opts-col {
+  min-width: 0;
+}
+
+.cb-passage-card {
+  margin-top: 12px;
+  padding: 12px 14px;
+  background: var(--surface-sunken);
+}
+
+.cb-passage-toggle {
+  width: 100%;
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-align: left;
+}
+
+.cb-passage-text {
+  margin: 8px 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.cb-stem {
+  font-size: var(--text-stem);
+  font-weight: 700;
+  line-height: 1.6;
+  margin: 12px 0 0;
+  word-break: break-word;
+}
+
+mark {
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-weight: 900;
+}
+
+.cb-mark-red {
+  background: var(--red-bg);
+  color: var(--red);
+}
+
+.cb-mark-blue {
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+
+.cb-correction-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cb-correction-note {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.cb-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cb-opt-wrap {
+  position: relative;
+}
+
+.cb-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 14px;
+  min-height: 56px;
+  font-size: var(--text-body);
+  font-weight: 500;
+  border-radius: var(--radius-option);
+}
+
+.cb-opt:disabled {
+  cursor: default;
+}
+
+.cb-opt-key {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: var(--border-w) solid var(--line);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex: none;
+  background: var(--surface-raised);
+}
+
+.cb-opt.is-right {
+  background: var(--green-bg);
+  border-color: var(--green);
+  box-shadow: 0 var(--press-depth) 0 var(--green);
+}
+
+.cb-opt.is-right .cb-opt-key {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--on-semantic);
+}
+
+.cb-opt.is-picked {
+  background: var(--surface-sunken);
+  animation: cb-wobble 0.35s ease-out;
+}
+
+.cb-opt.is-dim {
+  opacity: 0.5;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+@keyframes cb-wobble {
+  25% {
+    transform: translateX(-6px);
+  }
+  60% {
+    transform: translateX(5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ── 口訣與回饋卡 ───────────────────────────────────────── */
+
+.cb-kou {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: cb-pop 0.32s var(--spring);
+}
+
+.cb-kou-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cb-ai-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.cb-kou-low {
+  margin: 0;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-law-changed {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 2px solid var(--ink);
+  background: var(--surface-sunken);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.cb-law-changed-badge {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--on-solid);
+  margin-top: 1px;
+}
+
+.cb-kou small {
+  display: block;
+  font-size: var(--text-small);
+  font-weight: 900;
+  color: var(--green);
+  letter-spacing: 0.04em;
+}
+
+.cb-kou.is-miss small {
+  color: var(--orange);
+}
+
+.cb-kou-mnemonic {
+  display: block;
+  font-size: var(--text-stem);
+  font-weight: 900;
+  line-height: 1.45;
+  margin-top: 2px;
+}
+
+.cb-trap {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.cb-trap em {
+  font-style: normal;
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--on-semantic);
+  background: var(--red);
+  border-radius: 8px;
+  padding: 2px 8px;
+  margin-top: 2px;
+}
+
+@keyframes cb-pop {
+  from {
+    transform: scale(0.92) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── 結果與蓋章 ─────────────────────────────────────────── */
+
+.cb-result {
+  min-height: calc(100dvh - 120px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cb-result-shake {
+  animation: cb-screen-shake 0.36s ease-out 0.14s;
+}
+
+@keyframes cb-screen-shake {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-3px, 3px);
+  }
+  50% {
+    transform: translate(3px, -2px);
+  }
+  75% {
+    transform: translate(-2px, 1px);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.cb-spacer {
+  flex: 1;
+}
+
+.cb-stamp {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 5px solid var(--red);
+  color: var(--red);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-weight: 900;
+  font-size: 1.625rem;
+  line-height: 1.2;
+  margin: 8px auto;
+  transform: rotate(-10deg);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 4px var(--surface-raised), inset 0 0 0 6px var(--red);
+  animation: cb-stamp-thud 0.5s var(--spring);
+}
+
+@keyframes cb-stamp-thud {
+  from {
+    transform: rotate(-10deg) scale(2.4);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(-10deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.cb-result-score {
+  text-align: center;
+}
+
+.cb-result-note {
+  font-size: 0.9375rem;
+  margin: 6px 0 0;
+}

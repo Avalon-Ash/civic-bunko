@@ -4,7 +4,7 @@ import type { TopicInfo } from '../../core/types';
 import type { World } from '../../core/world';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
-import { bilingualOn, questionPaper, readView } from '../../selectors';
+import { bilingualOn, paperSubjectName, questionPaper, readView } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
 import {
   BilingualToggle,
@@ -86,11 +86,12 @@ export function ReadScreen({ world }: ReadScreenProps) {
   const { question, group, enrich, zh, groupZh, askType, pass, totalPasses, index, total, views } = view;
   const paper = questionPaper(world, question.paperId);
   const accessory = currentAccessory(world);
-  const sourceLabel = formatQuestionSource(paper, question.no);
+  const subjectName = paperSubjectName(world, paper);
+  const sourceLabel = formatQuestionSource(paper, question.no, subjectName);
   const firstTopic = enrich?.topic[0];
   const topicLabel = firstTopic
     ? resolveTopicLabel(topics, firstTopic)
-    : (paper?.subjectName ?? '題目');
+    : (subjectName ?? '題目');
   const bilingualEnabled = bilingualOn(world);
   const hasZh = Boolean(zh || groupZh);
   const showZh = bilingualEnabled && hasZh;

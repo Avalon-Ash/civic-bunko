@@ -1,0 +1,281 @@
+/* 版面與元件樣式：顏色、圓角、字級與曲線全部取自 src/theme.css token。
+   動畫只動 transform 與 opacity，不寫色碼。 */
+
+.cb-shell {
+  height: 100%;
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.cb-main {
+  flex: 1;
+  min-height: 0;
+  order: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-top: max(14px, env(safe-area-inset-top, 0px));
+  padding-bottom: 24px;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
+}
+
+.cb-container {
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.cb-main.is-wide .cb-container {
+  max-width: var(--wide-max);
+}
+
+/* ── 排版與共用工具 ─────────────────────────────────────── */
+
+h1 {
+  font-size: var(--text-title);
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--ink-soft);
+  letter-spacing: 0.06em;
+}
+
+.cb-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cb-stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cb-stack-xs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cb-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.cb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cb-wrap {
+  flex-wrap: wrap;
+}
+
+.cb-center {
+  justify-content: center;
+}
+
+.cb-grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.cb-ml-auto {
+  margin-left: auto;
+}
+
+.cb-block {
+  display: block;
+}
+
+.cb-mt-xs {
+  margin-top: 6px;
+}
+
+.cb-mt-sm {
+  margin-top: 10px;
+}
+
+.cb-mt-md {
+  margin-top: 14px;
+}
+
+.cb-mb-sm {
+  margin-bottom: 10px;
+}
+
+.cb-sub {
+  font-size: var(--text-small);
+  color: var(--ink-soft);
+}
+
+.cb-sub-strong {
+  font-size: var(--text-small);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.cb-num-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── 貼紙卡片與按鈕（按下下沉 --press-depth、放開彈回 --spring）── */
+
+.cb-card {
+  background: var(--surface);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+  padding: 16px;
+  min-width: 0;
+}
+
+.cb-card-btn {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.cb-card-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.cb-m0 {
+  margin: 0;
+}
+
+.cb-tone-pink {
+  background: var(--pink);
+}
+
+.cb-tone-mint {
+  background: var(--mint);
+}
+
+.cb-tone-butter {
+  background: var(--butter);
+}
+
+.cb-tone-green {
+  background: var(--green-bg);
+  border-color: var(--green);
+  box-shadow: 0 var(--press-depth) 0 var(--green);
+}
+
+.cb-tone-red {
+  background: var(--red-bg);
+  border-color: var(--red);
+  box-shadow: 0 var(--press-depth) 0 var(--red);
+}
+
+.cb-tone-blue {
+  background: var(--blue-bg);
+  border-color: var(--blue);
+  box-shadow: 0 var(--press-depth) 0 var(--blue);
+}
+
+.cb-tone-orange {
+  background: var(--orange-bg);
+  border-color: var(--orange);
+  box-shadow: 0 var(--press-depth) 0 var(--orange);
+}
+
+.cb-press {
+  transition: transform 0.14s var(--spring);
+}
+
+.cb-press:active:not(:disabled) {
+  transform: translateY(var(--press-depth));
+  box-shadow: 0 0 0 var(--line);
+}
+
+.cb-press.is-right:active:not(:disabled),
+.cb-tone-green.cb-press:active:not(:disabled) {
+  box-shadow: 0 0 0 var(--green);
+}
+
+.cb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  min-width: var(--tap-min);
+  padding: 8px 20px;
+  border-radius: var(--radius-pill);
+  border: var(--border-w) solid var(--line);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  text-align: center;
+}
+
+.cb-btn-primary {
+  background: var(--pink);
+  color: var(--ink);
+}
+
+.cb-btn-ghost {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.cb-btn-butter {
+  background: var(--butter);
+  color: var(--ink);
+}
+
+.cb-btn-mint {
+  background: var(--mint);
+  color: var(--ink);
+}
+
+.cb-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.cb-acts {
+  display: flex;
+  gap: 12px;
+}
+
+.cb-acts .cb-btn {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+}

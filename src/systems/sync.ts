@@ -4,12 +4,21 @@ import {
   SYNC_REMOTE_PATH,
   SYNC_STORAGE_KEY,
 } from '../core/constants/sync';
-import type { DayKey, Progress, QuestionId, SyncCredentials, SyncState } from '../core/types';
+import { EXAM_HISTORY_MAX } from '../core/constants/exam';
+import type {
+  DayKey,
+  ExamRecord,
+  Progress,
+  QuestionId,
+  SyncCredentials,
+  SyncState,
+} from '../core/types';
 import type { World } from '../core/world';
 import { parseDaysRecord } from './daily';
-import { parseProgressEntry, type StorageLike } from './persistence';
+import { parseExamHistory, parseProgressEntry, type StorageLike } from './persistence';
+import { applySyncedSettings } from './settings';
 import { base64ToUtf8, decodeSyncCode, utf8ToBase64, validateSyncCredentials } from './syncCode';
-import { mergeDays, mergeProgress } from './syncMerge';
+import { mergeCardsSeen, mergeDays, mergeExamHistory, mergeProgress } from './syncMerge';
 
 export interface SyncStorageLike extends StorageLike {
   removeItem?(key: string): void;
@@ -31,9 +40,18 @@ interface SyncController {
   disposed: boolean;
 }
 
+interface RemoteContent {
+  progress: Map<QuestionId, Progress>;
+  days: Map<DayKey, number>;
+  /** 看過的卡片；舊版同步檔沒有這欄，視為空 */
+  cardsSeen: string[];
+  /** 模擬考歷次成績；舊版同步檔沒有這欄，視為空 */
+  examHistory: ExamRecord[];
+}
+
 type RemoteFetchResult =
   | { kind: 'missing' }
-  | { kind: 'ok'; sha: string; progress: Map<QuestionId, Progress>; days: Map<DayKey, number> }
+  | ({ kind: 'ok'; sha: string } & RemoteContent)
   | { kind: 'error'; message: string };
 
 const MSG_INVALID_CODE = '同步碼格式不對';
@@ -181,9 +199,29 @@ function dayMapsEqual(
   return true;
 }
 
-function parseRemoteContent(
-  base64Content: string,
-): { progress: Map<QuestionId, Progress>; days: Map<DayKey, number> } | null {
+function sameStrings(a: readonly string[], b: readonly string[]): boolean {
+  return a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
+function sameExamHistory(a: readonly ExamRecord[], b: readonly ExamRecord[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every((record, index) => {
+      const other = b[index];
+      return (
+        other !== undefined &&
+        record.paperId === other.paperId &&
+        record.at === other.at &&
+        record.total === other.total &&
+        record.answered === other.answered &&
+        record.correct === other.correct &&
+        record.score === other.score
+      );
+    })
+  );
+}
+
+function parseRemoteContent(base64Content: string): RemoteContent | null {
   try {
     const jsonText = base64ToUtf8(base64Content);
     const parsed: unknown = JSON.parse(jsonText);
@@ -205,7 +243,14 @@ function parseRemoteContent(
       days = parsedDays;
     }
 
-    return { progress, days };
+    // 這兩欄是後來加的：缺欄或格式不對都當成空的，不讓整份同步失敗
+    const cardsSeen =
+      Array.isArray(parsed.cardsSeen) && parsed.cardsSeen.every((id) => typeof id === 'string')
+        ? (parsed.cardsSeen as string[])
+        : [];
+    const examHistory = parseExamHistory(parsed.examHistory) ?? [];
+
+    return { progress, days, cardsSeen, examHistory };
   } catch {
     return null;
   }
@@ -252,7 +297,7 @@ async function fetchRemoteFile(
     return { kind: 'error', message: MSG_DATA_ERROR };
   }
 
-  return { kind: 'ok', sha: body.sha, progress: parsed.progress, days: parsed.days };
+  return { kind: 'ok', sha: body.sha, ...parsed };
 }
 
 function isStale(controller: SyncController, gen: number): boolean {
@@ -288,6 +333,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     const remoteMap = remote.kind === 'ok' ? remote.progress : new Map<QuestionId, Progress>();
     const remoteDays = remote.kind === 'ok' ? remote.days : new Map<DayKey, number>();
     const remoteSha = remote.kind === 'ok' ? remote.sha : null;
+    const remoteCards = remote.kind === 'ok' ? remote.cardsSeen : [];
+    const remoteExams = remote.kind === 'ok' ? remote.examHistory : [];
 
     const merged = mergeProgress(world.progress, remoteMap);
     const mergedDays = mergeDays(world.dayLog, remoteDays);
@@ -314,10 +361,30 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       }
     }
 
+    const localCards = world.settings.cardsSeen ?? [];
+    const localExams = world.settings.examHistory ?? [];
+    const mergedCards = mergeCardsSeen(localCards, remoteCards);
+    const mergedExams = mergeExamHistory(localExams, remoteExams, EXAM_HISTORY_MAX);
+    if (!sameStrings(mergedCards, localCards) || !sameExamHistory(mergedExams, localExams)) {
+      applySyncedSettings(world, mergedCards, mergedExams);
+      if (isStale(controller, gen)) return;
+    }
+
+    // 卡片已看與模擬考成績只比內容：遠端順序不同不必寫回
+    const remoteCardSet = new Set(remoteCards);
+    const cardsDiffer =
+      mergedCards.length !== remoteCardSet.size || mergedCards.some((id) => !remoteCardSet.has(id));
+    const examsDiffer = !sameExamHistory(
+      mergedExams,
+      mergeExamHistory([], remoteExams, EXAM_HISTORY_MAX),
+    );
+
     const shouldPut =
       remote.kind === 'missing' ||
       !progressMapsEqual(merged, remoteMap) ||
-      !dayMapsEqual(mergedDays, remoteDays);
+      !dayMapsEqual(mergedDays, remoteDays) ||
+      cardsDiffer ||
+      examsDiffer;
     if (!shouldPut) {
       setSyncState(world, {
         status: 'idle',
@@ -332,6 +399,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       updatedAt: deps.now().toISOString(),
       progress: Object.fromEntries(merged),
       days: Object.fromEntries(mergedDays),
+      cardsSeen: mergedCards,
+      examHistory: mergedExams,
     });
     const putBody: Record<string, unknown> = {
       message: 'chore: sync progress',

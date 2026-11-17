@@ -1,4 +1,4 @@
-import type { DayKey, Progress, QuestionId } from '../core/types';
+import type { DayKey, ExamRecord, Progress, QuestionId } from '../core/types';
 
 function compareTimestamp(a: string, b: string): number {
   const msA = Date.parse(a);
@@ -91,4 +91,50 @@ export function mergeDays(
     result.set(day, existing === undefined ? count : Math.max(existing, count));
   }
   return result;
+}
+
+/**
+ * 合併兩份「看過的卡片」：聯集。先保留本機順序，再接上遠端多出來的（依字典序，確保結果與遠端順序無關）。
+ */
+export function mergeCardsSeen(local: readonly string[], remote: readonly string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const id of local) {
+    if (!seen.has(id)) {
+      seen.add(id);
+      result.push(id);
+    }
+  }
+  const extra = [...new Set(remote)].filter((id) => !seen.has(id)).sort(compareText);
+  result.push(...extra);
+  return result;
+}
+
+function examKey(record: ExamRecord): string {
+  return `${record.at}|${record.paperId}`;
+}
+
+/**
+ * 合併兩份模擬考歷次成績：以「交卷時間＋試卷」當鍵取聯集，舊到新排序，只留最後 max 筆。
+ * 同一鍵兩邊都有時取本機那筆（內容應相同）。
+ */
+export function mergeExamHistory(
+  local: readonly ExamRecord[],
+  remote: readonly ExamRecord[],
+  max: number,
+): ExamRecord[] {
+  const byKey = new Map<string, ExamRecord>();
+  for (const record of remote) {
+    byKey.set(examKey(record), record);
+  }
+  for (const record of local) {
+    byKey.set(examKey(record), record);
+  }
+  const merged = [...byKey.entries()]
+    .sort(([keyA, a], [keyB, b]) => {
+      const timeCmp = compareTimestamp(a.at, b.at);
+      return timeCmp !== 0 ? timeCmp : compareText(keyA, keyB);
+    })
+    .map(([, record]) => ({ ...record }));
+  return merged.length > max ? merged.slice(merged.length - max) : merged;
 }

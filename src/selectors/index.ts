@@ -371,6 +371,17 @@ export function activeBank(world: World): Bank | null {
   return world.banks[0] ?? null;
 }
 
+/**
+ * 試卷科目的顯示名稱：優先用題庫登記的科目名稱。
+ * 官方科目全名可能帶很長的括號說明（例如「法學知識與英文（包括中華民國憲法、法學緒論、英文）」），放進標籤會超出畫面。
+ */
+export function paperSubjectName(world: World, paper: Paper | null): string | null {
+  if (!paper) return null;
+  const bank = world.banks.find((b) => b.id === paper.bankId);
+  const subject = bank?.subjects.find((s) => s.key === paper.subjectKey);
+  return subject?.name ?? paper.subjectName;
+}
+
 /** 統計指定題庫的總題數與已刷題數。 */
 export function bankTotals(world: World, bankId: BankId): BankTotalsView {
   let total = 0;

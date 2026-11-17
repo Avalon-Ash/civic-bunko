@@ -1,0 +1,115 @@
+/* ── 今日畫面 ───────────────────────────────────────────── */
+
+.cb-countdown {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cb-countdown-num {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cb-countdown-num b {
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-totals-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cb-totals-text {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cb-mission {
+  gap: 12px;
+}
+
+.cb-dot {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  border: var(--border-w) solid var(--line);
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  flex: none;
+}
+
+.cb-mission-title {
+  display: block;
+  font-size: 1rem;
+}
+
+.cb-go {
+  font-weight: 900;
+  font-size: 0.875rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--on-solid);
+  flex: none;
+}
+
+.cb-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.cb-week-stamp {
+  aspect-ratio: 1;
+  min-width: 0;
+  min-height: var(--tap-min);
+  border-radius: 50%;
+  border: 2.5px dashed var(--ink-soft);
+  display: grid;
+  place-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  background: transparent;
+}
+
+.cb-week-stamp.is-today {
+  border-style: solid;
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.cb-week-stamp.is-on {
+  border: 2.5px solid var(--red);
+  color: var(--red);
+  font-weight: 900;
+  background: var(--surface-raised);
+  transform: rotate(-10deg);
+}
+
+.cb-week-stamp.is-wobbling {
+  animation: cb-stamp-wobble 0.42s var(--spring);
+}
+
+@keyframes cb-stamp-wobble {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(-16deg) scale(1.1);
+  }
+  60% {
+    transform: rotate(10deg) scale(0.95);
+  }
+  100% {
+    transform: rotate(-10deg) scale(1);
+  }
+}
