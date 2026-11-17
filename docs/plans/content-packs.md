@@ -37,7 +37,7 @@ tools/zh/src/<packId>/   中譯來源
 | :-- | :-- | :-- | :-- |
 | PK0 | 資料搬進 `data/packs/local4-civil/`、寫 `pack.json`、本檔與派工單 | 主代理（已完成，2026-11-17） | 69 個檔純改名 |
 | PK1 | 路徑：`src/data/source.ts` 改掃 `data/packs/*`；新增 `tools/paths.mjs`，所有工具改用它；驗證腳本逐包檢查 | agy Hydrogen high（已完成，2026-11-17；第一次因跑了允許清單外的指令被終止，第二次 7 分鐘完成） | 145 個測試、四行統計、92 個打包檔與 90 個資料檔名都和搬動前相同；解析器與中譯組裝重跑後資料零變動。審查時還原了被弄掉的壞字元規則 |
-| PK2 | 考試別：`ExamKind` 改成字串 key，顯示名稱從 `pack.json` 的 `exams` 讀；新增 `tools/lint/engine-boundary.mjs`（引擎裡不得出現任何包的 id、科目、考試別字面值）並掛進 `npm run lint` | agy Hydrogen high；守門腳本由主代理先寫好（紅燈），執行者只負責讓它變綠 | 守門腳本 ERROR=0；其餘同 PK1 |
+| PK2 | 考試別：`ExamKind` 改成字串 key，顯示名稱從 `pack.json` 的 `exams` 讀；新增 `tools/lint/engine-boundary.mjs`（引擎裡不得出現任何包的 id、科目、考試別字面值）並掛進 `npm run lint` | agy Hydrogen high（已完成，2026-11-17，約 3 分鐘一次過）；守門腳本由主代理先寫好（紅燈 8 項），執行者只負責讓它變綠 | 守門腳本 ERROR=0；146 個測試（新增 examLabel 1 個）、四行統計、92 個打包檔（只有 `assets/index-*` 不同）；正式版預覽的出處標籤、申論卡標籤、模擬考選卷標籤、既有存檔都正常 |
 | PK3 | 題庫切換：`Settings.activeBankId`、`setActiveBank` 指令、只載入目前題庫的檔案、有兩包以上才出現的選擇器 | Sonnet 子代理（跨系統，要判斷） | **等第二個題庫的內容進來才派**：沒有第二包就沒辦法在真的 App 裡驗 |
 
 Orchestrator（Argon 規劃）這次不試：Argon 週池只剩 1%。Codex 到 11/21 才恢復。
