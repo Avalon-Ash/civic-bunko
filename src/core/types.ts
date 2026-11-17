@@ -412,41 +412,12 @@ export interface ToneSpec {
   dur: number;
   gain: number;
 }
-/** 喵叫的一個嘴型點：at＝在整聲的第幾成（0–1），formants＝三個共振峰（赫茲），amp＝這時的音量（0–1） */
-export interface MeowVowel {
-  at: number;
-  formants: [number, number, number];
-  amp: number;
-}
-/**
- * 小貓叫：聲帶（低通後的鋸齒波＋一點氣音）經過三個會移動的共振峰。
- * 嘴型照 [m]→[i]→[a]→[u] 走（成貓的「喵」），或 [m]→[i]→[u]（小貓的「咪」）；音高呈拱形，最高點在嘴巴張最大時。
- */
-export interface MeowSpec {
-  /** 音高（赫茲）：起、最高、尾；peakAt＝最高點在整聲的第幾成 */
-  pitch: { start: number; peak: number; end: number; peakAt: number };
-  /** 長度（秒），每次在範圍內隨機 */
-  dur: { min: number; max: number };
-  /** 每次音高隨機上下幾成 */
-  jitter: number;
-  vibrato: { hz: number; depth: number };
+/** 一段貓叫錄音（檔案在 src/ui/sounds/）：從 offset 秒開始播 duration 秒，乘上 gain 讓幾段一樣大聲 */
+export interface MeowClip {
+  file: string;
+  offset: number;
+  duration: number;
   gain: number;
-  /** 聲帶聲的低通（赫茲）：越低越柔 */
-  tilt: number;
-  /** 氣音音量（相對於主聲） */
-  breath: number;
-  /** 共振峰的 Q 與相對音量（F1、F2、F3） */
-  formantQ: [number, number, number];
-  formantGain: [number, number, number];
-  /** 成貓「喵」的嘴型軌跡 */
-  meow: MeowVowel[];
-  /** 小貓「咪」的嘴型軌跡（比較短、比較高） */
-  mew: MeowVowel[];
-  /** 出「咪」的機率；咪的音高、長度、音量各乘上的倍數（音量：咪比較高，落在共振峰裡的諧波少，要補回來） */
-  mewChance: number;
-  mewPitch: number;
-  mewDur: number;
-  mewGain: number;
 }
 
 // ── 設定 ────────────────────────────────────────────────

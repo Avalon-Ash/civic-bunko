@@ -1,5 +1,5 @@
 // 音效播放器（Web Audio 即時合成）。聲音設計在 core/constants/sound.ts；這裡只負責把它播出來。
-import { MEOW, SOUND_ATTACK, SOUND_FLOOR, TONES } from '../core/constants/sound';
+import { MEOW_CLIPS, MEOW_FADE, SOUND_ATTACK, SOUND_FLOOR, TONES } from '../core/constants/sound';
 import type { SoundName, ToneSpec } from '../core/types';
 
 type AudioCtor = typeof AudioContext;
@@ -29,6 +29,7 @@ function audio(create: boolean): AudioContext | null {
     const nav = navigator as Navigator & NavigatorWithAudioSession;
     if (nav.audioSession) nav.audioSession.type = 'ambient';
     ctx = new Ctor();
+    preloadClips(ctx);
   }
   if (ctx && ctx.state === 'suspended') void ctx.resume();
   return ctx;
@@ -54,80 +55,55 @@ function playTone(ac: BaseAudioContext, spec: ToneSpec, t0: number): void {
   osc.stop(t + spec.dur + SOUND_ATTACK);
 }
 
-/** 一秒的白噪音（氣音用），建一次重用 */
-let noiseBuffer: AudioBuffer | null = null;
-function noise(ac: BaseAudioContext): AudioBuffer {
-  if (noiseBuffer && noiseBuffer.sampleRate === ac.sampleRate) return noiseBuffer;
-  const buf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i += 1) data[i] = Math.random() * 2 - 1;
-  noiseBuffer = buf;
-  return buf;
+/** 貓叫錄音的網址（打包時進 assets/，離線快取會收） */
+const CLIP_URLS = import.meta.glob<string>('./sounds/*.mp3', { query: '?url', import: 'default', eager: true });
+const clipBuffers = new Map<string, Promise<AudioBuffer | null>>();
+let lastClip = -1;
+
+/** 解碼一段錄音（同一段只解一次；離線又沒快取時回 null） */
+function loadClip(ac: BaseAudioContext, file: string): Promise<AudioBuffer | null> {
+  const cached = clipBuffers.get(file);
+  if (cached) return cached;
+  const url = CLIP_URLS[`./sounds/${file}`];
+  const job = url
+    ? fetch(url)
+        .then((r) => r.arrayBuffer())
+        .then((data) => ac.decodeAudioData(data))
+        .catch(() => {
+          clipBuffers.delete(file);
+          return null;
+        })
+    : Promise.resolve(null);
+  clipBuffers.set(file, job);
+  return job;
 }
 
-/** 在 [-1, 1] 之間隨機 */
-const spread = (): number => Math.random() * 2 - 1;
+/** 先把貓叫錄音解碼好，第一次點小貓才不會慢半拍 */
+function preloadClips(ac: BaseAudioContext): void {
+  for (const clip of MEOW_CLIPS) void loadClip(ac, clip.file);
+}
 
+/** 輪流挑一段（不連續兩次同一段），解碼好就播 */
 function playMeow(ac: BaseAudioContext, t: number): void {
-  const m = MEOW;
-  const isMew = Math.random() < m.mewChance;
-  const shape = isMew ? m.mew : m.meow;
-  const k = (1 + spread() * m.jitter) * (isMew ? m.mewPitch : 1);
-  const dur = (m.dur.min + Math.random() * (m.dur.max - m.dur.min)) * (isMew ? m.mewDur : 1);
-  const end = t + dur;
-  const gain = m.gain * (isMew ? m.mewGain : 1);
-
-  // 聲帶：鋸齒波，音高拱形＋顫音，再低通讓它不刺
-  const src = ac.createOscillator();
-  src.type = 'sawtooth';
-  src.frequency.setValueAtTime(m.pitch.start * k, t);
-  src.frequency.linearRampToValueAtTime(m.pitch.peak * k, t + dur * m.pitch.peakAt);
-  src.frequency.exponentialRampToValueAtTime(m.pitch.end * k, end);
-  const lfo = ac.createOscillator();
-  lfo.frequency.setValueAtTime(m.vibrato.hz, t);
-  const lfoGain = ac.createGain();
-  lfoGain.gain.setValueAtTime(m.vibrato.depth, t);
-  lfo.connect(lfoGain).connect(src.frequency);
-  const tilt = ac.createBiquadFilter();
-  tilt.type = 'lowpass';
-  tilt.frequency.setValueAtTime(m.tilt, t);
-  src.connect(tilt);
-
-  // 氣音：白噪音，跟著主聲一起走共振峰
-  const air = ac.createBufferSource();
-  air.buffer = noise(ac);
-  const airGain = ac.createGain();
-  airGain.gain.setValueAtTime(m.breath, t);
-  air.connect(airGain);
-
-  // 嘴型：三個共振峰沿著 [m]→[i]→[a]→[u] 移動；音量跟著嘴巴開合
-  const mouth = ac.createGain();
-  mouth.gain.setValueAtTime(SOUND_FLOOR, t);
-  for (const v of shape) mouth.gain.linearRampToValueAtTime(Math.max(SOUND_FLOOR, v.amp * gain), t + dur * v.at + SOUND_ATTACK);
-  mouth.gain.exponentialRampToValueAtTime(SOUND_FLOOR, end);
-
-  for (let i = 0; i < 3; i += 1) {
-    const bp = ac.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.Q.setValueAtTime(m.formantQ[i] ?? 1, t);
-    const first = shape[0];
-    if (first) bp.frequency.setValueAtTime(first.formants[i] ?? 1000, t);
-    for (const v of shape) bp.frequency.linearRampToValueAtTime(v.formants[i] ?? 1000, t + dur * v.at);
-    const level = ac.createGain();
-    level.gain.setValueAtTime(m.formantGain[i] ?? 0, t);
-    tilt.connect(bp);
-    airGain.connect(bp);
-    bp.connect(level).connect(mouth);
-  }
-  mouth.connect(ac.destination);
-
-  src.start(t);
-  lfo.start(t);
-  air.start(t);
-  const stopAt = end + SOUND_ATTACK;
-  src.stop(stopAt);
-  lfo.stop(stopAt);
-  air.stop(stopAt);
+  if (MEOW_CLIPS.length === 0) return;
+  let idx = Math.floor(Math.random() * MEOW_CLIPS.length);
+  if (MEOW_CLIPS.length > 1 && idx === lastClip) idx = (idx + 1) % MEOW_CLIPS.length;
+  lastClip = idx;
+  const clip = MEOW_CLIPS[idx];
+  if (!clip) return;
+  void loadClip(ac, clip.file).then((buf) => {
+    if (!buf) return;
+    const start = Math.max(t, ac.currentTime);
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    const g = ac.createGain();
+    const end = start + clip.duration;
+    g.gain.setValueAtTime(clip.gain, start);
+    g.gain.setValueAtTime(clip.gain, end - MEOW_FADE);
+    g.gain.linearRampToValueAtTime(SOUND_FLOOR, end);
+    src.connect(g).connect(ac.destination);
+    src.start(start, clip.offset, clip.duration);
+  });
 }
 
 /** 在指定的音訊環境裡排一個音效（離線算圖、測量音量也用這個）。 */

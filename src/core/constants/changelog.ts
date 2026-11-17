@@ -3,10 +3,10 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
-    id: '2026-11-18-meow',
+    id: '2026-11-18-meow-real',
     date: '2026-11-18',
-    title: '小貓的叫聲',
-    items: ['點小貓的叫聲重做了，更像真的貓：有時是「喵～」，有時是小貓的「咪」'],
+    title: '真的貓叫',
+    items: ['點小貓會播真的貓叫錄音，有三種叫聲輪流出現'],
   },
   {
     id: '2026-11-18-sound',
