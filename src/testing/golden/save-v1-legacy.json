@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "progress": {
+    "115-general-admin-law-q08": {
+      "seen": 2,
+      "correct": 1,
+      "streak": 1,
+      "lastPick": "A",
+      "lastAt": "2026-11-15T12:30:00.000Z",
+      "due": "2026-11-17"
+    }
+  },
+  "settings": {
+    "theme": "system",
+    "lastRound": {
+      "bankId": "local4-civil",
+      "subjectKeys": ["admin-law"],
+      "count": 5,
+      "mode": "new",
+      "fast": true
+    }
+  }
+}
