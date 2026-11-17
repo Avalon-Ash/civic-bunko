@@ -163,7 +163,7 @@
       "topic": ["local-gov/legislation"],
       "mnemonic": "委辦是幫上級做事，規則一定要「先核定、再發布」！",
       "trap": "看清順序！「核定後發布」跟「發布後備查」千萬別寫反。",
-      "plain": null,
+      "plain": "地方幫中央做事時訂的「委辦規則」，下面哪一種說法是錯的？",
       "marks": [
         { "text": "委辦規則", "color": "blue" },
         { "text": "錯誤", "color": "red" }
@@ -188,7 +188,7 @@
       "topic": ["local-gov/concepts", "local-gov/entities"],
       "mnemonic": "地方有自主組織權，但設機關還是要議會訂組織自治條例！",
       "trap": "自主組織權不是行政首長說了算，仍受憲法法律與議會拘束。",
-      "plain": null,
+      "plain": "大法官怎麼看地方政府的「自主組織權」，下面哪一項說對了？",
       "marks": [
         { "text": "司法院大法官解釋", "color": "blue" },
         { "text": "地方自治團體", "color": "blue" },
@@ -240,7 +240,7 @@
       "topic": ["local-gov/entities", "local-gov/supervision"],
       "mnemonic": "山地原住民區比照「鄉鎮市」，解職找直轄市政府、不是原民會！",
       "trap": "看到「原住民」別選原民會！它比照縣與鄉，直轄市管。",
-      "plain": null,
+      "plain": "像烏來區這類「直轄市山地原住民區」，下面哪一項規定說錯了？",
       "marks": [
         { "text": "直轄市山地原住民區", "color": "blue" },
         { "text": "錯誤", "color": "red" }
@@ -318,7 +318,7 @@
       "topic": ["local-gov/council"],
       "mnemonic": "官員不是議會成員，去備詢只能「列席」，不是「出席」！",
       "trap": "經典一字陷阱！只有議員能「出席」，業務主管是「列席」備詢。",
-      "plain": null,
+      "plain": "地方政府跟議會開會時的互動規矩，下面哪一種說法不對？",
       "marks": [
         { "text": "地方制度法", "color": "blue" },
         { "text": "地方行政", "color": "blue" },
@@ -372,7 +372,7 @@
       "topic": ["local-gov/concepts"],
       "mnemonic": "單一制也能把權力分給地方，不是只有中央集權一種走法！",
       "trap": "看到「必然」「一定」「絕對」等極端詞，先懷疑它是錯的。",
-      "plain": null,
+      "plain": "國家要把權力分給中央和地方政府，下面哪個說法是錯的？",
       "marks": [
         { "text": "中央與地方分權", "color": "blue" },
         { "text": "錯誤", "color": "red" }
@@ -502,7 +502,7 @@
       "topic": ["local-gov/cooperation", "local-gov/concepts"],
       "mnemonic": "社造靈魂是「由下而上」居民自己來，不是國家由上壓下來！",
       "trap": "看到「國家力量貫徹」「監督地方」就錯了，剛好與社造相反。",
-      "plain": null,
+      "plain": "談到台灣推動的「社區總體營造」，下面哪一種說法是錯的？",
       "marks": [
         { "text": "社區總體營造", "color": "blue" },
         { "text": "錯誤", "color": "red" }
@@ -631,7 +631,7 @@
       "topic": ["local-gov/election", "local-gov/finance"],
       "mnemonic": "地方制度法沒寫「參與式預算」這五個字，是地方自己推動的！",
       "trap": "別以為所有地方政府在做的政策，地方制度法裡就一定有條文。",
-      "plain": null,
+      "plain": "讓市民直接提案投票決定預算怎麼花的「參與式預算」，哪項說錯了？",
       "marks": [
         { "text": "參與式預算", "color": "blue" },
         { "text": "錯誤", "color": "red" }

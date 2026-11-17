@@ -485,7 +485,7 @@
       "topic": ["public-admin/organization"],
       "mnemonic": "行政院政務委員：「七上八下九剛剛好」，法定 7 至 9 人。",
       "trap": "政務委員有明確員額上下限 7 至 9 人，不是沒有限制。",
-      "plain": null,
+      "plain": "依照《行政院組織法》，行政院裡一共會設幾位政務委員？",
       "marks": [
         { "text": "行政院組織法", "color": "blue" },
         { "text": "政務委員", "color": "blue" }

@@ -60,7 +60,7 @@
       "topic": ["public-admin/foundations", "public-admin/ethics"],
       "mnemonic": "黑堡文官不是工具人！要主動當「公共利益的受託者」。",
       "trap": "黑堡宣言反對「向企業學習」，那是新公共管理的主張！",
-      "plain": null,
+      "plain": "《黑堡宣言》主張政府官員應該抱持什麼樣的態度做事？",
       "marks": [
         { "text": "黑堡宣言", "color": "blue" }
       ],
@@ -161,7 +161,7 @@
       "topic": ["public-admin/reform"],
       "mnemonic": "新公共管理把民眾當「顧客」做市場生意；「公民治理」是新公共服務！",
       "trap": "分清楚「新公共管理（顧客）」和「新公共服務（公民）」！",
-      "plain": null,
+      "plain": "提到「新公共管理」這套政府改革主張，下面哪一項說法是錯的？",
       "marks": [
         { "text": "何者錯誤", "color": "red" },
         { "text": "新公共管理", "color": "blue" }
@@ -240,7 +240,7 @@
       "topic": ["public-admin/ethics", "public-admin/personnel"],
       "mnemonic": "四組都沒同時適用兩法，本題官方已更正為「一律給分」！",
       "trap": "原答案為 C，因四組皆無同時適用兩法，官方更正一律給分。",
-      "plain": null,
+      "plain": "下面哪一組公職人員，同時受《公務員服務法》跟《懲戒法》規範？",
       "marks": [
         { "text": "公務員服務法", "color": "blue" },
         { "text": "公務員懲戒法", "color": "blue" }
@@ -266,7 +266,7 @@
       "topic": ["public-admin/ethics"],
       "mnemonic": "行政倫理管的是「當官辦事的準則」，不是只管下班後的私生活。",
       "trap": "注意「針對職務外行為規範」把行政倫理的重點完全說反了！",
-      "plain": null,
+      "plain": "談到公務員應遵守的「行政倫理」，下面哪一個說法不正確？",
       "marks": [
         { "text": "何者錯誤", "color": "red" },
         { "text": "行政倫理", "color": "blue" }
@@ -467,7 +467,7 @@
       "topic": ["public-admin/organization"],
       "mnemonic": "組織發展本來就把組織當「開放系統」，跟環境互動哪會是限制！",
       "trap": "問「非屬限制」，做不到的「完美、一夕成功」才是限制。",
-      "plain": null,
+      "plain": "用「組織發展」幫機關體質升級時，下面哪一項並不是它的限制？",
       "marks": [
         { "text": "非屬", "color": "red" },
         { "text": "組織發展", "color": "blue" }
@@ -492,7 +492,7 @@
       "topic": ["public-admin/organization", "public-admin/behavior"],
       "mnemonic": "文化是「骨子裡的長期信念」，氣候是「當下的短期感受」，不能互換！",
       "trap": "組織文化和組織氣候長得很像，但深度與穩定度完全不同！",
-      "plain": null,
+      "plain": "一個機關長期累積下來的「組織文化」，下面哪一種說法是錯的？",
       "marks": [
         { "text": "何者錯誤", "color": "red" },
         { "text": "組織文化", "color": "blue" }

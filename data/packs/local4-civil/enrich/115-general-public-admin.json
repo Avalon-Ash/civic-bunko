@@ -58,7 +58,7 @@
       "topic": ["public-admin/foundations", "public-admin/behavior"],
       "mnemonic": "霍桑實驗看工廠內部「人際關係」，不看外在環境。",
       "trap": "看到「外在環境互動」，那是後來的系統理論。",
-      "plain": null,
+      "plain": "有名的「霍桑實驗」發現了不少管理現象，下面哪一項其實不是它發現的？",
       "marks": [
         { "text": "何者不是", "color": "red" },
         { "text": "霍桑實驗", "color": "blue" }
@@ -83,7 +83,7 @@
       "topic": ["public-admin/foundations"],
       "mnemonic": "修正理論看重人與動機，權威要部屬接受才算數。",
       "trap": "「權力只看職位、不管部屬」是傳統理論的觀點。",
-      "plain": null,
+      "plain": "1930–1960 年代重視人性的「修正理論時期」，下面哪種說法錯了？",
       "marks": [
         { "text": "何者錯誤", "color": "red" },
         { "text": "修正理論時期", "color": "blue" }
@@ -108,7 +108,7 @@
       "topic": ["public-admin/foundations"],
       "mnemonic": "科學管理只管「工廠內部標準化」，不管外在利益團體。",
       "trap": "傳統理論假設政治行政二分，不會談利益團體價值。",
-      "plain": null,
+      "plain": "早期追求工作標準化的「科學管理學派」，下面哪一個說法不正確？",
       "marks": [
         { "text": "何者錯誤", "color": "red" },
         { "text": "科學管理學派", "color": "blue" }
@@ -134,7 +134,7 @@
       "topic": ["public-admin/foundations"],
       "mnemonic": "新公共行政（NPA）講求「公平、協和、適應動盪」。",
       "trap": "別把「邏輯實證」或「企業家精神」當成 NPA！",
-      "plain": null,
+      "plain": "1960 年代興起的「新公共行政」思潮，下面哪一項是它的主要主張？",
       "marks": [
         { "text": "新公共行政", "color": "blue" }
       ],
@@ -158,7 +158,7 @@
       "topic": ["public-admin/reform"],
       "mnemonic": "新公共管理（NPM）師法企業：鬆綁法規、重市場效率。",
       "trap": "公平正義屬新公共行政，大有為政府跟 NPM 相反。",
-      "plain": null,
+      "plain": "「新公共管理」想用新方法改革政府，下面哪一項說對了它的核心主張？",
       "marks": [
         { "text": "新公共管理", "color": "blue" }
       ],
@@ -208,7 +208,7 @@
       "topic": ["public-admin/ethics"],
       "mnemonic": "對外在控制者（民意、議會）即時回應＝政治的倫理。",
       "trap": "題目關鍵字是「對外回應」，不是對內管理或守法。",
-      "plain": null,
+      "plain": "要求公務員敏銳回應外在監督者與大環境的要求，這屬於哪一種行政倫理？",
       "marks": [
         { "text": "對外的回應力", "color": "blue" },
         { "text": "行政倫理", "color": "blue" }
@@ -440,7 +440,7 @@
       "topic": ["public-admin/organization"],
       "mnemonic": "二級獨立機關只有「中選會、公平會、通傳會」，沒有核安會。",
       "trap": "原能會改制後的「核能安全委員會」是三級獨立機關！",
-      "plain": null,
+      "plain": "在中央政府的部會組織架構裡，下面哪一個單位其實不是二級機關？",
       "marks": [
         { "text": "不屬於", "color": "red" },
         { "text": "中央政府之二級機關", "color": "blue" }
@@ -541,7 +541,7 @@
       "topic": ["public-admin/personnel", "public-admin/ethics"],
       "mnemonic": "公務員「絕對保密」，服從遇到「刑事違法」就不必服從。",
       "trap": "離職旋轉門是 3 年（非 1 年），且不需絕對服從違法命令。",
-      "plain": null,
+      "plain": "關於台灣公務員依法要遵守的義務，下面哪一個說法才正確？",
       "marks": [
         { "text": "公務人員的義務", "color": "blue" }
       ],
@@ -668,7 +668,7 @@
       "topic": ["public-admin/budget", "public-admin/organization"],
       "mnemonic": "主計總處的首長，簡稱「主計長」（不是總處長）。",
       "trap": "別被「總處」兩個字騙了，人事總處叫人事長、主計叫主計長。",
-      "plain": null,
+      "plain": "管政府預算跟統計的「行政院主計總處」，它的最高主管職稱叫什麼？",
       "marks": [
         { "text": "行政院主計總處", "color": "blue" },
         { "text": "首長", "color": "blue" }
@@ -719,7 +719,7 @@
       "topic": ["public-admin/budget"],
       "mnemonic": "績效預算只做機關內部「事與錢」的連結，沒引入市場競爭。",
       "trap": "「引入市場競爭」是新公共管理／企業化預算，不是績效預算。",
-      "plain": null,
+      "plain": "編預算時把施政計畫和績效綁一起的制度，哪一項其實不是它的優缺點？",
       "marks": [
         { "text": "何者不是", "color": "red" },
         { "text": "計畫與績效預算制度", "color": "blue" }
@@ -795,7 +795,7 @@
       "topic": ["public-admin/behavior"],
       "mnemonic": "轉換型領導＝「交易型」加「魅力型」，靠願景和價值感召。",
       "trap": "用「物質報酬換服從」是交易型領導，別跟轉換型搞混。",
-      "plain": null,
+      "plain": "能帶動團隊一起成長改變的「轉換型領導」，下面哪種說法才對？",
       "marks": [
         { "text": "轉換型領導", "color": "blue" }
       ],
@@ -844,7 +844,7 @@
       "topic": ["public-admin/behavior"],
       "mnemonic": "增強理論四招：「正增強、迴避學習、懲罰、削弱」，沒有分享。",
       "trap": "「迴避學習」就是負增強，這是增強理論裡真的有的招式。",
-      "plain": null,
+      "plain": "心理學的「增強理論」有幾種改變行為的方法，下面哪一項其實不在裡面？",
       "marks": [
         { "text": "何者不是", "color": "red" },
         { "text": "增強理論", "color": "blue" }
@@ -999,7 +999,7 @@
       "topic": ["public-admin/policy"],
       "mnemonic": "「問題流」是金登多元流程的概念，不是薩巴提爾倡導聯盟。",
       "trap": "ACF 有次級系統、政策掮客、指導工具，沒有「三流」。",
-      "plain": null,
+      "plain": "用「倡導聯盟架構」來分析政策怎麼變遷時，下面哪個詞其實不是它的概念？",
       "marks": [
         { "text": "何者不是", "color": "red" },
         { "text": "倡導聯盟架構", "color": "blue" }
@@ -1074,7 +1074,7 @@
       "topic": ["public-admin/budget", "public-admin/governance"],
       "mnemonic": "中央統籌分配稅款來自「國稅」，地方拿到後列為「稅課收入」。",
       "trap": "財源是國稅（所得、營業、貨物稅），但地方帳上列為稅課收入。",
-      "plain": null,
+      "plain": "中央每年分給各縣市的「統籌分配稅款」，下面哪一個說法才正確？",
       "marks": [
         { "text": "中央統籌分配稅款", "color": "blue" }
       ],
