@@ -15,6 +15,8 @@ export type ItemArt =
       motion?: ItemMotion;
       /** 有身體的小貓用的圖（畫在身體前面）：以身體中心為原點、站姿身體大小（TORSO_REF）畫，會跟著姿勢的身體縮放與轉動。沒有就照頭像的圖接在背上 */
       body?: ReactNode;
+      /** 有身體的小貓用的圖（畫在身體後面）：以背的對位點為原點、等比縮放；頭像的圖排在頭兩側或頭上，接到側身會被頭和身體擋住的背飾用這個 */
+      onBack?: ReactNode;
     }
   /** 毛色：套在貓外層的 class（色票在 theme.css） */
   | { kind: 'fur'; className: string };
@@ -369,6 +371,15 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     motion: 'bob',
     box: '44 0 20 52',
+    // 背上版：線綁在背上，氣球飄在尾巴那側的上方（頭像版在頭右上，接到身體會躲在頭後面）
+    onBack: (
+      <g>
+        <path d="M0 0 Q-10 -24 -14 -56" fill="none" stroke={LINE} strokeWidth="1.8" strokeLinecap="round" />
+        <ellipse cx="-15" cy="-70" rx="10" ry="12.5" fill="var(--acc-coral)" {...thin} />
+        <path d="M-17 -57.5 L-14.5 -55 L-12.5 -57.8 Z" fill="var(--acc-coral)" {...thin} />
+        <path d="M-20 -76 Q-18.5 -79 -15.5 -79.8" fill="none" stroke="var(--acc-cream)" strokeWidth="2.2" strokeLinecap="round" />
+      </g>
+    ),
     node: (
       <g>
         <path d="M54 46 Q52 34 56.5 19.5" fill="none" stroke={LINE} strokeWidth="1.2" strokeLinecap="round" />
@@ -397,6 +408,23 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     motion: 'flap',
     box: '-8 20 80 36',
+    // 背上版：側身只看得到一對翅膀從背上往尾巴那側豎起來（遠的那片稍微錯開、顏色淡一點）
+    onBack: (
+      <g>
+        <path
+          d="M10 2 Q10 -26 -14 -42 Q-22 -40 -18 -32 Q-27 -29 -20 -22 Q-26 -16 -16 -12 Q-6 -4 10 2 Z"
+          transform="translate(9 -3)"
+          fill="var(--acc-lav)"
+          {...stroke}
+        />
+        <path
+          d="M8 4 Q6 -28 -22 -44 Q-31 -41 -26 -33 Q-36 -29 -28 -21 Q-35 -14 -24 -10 Q-12 -2 8 4 Z"
+          fill="var(--acc-cream)"
+          {...stroke}
+        />
+        <path d="M-26 -33 Q-12 -28 -2 -20 M-28 -21 Q-14 -18 -2 -12" fill="none" stroke="var(--acc-lav)" strokeWidth="1.8" strokeLinecap="round" />
+      </g>
+    ),
     node: (
       <g>
         <path

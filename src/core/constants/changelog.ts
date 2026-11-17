@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-18-dressing-room',
+    date: '2026-11-18',
+    title: '試衣間',
+    items: [
+      '小貓頁的試穿改成全身的小貓，背景、坐墊、披風都看得到',
+      '往下挑配件時，試衣間會停在畫面上方，不會被捲走；買下來的按鈕也在那裡',
+      '天使翅膀、氣球在小貓背上看得清楚了（跑出來玩時也是）',
+    ],
+  },
+  {
     id: '2026-11-18-wardrobe-fix',
     date: '2026-11-18',
     title: '配件修正',

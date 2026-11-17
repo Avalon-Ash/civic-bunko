@@ -26,23 +26,64 @@
   flex: none;
 }
 
-.cb-wd-hero {
-  display: grid;
-  gap: 12px;
-}
-
-.cb-wd-stage {
-  display: grid;
-  place-items: center;
-  padding: 10px 0 4px;
-}
-
-.cb-wd-today,
-.cb-wd-try {
+.cb-wd-today {
   display: grid;
   gap: 10px;
-  padding-top: 12px;
-  border-top: 2px dashed var(--hair);
+}
+
+/* 試衣間：捲到下面挑配件時黏在捲動區上緣，配件格從它底下捲過 */
+.cb-wd-room {
+  position: sticky;
+  /* 捲動區的上內距已經避開瀏海，黏在內距下緣就好 */
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-card);
+  background: var(--pink);
+  border: var(--border-w) solid var(--line);
+  box-shadow: 0 4px 0 var(--line);
+}
+
+/* 黏住時，上方內距那條縫用頁面底色蓋住，配件格不會從縫裡露出來 */
+.cb-wd-room.is-stuck::before {
+  content: '';
+  position: absolute;
+  left: -50vw;
+  right: -50vw;
+  bottom: calc(100% + var(--border-w));
+  height: 100vh;
+  background: var(--bg-top);
+  pointer-events: none;
+}
+
+/* 小貓照片框：姿勢圖左右留白多，框比圖窄、裁掉兩側空白；背景配件超出框的部分一起裁掉 */
+.cb-wd-room-cat {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 112px;
+  height: 124px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface-raised);
+  border: var(--border-w) solid var(--line);
+}
+
+.cb-wd-room-info {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.cb-wd-room-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .cb-wd-try-name {

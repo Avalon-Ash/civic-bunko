@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { ACHIEVEMENTS, SLOTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
+import { RUNNER_HOP_MS } from '../../core/constants/pet';
 import type { ItemId, Outfit, SlotId } from '../../core/types';
 import type { World } from '../../core/world';
 import {
@@ -13,7 +14,8 @@ import {
 } from '../../selectors/wardrobe';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
-import { Cat, ItemIcon } from '../kit/Cat';
+import { ItemIcon } from '../kit/Cat';
+import { CatBody } from '../kit/CatBody';
 import { Chip } from '../kit/Chip';
 import { CountUp } from '../kit/CountUp';
 import { ProgressBar } from '../kit/ProgressBar';
@@ -39,6 +41,54 @@ function achievementName(id: string): string {
   return ACHIEVEMENTS.find((a) => a.id === id)?.name ?? id;
 }
 
+/** 試衣間的小貓圖寬（px）；照片框比它窄（wardrobe.css .cb-wd-room-cat），裁掉姿勢圖兩側的空白 */
+const ROOM_CAT_WIDTH = 140;
+
+/** 試衣間裡的全身小貓：坐著；換上新衣服時跳一下；點牠會喵 */
+function DressingCat({ outfit, cheer }: { outfit: Outfit; cheer: number }) {
+  const [hopping, setHopping] = useState(false);
+  useEffect(() => {
+    if (cheer === 0) return;
+    setHopping(true);
+    const id = window.setTimeout(() => setHopping(false), RUNNER_HOP_MS);
+    return () => window.clearTimeout(id);
+  }, [cheer]);
+  return (
+    <button
+      type="button"
+      className="cb-wd-room-cat cb-press"
+      data-sound="meow"
+      aria-label="小貓試穿的樣子（點一下會喵）"
+      onClick={() => {
+        setHopping(false);
+        window.requestAnimationFrame(() => setHopping(true));
+        window.setTimeout(() => setHopping(false), RUNNER_HOP_MS);
+      }}
+    >
+      <CatBody pose={hopping ? 'hop' : 'sit'} mood={hopping ? 'yay' : undefined} outfit={outfit} width={ROOM_CAT_WIDTH} backdrop />
+    </button>
+  );
+}
+
+/** 試衣間有沒有黏在捲動區上緣（黏住時把上方的縫蓋掉）；捲動區的上內距直接讀樣式，不另外記一份 */
+function useStuck(ref: RefObject<HTMLElement | null>): boolean {
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    const scroller = el?.closest('.cb-main');
+    if (!el || !scroller) return;
+    const check = () => {
+      const pad = parseFloat(getComputedStyle(scroller).paddingTop) || 0;
+      const gap = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+      setStuck(scroller.scrollTop > 0 && gap <= pad + 1);
+    };
+    check();
+    scroller.addEventListener('scroll', check, { passive: true });
+    return () => scroller.removeEventListener('scroll', check);
+  }, [ref]);
+  return stuck;
+}
+
 export interface WardrobeScreenProps {
   world: World;
 }
@@ -59,6 +109,8 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   const [trying, setTrying] = useState<ItemId | null>(null);
   const [showAllAch, setShowAllAch] = useState(false);
   const [happy, setHappy] = useState(0);
+  const roomRef = useRef<HTMLDivElement | null>(null);
+  const stuck = useStuck(roomRef);
 
   const tryingStatus = trying ? statuses.find((s) => s.item.id === trying) ?? null : null;
   const preview: Outfit = useMemo(() => {
@@ -108,70 +160,77 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
         </span>
       </div>
 
-      <Card tone="pink" className="cb-wd-hero" data-cat-perch="">
-        <div className="cb-wd-stage">
-          <Cat key={happy} size={136} mood="yay" outfit={preview} spin={happy > 0} interactive />
+      <Card tone="pink" className="cb-wd-today" data-cat-perch="">
+        <div className="cb-sub-strong">
+          今天刷了 <b className="cb-num-tabular">{tiers.count}</b> 題
         </div>
-
-        {tryingStatus ? (
-          <div className="cb-wd-try">
-            <div className="cb-wd-try-name">
-              試穿：<b>{tryingStatus.item.name}</b>
-              {tryingStatus.item.sprint ? <Chip tone="orange">考前限定</Chip> : null}
-            </div>
-            {tryingStatus.state === 'buyable' ? (
-              <Button onClick={handleBuy}>
-                <FishIcon /> {tryingStatus.price} 買下來
-              </Button>
-            ) : tryingStatus.state === 'short' ? (
-              <p className="cb-sub-strong cb-m0">
-                還差 {tryingStatus.price !== undefined ? tryingStatus.price - fish.raw : 0} 條小魚乾，再刷幾題就買得起！
-              </p>
-            ) : tryingStatus.state === 'stamps' ? (
-              <p className="cb-sub-strong cb-m0">再蓋 {tryingStatus.need} 個章就會送你</p>
-            ) : tryingStatus.state === 'achievement' && tryingStatus.achievement ? (
-              <p className="cb-sub-strong cb-m0">
-                解鎖成就「{achievementName(tryingStatus.achievement)}」就會送你
-              </p>
-            ) : null}
-            <Button variant="ghost" onClick={() => setTrying(null)}>
-              不試了
-            </Button>
+        <ol className="cb-wd-tiers" aria-label="今日題數關卡">
+          {tiers.tiers.map((t) => (
+            <li key={t.at} className={t.reached ? 'is-reached' : ''}>
+              <span className="cb-wd-tier-at">{t.at} 題</span>
+              <span className="cb-wd-tier-fish">
+                <FishIcon size={14} />+{t.fish}
+              </span>
+            </li>
+          ))}
+        </ol>
+        {quest ? (
+          <div className={`cb-wd-quest ${quest.done ? 'is-done' : ''}`.trim()}>
+            <span className="cb-wd-quest-tag">今日任務</span>
+            <span className="cb-grow">{quest.quest.name}</span>
+            <span className="cb-wd-tier-fish">
+              {quest.done ? '完成！' : (
+                <>
+                  <FishIcon size={14} />+{quest.quest.fish}
+                </>
+              )}
+            </span>
           </div>
-        ) : (
-          <div className="cb-wd-today">
-            <div className="cb-sub-strong">
-              今天刷了 <b className="cb-num-tabular">{tiers.count}</b> 題
-            </div>
-            <ol className="cb-wd-tiers" aria-label="今日題數關卡">
-              {tiers.tiers.map((t) => (
-                <li key={t.at} className={t.reached ? 'is-reached' : ''}>
-                  <span className="cb-wd-tier-at">{t.at} 題</span>
-                  <span className="cb-wd-tier-fish">
-                    <FishIcon size={14} />+{t.fish}
-                  </span>
-                </li>
-              ))}
-            </ol>
-            {quest ? (
-              <div className={`cb-wd-quest ${quest.done ? 'is-done' : ''}`.trim()}>
-                <span className="cb-wd-quest-tag">今日任務</span>
-                <span className="cb-grow">{quest.quest.name}</span>
-                <span className="cb-wd-tier-fish">
-                  {quest.done ? '完成！' : (
-                    <>
-                      <FishIcon size={14} />+{quest.quest.fish}
-                    </>
-                  )}
-                </span>
-              </div>
-            ) : null}
-          </div>
-        )}
+        ) : null}
       </Card>
 
-      <section className="cb-section">
+      <section className="cb-section cb-wd-dress">
         <h2>換裝</h2>
+        {/* 試衣間：捲到下面挑配件時黏在上方，一直看得到小貓穿起來的樣子 */}
+        <div ref={roomRef} className={`cb-wd-room ${stuck ? 'is-stuck' : ''}`.trim()}>
+          <DressingCat outfit={preview} cheer={happy} />
+          <div className="cb-wd-room-info" aria-live="polite">
+            {tryingStatus ? (
+              <>
+                <div className="cb-wd-try-name">
+                  試穿：<b>{tryingStatus.item.name}</b>
+                  {tryingStatus.item.sprint ? <Chip tone="orange">考前限定</Chip> : null}
+                </div>
+                {tryingStatus.state === 'buyable' ? null : tryingStatus.state === 'short' ? (
+                  <p className="cb-sub-strong cb-m0">
+                    還差 {tryingStatus.price !== undefined ? tryingStatus.price - fish.raw : 0} 條小魚乾，再刷幾題就買得起！
+                  </p>
+                ) : tryingStatus.state === 'stamps' ? (
+                  <p className="cb-sub-strong cb-m0">再蓋 {tryingStatus.need} 個章就會送你</p>
+                ) : tryingStatus.state === 'achievement' && tryingStatus.achievement ? (
+                  <p className="cb-sub-strong cb-m0">
+                    解鎖成就「{achievementName(tryingStatus.achievement)}」就會送你
+                  </p>
+                ) : null}
+                <div className="cb-wd-room-actions">
+                  {tryingStatus.state === 'buyable' ? (
+                    <Button onClick={handleBuy}>
+                      <FishIcon /> {tryingStatus.price} 買下來
+                    </Button>
+                  ) : null}
+                  <Button variant="ghost" onClick={() => setTrying(null)}>
+                    不試了
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <strong>試衣間</strong>
+                <p className="cb-sub cb-m0">點下面的配件，小貓先穿給你看；買過的點一下就換上。</p>
+              </>
+            )}
+          </div>
+        </div>
         <div className="cb-wd-filters" role="group" aria-label="部位">
           <Chip tone="plain" active={filter === 'all'} onClick={() => setFilter('all')}>
             全部

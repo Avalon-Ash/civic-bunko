@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { HEAD_ORIGIN, PET_POSES, PET_VIEW_H, PET_VIEW_W, TORSO_REF } from '../../core/constants/pet';
+import { BACKDROP_ORIGIN, HEAD_ORIGIN, PET_BACKDROP, PET_POSES, PET_VIEW_H, PET_VIEW_W, TORSO_REF } from '../../core/constants/pet';
 import type { Outfit, PetAnchor, PetLeg, PetPose } from '../../core/types';
 import { CatHead, furClass, type CatMood } from './Cat';
 import { ITEM_ART } from './wardrobe/art';
@@ -13,6 +13,8 @@ export interface CatBodyProps {
   /** 顯示寬度（px） */
   width?: number;
   className?: string;
+  /** 畫背景配件（坐墊、月亮…）：試衣間要；出來亂跑時不要（背景跟著貓跑很怪） */
+  backdrop?: boolean;
 }
 
 /** 對位點 → SVG transform：把零件的原點 (ox, oy) 放到 anchor 上 */
@@ -51,11 +53,13 @@ function Leg({ leg, index, far }: { leg: PetLeg; index: number; far: boolean }) 
  * 有身體的小貓（側身、短腿、頭朝前）。照 PET_POSES 的姿勢資料畫：
  * 頭沿用 CatHead（含頭上、臉上、頸部的配件），接在姿勢的頭對位點；背上配件接在背的對位點。
  */
-export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, className = '' }: CatBodyProps) {
+export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, className = '', backdrop = false }: CatBodyProps) {
   const spec = PET_POSES[pose];
   const clip = useId();
   const backId = outfit.back;
   const backArt = backId ? ITEM_ART[backId] : undefined;
+  const bgId = backdrop ? outfit.bg : undefined;
+  const bgArt = bgId ? ITEM_ART[bgId] : undefined;
   const { torso } = spec;
   const torsoTransform = `rotate(${torso.rot} ${torso.cx} ${torso.cy})`;
 
@@ -72,7 +76,17 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
         className={`cb-pet cb-pet-motion-${spec.motion}`}
         transform={facing === 'left' ? `translate(${PET_VIEW_W} 0) scale(-1 1)` : undefined}
       >
-        {backArt && backArt.kind === 'layer' && !backArt.body ? (
+        {bgArt && bgArt.kind === 'layer' ? (
+          <g transform={place(PET_BACKDROP, BACKDROP_ORIGIN.x, BACKDROP_ORIGIN.y)} className="cb-slot cb-slot-bg">
+            {bgArt.node}
+          </g>
+        ) : null}
+
+        {backArt && backArt.kind === 'layer' && backArt.onBack ? (
+          <g transform={place(spec.back, 0, 0)} className="cb-pet-back">
+            <g className={backArt.motion ? `cb-pet-onback-${backArt.motion}` : undefined}>{backArt.onBack}</g>
+          </g>
+        ) : backArt && backArt.kind === 'layer' && !backArt.body ? (
           <g transform={place(spec.back, HEAD_ORIGIN.x, HEAD_ORIGIN.y)} className="cb-pet-back">
             {backArt.node}
           </g>

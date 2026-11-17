@@ -7,6 +7,9 @@ export const PET_VIEW_H = 90;
 export const PET_GROUND = 86;
 /** 頭的臉中心（Cat 的 64×64 座標裡）：對位點把這一點放到身體座標上 */
 export const HEAD_ORIGIN = { x: 32, y: 39 } as const;
+/** 背景配件（坐墊、月亮、彩虹）畫在頭像 64×64 座標裡；身體版把那張圖的中心放到這裡、放大到蓋住整隻貓 */
+export const BACKDROP_ORIGIN = { x: 32, y: 32 } as const;
+export const PET_BACKDROP = { x: PET_VIEW_W / 2, y: 46, rot: 0, scale: 1.25 } as const;
 /** 頭佔身體的比例 */
 const HEAD = 0.62;
 /** 背上配件（氣球、披風、翅膀）畫成頭像大小的幾成 */
