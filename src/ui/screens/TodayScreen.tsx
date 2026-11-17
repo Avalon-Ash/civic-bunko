@@ -16,6 +16,7 @@ import { currentOutfit, fishBalance, todayQuest } from '../../selectors/wardrobe
 import { FishIcon } from './WardrobeScreen';
 import { soundOn } from '../../selectors/sound';
 import { Switch } from '../kit/Switch';
+import { CatHome } from '../pet/CatHome';
 import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -207,13 +208,15 @@ export function TodayScreen({
 
       {bank ? (
         <>
-          <Card tone="pink" className="cb-countdown">
-            <Cat
-              size={76}
-              mood={papersLoading ? 'sleepy' : 'idle'}
-              outfit={outfit}
-              interactive
-            />
+          <Card tone="pink" className="cb-countdown" data-cat-perch="">
+            <CatHome size={76}>
+              <Cat
+                size={76}
+                mood={papersLoading ? 'sleepy' : 'idle'}
+                outfit={outfit}
+                interactive
+              />
+            </CatHome>
             <div className="cb-grow">
               <div className="cb-sub-strong">{bank.title}・距離筆試</div>
               <div className="cb-countdown-num">
@@ -268,7 +271,7 @@ export function TodayScreen({
           )}
 
           {onGoCat && !papersLoading ? (
-            <Card tone="butter" className="cb-wd-today-card" onClick={onGoCat}>
+            <Card tone="butter" className="cb-wd-today-card" onClick={onGoCat} data-cat-perch="">
               <span className="cb-wd-quest-tag">今日任務</span>
               <span className="cb-grow cb-wd-today-text">
                 {quest

@@ -420,6 +420,52 @@ export interface MeowClip {
   gain: number;
 }
 
+// ── 有身體的小貓（姿勢表在 constants/pet.ts）──────────────────
+export type PetPose =
+  | 'stand'
+  | 'walk'
+  | 'run'
+  | 'sit'
+  | 'groom'
+  | 'loaf'
+  | 'hop'
+  | 'stumble'
+  | 'dangle'
+  | 'fall';
+/** 姿勢裡會動的部分怎麼動（CSS 動畫在 styles/pet.css 的 cb-pet-motion-*） */
+export type PetMotion = 'still' | 'breathe' | 'walk' | 'run' | 'groom' | 'swing';
+/** 一個對位點：把某個零件的原點放到身體座標的 (x, y)，轉 rot 度、縮放 scale */
+export interface PetAnchor {
+  x: number;
+  y: number;
+  rot: number;
+  scale: number;
+}
+/** 一條腿：從 (x, y) 往下長 len，轉 rot 度（0＝垂直向下） */
+export interface PetLeg {
+  x: number;
+  y: number;
+  len: number;
+  rot: number;
+}
+/**
+ * 一個姿勢（像 RO 的一格動作）：身體橢圓、四條腿（遠側兩條畫在身體後面）、尾巴、
+ * 頭的對位點（頭的臉中心 (32, 39) 放到哪）、背上配件的對位點、表情與會動的方式。
+ */
+export interface PetPoseSpec {
+  torso: { cx: number; cy: number; rx: number; ry: number; rot: number };
+  /** 順序：後腿遠、前腿遠、後腿近、前腿近 */
+  legs: [PetLeg, PetLeg, PetLeg, PetLeg];
+  tail: string;
+  head: PetAnchor;
+  back: PetAnchor;
+  mood: 'idle' | 'yay' | 'oops' | 'sleepy';
+  motion: PetMotion;
+}
+
+/** 自由亂跑時的一個動作；每個分頁的權重在 constants/pet.ts 的 ROAM_ROUTES */
+export type RoamBehavior = 'walk' | 'sit' | 'groom' | 'nap' | 'perch' | 'zoom';
+
 // ── 設定 ────────────────────────────────────────────────
 export type ThemeChoice = 'system' | 'light' | 'dark';
 export interface Settings {

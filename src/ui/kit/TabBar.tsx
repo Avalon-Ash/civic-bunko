@@ -69,6 +69,7 @@ export function TabBar({ active, onSelect }: TabBarProps) {
             type="button"
             className="cb-tab-btn"
             aria-current={isCurrent ? 'page' : undefined}
+            data-cat-home={tab.id === 'cat' ? 'tab' : undefined}
             onClick={() => onSelect(tab.id)}
           >
             <TabIcon name={tab.icon} />

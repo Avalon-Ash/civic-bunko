@@ -65,7 +65,7 @@ function OutfitLayers({ outfit, behind }: { outfit: Outfit; behind: boolean }) {
 }
 
 /** 穿著的毛色 class（沒有就是空字串） */
-function furClass(outfit: Outfit): string {
+export function furClass(outfit: Outfit): string {
   const id = outfit.fur;
   if (!id) return '';
   const art = ITEM_ART[id];
@@ -89,6 +89,110 @@ export function ItemIcon({ id, size = 36 }: { id: ItemId; size?: number }) {
 /** 舊名稱：集章頁的配件圖示 */
 export function AccessoryIcon({ id, size = 36 }: { id: AccessoryId; size?: number }) {
   return <ItemIcon id={id} size={size} />;
+}
+
+/**
+ * 小貓的頭（含耳朵、表情、頭上與臉上的配件），畫在 64×64 的座標裡。
+ * 頭像用的 Cat 與有身體的 CatBody 共用它；backdrop＝要不要畫背景與背飾（身體版改畫在背上）。
+ */
+export function CatHead({ mood, outfit, backdrop }: { mood: CatMood; outfit: Outfit; backdrop: boolean }) {
+  return (
+    <>
+    {backdrop ? <OutfitLayers outfit={outfit} behind /> : null}
+    {EARS.map((d, i) => (
+      <path
+        key={d}
+        className={i === 0 ? 'cb-cat-ear cb-cat-ear-l' : 'cb-cat-ear cb-cat-ear-r'}
+        d={d}
+        fill="var(--cat-patch)"
+        stroke="var(--cat-line)"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+    ))}
+    <ellipse cx="32" cy="39" rx="26" ry="21" fill="var(--cat-fur)" />
+    <path
+      d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z"
+      fill="var(--cat-patch)"
+    />
+    <ellipse
+      cx="32"
+      cy="39"
+      rx="26"
+      ry="21"
+      fill="none"
+      stroke="var(--cat-line)"
+      strokeWidth="2.5"
+    />
+    <ellipse cx="15" cy="46" rx="4.5" ry="3" fill="var(--cat-blush)" />
+    <ellipse cx="49" cy="46" rx="4.5" ry="3" fill="var(--cat-blush)" />
+
+    {mood === 'yay' && (
+      <path
+        d="M19 41q3.5-5 7 0M38 41q3.5-5 7 0"
+        fill="none"
+        stroke="var(--cat-feature)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    )}
+
+    {mood === 'sleepy' && (
+      <>
+        <path
+          d="M19 40q3.5 3.5 7 0M38 40q3.5 3.5 7 0"
+          fill="none"
+          stroke="var(--cat-feature)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <text
+          x="50"
+          y="22"
+          fill="var(--ink-soft)"
+          fontSize="11"
+          fontWeight="900"
+        >
+          z
+        </text>
+      </>
+    )}
+
+    {(mood === 'idle' || mood === 'oops') && (
+      <g className={mood === 'idle' ? 'cb-cat-eyes' : undefined}>
+        <circle cx="22.5" cy="40" r="2.8" fill="var(--cat-feature)" />
+        <circle cx="41.5" cy="40" r="2.8" fill="var(--cat-feature)" />
+      </g>
+    )}
+
+    {mood === 'oops' ? (
+      <>
+        <path
+          d="M29 48h6"
+          stroke="var(--cat-feature)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M56 14q4 6 0 8q-4-2 0-8z"
+          fill="var(--blue-bg)"
+          stroke="var(--cat-line)"
+          strokeWidth="1.8"
+        />
+      </>
+    ) : (
+      <path
+        d="M27 46q2.5 3.5 5 0q2.5 3.5 5 0"
+        fill="none"
+        stroke="var(--cat-feature)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    )}
+    <OutfitLayers outfit={outfit} behind={false} />
+    </>
+  );
 }
 
 /** 原創角色：八字臉的圓貓。支援四種表情、待機眨眼、點擊壓扁回彈、配件疊加與隨機鼓勵氣泡。 */
@@ -164,99 +268,7 @@ export function Cat({
       className={`cb-cat-svg ${interactive ? 'cb-cat-alive' : ''} ${fur}`.trim()}
       overflow="visible"
     >
-      <OutfitLayers outfit={wearing} behind />
-      {EARS.map((d, i) => (
-        <path
-          key={d}
-          className={i === 0 ? 'cb-cat-ear cb-cat-ear-l' : 'cb-cat-ear cb-cat-ear-r'}
-          d={d}
-          fill="var(--cat-patch)"
-          stroke="var(--cat-line)"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
-      ))}
-      <ellipse cx="32" cy="39" rx="26" ry="21" fill="var(--cat-fur)" />
-      <path
-        d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z"
-        fill="var(--cat-patch)"
-      />
-      <ellipse
-        cx="32"
-        cy="39"
-        rx="26"
-        ry="21"
-        fill="none"
-        stroke="var(--cat-line)"
-        strokeWidth="2.5"
-      />
-      <ellipse cx="15" cy="46" rx="4.5" ry="3" fill="var(--cat-blush)" />
-      <ellipse cx="49" cy="46" rx="4.5" ry="3" fill="var(--cat-blush)" />
-
-      {mood === 'yay' && (
-        <path
-          d="M19 41q3.5-5 7 0M38 41q3.5-5 7 0"
-          fill="none"
-          stroke="var(--cat-feature)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-      )}
-
-      {mood === 'sleepy' && (
-        <>
-          <path
-            d="M19 40q3.5 3.5 7 0M38 40q3.5 3.5 7 0"
-            fill="none"
-            stroke="var(--cat-feature)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <text
-            x="50"
-            y="22"
-            fill="var(--ink-soft)"
-            fontSize="11"
-            fontWeight="900"
-          >
-            z
-          </text>
-        </>
-      )}
-
-      {(mood === 'idle' || mood === 'oops') && (
-        <g className={mood === 'idle' ? 'cb-cat-eyes' : undefined}>
-          <circle cx="22.5" cy="40" r="2.8" fill="var(--cat-feature)" />
-          <circle cx="41.5" cy="40" r="2.8" fill="var(--cat-feature)" />
-        </g>
-      )}
-
-      {mood === 'oops' ? (
-        <>
-          <path
-            d="M29 48h6"
-            stroke="var(--cat-feature)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M56 14q4 6 0 8q-4-2 0-8z"
-            fill="var(--blue-bg)"
-            stroke="var(--cat-line)"
-            strokeWidth="1.8"
-          />
-        </>
-      ) : (
-        <path
-          d="M27 46q2.5 3.5 5 0q2.5 3.5 5 0"
-          fill="none"
-          stroke="var(--cat-feature)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      )}
-      <OutfitLayers outfit={wearing} behind={false} />
+      <CatHead mood={mood} outfit={wearing} backdrop />
     </svg>
   );
 

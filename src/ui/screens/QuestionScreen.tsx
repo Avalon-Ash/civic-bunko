@@ -33,6 +33,7 @@ import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import { Dialog } from '../kit/Dialog';
 import { ProgressBar } from '../kit/ProgressBar';
+import { PetRunner } from '../pet/PetRunner';
 import { Segmented } from '../kit/Segmented';
 import { Sheet } from '../kit/Sheet';
 import { Toast } from '../kit/Toast';
@@ -338,6 +339,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
             value={index + (isAnswered ? 1 : 0)}
             total={total}
             showCat
+            runner={<PetRunner world={world} outfit={outfit} value={index + (isAnswered ? 1 : 0)} />}
             ariaLabel={`第 ${index + 1} 題，共 ${total} 題`}
             className="cb-grow"
           />

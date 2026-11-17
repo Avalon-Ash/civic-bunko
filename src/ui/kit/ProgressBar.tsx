@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 export interface ProgressBarProps {
   value: number;
   total: number;
   ariaLabel?: string;
   showCat?: boolean;
+  /** 換掉預設的貓頭，改放這個（答題頁的跑步小貓）；有它時不另外彈跳，動作由它自己管 */
+  runner?: ReactNode;
   className?: string;
 }
 
@@ -14,6 +16,7 @@ export function ProgressBar({
   total,
   ariaLabel,
   showCat = false,
+  runner,
   className = '',
 }: ProgressBarProps) {
   const safeTotal = Math.max(1, total);
@@ -32,7 +35,7 @@ export function ProgressBar({
 
   return (
     <div
-      className={`cb-prog-wrap ${showCat ? 'has-cat' : ''} ${className}`.trim()}
+      className={`cb-prog-wrap ${showCat ? 'has-cat' : ''} ${runner ? 'has-runner' : ''} ${className}`.trim()}
       role="progressbar"
       aria-label={ariaLabel}
       aria-valuemin={0}
@@ -48,6 +51,9 @@ export function ProgressBar({
       {showCat && (
         <div className="cb-bar-rail" aria-hidden="true">
           <div className="cb-bar-slider" style={{ transform: `translateX(${pct}%)` }}>
+            {runner ? (
+              <div className="cb-bar-cat cb-bar-runner">{runner}</div>
+            ) : (
             <div key={hopTick} className={`cb-bar-cat ${hopTick > 0 ? 'is-hopping' : ''}`}>
               <svg viewBox="0 0 36 36" width="28" height="28">
                 <path
@@ -72,6 +78,7 @@ export function ProgressBar({
                 <ellipse cx="27" cy="25" rx="2.4" ry="1.6" fill="var(--cat-blush)" />
               </svg>
             </div>
+            )}
           </div>
         </div>
       )}

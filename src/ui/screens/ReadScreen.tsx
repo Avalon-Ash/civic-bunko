@@ -25,6 +25,7 @@ import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Chip } from '../kit/Chip';
 import { ProgressBar } from '../kit/ProgressBar';
+import { PetRunner } from '../pet/PetRunner';
 import { Segmented } from '../kit/Segmented';
 import { useWorld } from '../useWorld';
 
@@ -146,6 +147,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
           value={index + 1}
           total={total}
           showCat
+          runner={<PetRunner world={world} outfit={outfit} value={index + 1} />}
           ariaLabel={
             totalPasses > 1
               ? `第 ${pass} 遍，第 ${index + 1} 題，共 ${total} 題`

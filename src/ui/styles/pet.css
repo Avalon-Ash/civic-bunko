@@ -1,0 +1,330 @@
+/* 有身體的小貓：姿勢的小動作（腿、尾巴、呼吸、搖晃）、進度條上的跑者、自由亂跑的小貓。
+   減少動態時由 theme.css 全部關掉。動畫時間跟 constants/pet.ts 對齊的，用 CSS 變數由元件帶進來。 */
+
+.cb-pet-svg {
+  display: block;
+  overflow: visible;
+}
+
+.cb-pet-leg,
+.cb-pet-tail,
+.cb-pet-head,
+.cb-pet-bob,
+.cb-pet {
+  transform-box: fill-box;
+}
+
+.cb-pet-leg {
+  transform-origin: 50% 0;
+}
+
+.cb-pet-tail {
+  transform-origin: 100% 100%;
+  animation: cb-pet-tail 2.6s ease-in-out infinite;
+}
+
+@keyframes cb-pet-tail {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-7deg);
+  }
+}
+
+/* 呼吸：身體與頭一起微微起伏 */
+.cb-pet-motion-breathe .cb-pet-bob {
+  transform-origin: 50% 100%;
+  animation: cb-pet-breathe 3.2s ease-in-out infinite;
+}
+
+@keyframes cb-pet-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.025);
+  }
+}
+
+/* 走：對角的腿一起擺，身體上下晃 */
+.cb-pet-motion-walk .cb-pet-leg-0,
+.cb-pet-motion-walk .cb-pet-leg-3 {
+  animation: cb-pet-leg-a 0.5s ease-in-out infinite;
+}
+
+.cb-pet-motion-walk .cb-pet-leg-1,
+.cb-pet-motion-walk .cb-pet-leg-2 {
+  animation: cb-pet-leg-b 0.5s ease-in-out infinite;
+}
+
+.cb-pet-motion-walk .cb-pet-bob {
+  animation: cb-pet-bob 0.25s ease-in-out infinite;
+}
+
+@keyframes cb-pet-leg-a {
+  0%,
+  100% {
+    transform: rotate(20deg);
+  }
+  50% {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes cb-pet-leg-b {
+  0%,
+  100% {
+    transform: rotate(-20deg);
+  }
+  50% {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes cb-pet-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.5px);
+  }
+}
+
+/* 跑：前後腿一起蹬，晃得比較大 */
+.cb-pet-motion-run .cb-pet-leg-0,
+.cb-pet-motion-run .cb-pet-leg-2 {
+  animation: cb-pet-leg-a 0.28s linear infinite;
+}
+
+.cb-pet-motion-run .cb-pet-leg-1,
+.cb-pet-motion-run .cb-pet-leg-3 {
+  animation: cb-pet-leg-b 0.28s linear infinite;
+}
+
+.cb-pet-motion-run .cb-pet-bob {
+  animation: cb-pet-bob 0.14s ease-in-out infinite;
+}
+
+/* 理毛：舉起的前腳上下擦臉，頭跟著點 */
+.cb-pet-motion-groom .cb-pet-leg-3 {
+  animation: cb-pet-groom-paw 0.6s ease-in-out infinite;
+}
+
+.cb-pet-motion-groom .cb-pet-head {
+  transform-origin: 50% 80%;
+  animation: cb-pet-groom-head 1.2s ease-in-out infinite;
+}
+
+@keyframes cb-pet-groom-paw {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes cb-pet-groom-head {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-6deg);
+  }
+}
+
+/* 被拎起來：整隻以後頸為支點晃（角度由拖曳速度帶進來，再加一點自己晃） */
+.cb-pet-motion-swing {
+  transform-origin: 50% 20%;
+  animation: cb-pet-swing 1.1s ease-in-out infinite;
+}
+
+@keyframes cb-pet-swing {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+.cb-pet-motion-swing .cb-pet-leg {
+  animation: cb-pet-dangle-leg 0.9s ease-in-out infinite;
+}
+
+@keyframes cb-pet-dangle-leg {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+/* ── 進度條上的跑者 ─────────────────────────────────────── */
+
+.cb-prog-wrap.has-runner {
+  padding-top: 34px;
+}
+
+.cb-prog-wrap.has-runner .cb-bar-rail {
+  top: -2px;
+  height: 38px;
+}
+
+.cb-prog-wrap.has-runner .cb-bar-slider {
+  transition-duration: var(--runner-run-ms);
+  transition-timing-function: ease-in-out;
+}
+
+.cb-bar-runner {
+  bottom: 0;
+  top: auto;
+}
+
+/* ── 自由亂跑 ───────────────────────────────────────────── */
+
+/* 整層不擋點擊，只有小貓本身可以按；在分頁列之上、抽屜與提示之下 */
+.cb-pet-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  overflow: hidden;
+}
+
+.cb-pet-actor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: opacity 0.2s ease;
+  will-change: transform;
+}
+
+.cb-pet-actor:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* 她在捲動或剛點了畫面：變淡，點擊穿過去 */
+.cb-pet-actor.is-shy {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.cb-pet-actor.is-dragging {
+  cursor: grabbing;
+}
+
+.cb-pet-actor-inner {
+  transform-origin: 50% 20%;
+  transform: rotate(var(--pet-swing, 0deg));
+  transition: transform 0.18s ease-out;
+}
+
+.cb-pet-actor.is-landing .cb-pet-actor-inner {
+  transform-origin: 50% 100%;
+  animation: cb-pet-land 0.32s ease-out;
+}
+
+@keyframes cb-pet-land {
+  0% {
+    transform: scale(1.15, 0.8);
+  }
+  60% {
+    transform: scale(0.95, 1.06);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.cb-pet-actor.is-emerging .cb-pet-actor-inner {
+  animation: cb-pet-emerge 0.52s ease-out;
+}
+
+@keyframes cb-pet-emerge {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ── 小貓的家（頭像） ───────────────────────────────────── */
+
+.cb-cat-home {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+
+.cb-cat-home-paw {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface-raised);
+  box-shadow: 0 2px 0 var(--line);
+  display: grid;
+  place-items: center;
+  fill: var(--pink-deep);
+}
+
+/* 觸控區至少 44pt：按鈕看起來小，可點範圍往外擴 */
+.cb-cat-home-paw::before {
+  content: '';
+  position: absolute;
+  inset: -9px;
+}
+
+.cb-cat-home-empty {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.cb-cat-home-tip {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  translate: -50% 0;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  border: 2px solid var(--line);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 拎著小貓靠近家：家亮起來 */
+.cb-cat-home.is-target {
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--butter), 0 0 0 7px var(--line);
+}

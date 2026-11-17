@@ -10,6 +10,7 @@ import { topicStats, weakRoundConfig, weakSummary, weakTopics } from '../../sele
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
+import { CatHome } from '../pet/CatHome';
 import { SyncBackupSection } from '../components/SyncBackupSection';
 import { TopicList } from '../components/TopicList';
 import { CountUp } from '../kit/CountUp';
@@ -83,9 +84,11 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
         {papersLoading && <span className="cb-sub">題庫載入中…</span>}
       </div>
 
-      <Card tone="pink" className="cb-stack-sm cb-stamps-hero">
+      <Card tone="pink" className="cb-stack-sm cb-stamps-hero" data-cat-perch="">
         <div className="cb-row">
-          <Cat size={76} mood="yay" outfit={outfit} interactive />
+          <CatHome size={76}>
+            <Cat size={76} mood="yay" outfit={outfit} interactive />
+          </CatHome>
           <div className="cb-grow">
             <div className="cb-sub-strong">我的章</div>
             <div className="cb-stamps-count">
@@ -129,7 +132,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
             />
           </div>
         ) : (
-          <Card className="cb-weak-empty">
+          <Card className="cb-weak-empty" data-cat-perch="">
             <Cat size={54} mood={noMistakesYet ? 'yay' : 'idle'} interactive={false} />
             <p className="cb-sub-strong cb-m0 cb-grow">
               {noMistakesYet

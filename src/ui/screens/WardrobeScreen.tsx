@@ -108,7 +108,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
         </span>
       </div>
 
-      <Card tone="pink" className="cb-wd-hero">
+      <Card tone="pink" className="cb-wd-hero" data-cat-perch="">
         <div className="cb-wd-stage">
           <Cat key={happy} size={136} mood="yay" outfit={preview} spin={happy > 0} interactive />
         </div>
@@ -237,7 +237,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
         </h2>
         <div className="cb-stack-sm">
           {shownAch.map((a) => (
-            <Card key={a.achievement.id} className={`cb-wd-ach ${a.unlocked ? 'is-unlocked' : ''}`.trim()}>
+            <Card key={a.achievement.id} className={`cb-wd-ach ${a.unlocked ? 'is-unlocked' : ''}`.trim()} data-cat-perch="">
               <div className="cb-row">
                 <div className="cb-grow">
                   <strong>{a.achievement.name}</strong>

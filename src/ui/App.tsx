@@ -22,6 +22,7 @@ import { WardrobeScreen } from './screens/WardrobeScreen';
 import { RewardToast } from './components/RewardToast';
 import { ChangelogSheet } from './components/ChangelogSheet';
 import { useSoundEffects } from './useSoundEffects';
+import { PetLayer } from './pet/PetLayer';
 import { CHANGELOG } from '../core/constants/changelog';
 import { latestChangelog, unseenChangelog } from '../selectors/changelog';
 import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
@@ -258,6 +259,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
     <div className="cb-shell">
       <Toast message={examToast} onDismiss={() => setExamToast(null)} />
       <RewardToast world={world} />
+      <PetLayer world={world} tab={tab} allowed={!hasActiveRound} />
       <TabBar active={tab} onSelect={handleTabSelect} />
       <main
         ref={mainRef}

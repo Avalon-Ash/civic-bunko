@@ -453,7 +453,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         )}
       </div>
 
-      <div className="cb-start-dock">
+      <div className="cb-start-dock" data-cat-floor="">
         <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
           {startLabel}
         </Button>
