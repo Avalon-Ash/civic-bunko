@@ -1,11 +1,13 @@
-// 把 tools/zh/src/<paperId>.json（主代理寫的中譯）和官方題目組裝成 data/zh/<paperId>.json。
-// 題組文章依句切開，每句配一句中譯；英文原句一律取自 data/official，來源檔裡不寫英文。
+// 把 tools/zh/src/<packId>/<paperId>.json（主代理寫的中譯）和官方題目組裝成該內容包的 zh/<paperId>.json。
+// 題組文章依句切開，每句配一句中譯；英文原句一律取自該內容包的 official/，來源檔裡不寫英文。
 import fs from 'node:fs';
 import path from 'node:path';
+import { packPaths, resolvePack } from '../paths.mjs';
 
-const ROOT = path.resolve(import.meta.dirname, '../..');
-const SRC = path.join(ROOT, 'tools/zh/src');
-const OUT = path.join(ROOT, 'data/zh');
+const packId = resolvePack();
+const paths = packPaths(packId);
+const SRC = paths.zhSrcDir;
+const OUT = paths.zhDir;
 const CHOICES = ['A', 'B', 'C', 'D'];
 
 /** 依句號、問號、驚嘆號切句；「U.S.」這類縮寫後面不切。 */
@@ -26,7 +28,7 @@ fs.mkdirSync(OUT, { recursive: true });
 for (const file of fs.readdirSync(SRC).filter((f) => f.endsWith('.json')).sort()) {
   const paperId = file.replace(/\.json$/, '');
   const src = JSON.parse(fs.readFileSync(path.join(SRC, file), 'utf8'));
-  const official = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/official', file), 'utf8'));
+  const official = JSON.parse(fs.readFileSync(path.join(paths.officialDir, file), 'utf8'));
 
   const groups = [];
   for (const group of official.groups) {

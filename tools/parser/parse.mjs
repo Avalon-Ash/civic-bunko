@@ -1,7 +1,8 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname, basename } from 'node:path';
+import { resolve, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { packPaths, RAW_DIR, resolvePack, ROOT } from '../paths.mjs';
 import {
   groupItemsIntoLines,
   parseAnswerPdf,
@@ -10,9 +11,6 @@ import {
 } from './lib.mjs';
 
 export { groupItemsIntoLines };
-
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const BANK_ID = 'local4-civil';
 
 function extractPuaCodes(str) {
   const codes = [];
@@ -38,13 +36,13 @@ async function readPdfPages(absPath) {
 }
 
 async function runDump(manifest) {
-  const dumpDir = resolve(root, 'tools/parser/.dump');
+  const dumpDir = resolve(ROOT, 'tools/parser/.dump');
   mkdirSync(dumpDir, { recursive: true });
 
   const puaStats = new Map();
 
   for (const entry of manifest.files) {
-    const absPdf = resolve(root, entry.file);
+    const absPdf = resolve(ROOT, entry.file);
     const pages = await readPdfPages(absPdf);
     const outLines = [];
     outLines.push(
@@ -138,11 +136,10 @@ function groupManifestIntoPapers(files) {
   );
 }
 
-async function runParse(manifest) {
-  const officialDir = resolve(root, 'data/official');
+async function runParse(manifestFiles, officialDir, bankId) {
   mkdirSync(officialDir, { recursive: true });
 
-  const bundles = groupManifestIntoPapers(manifest.files);
+  const bundles = groupManifestIntoPapers(manifestFiles);
   const indexPapers = [];
   let totalQuestions = 0;
   let totalNeedsReview = 0;
@@ -153,9 +150,9 @@ async function runParse(manifest) {
     }
 
     const [qPages, sPages, mPages] = await Promise.all([
-      readPdfPages(resolve(root, b.q.file)),
-      readPdfPages(resolve(root, b.s.file)),
-      b.m ? readPdfPages(resolve(root, b.m.file)) : Promise.resolve(null),
+      readPdfPages(resolve(ROOT, b.q.file)),
+      readPdfPages(resolve(ROOT, b.s.file)),
+      b.m ? readPdfPages(resolve(ROOT, b.m.file)) : Promise.resolve(null),
     ]);
 
     const sParsed = parseAnswerPdf(sPages);
@@ -241,7 +238,7 @@ async function runParse(manifest) {
     const paperFile = {
       paper: {
         id: b.id,
-        bankId: BANK_ID,
+        bankId,
         year: b.year,
         exam: b.exam,
         subjectKey: b.subjectKey,
@@ -267,7 +264,7 @@ async function runParse(manifest) {
 
     indexPapers.push({
       id: b.id,
-      bankId: BANK_ID,
+      bankId,
       year: b.year,
       exam: b.exam,
       subjectKey: b.subjectKey,
@@ -292,15 +289,25 @@ async function runParse(manifest) {
 }
 
 async function main() {
-  const args = new Set(process.argv.slice(2));
-  const manifest = JSON.parse(readFileSync(resolve(root, 'data/raw/manifest.json'), 'utf8'));
+  const argv = process.argv.slice(2);
+  const args = new Set(argv);
+  const manifest = JSON.parse(readFileSync(join(RAW_DIR, 'manifest.json'), 'utf8'));
 
   if (args.has('--dump')) {
     await runDump(manifest);
     return;
   }
 
-  await runParse(manifest);
+  const packId = resolvePack(argv);
+  const paths = packPaths(packId);
+  const pack = JSON.parse(readFileSync(paths.packFile, 'utf8'));
+  const subjectKeys = new Set((pack.subjects ?? []).map((s) => s.key));
+  const examKeys = Array.isArray(pack.exams) ? new Set(pack.exams.map((e) => e.key)) : null;
+  const manifestFiles = manifest.files.filter(
+    (f) => subjectKeys.has(f.subjectKey) && (!examKeys || examKeys.has(f.exam)),
+  );
+
+  await runParse(manifestFiles, paths.officialDir, pack.id ?? packId);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

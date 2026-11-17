@@ -1,12 +1,11 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve, dirname, join } from 'node:path';
+import { RAW_DIR, ROOT } from '../paths.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const targetsPath = resolve(root, 'tools/crawler/targets.json');
+const targetsPath = resolve(ROOT, 'tools/crawler/targets.json');
 const targets = JSON.parse(readFileSync(targetsPath, 'utf8'));
-const manifestPath = resolve(root, 'data/raw/manifest.json');
+const manifestPath = join(RAW_DIR, 'manifest.json');
 
 const isDryRun = process.argv.includes('--dry-run');
 
@@ -274,7 +273,7 @@ function loadExistingManifest() {
 
 function isValidCachedFile(item, existingEntry) {
   if (!existingEntry || existingEntry.url !== item.url || !existingEntry.sha256) return null;
-  const absPath = resolve(root, item.file);
+  const absPath = resolve(ROOT, item.file);
   if (!existsSync(absPath)) return null;
   const buf = readFileSync(absPath);
   if (buf.subarray(0, 5).toString('latin1') !== '%PDF-') return null;
@@ -359,7 +358,7 @@ async function main() {
         continue;
       }
 
-      const absPath = resolve(root, item.file);
+      const absPath = resolve(ROOT, item.file);
       mkdirSync(dirname(absPath), { recursive: true });
       writeFileSync(absPath, result.buf);
 
