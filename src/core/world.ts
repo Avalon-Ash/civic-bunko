@@ -2,6 +2,7 @@ import { attachDaily } from '../systems/daily';
 import { attachRound } from '../systems/round';
 import { attachScheduling } from '../systems/scheduling';
 import { attachSettings } from '../systems/settings';
+import { attachWardrobe } from '../systems/wardrobe';
 import { createBus, type Bus } from './bus';
 import { initStore } from './store';
 import type {
@@ -83,6 +84,7 @@ export function createWorld(): World {
   attachDaily(world);
   attachSettings(world);
   attachRound(world);
+  attachWardrobe(world);
   initStore(world);
 
   return world;

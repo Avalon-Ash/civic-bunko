@@ -17,10 +17,23 @@ import type {
 } from '../core/types';
 import type { World } from '../core/world';
 import { parseDaysRecord } from './daily';
-import { parseExamHistory, parseProgressEntry, type StorageLike } from './persistence';
+import {
+  parseExamHistory,
+  parseProgressEntry,
+  parseWardrobe,
+  type StorageLike,
+} from './persistence';
 import { applySyncedSettings } from './settings';
 import { base64ToUtf8, decodeSyncCode, utf8ToBase64, validateSyncCredentials } from './syncCode';
-import { mergeCardsSeen, mergeDays, mergeExamHistory, mergeProgress } from './syncMerge';
+import {
+  mergeCardsSeen,
+  mergeDays,
+  mergeExamHistory,
+  mergeProgress,
+  mergeWardrobe,
+  type SyncWardrobe,
+} from './syncMerge';
+import { applySyncedWardrobe } from './wardrobe';
 
 export interface SyncStorageLike extends StorageLike {
   removeItem?(key: string): void;
@@ -53,6 +66,8 @@ interface RemoteContent {
   cardsSeen: string[];
   /** 模擬考歷次成績；舊版同步檔沒有這欄，視為空 */
   examHistory: ExamRecord[];
+  /** 衣櫥進度（不含 outfit）；舊版或損毀視為空 */
+  wardrobe: SyncWardrobe;
 }
 
 type RemoteFetchResult =
@@ -232,6 +247,32 @@ function sameStrings(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
+function emptyWardrobe(): SyncWardrobe {
+  return { owned: [], achievements: [], quests: {} };
+}
+
+function stringSetDiffers(a: readonly string[], b: readonly string[]): boolean {
+  const setA = new Set(a);
+  const setB = new Set(b);
+  if (setA.size !== setB.size) return true;
+  for (const item of setA) {
+    if (!setB.has(item)) return true;
+  }
+  return false;
+}
+
+function wardrobeSetDiffers(a: SyncWardrobe, b: SyncWardrobe): boolean {
+  if (stringSetDiffers(a.owned, b.owned)) return true;
+  if (stringSetDiffers(a.achievements, b.achievements)) return true;
+  const days = new Set<string>([...Object.keys(a.quests), ...Object.keys(b.quests)]);
+  for (const day of days) {
+    if (stringSetDiffers(a.quests[day] ?? [], b.quests[day] ?? [])) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function sameExamHistory(a: readonly ExamRecord[], b: readonly ExamRecord[]): boolean {
   return (
     a.length === b.length &&
@@ -272,14 +313,22 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
       days = parsedDays;
     }
 
-    // 這兩欄是後來加的：缺欄或格式不對都當成空的，不讓整份同步失敗
+    // 這幾欄是後來加的：缺欄或格式不對都當成空的，不讓整份同步失敗
     const cardsSeen =
       Array.isArray(parsed.cardsSeen) && parsed.cardsSeen.every((id) => typeof id === 'string')
         ? (parsed.cardsSeen as string[])
         : [];
     const examHistory = parseExamHistory(parsed.examHistory) ?? [];
+    const parsedWardrobe = parseWardrobe(parsed.wardrobe);
+    const wardrobe: SyncWardrobe = parsedWardrobe
+      ? {
+          owned: parsedWardrobe.owned,
+          achievements: parsedWardrobe.achievements,
+          quests: parsedWardrobe.quests,
+        }
+      : emptyWardrobe();
 
-    return { progress, days, cardsSeen, examHistory };
+    return { progress, days, cardsSeen, examHistory, wardrobe };
   } catch {
     return null;
   }
@@ -371,6 +420,7 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     const remoteSha = remote.kind === 'ok' ? remote.sha : null;
     const remoteCards = remote.kind === 'ok' ? remote.cardsSeen : [];
     const remoteExams = remote.kind === 'ok' ? remote.examHistory : [];
+    const remoteWardrobe = remote.kind === 'ok' ? remote.wardrobe : emptyWardrobe();
 
     const merged = mergeProgress(world.progress, remoteMap);
     const mergedDays = mergeDays(world.dayLog, remoteDays);
@@ -406,7 +456,21 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       if (isStale(controller, gen)) return;
     }
 
-    // 卡片已看與模擬考成績只比內容：遠端順序不同不必寫回
+    const localWardrobeRaw = world.settings.wardrobe;
+    const localWardrobe: SyncWardrobe = localWardrobeRaw
+      ? {
+          owned: localWardrobeRaw.owned,
+          achievements: localWardrobeRaw.achievements,
+          quests: localWardrobeRaw.quests,
+        }
+      : emptyWardrobe();
+    const mergedWardrobe = mergeWardrobe(localWardrobe, remoteWardrobe);
+    if (wardrobeSetDiffers(localWardrobe, mergedWardrobe)) {
+      applySyncedWardrobe(world, mergedWardrobe);
+      if (isStale(controller, gen)) return;
+    }
+
+    // 卡片已看、模擬考成績與衣櫥只比內容：遠端順序不同不必寫回
     const remoteCardSet = new Set(remoteCards);
     const cardsDiffer =
       mergedCards.length !== remoteCardSet.size || mergedCards.some((id) => !remoteCardSet.has(id));
@@ -414,13 +478,15 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       mergedExams,
       mergeExamHistory([], remoteExams, EXAM_HISTORY_MAX),
     );
+    const wardrobeDiffers = wardrobeSetDiffers(remoteWardrobe, mergedWardrobe);
 
     const shouldPut =
       remote.kind === 'missing' ||
       !progressMapsEqual(merged, remoteMap) ||
       !dayMapsEqual(mergedDays, remoteDays) ||
       cardsDiffer ||
-      examsDiffer;
+      examsDiffer ||
+      wardrobeDiffers;
     if (!shouldPut) {
       setSyncState(world, {
         status: 'idle',
@@ -437,6 +503,7 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       days: Object.fromEntries(mergedDays),
       cardsSeen: mergedCards,
       examHistory: mergedExams,
+      wardrobe: mergedWardrobe,
     });
     const putBody: Record<string, unknown> = {
       message: 'chore: sync progress',

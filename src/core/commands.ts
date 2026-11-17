@@ -20,6 +20,7 @@ import {
   setTheme,
 } from '../systems/settings';
 import { disableSync, setSyncCode, syncNow } from '../systems/sync';
+import { buyItem, dismissCelebrations, wear } from '../systems/wardrobe';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
 import type { World } from './world';
@@ -102,7 +103,7 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       setBilingual(world, cmd.on);
       break;
     case 'markCardSeen':
-      markCardSeen(world, cmd.id);
+      markCardSeen(world, cmd.id, now);
       break;
     case 'importProgress': {
       const result = importProgress(world, cmd.json);
@@ -122,6 +123,15 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'disableSync':
       disableSync(world);
+      break;
+    case 'buyItem':
+      buyItem(world, cmd.id, now);
+      break;
+    case 'wear':
+      wear(world, cmd.slot, cmd.item);
+      break;
+    case 'dismissCelebrations':
+      dismissCelebrations(world);
       break;
   }
 }
