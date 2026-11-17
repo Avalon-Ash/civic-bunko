@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import type { CardKind } from '../../core/types';
 import type { World } from '../../core/world';
-import { cardById, cardDecks, cardsOfKind } from '../../selectors/cards';
+import { cardById, cardDecks, cardSubjects, cardsOfKind } from '../../selectors/cards';
 import '../cards.css';
 import { CardDetailSheet } from '../components/cards/CardDetailSheet';
 import { CardListItem } from '../components/cards/CardListItem';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
+import { Chip } from '../kit/Chip';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { useWorld } from '../useWorld';
 
@@ -31,6 +32,7 @@ function CardsContent({ world }: { world: World }) {
   useWorld(world);
   const [selectedKind, setSelectedKind] = useState<CardKind>('concept');
   const [openCardId, setOpenCardId] = useState<string | null>(null);
+  const [subjectFilter, setSubjectFilter] = useState<string | null>(null);
 
   const decks = cardDecks(world);
   const firstDeck = decks[0];
@@ -40,7 +42,13 @@ function CardsContent({ world }: { world: World }) {
 
   const activeDeck = decks.find((deck) => deck.kind === selectedKind) ?? firstDeck;
   const activeKind = activeDeck.kind;
-  const cards = cardsOfKind(world, activeKind);
+  const allCards = cardsOfKind(world, activeKind);
+  const subjects = cardSubjects(allCards);
+  // 換分類後，原本選的科目在這一類可能沒有卡：當成沒選
+  const activeSubject =
+    subjectFilter !== null && subjects.some((s) => s.key === subjectFilter) ? subjectFilter : null;
+  const cards =
+    activeSubject === null ? allCards : allCards.filter((card) => card.subjectKey === activeSubject);
   const openCard = openCardId ? cardById(world, openCardId) : null;
 
   const deckOptions: SegmentedOption<CardKind>[] = decks.map((deck) => ({
@@ -67,6 +75,24 @@ function CardsContent({ world }: { world: World }) {
           ariaLabel="圖卡類別"
           className="cb-seg-fill cb-card-seg"
         />
+      )}
+
+      {subjects.length > 1 && (
+        <div className="cb-pick-grid" role="group" aria-label="依科目篩選圖卡">
+          <Chip tone="mint" active={activeSubject === null} onClick={() => setSubjectFilter(null)}>
+            全部 {allCards.length}
+          </Chip>
+          {subjects.map((subject) => (
+            <Chip
+              key={subject.key}
+              tone="mint"
+              active={activeSubject === subject.key}
+              onClick={() => setSubjectFilter(subject.key)}
+            >
+              {subject.short} {subject.count}
+            </Chip>
+          ))}
+        </div>
       )}
 
       <div className="cb-card-grid">
