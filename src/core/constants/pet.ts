@@ -20,7 +20,8 @@ const STAND_LEGS: [PetLeg, PetLeg, PetLeg, PetLeg] = [
   { x: 67, y: 74, len: 10, rot: 0 },
 ];
 const TAIL_UP = 'M28 63 Q15 58 17 45 Q18 38 23 41';
-const TAIL_GROUND = 'M33 84 Q52 92 72 85';
+/** 坐著時尾巴從屁股往上捲成問號，靠在背後 */
+const TAIL_SIT = 'M34 81 Q20 83 21 71 Q22 63 28 65';
 const TAIL_HANG = 'M50 74 Q46 84 51 89';
 
 const stand: PetPoseSpec = {
@@ -58,7 +59,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
       { x: 42, y: 82, len: 8, rot: 85 },
       { x: 62, y: 68, len: 18, rot: 2 },
     ],
-    tail: TAIL_GROUND,
+    tail: TAIL_SIT,
     head: { x: 58, y: 40, rot: 0, scale: HEAD },
     back: { x: 42, y: 54, rot: -12, scale: BACK },
     mood: 'idle',
@@ -72,22 +73,24 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
       { x: 42, y: 82, len: 8, rot: 85 },
       { x: 62, y: 66, len: 15, rot: -160 },
     ],
-    tail: TAIL_GROUND,
+    tail: TAIL_SIT,
     head: { x: 58, y: 41, rot: -10, scale: HEAD },
     back: { x: 42, y: 54, rot: -12, scale: BACK },
     mood: 'yay',
     motion: 'groom',
   },
   loaf: {
-    torso: { cx: 50, cy: 75, rx: 26, ry: 11, rot: 0 },
+    torso: { cx: 48, cy: 73, rx: 25, ry: 13, rot: 0 },
     legs: [
       { x: 40, y: 80, len: 0, rot: 0 },
       { x: 62, y: 80, len: 0, rot: 0 },
       { x: 44, y: 80, len: 0, rot: 0 },
       { x: 66, y: 80, len: 0, rot: 0 },
     ],
-    tail: 'M27 80 Q38 92 66 87',
-    head: { x: 71, y: 62, rot: 4, scale: HEAD },
+    /** 縮成一條吐司：尾巴整條收在身體底下（尾巴畫在身體後面，繞到前面會像墊了個盤子） */
+    tail: 'M32 74 Q38 78 46 76',
+    /** 頭靠在身體前端上，下巴壓進身體 */
+    head: { x: 65, y: 62, rot: 4, scale: HEAD },
     back: { x: 46, y: 66, rot: 0, scale: BACK },
     mood: 'sleepy',
     motion: 'breathe',
@@ -164,7 +167,7 @@ export const RUNNER_SLEEP_AFTER_MS = 60_000;
 
 // ── 其他分頁：從頭像鑽出來自由亂跑 ─────────────────────────
 /** 亂跑的小貓寬度（px；高度照 PET_VIEW 比例） */
-export const ROAM_WIDTH = 60;
+export const ROAM_WIDTH = 80;
 /** 速度（px／秒）與重力（px／秒²） */
 export const ROAM_WALK_SPEED = 45;
 export const ROAM_RUN_SPEED = 190;
