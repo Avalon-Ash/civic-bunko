@@ -1,5 +1,6 @@
 import {
   SYNC_API_BASE,
+  SYNC_FETCH_TIMEOUT_MS,
   SYNC_FILE_VERSION,
   SYNC_REMOTE_PATH,
   SYNC_STORAGE_KEY,
@@ -29,6 +30,8 @@ export interface SyncDeps {
   fetch: typeof fetch;
   storage: SyncStorageLike;
   now: () => Date;
+  /** 單一請求的逾時（毫秒）；沒給就用 SYNC_FETCH_TIMEOUT_MS。測試用來縮短等待 */
+  fetchTimeoutMs?: number;
 }
 
 interface SyncController {
@@ -65,6 +68,29 @@ const MSG_DATA_ERROR = '同步資料格式不正確';
 const MSG_GENERIC_ERROR = '同步失敗，請稍後再試';
 
 const controllers = new WeakMap<World, SyncController>();
+
+/**
+ * 幫一個 Promise 加上逾時：時間到還沒結果就以錯誤結束，並中止底下的請求。
+ * 請求如果永遠不回來（App 被系統暫停時會發生），沒有這層的話同步會永遠卡在「同步中」。
+ */
+async function withTimeout<T>(
+  run: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number,
+): Promise<T> {
+  const abort = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(() => {
+      abort.abort();
+      reject(new Error('sync request timed out'));
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([run(abort.signal), timeout]);
+  } finally {
+    if (timer !== undefined) clearTimeout(timer);
+  }
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -262,14 +288,20 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
 async function fetchRemoteFile(
   fetchFn: typeof fetch,
   cred: SyncCredentials,
+  timeoutMs: number,
 ): Promise<RemoteFetchResult> {
   let response: Response;
   try {
-    response = await fetchFn(buildRemoteUrl(cred), {
-      method: 'GET',
-      headers: buildHeaders(cred.token),
-      cache: 'no-store',
-    });
+    response = await withTimeout(
+      (signal) =>
+        fetchFn(buildRemoteUrl(cred), {
+          method: 'GET',
+          headers: buildHeaders(cred.token),
+          cache: 'no-store',
+          signal,
+        }),
+      timeoutMs,
+    );
   } catch {
     return { kind: 'error', message: MSG_NETWORK_ERROR };
   }
@@ -286,7 +318,7 @@ async function fetchRemoteFile(
 
   let body: unknown;
   try {
-    body = await response.json();
+    body = await withTimeout(() => response.json() as Promise<unknown>, timeoutMs);
   } catch {
     return { kind: 'error', message: MSG_DATA_ERROR };
   }
@@ -321,7 +353,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     const cred = controller.credentials;
     if (isStale(controller, gen) || !cred) return;
 
-    const remote = await fetchRemoteFile(deps.fetch, cred);
+    const timeoutMs = deps.fetchTimeoutMs ?? SYNC_FETCH_TIMEOUT_MS;
+    const remote = await fetchRemoteFile(deps.fetch, cred, timeoutMs);
     if (isStale(controller, gen)) return;
 
     if (remote.kind === 'error') {
@@ -415,11 +448,16 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
 
     let putResponse: Response;
     try {
-      putResponse = await deps.fetch(buildRemoteUrl(cred), {
-        method: 'PUT',
-        headers: buildHeaders(cred.token, true),
-        body: JSON.stringify(putBody),
-      });
+      putResponse = await withTimeout(
+        (signal) =>
+          deps.fetch(buildRemoteUrl(cred), {
+            method: 'PUT',
+            headers: buildHeaders(cred.token, true),
+            body: JSON.stringify(putBody),
+            signal,
+          }),
+        timeoutMs,
+      );
     } catch {
       if (isStale(controller, gen)) return;
       setSyncState(world, {
@@ -578,7 +616,7 @@ export function syncNow(world: World): void {
 /**
  * App 切到背景或回到前景時呼叫：有設定同步就同步一次。
  * 回合做到一半就關掉、或 App 一直開在背景時，靠這個把進度送上去、把另一台的進度抓回來。
- * 距離上一次這類同步不到 SYNC_VISIBILITY_MIN_INTERVAL_MS 就略過。回傳這次有沒有觸發。
+ * 距離上一次這類同步不到 SYNC_VISIBILITY_MIN_INTERVAL_MS 就略過（上一次同步失敗時不略過）。回傳這次有沒有觸發。
  */
 export function syncOnVisibilityChange(world: World): boolean {
   const controller = controllers.get(world);
@@ -586,7 +624,9 @@ export function syncOnVisibilityChange(world: World): boolean {
     return false;
   }
   const nowMs = controller.deps.now().getTime();
+  // 上一次同步失敗（例如切到背景時請求被系統中斷）就不受間隔限制，回到前景立刻重試
   if (
+    world.sync.status !== 'error' &&
     controller.lastVisibilitySyncAt !== null &&
     nowMs - controller.lastVisibilitySyncAt < SYNC_VISIBILITY_MIN_INTERVAL_MS
   ) {

@@ -311,6 +311,53 @@ describe('persistence golden: shipped formats must stay readable', () => {
     assert.equal(syncOnVisibilityChange(offline), false);
     assert.equal(gets, 3);
   });
+
+  it('writes a current save back byte-for-byte equivalent: nothing is dropped or rewritten on load', () => {
+    const { world, storage } = loadSave('save-v1.json');
+    world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+
+    const written: unknown = JSON.parse(storage.data[STORAGE_KEY] ?? 'null');
+    const original: unknown = JSON.parse(golden('save-v1.json'));
+    assert.deepEqual(written, original);
+  });
+
+  it('a request that never comes back times out instead of leaving sync stuck, and the next trigger still runs', async () => {
+    let hang = true;
+    let calls = 0;
+    const fakeFetch: typeof fetch = (_input, init) => {
+      calls += 1;
+      if (hang) return new Promise<Response>(() => undefined);
+      return Promise.resolve(
+        (init?.method ?? 'GET') === 'GET'
+          ? remoteResponse('sync-v1-legacy.json')
+          : new Response('{}', { status: 200 }),
+      );
+    };
+
+    const world = createWorld();
+    attachSync(world, {
+      fetch: fakeFetch,
+      storage: memoryStorage({ [SYNC_STORAGE_KEY]: JSON.stringify(TEST_CREDENTIALS) }),
+      now: () => new Date('2026-11-17T04:00:00.000Z'),
+      fetchTimeoutMs: 20,
+    });
+    await waitForSync(world);
+
+    assert.equal(calls, 1);
+    assert.equal(world.sync.status, 'error');
+    assert.equal(world.sync.error, '現在連不上網路，稍後會再試');
+    assert.equal(world.progress.size, 0);
+
+    // 上一次失敗：不受間隔限制，回到前景立刻重試
+    hang = false;
+    assert.equal(syncOnVisibilityChange(world), true);
+    // 已經在同步中了：同一個間隔內的第二次切換不再重複觸發
+    assert.equal(syncOnVisibilityChange(world), false);
+    await waitForSync(world);
+
+    assert.equal(world.sync.status, 'idle');
+    assert.equal(world.progress.get('115-general-public-admin-q21')?.seen, 1);
+  });
 });
 
 const GOLDEN_HASHES: Record<string, string> = {
