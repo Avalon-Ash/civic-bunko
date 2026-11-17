@@ -6,7 +6,6 @@
   overflow: visible;
 }
 
-.cb-pet-leg,
 .cb-pet-tail,
 .cb-pet-head,
 .cb-pet-bob,
@@ -14,8 +13,11 @@
   transform-box: fill-box;
 }
 
+/* 腿繞著腿根轉：腿畫在以腿根為原點的座標裡（CatBody 的 Leg），所以支點就是原點。
+   不用外框的百分比，腳掌、袖子把外框撐大也不會讓支點跑掉 */
 .cb-pet-leg {
-  transform-origin: 50% 0;
+  transform-box: view-box;
+  transform-origin: 0 0;
 }
 
 .cb-pet-tail {

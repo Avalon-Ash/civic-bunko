@@ -1,10 +1,28 @@
 // 小八喵配件的圖（每件一個 SVG 片段，畫在貓的 64×64 座標裡）。
 // 配件清單（ID、部位、取得方式）在 src/core/constants/wardrobe.ts；這裡只放圖。顏色只用 theme.css 的 token。
 import type { ReactNode } from 'react';
+import { PET_HEAD_SCALE } from '../../../core/constants/pet';
 import type { ItemId } from '../../../core/types';
 
 /** 配件自己的小動作（動畫在 styles/wardrobe.css 的 cb-motion-*） */
 export type ItemMotion = 'bob' | 'hop' | 'flap';
+
+/**
+ * 有身體的小貓用的圖（身體座標 100×90，不縮放、只跟著姿勢移動與轉動）。
+ * 有這份圖的配件，在身體版就不畫頭像的 node，改照這裡穿到身體上。
+ */
+export interface BodyArt {
+  /** 衣服的布面：剪裁在身體輪廓內，所以每個姿勢都合身。原點在脖子那端、+x 朝前、-y 是背，身體往 -x 延伸 */
+  wrap?: ReactNode;
+  /** 蓋在身體上、不剪裁（披風）。座標同 wrap */
+  over?: ReactNode;
+  /** 前腿上端的袖子。原點在腿根、+y 往下，腿寬是 PET_LEG_W */
+  sleeve?: ReactNode;
+  /** 畫在身體後面（翅膀、氣球）。原點在姿勢的背對位點 */
+  behind?: ReactNode;
+  /** 留在頭上的那一部分（領口、領結）。頭像座標，跟頭一起縮放 */
+  head?: ReactNode;
+}
 
 export type ItemArt =
   /** 圖層：node 畫在貓的座標裡；box 是單獨顯示圖示時的 viewBox */
@@ -13,21 +31,26 @@ export type ItemArt =
       node: ReactNode;
       box: string;
       motion?: ItemMotion;
-      /** 有身體的小貓用的圖（畫在身體前面）：以身體中心為原點、站姿身體大小（TORSO_REF）畫，會跟著姿勢的身體縮放與轉動。沒有就照頭像的圖接在背上 */
-      body?: ReactNode;
-      /** 有身體的小貓用的圖（畫在身體後面）：以背的對位點為原點、等比縮放；頭像的圖排在頭兩側或頭上，接到側身會被頭和身體擋住的背飾用這個 */
-      onBack?: ReactNode;
+      onBody?: BodyArt;
+      /** 背景配件的全身版（身體座標，地面在 PET_GROUND）：畫在整隻貓後面。沒有就把頭像的圖放大墊在後面 */
+      stage?: ReactNode;
     }
   /** 毛色：套在貓外層的 class（色票在 theme.css） */
   | { kind: 'fur'; className: string };
 
 const LINE = 'var(--cat-line)';
-/** 配件外框粗細：與貓本體的 2.5 同級、略細 */
+/** 配件的線只有三級：外框（與貓本體的 CAT_LINE_W 同級、略細）、小零件的外框、圖案裡的細線 */
 const W = 2.2;
 const WT = 1.8;
+const WF = 1.1;
 
 const stroke = { stroke: LINE, strokeWidth: W, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
 const thin = { stroke: LINE, strokeWidth: WT, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const };
+/** 身體座標用的線：身體版的圖不經過頭的縮放，線寬自己乘上頭的比例，才跟頭上的配件一樣粗 */
+const bstroke = { ...stroke, strokeWidth: W * PET_HEAD_SCALE };
+const bthin = { ...thin, strokeWidth: WT * PET_HEAD_SCALE };
+/** 布面上的織紋、摺線 */
+const seam = { fill: 'none', strokeWidth: 1.1, strokeLinecap: 'round' as const };
 
 export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   // ── 舊集章配件（沿用原本的造型）──────────────────────────
@@ -38,7 +61,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       <g transform="translate(47 22) rotate(18)">
         <path d="M-1 0 L-8 -4.5 L-8 4.5 Z" fill="var(--pink-deep)" {...stroke} />
         <path d="M1 0 L8 -4.5 L8 4.5 Z" fill="var(--pink-deep)" {...stroke} />
-        <circle cx="0" cy="0" r="2.6" fill="var(--acc-straw)" stroke={LINE} strokeWidth="2" />
+        <circle cx="0" cy="0" r="2.6" fill="var(--acc-straw)" stroke={LINE} strokeWidth={W} />
       </g>
     ),
   },
@@ -47,19 +70,23 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     box: '8 1 48 26',
     node: (
       <g>
-        <ellipse cx="32" cy="18" rx="22" ry="4.5" fill="var(--acc-straw)" stroke={LINE} strokeWidth="2.4" />
-        <path d="M21 17 L23 7 Q32 4 41 7 L43 17 Z" fill="var(--acc-straw)" stroke={LINE} strokeWidth="2.4" strokeLinejoin="round" />
+        <ellipse cx="32" cy="18" rx="22" ry="4.5" fill="var(--acc-straw)" stroke={LINE} strokeWidth={W} />
+        <path d="M21 17 L23 7 Q32 4 41 7 L43 17 Z" fill="var(--acc-straw)" stroke={LINE} strokeWidth={W} strokeLinejoin="round" />
         <path d="M21.8 14.8 Q32 16.8 42.2 14.8" fill="none" stroke="var(--pink-deep)" strokeWidth="3" strokeLinecap="round" />
       </g>
     ),
   },
   scarf: {
     kind: 'layer',
-    box: '14 48 36 18',
+    box: '13 49 38 23',
+    // 圍一圈在下巴下面，尾巴從右前方垂下來、尾端有條紋和流蘇
     node: (
       <g>
-        <path d="M36 57.5 L42 57.5 L43 62.5 L35.5 62.5 Z" fill="var(--acc-mint)" {...stroke} />
-        <path d="M18 54 Q32 59.5 46 54 L44.5 59.5 Q32 62.5 19.5 59.5 Z" fill="var(--acc-mint)" {...stroke} />
+        <path d="M36 60 L43 59 L45 68.4 L38 69.6 Z" fill="var(--acc-mint)" {...stroke} />
+        <path d="M37.2 64.6 L44 63.5" stroke="var(--acc-leaf)" {...seam} strokeWidth="1.6" />
+        <path d="M40 69.2 V71.4 M43 68.7 V70.9" fill="none" {...thin} />
+        <path d="M17 53.6 Q32 60.4 47 53.6 L46.4 59.8 Q32 66 17.6 59.8 Z" fill="var(--acc-mint)" {...stroke} />
+        <path d="M24 59.2 L24.6 62.6 M32 60.4 V63.9 M40 59.2 L39.4 62.6" stroke="var(--acc-leaf)" strokeOpacity="0.8" {...seam} />
       </g>
     ),
   },
@@ -75,9 +102,9 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
           [-2.6, 3.6],
           [-4.3, -1.4],
         ].map(([x, y]) => (
-          <circle key={`${x},${y}`} cx={x} cy={y} r="3.2" fill="var(--pink-deep)" stroke={LINE} strokeWidth="2" />
+          <circle key={`${x},${y}`} cx={x} cy={y} r="3.2" fill="var(--pink-deep)" stroke={LINE} strokeWidth={W} />
         ))}
-        <circle cx="0" cy="0" r="2.8" fill="var(--acc-straw)" stroke={LINE} strokeWidth="1.8" />
+        <circle cx="0" cy="0" r="2.8" fill="var(--acc-straw)" stroke={LINE} strokeWidth={WT} />
       </g>
     ),
   },
@@ -86,10 +113,10 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     box: '8 28 48 24',
     node: (
       <g>
-        <circle cx="22.5" cy="40" r="6.8" fill="var(--acc-sky)" fillOpacity="0.35" stroke={LINE} strokeWidth="2.3" />
-        <circle cx="41.5" cy="40" r="6.8" fill="var(--acc-sky)" fillOpacity="0.35" stroke={LINE} strokeWidth="2.3" />
-        <path d="M29.3 40 Q32 38 34.7 40" fill="none" stroke={LINE} strokeWidth="2.3" strokeLinecap="round" />
-        <path d="M15.7 39.5 L10 38 M48.3 39.5 L54 38" fill="none" stroke={LINE} strokeWidth="2.2" strokeLinecap="round" />
+        <circle cx="22.5" cy="40" r="6.8" fill="var(--acc-sky)" fillOpacity="0.35" stroke={LINE} strokeWidth={W} />
+        <circle cx="41.5" cy="40" r="6.8" fill="var(--acc-sky)" fillOpacity="0.35" stroke={LINE} strokeWidth={W} />
+        <path d="M29.3 40 Q32 38 34.7 40" fill="none" stroke={LINE} strokeWidth={W} strokeLinecap="round" />
+        <path d="M15.7 39.5 L10 38 M48.3 39.5 L54 38" fill="none" stroke={LINE} strokeWidth={W} strokeLinecap="round" />
       </g>
     ),
   },
@@ -98,7 +125,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     box: '15 1 34 22',
     node: (
       <g>
-        <path d="M21 19 L19 7 L27 13 L32 4 L37 13 L45 7 L43 19 Z" fill="var(--acc-straw)" stroke={LINE} strokeWidth="2.4" strokeLinejoin="round" />
+        <path d="M21 19 L19 7 L27 13 L32 4 L37 13 L45 7 L43 19 Z" fill="var(--acc-straw)" stroke={LINE} strokeWidth={W} strokeLinejoin="round" />
         <circle cx="32" cy="14" r="2" fill="var(--pink-deep)" />
       </g>
     ),
@@ -251,7 +278,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       <g>
         <path d="M45.5 46 Q49 52 47 58" fill="none" stroke="var(--acc-gold)" strokeWidth="1.4" strokeDasharray="1.6 1.4" strokeLinecap="round" />
         <circle cx="41.5" cy="40" r="6.6" fill="var(--acc-sky)" fillOpacity="0.3" stroke="var(--acc-gold)" strokeWidth="2.4" />
-        <circle cx="41.5" cy="40" r="7.9" fill="none" stroke={LINE} strokeWidth="1.2" />
+        <circle cx="41.5" cy="40" r="7.9" fill="none" stroke={LINE} strokeWidth={WF} />
       </g>
     ),
   },
@@ -265,15 +292,17 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
         <path d="M49 48 L55 44 L54.5 52 Z" fill="var(--acc-silver)" {...thin} />
         <path d="M33 48 Q40 42.5 49.5 48 Q40 53.5 33 48 Z" fill="var(--acc-silver)" {...thin} />
         <circle cx="36.8" cy="47.2" r="1" fill={LINE} />
-        <path d="M42 46 Q43.2 48 42 50 M45 46.4 Q46 48 45 49.6" fill="none" stroke={LINE} strokeWidth="1" strokeLinecap="round" />
+        <path d="M42 46 Q43.2 48 42 50 M45 46.4 Q46 48 45 49.6" fill="none" stroke={LINE} strokeWidth={WF} strokeLinecap="round" />
       </g>
     ),
   },
   mustache: {
     kind: 'layer',
-    box: '18 38 28 14',
+    box: '18 40 28 14',
+    // 掛在鼻子下面，蓋住嘴巴
     node: (
       <path
+        transform="translate(0 2.6)"
         d="M32 44.2 Q28 42 24.5 44 Q21.5 46 22.5 48.5 Q20 47.5 20.5 44.8 Q22 40.5 27 41.5 Q30.5 42.3 32 43.4 Q33.5 42.3 37 41.5 Q42 40.5 43.5 44.8 Q44 47.5 41.5 48.5 Q42.5 46 39.5 44 Q36 42 32 44.2 Z"
         fill="var(--acc-wood)"
         {...thin}
@@ -300,7 +329,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       <g>
         <path d="M17 54 Q32 60 47 54 L46.5 57.6 Q32 63.4 17.5 57.6 Z" fill="var(--acc-coral)" {...stroke} />
         <circle cx="32" cy="61" r="3.6" fill="var(--acc-gold)" {...thin} />
-        <path d="M30.2 61.6 H33.8 M32 61.6 V64" fill="none" stroke={LINE} strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M30.2 61.6 H33.8 M32 61.6 V64" fill="none" stroke={LINE} strokeWidth={WF} strokeLinecap="round" />
       </g>
     ),
   },
@@ -337,7 +366,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
         <path d="M22.5 58.2 L29.5 62 M41.5 58.2 L34.5 62" fill="none" stroke="var(--acc-coral)" strokeWidth="2" strokeLinecap="round" />
         <rect x="26" y="61.2" width="12" height="8.5" rx="1.6" fill="var(--acc-cream)" {...thin} />
         <rect x="27.6" y="62.9" width="3.6" height="4.4" rx="0.6" fill="var(--acc-sky)" />
-        <path d="M32.6 63.7 H36.2 M32.6 66.3 H35.4" stroke={LINE} strokeWidth="1" strokeLinecap="round" />
+        <path d="M32.6 63.7 H36.2 M32.6 66.3 H35.4" stroke={LINE} strokeWidth={WF} strokeLinecap="round" />
       </g>
     ),
   },
@@ -346,6 +375,29 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   sweater: {
     kind: 'layer',
     box: '6 50 52 26',
+    onBody: {
+      // 從脖子往後套到腰，下擺是一圈羅紋；屁股露在外面
+      wrap: (
+        <g>
+          <rect x="-23" y="-15" width="32" height="30" fill="var(--acc-lav)" />
+          <path d="M-17.5 -15 V15 M-12.5 -15 V15 M-7.5 -15 V15 M-2.5 -15 V15" stroke="var(--acc-cream)" strokeOpacity="0.7" {...seam} />
+          <rect x="-25.2" y="-15" width="4.2" height="30" fill="var(--acc-cream)" {...bthin} />
+        </g>
+      ),
+      sleeve: (
+        <g>
+          <path d="M-4.3 -1.5 V5.4 H4.3 V-1.5" fill="var(--acc-lav)" {...bstroke} />
+          <rect x="-4.9" y="4.4" width="9.8" height="3.2" rx="1.6" fill="var(--acc-cream)" {...bthin} />
+        </g>
+      ),
+      // 下巴下面的高領
+      head: (
+        <g>
+          <path d="M20.5 56.6 Q32 61.4 43.5 56.6 L43.2 62 Q32 66.6 20.8 62 Z" fill="var(--acc-lav)" {...stroke} />
+          <path d="M26 60.4 V64 M32 61.2 V65 M38 60.4 V64" stroke="var(--acc-cream)" strokeOpacity="0.75" {...seam} />
+        </g>
+      ),
+    },
     node: (
       <g>
         <path d="M11 55 Q32 64.5 53 55 L54 63.5 Q32 73 10 63.5 Z" fill="var(--acc-lav)" {...stroke} />
@@ -356,6 +408,24 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   sailor: {
     kind: 'layer',
     box: '4 50 56 26',
+    onBody: {
+      // 領片披在肩背上，邊上一道白線
+      wrap: (
+        <g>
+          <path d="M6 -20 H-14.5 V1 Q-6 6.5 6 4 Z" fill="var(--acc-navy)" />
+          <path d="M-11.6 -20 V-0.6 Q-5 3.4 6 1.4" stroke="var(--acc-cream)" {...seam} strokeWidth="1.3" />
+          <path d="M-14.5 -20 V1 Q-6 6.5 6 4" fill="none" {...bthin} />
+        </g>
+      ),
+      // 下巴下面的領巾結
+      head: (
+        <g>
+          <path d="M22 57 Q32 61.6 42 57 L41.4 60.6 Q32 64.8 22.6 60.6 Z" fill="var(--acc-navy)" {...stroke} />
+          <path d="M28.4 62.6 L35.6 62.6 L32 70.4 Z" fill="var(--acc-coral)" {...thin} />
+          <circle cx="32" cy="62.6" r="2.3" fill="var(--acc-coral)" {...thin} />
+        </g>
+      ),
+    },
     node: (
       <g>
         <path d="M10 55 Q32 65 54 55 L56.5 64 Q32 75 7.5 64 Z" fill="var(--acc-navy)" {...stroke} />
@@ -371,18 +441,20 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     motion: 'bob',
     box: '44 0 20 52',
-    // 背上版：線綁在背上，氣球飄在尾巴那側的上方（頭像版在頭右上，接到身體會躲在頭後面）
-    onBack: (
-      <g>
-        <path d="M0 0 Q-10 -24 -14 -56" fill="none" stroke={LINE} strokeWidth="1.8" strokeLinecap="round" />
-        <ellipse cx="-15" cy="-70" rx="10" ry="12.5" fill="var(--acc-coral)" {...thin} />
-        <path d="M-17 -57.5 L-14.5 -55 L-12.5 -57.8 Z" fill="var(--acc-coral)" {...thin} />
-        <path d="M-20 -76 Q-18.5 -79 -15.5 -79.8" fill="none" stroke="var(--acc-cream)" strokeWidth="2.2" strokeLinecap="round" />
-      </g>
-    ),
+    onBody: {
+      // 線綁在背上，氣球飄在頭的後上方（頭像版在頭右上，接到身體會躲在頭後面）
+      behind: (
+        <g>
+          <path d="M0 0 Q-4.5 -13 -6.2 -27.6" fill="none" stroke={LINE} strokeWidth={WF} strokeLinecap="round" />
+          <ellipse cx="-6.5" cy="-36.4" rx="6.7" ry="8.3" fill="var(--acc-coral)" {...bthin} />
+          <path d="M-7.7 -28.2 L-6.3 -26.6 L-5 -28.3 Z" fill="var(--acc-coral)" {...bthin} />
+          <path d="M-9.9 -40.6 Q-8.9 -42.6 -6.9 -43.1" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" />
+        </g>
+      ),
+    },
     node: (
       <g>
-        <path d="M54 46 Q52 34 56.5 19.5" fill="none" stroke={LINE} strokeWidth="1.2" strokeLinecap="round" />
+        <path d="M54 46 Q52 34 56.5 19.5" fill="none" stroke={LINE} strokeWidth={WF} strokeLinecap="round" />
         <ellipse cx="57" cy="11.5" rx="6.3" ry="7.8" fill="var(--acc-coral)" {...thin} />
         <path d="M55.5 19 L57 20.6 L58.5 19 Z" fill="var(--acc-coral)" {...thin} />
         <path d="M54 7.5 Q55 5.6 56.8 5.2" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" />
@@ -391,14 +463,16 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   cape: {
     kind: 'layer',
-    // 身體版：從後頸披過背、下擺鋸齒（頭像版畫在頭後面，接到身體上會整件被身體擋住）
-    body: (
-      <path
-        d="M20 -9 Q4 -16 -18 -10 Q-27 -2 -25 9 L-17 5 L-10 10 L-3 4 L4 8 Q11 -2 20 -9 Z"
-        fill="var(--acc-coral)"
-        {...stroke}
-      />
-    ),
+    onBody: {
+      // 從後頸披過背、蓋住半邊身體，下擺鋸齒（頭像版畫在頭後面，接到身體上會整件被身體擋住）
+      over: (
+        <path
+          d="M4 -4 Q-1 -16 -17 -15.6 Q-29 -15 -36.5 -7 L-31 -6.4 L-33.6 0.6 L-27 -0.6 L-27.6 6.6 L-21.4 4 L-18.6 10 L-13 5.4 Q-3 8.4 3 3.4 Q5.4 0 4 -4 Z"
+          fill="var(--acc-coral)"
+          {...bstroke}
+        />
+      ),
+    },
     box: '-2 30 68 36',
     node: (
       <path d="M12 38 Q2 50 -0.5 63.5 Q16 60 32 64 Q48 60 64.5 63.5 Q62 50 52 38 Z" fill="var(--acc-coral)" {...stroke} />
@@ -408,23 +482,25 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     motion: 'flap',
     box: '-8 20 80 36',
-    // 背上版：側身只看得到一對翅膀從背上往尾巴那側豎起來（遠的那片稍微錯開、顏色淡一點）
-    onBack: (
-      <g>
-        <path
-          d="M10 2 Q10 -26 -14 -42 Q-22 -40 -18 -32 Q-27 -29 -20 -22 Q-26 -16 -16 -12 Q-6 -4 10 2 Z"
-          transform="translate(9 -3)"
-          fill="var(--acc-lav)"
-          {...stroke}
-        />
-        <path
-          d="M8 4 Q6 -28 -22 -44 Q-31 -41 -26 -33 Q-36 -29 -28 -21 Q-35 -14 -24 -10 Q-12 -2 8 4 Z"
-          fill="var(--acc-cream)"
-          {...stroke}
-        />
-        <path d="M-26 -33 Q-12 -28 -2 -20 M-28 -21 Q-14 -18 -2 -12" fill="none" stroke="var(--acc-lav)" strokeWidth="1.8" strokeLinecap="round" />
-      </g>
-    ),
+    onBody: {
+      // 側身只看得到一對翅膀從背上往後豎起來（遠的那片錯開一點、顏色不同）
+      behind: (
+        <g>
+          <path
+            d="M4 3 Q5 -14 -10 -25 Q-16 -24 -13.5 -19 Q-19.5 -17.5 -15.5 -13 Q-20 -9.5 -13.5 -7 Q-7 -1.5 4 3 Z"
+            transform="translate(6.5 -2) scale(0.9)"
+            fill="var(--acc-lav)"
+            {...bstroke}
+          />
+          <path
+            d="M4 3 Q5 -14 -10 -25 Q-16 -24 -13.5 -19 Q-19.5 -17.5 -15.5 -13 Q-20 -9.5 -13.5 -7 Q-7 -1.5 4 3 Z"
+            fill="var(--acc-cream)"
+            {...bstroke}
+          />
+          <path d="M-13.5 -19 Q-6 -16.5 -0.5 -10.5 M-15.5 -13 Q-8 -11.5 -1.5 -5.5" stroke="var(--acc-lav)" {...seam} />
+        </g>
+      ),
+    },
     node: (
       <g>
         <path
@@ -446,6 +522,14 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   cushion: {
     kind: 'layer',
     box: '-2 52 68 16',
+    // 全身版：一塊大坐墊鋪在地上，小貓坐在上面
+    stage: (
+      <g>
+        <path d="M16 79.5 L12.5 76.5 M84 79.5 L87.5 76.5 M16 86.5 L12.5 89 M84 86.5 L87.5 89" stroke="var(--acc-gold)" strokeWidth="1.5" strokeLinecap="round" />
+        <rect x="14" y="76.5" width="72" height="12.5" rx="6.2" fill="var(--pink)" {...bstroke} />
+        <path d="M21 83.6 Q50 87.4 79 83.6" stroke="var(--pink-deep)" strokeOpacity="0.6" {...seam} />
+      </g>
+    ),
     node: (
       <g>
         <path d="M0.5 57 L-2 54.5 M63.5 57 L66 54.5 M0.5 63 L-2 65.5 M63.5 63 L66 65.5" stroke="var(--acc-gold)" strokeWidth="1.8" strokeLinecap="round" />
@@ -457,6 +541,17 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'book-stack': {
     kind: 'layer',
     box: '44 26 24 38',
+    // 全身版：三本書疊在小貓前面的地上，上面橫著一枝鉛筆（疊太高會頂到臉）
+    stage: (
+      <g>
+        <rect x="68" y="78.6" width="19" height="7" rx="1.4" fill="var(--acc-sky)" {...bthin} />
+        <rect x="70" y="71.6" width="16" height="7" rx="1.4" fill="var(--acc-coral)" {...bthin} />
+        <rect x="68.6" y="64.6" width="17.4" height="7" rx="1.4" fill="var(--acc-leaf)" {...bthin} />
+        <path d="M71 82.1 H84 M73 75.1 H83 M71.6 68.1 H83" stroke="var(--acc-cream)" strokeWidth="0.9" strokeLinecap="round" />
+        <path d="M71.5 61.2 H80.5 L84 62.9 L80.5 64.6 H71.5 Z" fill="var(--acc-gold)" {...bthin} />
+        <path d="M80.5 61.2 V64.6" fill="none" {...bthin} />
+      </g>
+    ),
     node: (
       <g>
         <rect x="48" y="55" width="19" height="7" rx="1.6" fill="var(--acc-sky)" {...thin} />
@@ -471,6 +566,17 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   moon: {
     kind: 'layer',
     box: '-1 -1 66 66',
+    // 全身版：一圈夜空在小貓背後，月亮掛在左上（右上是頭）
+    stage: (
+      <g>
+        <circle cx="50" cy="46" r="37" fill="var(--acc-night)" />
+        <path d="M27 12.5 A9.5 9.5 0 1 0 36.5 23.5 A7.2 7.2 0 1 1 27 12.5 Z" fill="var(--acc-gold)" {...bthin} />
+        <path
+          d="M80 27 l0.9 2 l2 0.9 l-2 0.9 l-0.9 2 l-0.9 -2 l-2 -0.9 l2 -0.9 Z M19 52 l0.7 1.5 l1.5 0.7 l-1.5 0.7 l-0.7 1.5 l-0.7 -1.5 l-1.5 -0.7 l1.5 -0.7 Z M83 54 l0.7 1.5 l1.5 0.7 l-1.5 0.7 l-0.7 1.5 l-0.7 -1.5 l-1.5 -0.7 l1.5 -0.7 Z M70 11 l0.6 1.3 l1.3 0.6 l-1.3 0.6 l-0.6 1.3 l-0.6 -1.3 l-1.3 -0.6 l1.3 -0.6 Z"
+          fill="var(--acc-cream)"
+        />
+      </g>
+    ),
     node: (
       <g>
         <circle cx="32" cy="36" r="31" fill="var(--acc-night)" />
@@ -482,6 +588,26 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   rainbow: {
     kind: 'layer',
     box: '-4 -4 72 50',
+    // 全身版：彩虹從小貓背後跨過去，兩端落在雲上
+    stage: (
+      <g>
+        <g fill="none" strokeLinecap="round" strokeWidth="3.6">
+          <path d="M18 64 A32 32 0 0 1 82 64" stroke="var(--acc-coral)" />
+          <path d="M21.6 64 A28.4 28.4 0 0 1 78.4 64" stroke="var(--acc-gold)" />
+          <path d="M25.2 64 A24.8 24.8 0 0 1 74.8 64" stroke="var(--acc-leaf)" />
+          <path d="M28.8 64 A21.2 21.2 0 0 1 71.2 64" stroke="var(--acc-sky)" />
+        </g>
+        {[13, 67].map((x) => (
+          <path
+            key={x}
+            transform={`translate(${x} 59)`}
+            d="M3.6 10 Q0.4 10 0.8 6.8 Q1.2 4 4.4 4.4 Q5.6 0.8 9.6 2 Q13.6 0.6 15 4.4 Q18.6 4.6 18.4 7.6 Q18.2 10 15.6 10 Z"
+            fill="var(--acc-cream)"
+            {...bthin}
+          />
+        ))}
+      </g>
+    ),
     node: (
       <g fill="none" strokeLinecap="round">
         <path d="M-1 42 A33 33 0 0 1 65 42" stroke="var(--acc-coral)" strokeWidth="4" />
