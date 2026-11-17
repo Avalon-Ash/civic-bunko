@@ -12,6 +12,7 @@ import { createWorld } from '../core/world';
 import { exportProgress } from './persistence';
 import { attachSync, waitForSync, type SyncStorageLike } from './sync';
 import { encodeSyncCode } from './syncCode';
+import { makeConfig } from '../testing/fixture';
 
 function createMemoryStorage(
   initial: Record<string, string> = {},
@@ -360,7 +361,7 @@ describe('sync system', () => {
     assert.equal(world.sync.status, 'syncing');
     // Trigger multiple times while first sync is in flight
     dispatch(world, { type: 'syncNow' });
-    world.bus.emit({ type: 'roundFinished', results: [], at: '2026-11-16T05:00:00.000Z' });
+    world.bus.emit({ type: 'roundFinished', results: [], config: makeConfig(), at: '2026-11-16T05:00:00.000Z' });
 
     // Resolve first GET
     resolveFirstGet(jsonResponse(404, { message: 'Not Found' }));
@@ -399,7 +400,7 @@ describe('sync system', () => {
     await waitForSync(world);
 
     dispatch(world, { type: 'syncNow' });
-    world.bus.emit({ type: 'roundFinished', results: [], at: '2026-11-16T05:02:00.000Z' });
+    world.bus.emit({ type: 'roundFinished', results: [], config: makeConfig(), at: '2026-11-16T05:02:00.000Z' });
     await waitForSync(world);
 
     assert.equal(fetchAfterDisable, 0);

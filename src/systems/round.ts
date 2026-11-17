@@ -243,6 +243,7 @@ export function nextQuestion(
       type: 'roundFinished',
       results: [],
       at: now().toISOString(),
+      config: round.config,
     });
 
     return 'finished';
@@ -266,6 +267,7 @@ export function nextQuestion(
     type: 'roundFinished',
     results: [...round.results],
     at: now().toISOString(),
+    config: round.config,
   });
 
   return 'finished';
@@ -326,6 +328,7 @@ export function quitRound(
       type: 'roundFinished',
       results: [...results],
       at,
+      config: finishedRound.config,
     });
 
     const total = finishedRound.queue.length;
@@ -365,6 +368,7 @@ export function quitRound(
     type: 'roundFinished',
     results: [...finishedRound.results],
     at: now().toISOString(),
+    config: finishedRound.config,
   });
 
   return 'finished';
