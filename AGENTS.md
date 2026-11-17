@@ -18,7 +18,7 @@
 ## 2. 專案不變條件
 
 **題庫（最重要）**
-- 題目、選項、答案只來自考選部官方 PDF。`data/official/**` 只能由 `tools/crawler/` 的流水線產生，任何代理不得手改、不得用模型「修正」或補寫題目文字。解析失敗的題目標 `parseStatus: "needs_review"` 交主代理，不猜。
+- 題目、選項、答案只來自考選部官方 PDF。`data/packs/<包ID>/official/**` 只能由 `tools/crawler/` 的流水線產生，任何代理不得手改、不得用模型「修正」或補寫題目文字。解析失敗的題目標 `parseStatus: "needs_review"` 交主代理，不猜。
 - 答案以官方標準答案為準；有更正答案時以更正為準，並保留 `correction` 欄位（原答案、更正內容、來源檔）。
 - 每題帶 `source`（年度、考試、類科、科目、題號、官方檔案 URL、下載日期、PDF sha256）。
 - 範圍：113–115 年普通考試與 113–114 年地方特考四等，一般民政在 115 年地特四等要考的五科（國文、法學知識與英文、地方自治概要、行政法概要、行政學概要）。**初等考試、其他等級、其他類科專屬科目不得進題庫**；Drive 參考資料夾的檔案只當視覺參考，不當資料來源。
@@ -32,9 +32,9 @@
 - 新功能（每日任務、成就、獎勵、視覺）要存的狀態：欄位設成選填、缺欄位時有預設值、壞資料只丟掉那一欄不丟整份存檔；要不要跨裝置同步由主代理決定，要同步的必須能合併（取聯集或取較大值），不能後寫蓋前寫。
 
 **加工層（AI 產生的內容）**
-- 白話情境、關鍵字、四色標記、逐選項解析、考點標籤放在 `data/enrich/**`，以題目 ID 對應，不得寫回 `data/official/**`。
+- 白話情境、關鍵字、四色標記、逐選項解析、考點標籤放在 `data/packs/<包ID>/enrich/**`，以題目 ID 對應，不得寫回 `official/**`。
 - 每筆帶 `model`、`generatedAt`、`reviewed`（預設 `false`）。畫面上未審查的解析要標示「AI 解析」。
-- 卡片（觀念、新法、申論架構）放 `data/cards/**`，由主代理撰寫；申論題原文不寫進卡片檔，載入時從官方層帶入。
+- 卡片（觀念、新法、申論架構）放 `data/packs/<包ID>/cards/**`，由主代理撰寫；申論題原文不寫進卡片檔，載入時從官方層帶入。
 - 解析引用法條必須寫法規名稱與條號，且條文內容要能在 `data/laws/**`（全國法規資料庫的本機副本）查到；查不到就寫 `lawRef: null` 並在 `note` 說明，不憑印象寫條號。
 - 字數上限由 `npm run validate` 強制（口訣 ≤ 40 字、陷阱提醒 ≤ 30 字、白話情境 ≤ 60 字、單一選項解析 ≤ 50 字；卡片每行 ≤ 30 字、每面 ≤ 3 行、每張 ≤ 5 面，數字在 `src/core/constants/cards.ts` 與 `tools/validate/cards.mjs`）。超過就拆卡，不放寬上限。
 
@@ -42,7 +42,7 @@
 - 型別只定義在 `src/core/types.ts`；數值、上限、日期、顏色語意只定義在 `src/core/constants/*.ts` 與 `src/theme.css`。其他地方不寫魔術數字、不重複定義。
 - Component 是純資料；邏輯放 System（純函式）；System 之間只透過 `src/core/bus.ts` 溝通。
 - 一個狀態欄位只有一個擁有者 System。畫面只經 `selectors` 讀、只經 `UICommand` 寫；System 不碰 DOM。
-- 題庫是可抽換的包，登記在 `data/banks.json`；程式裡不得寫死考試名稱、年度、科目清單。
+- 題庫是可抽換的內容包：一包一個資料夾 `data/packs/<包ID>/`（`pack.json` 登記檔＋`official/`、`enrich/`、`zh/`、`cards/`、`topics.json`）；`data/laws/` 是各包共用的參考資料。App 只從 `src/data/source.ts` 取內容、工具只從 `tools/paths.mjs` 取路徑，其他地方不拼內容路徑；程式裡不得寫死考試名稱、年度、科目清單。細節在 `docs/plans/content-packs.md`。
 - 不得使用 `alert`、`confirm`、`prompt`、`window.open`、`target="_blank"`。抽屜、對話框、提示一律用 `src/ui/kit/` 的自製元件。
 
 **介面**

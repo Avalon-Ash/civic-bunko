@@ -2,12 +2,11 @@
 // 檢查 data/raw/manifest.json 與實際下載的 PDF 是否完整、可追溯。
 import { readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve, join } from 'node:path';
+import { RAW_DIR, ROOT } from '../paths.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const targets = JSON.parse(readFileSync(resolve(root, 'tools/crawler/targets.json'), 'utf8'));
-const manifestPath = resolve(root, 'data/raw/manifest.json');
+const targets = JSON.parse(readFileSync(resolve(ROOT, 'tools/crawler/targets.json'), 'utf8'));
+const manifestPath = join(RAW_DIR, 'manifest.json');
 const errors = [];
 const fail = (m) => errors.push(m);
 
@@ -30,8 +29,8 @@ for (const f of files) {
   const expectUrl = `${targets.baseUrl}wHandExamQandA_File.ashx?t=${f.type}&code=${f.examCode}&c=${f.classCode}&s=${f.subjectCode}&q=1`;
   if (f.url !== expectUrl) fail(`${tag} url 與欄位不一致`);
   if (typeof f.classLabel !== 'string' || !f.classLabel.includes(targets.classMatch.className)) fail(`${tag} classLabel 不是${targets.classMatch.className}`);
-  const p = resolve(root, String(f.file));
-  if (!p.startsWith(resolve(root, 'data/raw'))) { fail(`${tag} file 不在 data/raw 內`); continue; }
+  const p = resolve(ROOT, String(f.file));
+  if (!p.startsWith(RAW_DIR)) { fail(`${tag} file 不在 data/raw 內`); continue; }
   if (!existsSync(p)) { fail(`${tag} 檔案不存在 ${f.file}`); continue; }
   const buf = readFileSync(p);
   if (buf.subarray(0, 5).toString('latin1') !== '%PDF-') fail(`${tag} 不是 PDF`);

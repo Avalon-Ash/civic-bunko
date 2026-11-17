@@ -29,7 +29,7 @@ export interface World {
   questions: Map<QuestionId, OfficialQuestion>;
   groups: Map<string, PassageGroup>;
   enrich: Map<QuestionId, Enrich>;
-  /** data/topics.json 的考點清單（bankLoader 載入） */
+  /** data/packs/<packId>/topics.json 的考點清單（bankLoader 載入） */
   topics: TopicInfo[];
   /** 英文題中譯，以題目 ID 為鍵（zhLoader 載入） */
   zh: Map<QuestionId, QuestionZh>;

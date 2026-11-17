@@ -10,7 +10,7 @@ export type PaperId = string;
 /** `<PaperId>-q<兩位數題號>`，例 `115-general-admin-law-q08` */
 export type QuestionId = string;
 
-// ── 題庫登記（data/banks.json）────────────────────────────
+// ── 題庫登記（data/packs/<packId>/pack.json）─────────────
 export interface SubjectInfo {
   key: SubjectKey;
   name: string;
@@ -25,7 +25,7 @@ export interface Bank {
   subjects: SubjectInfo[];
 }
 
-// ── 官方層（data/official/**，只由 tools/parser 產生）──────
+// ── 官方層（data/packs/<packId>/official/**，只由 tools/parser 產生）──
 export interface SourceFile {
   url: string;
   file: string;
@@ -76,14 +76,14 @@ export interface Paper {
   mcqCount: number;
   sources: { q: SourceFile; s: SourceFile; m: SourceFile | null };
 }
-/** data/official/<PaperId>.json */
+/** data/packs/<packId>/official/<PaperId>.json */
 export interface PaperFile {
   paper: Paper;
   groups: PassageGroup[];
   questions: OfficialQuestion[];
   essays: EssayQuestion[];
 }
-/** data/official/index.json */
+/** data/packs/<packId>/official/index.json */
 export interface PaperIndex {
   papers: Array<{
     id: PaperId;
@@ -97,7 +97,7 @@ export interface PaperIndex {
   }>;
 }
 
-// ── 加工層（data/enrich/<PaperId>.json，AI 產生，可能不存在）──
+// ── 加工層（data/packs/<packId>/enrich/<PaperId>.json，AI 產生，可能不存在）──
 export type MarkColor = 'red' | 'blue';
 export type VisualTone = 'plain' | 'hot' | 'key';
 export type EnrichVisual =
@@ -111,7 +111,7 @@ export interface LawRef {
 }
 export interface Enrich {
   id: QuestionId;
-  /** data/topics.json 的 id，1–2 個 */
+  /** data/packs/<packId>/topics.json 的 id，1–2 個 */
   topic: string[];
   /** 口訣 */
   mnemonic: string;
@@ -135,7 +135,7 @@ export interface EnrichFile {
   items: Enrich[];
 }
 
-// ── 英文題中譯（data/zh/<PaperId>.json，主代理撰寫）──────────
+// ── 英文題中譯（data/packs/<packId>/zh/<PaperId>.json，主代理撰寫）──────────
 export interface VocabEntry {
   en: string;
   zh: string;
@@ -179,7 +179,7 @@ export interface TopicInfo {
   name: string;
 }
 
-// ── 卡片（data/cards/<deck>.json，主代理撰寫）──────────────
+// ── 卡片（data/packs/<packId>/cards/<deck>.json，主代理撰寫）──────────────
 /** concept＝前置觀念；newlaw＝新法必考；essay＝申論架構 */
 export type CardKind = 'concept' | 'newlaw' | 'essay';
 export interface CardFace {
@@ -244,7 +244,7 @@ export interface RoundConfig {
   passes: number;
   /** 模擬考：整份試卷照官方題號順序、計時、交卷後才看答案 */
   exam?: { paperId: PaperId; minutes: number } | null;
-  /** 弱點回合：只出考點（data/topics.json 的 id）在這個清單裡的題目；沒有或空陣列＝不限 */
+  /** 弱點回合：只出考點（data/packs/<packId>/topics.json 的 id）在這個清單裡的題目；沒有或空陣列＝不限 */
   topicIds?: string[];
 }
 export interface RoundResult {

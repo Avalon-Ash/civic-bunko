@@ -1,12 +1,11 @@
 // 從全國法規資料庫抓現行條文到 data/laws/。零依賴，只在本機手動執行。
 // 用法：node tools/laws/fetch.mjs
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { resolve, join } from 'node:path';
+import { LAWS_DIR, ROOT } from '../paths.mjs';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-const targets = JSON.parse(readFileSync(resolve(root, 'tools/laws/targets.json'), 'utf8'));
-const outDir = resolve(root, 'data/laws');
+const targets = JSON.parse(readFileSync(resolve(ROOT, 'tools/laws/targets.json'), 'utf8'));
+const outDir = LAWS_DIR;
 mkdirSync(outDir, { recursive: true });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const text = (html) =>
@@ -47,8 +46,7 @@ for (const t of targets.laws) {
   if (articles.length === 0) {
     failed.push(`${t.pcode} ${t.name} 解析不到任何條文`);
   } else {
-    const file = `data/laws/${t.pcode}.json`;
-    writeFileSync(resolve(root, file), JSON.stringify({ pcode: t.pcode, name, amendedAt, url, fetchedAt: new Date().toISOString(), articles }, null, 1) + '\n');
+    writeFileSync(join(LAWS_DIR, `${t.pcode}.json`), JSON.stringify({ pcode: t.pcode, name, amendedAt, url, fetchedAt: new Date().toISOString(), articles }, null, 1) + '\n');
     index.push({ pcode: t.pcode, name, amendedAt, articleCount: articles.length });
     console.log(`${t.pcode} ${name} ${articles.length} 條（${amendedAt}）`);
   }
