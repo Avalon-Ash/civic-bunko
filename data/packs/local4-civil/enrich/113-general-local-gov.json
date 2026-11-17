@@ -585,7 +585,7 @@
       "topic": ["local-gov/election"],
       "mnemonic": "投公投只要滿 18 歲！滿 20 歲才是投人（選總統立委）。",
       "trap": "別把一般選舉的 20 歲跟公民投票的 18 歲搞混。",
-      "plain": null,
+      "plain": "只要沒有受監護宣告，國民滿幾歲就可以參加公民投票？",
       "marks": [
         { "text": "年滿幾歲", "color": "blue" },
         { "text": "未受監護宣告者", "color": "blue" },
