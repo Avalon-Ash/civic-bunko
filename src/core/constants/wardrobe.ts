@@ -11,8 +11,9 @@ export const SLOTS: ReadonlyArray<{ id: SlotId; name: string; layer: boolean; be
   { id: 'neck', name: '頸部', layer: true, behindCat: false },
   { id: 'face-low', name: '嘴邊', layer: true, behindCat: false },
   { id: 'face-mid', name: '眼睛', layer: true, behindCat: false },
-  { id: 'head-side', name: '頭側', layer: true, behindCat: false },
   { id: 'head-top', name: '頭頂', layer: true, behindCat: false },
+  // 頭側在帽子上面：花、蝴蝶結、髮夾看起來像別在帽子上，不會被毛線帽、貝雷帽整個蓋掉
+  { id: 'head-side', name: '頭側', layer: true, behindCat: false },
   { id: 'fur', name: '毛色', layer: false, behindCat: false },
 ];
 

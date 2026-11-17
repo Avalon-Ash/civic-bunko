@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { HEAD_ORIGIN, PET_POSES, PET_VIEW_H, PET_VIEW_W } from '../../core/constants/pet';
+import { HEAD_ORIGIN, PET_POSES, PET_VIEW_H, PET_VIEW_W, TORSO_REF } from '../../core/constants/pet';
 import type { Outfit, PetAnchor, PetLeg, PetPose } from '../../core/types';
 import { CatHead, furClass, type CatMood } from './Cat';
 import { ITEM_ART } from './wardrobe/art';
@@ -72,7 +72,7 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
         className={`cb-pet cb-pet-motion-${spec.motion}`}
         transform={facing === 'left' ? `translate(${PET_VIEW_W} 0) scale(-1 1)` : undefined}
       >
-        {backArt && backArt.kind === 'layer' ? (
+        {backArt && backArt.kind === 'layer' && !backArt.body ? (
           <g transform={place(spec.back, HEAD_ORIGIN.x, HEAD_ORIGIN.y)} className="cb-pet-back">
             {backArt.node}
           </g>
@@ -109,6 +109,14 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
               stroke={LINE}
               strokeWidth={OUTLINE}
             />
+            {backArt && backArt.kind === 'layer' && backArt.body ? (
+              <g
+                className="cb-pet-back"
+                transform={`translate(${torso.cx} ${torso.cy}) scale(${torso.rx / TORSO_REF.rx} ${torso.ry / TORSO_REF.ry})`}
+              >
+                {backArt.body}
+              </g>
+            ) : null}
           </g>
 
           <Leg leg={spec.legs[2]} index={2} far={false} />

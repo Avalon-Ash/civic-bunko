@@ -24,8 +24,11 @@ const TAIL_UP = 'M28 63 Q15 58 17 45 Q18 38 23 41';
 const TAIL_SIT = 'M34 81 Q20 83 21 71 Q22 63 28 65';
 const TAIL_HANG = 'M50 74 Q46 84 51 89';
 
+/** 站姿的身體大小：配件的「身體版」圖以它為準畫，再依各姿勢的身體大小縮放 */
+export const TORSO_REF = { rx: 24, ry: 13 } as const;
+
 const stand: PetPoseSpec = {
-  torso: { cx: 50, cy: 64, rx: 24, ry: 13, rot: 0 },
+  torso: { cx: 50, cy: 64, rx: TORSO_REF.rx, ry: TORSO_REF.ry, rot: 0 },
   legs: STAND_LEGS,
   tail: TAIL_UP,
   head: { x: 72, y: 44, rot: 0, scale: HEAD },

@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-18-wardrobe-fix',
+    date: '2026-11-18',
+    title: '配件修正',
+    items: [
+      '准考證、領帶、領結改成掛在下巴下面，不會壓在臉上',
+      '戴毛線帽、貝雷帽時，蝴蝶結、小花、髮夾會別在帽子上，不再被蓋住',
+      '小貓跑出來玩時，小披風會披在背上',
+    ],
+  },
+  {
     id: '2026-11-18-pet',
     date: '2026-11-18',
     title: '小貓長出身體了',

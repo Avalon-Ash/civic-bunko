@@ -8,7 +8,14 @@ export type ItemMotion = 'bob' | 'hop' | 'flap';
 
 export type ItemArt =
   /** 圖層：node 畫在貓的座標裡；box 是單獨顯示圖示時的 viewBox */
-  | { kind: 'layer'; node: ReactNode; box: string; motion?: ItemMotion }
+  | {
+      kind: 'layer';
+      node: ReactNode;
+      box: string;
+      motion?: ItemMotion;
+      /** 有身體的小貓用的圖（畫在身體前面）：以身體中心為原點、站姿身體大小（TORSO_REF）畫，會跟著姿勢的身體縮放與轉動。沒有就照頭像的圖接在背上 */
+      body?: ReactNode;
+    }
   /** 毛色：套在貓外層的 class（色票在 theme.css） */
   | { kind: 'fur'; className: string };
 
@@ -297,35 +304,38 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   bowtie: {
     kind: 'layer',
-    box: '20 50 24 16',
+    box: '19 55 26 15',
+    // 領結掛在下巴下緣（下巴在 x 22–42 約 y 58.5–60），翅膀不伸進臉裡
     node: (
       <g>
-        <path d="M30.5 57.5 L22.5 53 Q21.5 57.5 22.5 62 Z" fill="var(--acc-lav)" {...stroke} />
-        <path d="M33.5 57.5 L41.5 53 Q42.5 57.5 41.5 62 Z" fill="var(--acc-lav)" {...stroke} />
-        <rect x="29.5" y="55" width="5" height="5" rx="1.6" fill="var(--pink-deep)" {...thin} />
+        <path d="M30.5 62.6 L22.5 59 Q21.4 62.6 22.5 66.2 Z" fill="var(--acc-lav)" {...stroke} />
+        <path d="M33.5 62.6 L41.5 59 Q42.6 62.6 41.5 66.2 Z" fill="var(--acc-lav)" {...stroke} />
+        <rect x="29.5" y="60.2" width="5" height="5" rx="1.6" fill="var(--pink-deep)" {...thin} />
       </g>
     ),
   },
   necktie: {
     kind: 'layer',
-    box: '24 52 16 20',
+    box: '24 56 16 19',
+    // 領帶結從下巴下緣（y≈60）往下掛
     node: (
       <g>
-        <path d="M30.3 59.5 L27.8 67 L32 70 L36.2 67 L33.7 59.5 Z" fill="var(--acc-navy)" {...stroke} />
-        <path d="M28.6 54.6 L35.4 54.6 L34 59.8 L30 59.8 Z" fill="var(--acc-navy)" {...stroke} />
-        <path d="M29.4 63.4 L34.8 61.4 M28.6 66.4 L35.6 63.8" stroke="var(--acc-gold)" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M30.3 63.6 L27.8 71 L32 74 L36.2 71 L33.7 63.6 Z" fill="var(--acc-navy)" {...stroke} />
+        <path d="M28.8 59.3 L35.2 59.3 L33.9 63.9 L30.1 63.9 Z" fill="var(--acc-navy)" {...stroke} />
+        <path d="M29.4 67.4 L34.8 65.4 M28.6 70.4 L35.6 67.8" stroke="var(--acc-gold)" strokeWidth="1.5" strokeLinecap="round" />
       </g>
     ),
   },
   'exam-pass': {
     kind: 'layer',
-    box: '18 48 28 18',
+    box: '18 55 28 17',
+    // 掛繩從下巴邊緣（x 22／42、y≈58.4）開始，卡片掛在下巴下面
     node: (
       <g>
-        <path d="M21 51.5 L30 57.5 M43 51.5 L34 57.5" fill="none" stroke="var(--acc-coral)" strokeWidth="2" strokeLinecap="round" />
-        <rect x="26" y="56.5" width="12" height="8.5" rx="1.6" fill="var(--acc-cream)" {...thin} />
-        <rect x="27.6" y="58.2" width="3.6" height="4.4" rx="0.6" fill="var(--acc-sky)" />
-        <path d="M32.6 59 H36.2 M32.6 61.6 H35.4" stroke={LINE} strokeWidth="1" strokeLinecap="round" />
+        <path d="M22.5 58.2 L29.5 62 M41.5 58.2 L34.5 62" fill="none" stroke="var(--acc-coral)" strokeWidth="2" strokeLinecap="round" />
+        <rect x="26" y="61.2" width="12" height="8.5" rx="1.6" fill="var(--acc-cream)" {...thin} />
+        <rect x="27.6" y="62.9" width="3.6" height="4.4" rx="0.6" fill="var(--acc-sky)" />
+        <path d="M32.6 63.7 H36.2 M32.6 66.3 H35.4" stroke={LINE} strokeWidth="1" strokeLinecap="round" />
       </g>
     ),
   },
@@ -370,6 +380,14 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   cape: {
     kind: 'layer',
+    // 身體版：從後頸披過背、下擺鋸齒（頭像版畫在頭後面，接到身體上會整件被身體擋住）
+    body: (
+      <path
+        d="M20 -9 Q4 -16 -18 -10 Q-27 -2 -25 9 L-17 5 L-10 10 L-3 4 L4 8 Q11 -2 20 -9 Z"
+        fill="var(--acc-coral)"
+        {...stroke}
+      />
+    ),
     box: '-2 30 68 36',
     node: (
       <path d="M12 38 Q2 50 -0.5 63.5 Q16 60 32 64 Q48 60 64.5 63.5 Q62 50 52 38 Z" fill="var(--acc-coral)" {...stroke} />
