@@ -441,6 +441,8 @@ export type AppEvent =
   | { type: 'progressChanged'; ids: QuestionId[] }
   | { type: 'dayLogChanged'; day: DayKey; count: number }
   | { type: 'settingsChanged'; settings: Settings }
+  /** 使用者打開一張之前沒看過的圖卡（讀檔、同步不會發） */
+  | { type: 'cardSeen'; id: string; at: string }
   | { type: 'syncChanged'; sync: SyncState }
   /** 衣櫥系統：新解鎖的成就、新完成的小任務（給畫面放慶祝） */
   | { type: 'rewardsEarned'; rewards: Celebration[] };
