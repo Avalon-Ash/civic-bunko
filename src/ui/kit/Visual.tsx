@@ -1,4 +1,4 @@
-import { Fragment, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import type { EnrichVisual } from '../../core/types';
 
 export interface VisualProps {
@@ -29,7 +29,7 @@ export function Visual({ visual, className = '' }: VisualProps) {
               stepOrder += 1;
 
               return (
-                <Fragment key={`${laneIdx}-${idx}`}>
+                <span key={`${laneIdx}-${idx}`} className="cb-lane-seg">
                   {idx > 0 && (
                     <span
                       className="cb-lane-arrow cb-vis-step"
@@ -45,7 +45,7 @@ export function Visual({ visual, className = '' }: VisualProps) {
                   >
                     {step.text}
                   </span>
-                </Fragment>
+                </span>
               );
             })}
           </div>
