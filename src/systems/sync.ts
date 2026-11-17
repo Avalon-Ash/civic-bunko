@@ -3,6 +3,7 @@ import {
   SYNC_FILE_VERSION,
   SYNC_REMOTE_PATH,
   SYNC_STORAGE_KEY,
+  SYNC_VISIBILITY_MIN_INTERVAL_MS,
 } from '../core/constants/sync';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type {
@@ -38,6 +39,8 @@ interface SyncController {
   pendingRerun: boolean;
   generation: number;
   disposed: boolean;
+  /** 上一次因為前景／背景切換而觸發同步的時間（毫秒）；還沒有過是 null */
+  lastVisibilitySyncAt: number | null;
 }
 
 interface RemoteContent {
@@ -510,6 +513,7 @@ export function attachSync(world: World, deps: SyncDeps): () => void {
     pendingRerun: false,
     generation: 0,
     disposed: false,
+    lastVisibilitySyncAt: null,
   };
   controllers.set(world, controller);
 
@@ -569,6 +573,28 @@ export function syncNow(world: World): void {
   const controller = controllers.get(world);
   if (!controller) return;
   triggerSync(controller);
+}
+
+/**
+ * App 切到背景或回到前景時呼叫：有設定同步就同步一次。
+ * 回合做到一半就關掉、或 App 一直開在背景時，靠這個把進度送上去、把另一台的進度抓回來。
+ * 距離上一次這類同步不到 SYNC_VISIBILITY_MIN_INTERVAL_MS 就略過。回傳這次有沒有觸發。
+ */
+export function syncOnVisibilityChange(world: World): boolean {
+  const controller = controllers.get(world);
+  if (!controller || controller.disposed || controller.credentials === null) {
+    return false;
+  }
+  const nowMs = controller.deps.now().getTime();
+  if (
+    controller.lastVisibilitySyncAt !== null &&
+    nowMs - controller.lastVisibilitySyncAt < SYNC_VISIBILITY_MIN_INTERVAL_MS
+  ) {
+    return false;
+  }
+  controller.lastVisibilitySyncAt = nowMs;
+  triggerSync(controller);
+  return true;
 }
 
 /** 停止同步並移除本機同步憑證，不更動本機作答進度。 */

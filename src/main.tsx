@@ -9,7 +9,7 @@ import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics, l
 import { loadBank, loadTopicList } from './systems/bankLoader';
 import { loadCards } from './systems/cardLoader';
 import { attachPersistence } from './systems/persistence';
-import { attachSync } from './systems/sync';
+import { attachSync, syncOnVisibilityChange } from './systems/sync';
 import { loadZh } from './systems/zhLoader';
 import { App } from './ui/App';
 import { getCurrentAppVersion } from './ui/useAppVersion';
@@ -24,6 +24,11 @@ attachSync(world, {
   fetch: window.fetch.bind(window),
   storage: window.localStorage,
   now: () => new Date(),
+});
+
+// 切到背景時把進度送上去，回到前景時把另一台的進度抓回來（沒設定同步時不做事）。
+document.addEventListener('visibilitychange', () => {
+  syncOnVisibilityChange(world);
 });
 
 const { banks } = loadBankMeta();
