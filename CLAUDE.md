@@ -12,7 +12,7 @@
 ## 鐵律
 - 合併進 `main`、`git push`、開或改 GitHub Pages 設定，都要使用者明確同意，分開問。
 - 執行代理正在寫的 checkout 只讀不寫。
-- 題庫只來自考選部官方 PDF；`data/official/**` 不手改（`AGENTS.md` §2）。
+- 題庫只來自考選部官方 PDF；`data/packs/*/official/**` 不手改（`AGENTS.md` §2）。
 - 考試是 2026-12-05：功能與內容衝突時，先保「使用者今天刷得到題」。考前 3 天（12-02 起）只修錯，不加功能。
 - 子代理與新工作階段預設 Sonnet。
 

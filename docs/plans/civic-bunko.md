@@ -229,6 +229,7 @@ npm run build
 - 加工內容的複查：每批抽查 10–20%，另由 agy 全量交叉檢查「說明是否與官方答案矛盾」，主代理逐筆確認後修正（紀錄在 `docs/HANDOFF.md`）。
 
 ### 程式結構補充（2026-11-17）
+- 題庫內容已搬進內容包 `data/packs/<包ID>/`（開案書 `docs/plans/content-packs.md`）：本檔 §4 與上面提到的 `data/official`、`data/enrich`、`data/zh`、`data/cards`、`data/topics.json`、`data/banks.json`，現在分別是該包底下的 `official/`、`enrich/`、`zh/`、`cards/`、`topics.json`、`pack.json`。
 - 樣式：`src/ui/app.css` 只是入口，依序載入 `src/ui/styles/*.css`（順序就是層疊順序）；`cards.css`、`bilingual.css` 隨元件載入。
 - 集章頁拆成 `StampsScreen`（章、配件、考點、各科統計）＋ `components/SyncBackupSection`（同步與備份）；弱點與高頻共用 `components/TopicList`。
 - 設定欄位只由 `systems/settings.ts` 寫入：同步系統算出合併結果後呼叫 `applySyncedSettings`。

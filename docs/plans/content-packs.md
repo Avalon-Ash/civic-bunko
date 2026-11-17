@@ -35,8 +35,8 @@ tools/zh/src/<packId>/   中譯來源
 
 | 包 | 內容 | 執行者 | 驗收（數字） |
 | :-- | :-- | :-- | :-- |
-| PK0 | 資料搬進 `data/packs/local4-civil/`、寫 `pack.json`、本檔與派工單 | 主代理（已完成） | `git status` 只有改名 |
-| PK1 | 路徑：`src/data/source.ts` 改掃 `data/packs/*`；新增 `tools/paths.mjs`，所有工具改用它；驗證腳本逐包檢查 | agy Hydrogen high（機械性、規格明確） | 見 `docs/dispatch/PK1-paths.md` |
+| PK0 | 資料搬進 `data/packs/local4-civil/`、寫 `pack.json`、本檔與派工單 | 主代理（已完成，2026-11-17） | 69 個檔純改名 |
+| PK1 | 路徑：`src/data/source.ts` 改掃 `data/packs/*`；新增 `tools/paths.mjs`，所有工具改用它；驗證腳本逐包檢查 | agy Hydrogen high（已完成，2026-11-17；第一次因跑了允許清單外的指令被終止，第二次 7 分鐘完成） | 145 個測試、四行統計、92 個打包檔與 90 個資料檔名都和搬動前相同；解析器與中譯組裝重跑後資料零變動。審查時還原了被弄掉的壞字元規則 |
 | PK2 | 考試別：`ExamKind` 改成字串 key，顯示名稱從 `pack.json` 的 `exams` 讀；新增 `tools/lint/engine-boundary.mjs`（引擎裡不得出現任何包的 id、科目、考試別字面值）並掛進 `npm run lint` | agy Hydrogen high；守門腳本由主代理先寫好（紅燈），執行者只負責讓它變綠 | 守門腳本 ERROR=0；其餘同 PK1 |
 | PK3 | 題庫切換：`Settings.activeBankId`、`setActiveBank` 指令、只載入目前題庫的檔案、有兩包以上才出現的選擇器 | Sonnet 子代理（跨系統，要判斷） | **等第二個題庫的內容進來才派**：沒有第二包就沒辦法在真的 App 裡驗 |
 
@@ -44,7 +44,7 @@ Orchestrator（Argon 規劃）這次不試：Argon 週池只剩 1%。Codex 到 1
 
 ## 4. 怎麼證明行為不變（每一包都要過）
 
-1. `npm run lint`、`npm test`（不得少於 131 個、全過）。
+1. `npm run lint`、`npm test`（不得少於 145 個、全過；其中 `persistenceGolden.test.ts` 是使用者資料的守門測試）。
 2. `npm run validate` 的四行統計與搬動前相同：`papers=25 questions=925 needs_review=0 ERROR=0 WARN=0`、`enrich files=25 items=925 low_confidence=0 law_changed=1 ERROR=0`、`cards files=7 cards=57 essays=16 ERROR=0`、`zh files=5 items=100 segments=155 ERROR=0`（PK1 之後每行前面多 `[local4-civil] `）。
 3. `npm run build` 後 `dist/precache.json` 仍是 92 個檔；其中資料檔（試卷、加工、圖卡、中譯、考點、法規）的檔名與 `main` 打包出來的**完全相同**（檔名含內容雜湊，相同＝內容沒變）。由主代理比對。
 4. `node tools/zh/build.mjs` 重跑後 `git status` 沒有變動。
