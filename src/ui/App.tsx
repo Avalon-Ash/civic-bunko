@@ -18,6 +18,8 @@ import { QuestionScreen } from './screens/QuestionScreen';
 import { ReadScreen } from './screens/ReadScreen';
 import { ResultScreen } from './screens/ResultScreen';
 import { StampsScreen } from './screens/StampsScreen';
+import { WardrobeScreen } from './screens/WardrobeScreen';
+import { RewardToast } from './components/RewardToast';
 import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
 import { useAppVersion } from './useAppVersion';
 import { useWorld } from './useWorld';
@@ -189,16 +191,20 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
               setTab('quiz');
             }}
             onGoStamps={() => setTab('stamps')}
+            onGoCat={() => setTab('cat')}
           />
         );
       case 'cards':
         return <CardsScreen world={world} />;
+      case 'cat':
+        return <WardrobeScreen world={world} />;
       case 'stamps':
         return (
           <StampsScreen
             world={world}
             papersLoading={papersLoading}
             onStartQuiz={() => setTab('quiz')}
+            onGoCat={() => setTab('cat')}
           />
         );
       case 'quiz':
@@ -229,6 +235,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   return (
     <div className="cb-shell">
       <Toast message={examToast} onDismiss={() => setExamToast(null)} />
+      <RewardToast world={world} />
       <TabBar active={tab} onSelect={handleTabSelect} />
       <main
         ref={mainRef}

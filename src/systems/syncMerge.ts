@@ -1,4 +1,13 @@
-import type { DayKey, ExamRecord, Progress, QuestionId } from '../core/types';
+import type {
+  DayKey,
+  ExamRecord,
+  Progress,
+  QuestId,
+  QuestionId,
+  WardrobeState,
+} from '../core/types';
+
+export type SyncWardrobe = Pick<WardrobeState, 'owned' | 'achievements' | 'quests'>;
 
 function compareTimestamp(a: string, b: string): number {
   const msA = Date.parse(a);
@@ -137,4 +146,40 @@ export function mergeExamHistory(
     })
     .map(([, record]) => ({ ...record }));
   return merged.length > max ? merged.slice(merged.length - max) : merged;
+}
+
+function mergeSortedUnique(a: readonly string[], b: readonly string[]): string[] {
+  return [...new Set([...a, ...b])].sort(compareText);
+}
+
+/**
+ * 合併兩份衣櫥進度（owned、achievements、quests）：全部取聯集並排序，結果與參數順序無關。
+ * 不含 outfit（目前穿著只存在各裝置）。
+ */
+export function mergeWardrobe(
+  local: SyncWardrobe | undefined,
+  remote: SyncWardrobe | undefined,
+): SyncWardrobe {
+  const owned = mergeSortedUnique(local?.owned ?? [], remote?.owned ?? []);
+  const achievements = mergeSortedUnique(
+    local?.achievements ?? [],
+    remote?.achievements ?? [],
+  );
+
+  const dayKeys = mergeSortedUnique(
+    Object.keys(local?.quests ?? {}),
+    Object.keys(remote?.quests ?? {}),
+  );
+  const quests: Record<DayKey, QuestId[]> = {};
+  for (const day of dayKeys) {
+    const mergedIds = mergeSortedUnique(
+      local?.quests[day] ?? [],
+      remote?.quests[day] ?? [],
+    );
+    if (mergedIds.length > 0) {
+      quests[day] = mergedIds;
+    }
+  }
+
+  return { owned, achievements, quests };
 }

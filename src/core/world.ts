@@ -2,10 +2,12 @@ import { attachDaily } from '../systems/daily';
 import { attachRound } from '../systems/round';
 import { attachScheduling } from '../systems/scheduling';
 import { attachSettings } from '../systems/settings';
+import { attachWardrobe } from '../systems/wardrobe';
 import { createBus, type Bus } from './bus';
 import { initStore } from './store';
 import type {
   Bank,
+  Celebration,
   DayKey,
   Enrich,
   OfficialQuestion,
@@ -43,6 +45,8 @@ export interface World {
   lastRound: RoundState | null;
   settings: Settings;
   sync: SyncState;
+  /** 衣櫥系統新給的獎勵，畫面放完慶祝後清掉（不存檔） */
+  celebrations: Celebration[];
   bus: Bus;
 }
 
@@ -72,6 +76,7 @@ export function createWorld(): World {
       lastSyncedAt: null,
       error: null,
     },
+    celebrations: [],
     bus: createBus(),
   };
 
@@ -79,6 +84,7 @@ export function createWorld(): World {
   attachDaily(world);
   attachSettings(world);
   attachRound(world);
+  attachWardrobe(world);
   initStore(world);
 
   return world;

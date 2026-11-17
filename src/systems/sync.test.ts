@@ -12,6 +12,7 @@ import { createWorld } from '../core/world';
 import { exportProgress } from './persistence';
 import { attachSync, waitForSync, type SyncStorageLike } from './sync';
 import { encodeSyncCode } from './syncCode';
+import { makeConfig } from '../testing/fixture';
 
 function createMemoryStorage(
   initial: Record<string, string> = {},
@@ -48,12 +49,14 @@ function encodeRemoteContent(
   progress: Record<QuestionId, Progress>,
   updatedAt = '2026-11-15T10:00:00.000Z',
   days?: Record<DayKey, number>,
+  extra?: Record<string, unknown>,
 ): string {
   const json = JSON.stringify({
     version: SYNC_FILE_VERSION,
     updatedAt,
     progress,
     ...(days !== undefined ? { days } : {}),
+    ...(extra ?? {}),
   });
   const b64 = Buffer.from(json, 'utf8').toString('base64');
   // Simulate GitHub Contents API wrapping base64 with newlines
@@ -68,6 +71,12 @@ function decodePutContent(bodyText: string): {
     updatedAt: string;
     progress: Record<QuestionId, Progress>;
     days?: Record<DayKey, number>;
+    wardrobe?: {
+      owned: string[];
+      achievements: string[];
+      quests: Record<string, string[]>;
+      outfit?: unknown;
+    };
   };
 } {
   const parsed = JSON.parse(bodyText) as { message: string; content: string; sha?: string };
@@ -80,6 +89,12 @@ function decodePutContent(bodyText: string): {
       updatedAt: string;
       progress: Record<QuestionId, Progress>;
       days?: Record<DayKey, number>;
+      wardrobe?: {
+        owned: string[];
+        achievements: string[];
+        quests: Record<string, string[]>;
+        outfit?: unknown;
+      };
     },
   };
 }
@@ -360,7 +375,7 @@ describe('sync system', () => {
     assert.equal(world.sync.status, 'syncing');
     // Trigger multiple times while first sync is in flight
     dispatch(world, { type: 'syncNow' });
-    world.bus.emit({ type: 'roundFinished', results: [], at: '2026-11-16T05:00:00.000Z' });
+    world.bus.emit({ type: 'roundFinished', results: [], config: makeConfig(), at: '2026-11-16T05:00:00.000Z' });
 
     // Resolve first GET
     resolveFirstGet(jsonResponse(404, { message: 'Not Found' }));
@@ -399,7 +414,7 @@ describe('sync system', () => {
     await waitForSync(world);
 
     dispatch(world, { type: 'syncNow' });
-    world.bus.emit({ type: 'roundFinished', results: [], at: '2026-11-16T05:02:00.000Z' });
+    world.bus.emit({ type: 'roundFinished', results: [], config: makeConfig(), at: '2026-11-16T05:02:00.000Z' });
     await waitForSync(world);
 
     assert.equal(fetchAfterDisable, 0);
@@ -521,5 +536,115 @@ describe('sync system', () => {
     await waitForSync(worldInvalid);
     assert.equal(worldInvalid.sync.status, 'error');
     assert.equal(worldInvalid.sync.error, '同步資料格式不正確');
+  });
+
+  it('merges wardrobe without syncing outfit, keeps local outfit, and tolerates missing or corrupted remote wardrobe', async () => {
+    const storage = createMemoryStorage({
+      [SYNC_STORAGE_KEY]: JSON.stringify(TEST_CRED),
+    });
+
+    // 1. Both sides have wardrobe: merges owned/achievements/quests, preserves local outfit, omits outfit from PUT
+    const world = createWorld();
+    world.settings.wardrobe = {
+      owned: ['beanie'],
+      achievements: ['exam-1'],
+      quests: { '2026-11-17': ['quiz-round'] },
+      outfit: { 'head-top': 'beanie', neck: 'scarf' },
+    };
+
+    let putBodyRaw = '';
+    attachSync(world, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-w1',
+            content: encodeRemoteContent({}, '2026-11-17T00:00:00.000Z', undefined, {
+              wardrobe: {
+                owned: ['bell'],
+                achievements: ['stamps-3'],
+                quests: { '2026-11-17': ['new-card'] },
+                outfit: { 'head-top': 'beret' },
+              },
+            }),
+          });
+        }
+        putBodyRaw = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-w2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-17T10:00:00.000Z'),
+    });
+    await waitForSync(world);
+
+    assert.equal(world.sync.status, 'idle');
+    assert.deepEqual(world.settings.wardrobe, {
+      owned: ['beanie', 'bell'],
+      achievements: ['exam-1', 'stamps-3'],
+      quests: { '2026-11-17': ['new-card', 'quiz-round'] },
+      outfit: { 'head-top': 'beanie', neck: 'scarf' },
+    });
+
+    const put = decodePutContent(putBodyRaw);
+    assert.ok(put.payload.wardrobe);
+    assert.equal('outfit' in put.payload.wardrobe, false);
+    assert.deepEqual(put.payload.wardrobe, {
+      owned: ['beanie', 'bell'],
+      achievements: ['exam-1', 'stamps-3'],
+      quests: { '2026-11-17': ['new-card', 'quiz-round'] },
+    });
+
+    // 2. Remote missing wardrobe (legacy sync) keeps local wardrobe intact
+    const worldLegacyRemote = createWorld();
+    worldLegacyRemote.settings.wardrobe = {
+      owned: ['beanie'],
+      achievements: ['exam-1'],
+      quests: { '2026-11-17': ['quiz-round'] },
+      outfit: { 'head-top': 'beanie' },
+    };
+    attachSync(worldLegacyRemote, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-leg',
+            content: encodeRemoteContent({}),
+          });
+        }
+        return jsonResponse(200, { content: { sha: 'sha-leg-2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-17T11:00:00.000Z'),
+    });
+    await waitForSync(worldLegacyRemote);
+    assert.equal(worldLegacyRemote.sync.status, 'idle');
+    assert.deepEqual(worldLegacyRemote.settings.wardrobe, {
+      owned: ['beanie'],
+      achievements: ['exam-1'],
+      quests: { '2026-11-17': ['quiz-round'] },
+      outfit: { 'head-top': 'beanie' },
+    });
+
+    // 3. Corrupted remote wardrobe does not fail sync or drop progress
+    const worldCorruptRemote = createWorld();
+    attachSync(worldCorruptRemote, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-bad-w',
+            content: encodeRemoteContent(
+              { q1: makeProgress({ seen: 2 }) },
+              '2026-11-17T00:00:00.000Z',
+              undefined,
+              { wardrobe: 'corrupted-string' },
+            ),
+          });
+        }
+        return jsonResponse(200, { content: { sha: 'sha-bad-w2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-17T12:00:00.000Z'),
+    });
+    await waitForSync(worldCorruptRemote);
+    assert.equal(worldCorruptRemote.sync.status, 'idle');
+    assert.equal(worldCorruptRemote.progress.get('q1')?.seen, 2);
   });
 });

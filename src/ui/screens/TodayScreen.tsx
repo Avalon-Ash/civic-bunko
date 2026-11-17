@@ -11,7 +11,9 @@ import {
   getSettings,
   savedRoundInfo,
 } from '../../selectors';
-import { currentAccessory, todayProgress, weekStamps } from '../../selectors/daily';
+import { todayProgress, weekStamps } from '../../selectors/daily';
+import { currentOutfit, fishBalance, todayQuest } from '../../selectors/wardrobe';
+import { FishIcon } from './WardrobeScreen';
 import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -38,6 +40,8 @@ export interface TodayScreenProps {
   onStartQuiz: () => void;
   onGoSetup: () => void;
   onGoStamps?: () => void;
+  /** 打開小貓衣櫥分頁 */
+  onGoCat?: () => void;
   papersLoading?: boolean;
   loadError?: boolean;
   showInstallHint?: boolean;
@@ -58,6 +62,7 @@ export function TodayScreen({
   onStartQuiz,
   onGoSetup,
   onGoStamps,
+  onGoCat,
   papersLoading = false,
   loadError = false,
   showInstallHint = false,
@@ -97,7 +102,9 @@ export function TodayScreen({
   const missions = bank ? dailyMissions(world, bank.id, now) : [];
   const today = todayProgress(world, now);
   const week = weekStamps(world, now);
-  const accessory = currentAccessory(world);
+  const outfit = currentOutfit(world);
+  const quest = todayQuest(world, now);
+  const fish = fishBalance(world, now);
 
   const handleThemeChange = (theme: ThemeChoice) => {
     dispatch(world, { type: 'setTheme', theme });
@@ -173,7 +180,7 @@ export function TodayScreen({
       {!papersLoading && savedRound && (
         <Card tone="butter" className="cb-stack-sm">
           <div className="cb-row">
-            <Cat size={54} mood="idle" accessory={accessory} interactive />
+            <Cat size={54} mood="idle" outfit={outfit} interactive />
             <div className="cb-grow">
               <strong className="cb-resume-title">
                 {savedRound.study === 'read'
@@ -199,7 +206,7 @@ export function TodayScreen({
             <Cat
               size={76}
               mood={papersLoading ? 'sleepy' : 'idle'}
-              accessory={accessory}
+              outfit={outfit}
               interactive
             />
             <div className="cb-grow">
@@ -254,6 +261,23 @@ export function TodayScreen({
               <span className="cb-go">查看</span>
             </Card>
           )}
+
+          {onGoCat && !papersLoading ? (
+            <Card tone="butter" className="cb-wd-today-card" onClick={onGoCat}>
+              <span className="cb-wd-quest-tag">今日任務</span>
+              <span className="cb-grow cb-wd-today-text">
+                {quest
+                  ? quest.done
+                    ? '完成了！去幫小貓換裝'
+                    : `${quest.quest.name}・+${quest.quest.fish}`
+                  : '去小貓衣櫥看看'}
+              </span>
+              <span className="cb-fish-pill cb-fish-pill-sm" aria-label={`小魚乾 ${fish.balance} 條`}>
+                <FishIcon size={16} />
+                <b className="cb-num-tabular">{fish.balance}</b>
+              </span>
+            </Card>
+          ) : null}
 
           <section className="cb-section">
             <div className="cb-mission-head">

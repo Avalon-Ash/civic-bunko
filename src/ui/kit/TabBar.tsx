@@ -1,15 +1,16 @@
-export type TabId = 'today' | 'cards' | 'quiz' | 'stamps';
+export type TabId = 'today' | 'cards' | 'quiz' | 'cat' | 'stamps';
 
 interface TabDef {
   id: TabId;
   label: string;
-  icon: 'today' | 'cards' | 'quiz' | 'stamps';
+  icon: 'today' | 'cards' | 'quiz' | 'cat' | 'stamps';
 }
 
 const TABS: readonly TabDef[] = [
   { id: 'today', label: '今日', icon: 'today' },
   { id: 'cards', label: '圖卡', icon: 'cards' },
   { id: 'quiz', label: '刷題', icon: 'quiz' },
+  { id: 'cat', label: '小貓', icon: 'cat' },
   { id: 'stamps', label: '集章', icon: 'stamps' },
 ];
 
@@ -37,6 +38,13 @@ function TabIcon({ name }: { name: TabDef['icon'] }) {
       return (
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M5 20l1-5L16 5l4 4L10 19z" />
+        </svg>
+      );
+    case 'cat':
+      return (
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 10.5L5.8 4l4.4 3.2M19 10.5L18.2 4l-4.4 3.2" />
+          <ellipse cx="12" cy="13.5" rx="8" ry="6.5" />
         </svg>
       );
     case 'stamps':

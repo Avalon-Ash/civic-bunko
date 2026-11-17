@@ -5,7 +5,7 @@ import type { LawRef, QuestionId } from '../../core/types';
 import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
 import { bilingualOn, paperSubjectName, questionPaper, roundSummary } from '../../selectors';
-import { currentAccessory } from '../../selectors/daily';
+import { currentOutfit } from '../../selectors/wardrobe';
 import { examHistory, examQuestionDetail, examResult } from '../../selectors/exam';
 import {
   BilingualToggle,
@@ -54,7 +54,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
   useWorld(world);
   const summary = roundSummary(world);
   const exam = examResult(world);
-  const accessory = currentAccessory(world);
+  const outfit = currentOutfit(world);
 
   const [inspectId, setInspectId] = useState<QuestionId | null>(null);
   const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
@@ -102,7 +102,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
 
         <Card tone="pink" className="cb-exam-score-card">
           <div className="cb-row cb-center">
-            <Cat size={72} mood={tier.catMood} accessory={accessory} interactive />
+            <Cat size={72} mood={tier.catMood} outfit={outfit} interactive />
             <div className="cb-exam-score-main">
               <div className="cb-exam-score-num cb-num-tabular">
                 <CountUp value={exam.score} />
@@ -267,7 +267,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                       enrich={detail.enrich}
                       tone="butter"
                       catMood="oops"
-                      catAccessory={accessory}
+                      catOutfit={outfit}
                       label={<small>錯題複習・口訣與陷阱</small>}
                     />
                     <OptionExplainList
@@ -279,7 +279,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                 ) : (
                   <Card tone="butter" className="cb-kou is-miss">
                     <div className="cb-row">
-                      <Cat size={58} mood="oops" accessory={accessory} interactive />
+                      <Cat size={58} mood="oops" outfit={outfit} interactive />
                       <div className="cb-grow">
                         <small>正解是 ({detail.question.answer.join('、')})</small>
                         <div className="cb-sub-strong">口訣準備中</div>
@@ -311,7 +311,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
           <p className="cb-sub cb-result-note">先把這批記熟，再換自己作答試試看。</p>
         </div>
         <div className="cb-row cb-center">
-          <Cat size={96} mood="yay" accessory={accessory} interactive />
+          <Cat size={96} mood="yay" outfit={outfit} interactive />
         </div>
         <div className="cb-spacer" />
         <div className="cb-stack-sm">
@@ -357,7 +357,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
         </p>
       </div>
       <div className="cb-row cb-center">
-        <Cat size={96} mood={tier.catMood} accessory={accessory} interactive />
+        <Cat size={96} mood={tier.catMood} outfit={outfit} interactive />
       </div>
       <div className="cb-spacer" />
       <div className="cb-stack-sm">

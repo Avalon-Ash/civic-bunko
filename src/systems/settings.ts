@@ -66,8 +66,14 @@ export function setBilingual(world: World, on: boolean): void {
   });
 }
 
+const defaultNow = (): Date => new Date();
+
 /** 把卡片記成看過；已經記過就不動作。 */
-export function markCardSeen(world: World, id: string): void {
+export function markCardSeen(
+  world: World,
+  id: string,
+  now: () => Date = defaultNow,
+): void {
   const seen = world.settings.cardsSeen ?? [];
   if (seen.includes(id)) return;
   world.settings = {
@@ -77,6 +83,11 @@ export function markCardSeen(world: World, id: string): void {
   world.bus.emit({
     type: 'settingsChanged',
     settings: { ...world.settings },
+  });
+  world.bus.emit({
+    type: 'cardSeen',
+    id,
+    at: now().toISOString(),
   });
 }
 

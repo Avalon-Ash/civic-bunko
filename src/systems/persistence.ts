@@ -2,22 +2,32 @@ import { ACCESSORIES } from '../core/constants/daily';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
+import { SLOTS } from '../core/constants/wardrobe';
 import { bumpStore, subscribe } from '../core/store';
 import type {
   AskFilter,
   Choice,
   DayKey,
   ExamRecord,
+  Outfit,
   Progress,
+  QuestId,
   QuestionId,
   RoundConfig,
   RoundResult,
   RoundState,
   Settings,
+  SlotId,
   StudyMode,
+  WardrobeState,
 } from '../core/types';
 import type { World } from '../core/world';
-import { backfillDayLogFromProgress, clearBackfillMark, parseDaysRecord } from './daily';
+import {
+  backfillDayLogFromProgress,
+  clearBackfillMark,
+  isValidDayKey,
+  parseDaysRecord,
+} from './daily';
 import { validateSavedRound } from './round';
 
 export interface StorageLike {
@@ -38,9 +48,14 @@ interface PersistedPayload {
 }
 
 const ACCESSORY_ID_SET = new Set<string>(ACCESSORIES.map((a) => a.id));
+const SLOT_ID_SET = new Set<string>(SLOTS.map((s) => s.id));
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string');
 }
 
 function isChoice(value: unknown): value is Choice {
@@ -57,10 +72,11 @@ interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
   passes?: number;
 }
 
-interface RawSettings extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual'> {
+interface RawSettings extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe'> {
   lastRound: RawRoundConfig | null;
   examHistory?: unknown;
   bilingual?: unknown;
+  wardrobe?: unknown;
 }
 
 function isValidProgress(value: unknown): value is RawProgress {
@@ -285,6 +301,41 @@ export function parseExamHistory(value: unknown): ExamRecord[] | undefined {
   return valid;
 }
 
+/** 解析並正規化衣櫥狀態；不是物件回傳 undefined，壞掉的子欄位只丟那一小項。 */
+export function parseWardrobe(value: unknown): WardrobeState | undefined {
+  if (!isRecord(value)) return undefined;
+
+  const owned = isStringArray(value.owned) ? [...value.owned] : [];
+  const achievements = isStringArray(value.achievements) ? [...value.achievements] : [];
+
+  const quests: Record<DayKey, QuestId[]> = {};
+  if (isRecord(value.quests)) {
+    for (const [day, ids] of Object.entries(value.quests)) {
+      if (isValidDayKey(day) && isStringArray(ids)) {
+        quests[day] = [...ids];
+      }
+    }
+  }
+
+  let outfit: Outfit | undefined;
+  if (isRecord(value.outfit)) {
+    const cleanOutfit: Outfit = {};
+    for (const [slot, itemId] of Object.entries(value.outfit)) {
+      if (SLOT_ID_SET.has(slot) && typeof itemId === 'string') {
+        cleanOutfit[slot as SlotId] = itemId;
+      }
+    }
+    outfit = cleanOutfit;
+  }
+
+  return {
+    owned,
+    achievements,
+    quests,
+    ...(outfit !== undefined ? { outfit } : {}),
+  };
+}
+
 function parseRoundState(value: unknown): RoundState | undefined {
   if (!isRecord(value)) return undefined;
   if (!isValidRoundConfig(value.config)) return undefined;
@@ -388,6 +439,10 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       parsed.settings.examHistory !== undefined
         ? parseExamHistory(parsed.settings.examHistory)
         : undefined;
+    const cleanWardrobe =
+      parsed.settings.wardrobe !== undefined
+        ? parseWardrobe(parsed.settings.wardrobe)
+        : undefined;
     cleanSettings = {
       theme: parsed.settings.theme,
       lastRound: parsed.settings.lastRound
@@ -399,6 +454,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       ...(parsed.settings.cardsSeen !== undefined ? { cardsSeen: [...parsed.settings.cardsSeen] } : {}),
       ...(typeof parsed.settings.bilingual === 'boolean' ? { bilingual: parsed.settings.bilingual } : {}),
       ...(cleanExamHistory !== undefined ? { examHistory: cleanExamHistory } : {}),
+      ...(cleanWardrobe !== undefined ? { wardrobe: cleanWardrobe } : {}),
     };
   }
 

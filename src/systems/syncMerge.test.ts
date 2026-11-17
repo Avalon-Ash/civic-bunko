@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { DayKey, Progress, QuestionId } from '../core/types';
-import { mergeDays, mergeProgress } from './syncMerge';
+import { mergeDays, mergeProgress, mergeWardrobe, type SyncWardrobe } from './syncMerge';
 
 function makeProg(overrides: Partial<Progress> = {}): Progress {
   return {
@@ -124,5 +124,40 @@ describe('syncMerge', () => {
       '2026-11-17': 9,
     });
     assert.deepEqual(Object.fromEntries(lr), Object.fromEntries(rl));
+  });
+
+  it('merges wardrobe owned, achievements, and quests with commutativity and idempotency', () => {
+    const local: SyncWardrobe = {
+      owned: ['wings', 'beanie'],
+      achievements: ['exam-60', 'answered-100'],
+      quests: {
+        '2026-11-18': ['exam'],
+        '2026-11-17': ['quiz-round'],
+      },
+    };
+    const remote: SyncWardrobe = {
+      owned: ['beanie', 'bell'],
+      achievements: ['answered-100', 'stamps-3'],
+      quests: {
+        '2026-11-17': ['new-card', 'quiz-round'],
+        '2026-11-19': ['topic-round'],
+      },
+    };
+
+    const lr = mergeWardrobe(local, remote);
+    const rl = mergeWardrobe(remote, local);
+
+    assert.deepEqual(lr, {
+      owned: ['beanie', 'bell', 'wings'],
+      achievements: ['answered-100', 'exam-60', 'stamps-3'],
+      quests: {
+        '2026-11-17': ['new-card', 'quiz-round'],
+        '2026-11-18': ['exam'],
+        '2026-11-19': ['topic-round'],
+      },
+    });
+    assert.deepEqual(lr, rl);
+    assert.deepEqual(mergeWardrobe(lr, lr), lr);
+    assert.deepEqual(mergeWardrobe(local, undefined), mergeWardrobe(undefined, local));
   });
 });

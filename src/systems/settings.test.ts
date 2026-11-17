@@ -62,7 +62,11 @@ describe('settings system', () => {
       history[EXAM_HISTORY_MAX - 1]?.at,
       `2026-11-16T10:${String(EXAM_HISTORY_MAX + 2).padStart(2, '0')}:00.000Z`,
     );
-    assert.equal(emitted.length, EXAM_HISTORY_MAX + 3);
+    // 每交一份就通知一次存檔；衣櫥解鎖模擬考成就時另外發的通知不算（主代理 2026-11-17 修訂，原本數全部通知）。
+    const examWrites = emitted.filter(
+      (s, i) => i === 0 || s.examHistory !== emitted[i - 1]?.examHistory,
+    );
+    assert.equal(examWrites.length, EXAM_HISTORY_MAX + 3);
   });
 
   it('does not overwrite settings.lastRound when starting a weak round with topicIds', () => {

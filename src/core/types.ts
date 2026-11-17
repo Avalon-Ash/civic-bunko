@@ -295,6 +295,101 @@ export interface ExamRecord {
 export type DayKey = string;
 export type AccessoryId = 'bow' | 'straw-hat' | 'scarf' | 'flower' | 'glasses' | 'crown';
 
+// ── 衣櫥（紙娃娃、小魚乾、成就、每日小任務）──────────────────
+/** 部位；疊圖順序只定義在 constants/wardrobe.ts 的 SLOTS。fur 不是圖層，是毛色色票。 */
+export type SlotId =
+  | 'bg'
+  | 'back'
+  | 'body'
+  | 'neck'
+  | 'face-low'
+  | 'face-mid'
+  | 'head-side'
+  | 'head-top'
+  | 'fur';
+/** 配件 ID（含舊的 AccessoryId）；是使用者資料的鍵，產生後不改名、不重編 */
+export type ItemId = string;
+/** 成就 ID；是使用者資料的鍵，產生後不改名、不重編 */
+export type AchievementId = string;
+/** 每日小任務 ID；是使用者資料的鍵，產生後不改名、不重編 */
+export type QuestId = string;
+export type ItemSource =
+  /** 舊集章配件：累積幾個章自動擁有 */
+  | { kind: 'stamps'; stamps: number }
+  /** 用小魚乾買 */
+  | { kind: 'shop'; price: number }
+  /** 解鎖這個成就就擁有 */
+  | { kind: 'achievement'; achievement: AchievementId };
+export interface WardrobeItem {
+  id: ItemId;
+  slot: SlotId;
+  name: string;
+  source: ItemSource;
+  /** 衝刺限定：只在考前 SPRINT_DAYS 天到考試當天上架（已買的永久擁有） */
+  sprint?: boolean;
+}
+/** 每個部位穿哪一件；沒有鍵＝那個部位空著 */
+export type Outfit = Partial<Record<SlotId, ItemId>>;
+export type AchievementMetric =
+  /** 累計刷題數（dayLog 全部加總，作答與看答案都算） */
+  | 'answeredTotal'
+  /** 熟練題數（作答過且 due 為 null） */
+  | 'mastered'
+  /** 累計章數 */
+  | 'stamps'
+  /** 最長連續蓋章天數 */
+  | 'stampStreak'
+  /** 看過的圖卡張數 */
+  | 'cardsSeen'
+  /** 交卷的模擬考次數 */
+  | 'examCount'
+  /** 模擬考最高分 */
+  | 'examBest';
+export interface Achievement {
+  id: AchievementId;
+  name: string;
+  /** 一句話條件說明（給畫面顯示） */
+  desc: string;
+  metric: AchievementMetric;
+  /** metric ≥ at 就解鎖 */
+  at: number;
+  fish: number;
+  /** 解鎖時一併送的配件 */
+  item?: ItemId;
+}
+export type QuestKind =
+  /** 完成一回作答回合（題數 ≥ QUEST_ROUND_MIN） */
+  | 'quiz-round'
+  /** 完成一回錯題重做（mode: 'wrong'） */
+  | 'wrong-round'
+  /** 完成一回弱點或高頻回合（有 topicIds） */
+  | 'topic-round'
+  /** 看一張新圖卡（cardsSeen 變多） */
+  | 'new-card'
+  /** 交一份模擬考 */
+  | 'exam';
+export interface Quest {
+  id: QuestId;
+  kind: QuestKind;
+  name: string;
+  fish: number;
+}
+/** 畫面要放的慶祝（只在記憶體，不存檔） */
+export type Celebration =
+  | { kind: 'achievement'; id: AchievementId }
+  | { kind: 'quest'; id: QuestId };
+/** 衣櫥狀態（存在 Settings.wardrobe）。owned、achievements、quests 跨裝置同步並取聯集；outfit 只存在各裝置。 */
+export interface WardrobeState {
+  /** 用小魚乾買下的配件（不含集章與成就送的） */
+  owned: ItemId[];
+  /** 已解鎖的成就；解鎖後不收回 */
+  achievements: AchievementId[];
+  /** 每天完成的小任務 */
+  quests: Record<DayKey, QuestId[]>;
+  /** 目前穿著；沒有這欄時沿用舊的 settings.accessory */
+  outfit?: Outfit;
+}
+
 // ── 設定 ────────────────────────────────────────────────
 export type ThemeChoice = 'system' | 'light' | 'dark';
 export interface Settings {
@@ -313,6 +408,8 @@ export interface Settings {
   bilingual?: boolean;
   /** 模擬考歷次成績，舊到新；上限在 constants/exam.ts */
   examHistory?: ExamRecord[];
+  /** 衣櫥；沒有這欄視為空的衣櫥 */
+  wardrobe?: WardrobeState;
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────
@@ -337,14 +434,18 @@ export type AppEvent =
   | { type: 'roundStarted'; config: RoundConfig; queue: QuestionId[] }
   | { type: 'answered'; id: QuestionId; pick: Choice; correct: boolean; at: string }
   | { type: 'viewed'; id: QuestionId; at: string }
-  | { type: 'roundFinished'; results: RoundResult[]; at: string }
+  | { type: 'roundFinished'; results: RoundResult[]; at: string; config: RoundConfig }
   | { type: 'examFinished'; record: ExamRecord }
   | { type: 'roundRestored' }
   | { type: 'cardsLoaded'; count: number }
   | { type: 'progressChanged'; ids: QuestionId[] }
   | { type: 'dayLogChanged'; day: DayKey; count: number }
   | { type: 'settingsChanged'; settings: Settings }
-  | { type: 'syncChanged'; sync: SyncState };
+  /** 使用者打開一張之前沒看過的圖卡（讀檔、同步不會發） */
+  | { type: 'cardSeen'; id: string; at: string }
+  | { type: 'syncChanged'; sync: SyncState }
+  /** 衣櫥系統：新解鎖的成就、新完成的小任務（給畫面放慶祝） */
+  | { type: 'rewardsEarned'; rewards: Celebration[] };
 
 // ── 指令（畫面寫入狀態的唯一入口）────────────────────────
 export type UICommand =
@@ -372,4 +473,10 @@ export type UICommand =
   | { type: 'resetProgress' }
   | { type: 'setSyncCode'; code: string }
   | { type: 'syncNow' }
-  | { type: 'disableSync' };
+  | { type: 'disableSync' }
+  /** 用小魚乾買一件 shop 配件；餘額不足、不在架上、已擁有時不動作 */
+  | { type: 'buyItem'; id: ItemId }
+  /** 穿上（item 為 null＝脫掉）；只接受已擁有、部位相符的配件 */
+  | { type: 'wear'; slot: SlotId; item: ItemId | null }
+  /** 畫面放完慶祝後清掉 */
+  | { type: 'dismissCelebrations' };
