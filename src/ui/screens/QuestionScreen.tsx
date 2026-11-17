@@ -397,7 +397,8 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
       </div>
 
       <div className="cb-q-opts-col">
-        <div className="cb-opts">
+        {/* 作答時改由答對／答錯的聲音回饋，不另外響按鍵聲；模擬考沒有即時對錯，照常響按鍵聲 */}
+        <div className="cb-opts" data-sound={isExam ? undefined : 'none'}>
           {optionOrder.map((choice) => {
             const idx = CHOICES.indexOf(choice);
             const optText = question.options[idx] ?? '';

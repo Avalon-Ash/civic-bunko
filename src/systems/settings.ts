@@ -151,3 +151,16 @@ export function attachSettings(world: World): () => void {
     unsubExam();
   };
 }
+
+/** 開關音效，並發出 settingsChanged。 */
+export function setSound(world: World, on: boolean): void {
+  world.settings = { ...world.settings, sound: on };
+  world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+}
+
+/** 記下看過的最新一則更新紀錄；一樣就不動作。 */
+export function markChangelogSeen(world: World, id: string): void {
+  if (world.settings.changelogSeen === id) return;
+  world.settings = { ...world.settings, changelogSeen: id };
+  world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+}

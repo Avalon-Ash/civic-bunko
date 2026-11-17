@@ -390,6 +390,46 @@ export interface WardrobeState {
   outfit?: Outfit;
 }
 
+// ── 更新紀錄 ────────────────────────────────────────────
+/** 一次對使用者有感的更新（系統內部的修改不列） */
+export interface ChangelogEntry {
+  /** 唯一 ID，產生後不改（存在 settings.changelogSeen） */
+  id: string;
+  /** YYYY-MM-DD */
+  date: string;
+  title: string;
+  items: string[];
+}
+
+// ── 音效（Web Audio 即時合成，數值在 constants/sound.ts）──────────
+export type SoundName = 'tap' | 'correct' | 'wrong' | 'reward' | 'meow';
+/** 一個音：從 from 赫茲滑到 to 赫茲（沒有 to 就不滑），在 at 秒開始、持續 dur 秒 */
+export interface ToneSpec {
+  wave: 'sine' | 'triangle' | 'square' | 'sawtooth';
+  from: number;
+  to?: number;
+  at: number;
+  dur: number;
+  gain: number;
+}
+/** 小貓叫：鋸齒波經過兩個共振峰（像嘴型），音高先升後降，加一點顫音 */
+export interface MeowSpec {
+  start: number;
+  peak: number;
+  end: number;
+  /** 升到最高音的時間（秒） */
+  rise: number;
+  dur: number;
+  gain: number;
+  formants: Array<{ freq: number; open: number; q: number }>;
+  vibratoHz: number;
+  vibratoDepth: number;
+  /** 每次音高隨機上下幾成，聽起來不會每次一樣 */
+  jitter: number;
+  /** 起音時間（秒） */
+  attack: number;
+}
+
 // ── 設定 ────────────────────────────────────────────────
 export type ThemeChoice = 'system' | 'light' | 'dark';
 export interface Settings {
@@ -410,6 +450,10 @@ export interface Settings {
   examHistory?: ExamRecord[];
   /** 衣櫥；沒有這欄視為空的衣櫥 */
   wardrobe?: WardrobeState;
+  /** 音效（按鈕、答題、小貓叫）；沒設定視為開啟。各裝置自己的設定，不同步 */
+  sound?: boolean;
+  /** 看過的最新一則更新紀錄 ID；各裝置自己的設定，不同步 */
+  changelogSeen?: string;
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────
@@ -479,4 +523,7 @@ export type UICommand =
   /** 穿上（item 為 null＝脫掉）；只接受已擁有、部位相符的配件 */
   | { type: 'wear'; slot: SlotId; item: ItemId | null }
   /** 畫面放完慶祝後清掉 */
-  | { type: 'dismissCelebrations' };
+  | { type: 'dismissCelebrations' }
+  | { type: 'setSound'; on: boolean }
+  /** 更新紀錄看完了（記下最新一則的 ID） */
+  | { type: 'markChangelogSeen'; id: string };

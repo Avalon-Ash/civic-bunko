@@ -10,7 +10,7 @@
 @import './styles/visual-law.css'; /* 小圖 Visual 與法條抽屜 */
 @import './styles/study-modes.css'; /* 看答案模式與問法設定 */
 @import './styles/sync.css'; /* 私人 repo 同步與備份 */
-@import './styles/resume-version.css'; /* 回合續接、新版提示、版本顯示 */
+@import './styles/resume-version.css'; /* 回合續接、新版提示、版本顯示、更新紀錄 */
 @import './styles/daily-stamps.css'; /* 每日目標、蓋章動畫、集章配件 */
 @import './styles/exam.css'; /* 模擬考與選項打亂 */
 @import './styles/topics.css'; /* 弱點與高頻考點、刷題頁快速回合與開始鈕 */

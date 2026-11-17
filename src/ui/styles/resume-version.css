@@ -61,3 +61,31 @@
   gap: 12px;
   flex-wrap: wrap;
 }
+
+/* 更新紀錄抽屜 */
+.cb-changelog {
+  display: grid;
+  gap: 16px;
+}
+
+.cb-changelog-entry {
+  display: grid;
+  gap: 6px;
+}
+
+.cb-changelog-title {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 1.0625rem;
+}
+
+.cb-changelog-list {
+  margin: 0;
+  padding-left: 1.2em;
+  display: grid;
+  gap: 4px;
+  line-height: 1.55;
+}

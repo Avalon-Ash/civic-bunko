@@ -333,3 +333,11 @@
 .cb-wd-grid .cb-acc-item.is-trying .cb-acc-circle {
   background: var(--cat-blush);
 }
+
+/* 有滑鼠的裝置拖不動橫向捲動列：改成換行全部攤開 */
+@media (hover: hover) and (pointer: fine) {
+  .cb-wd-filters {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}

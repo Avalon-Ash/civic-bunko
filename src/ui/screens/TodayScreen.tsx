@@ -14,6 +14,8 @@ import {
 import { todayProgress, weekStamps } from '../../selectors/daily';
 import { currentOutfit, fishBalance, todayQuest } from '../../selectors/wardrobe';
 import { FishIcon } from './WardrobeScreen';
+import { soundOn } from '../../selectors/sound';
+import { Switch } from '../kit/Switch';
 import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -42,6 +44,8 @@ export interface TodayScreenProps {
   onGoStamps?: () => void;
   /** 打開小貓衣櫥分頁 */
   onGoCat?: () => void;
+  /** 打開完整的更新紀錄 */
+  onOpenChangelog?: () => void;
   papersLoading?: boolean;
   loadError?: boolean;
   showInstallHint?: boolean;
@@ -63,6 +67,7 @@ export function TodayScreen({
   onGoSetup,
   onGoStamps,
   onGoCat,
+  onOpenChangelog,
   papersLoading = false,
   loadError = false,
   showInstallHint = false,
@@ -409,10 +414,27 @@ export function TodayScreen({
             </div>
           </section>
 
+          <Card className="cb-row cb-switch-card">
+            <div className="cb-grow">
+              <strong className="cb-block">音效</strong>
+              <span className="cb-sub">按鈕、答題的聲音和小貓叫；手機靜音時不會響</span>
+            </div>
+            <Switch
+              checked={soundOn(world)}
+              onChange={(on) => dispatch(world, { type: 'setSound', on })}
+              ariaLabel="音效"
+            />
+          </Card>
+
           <section className="cb-section cb-update-row">
             <Button variant="ghost" onClick={() => void handleCheckUpdate()} disabled={checkingUpdate}>
               {checkingUpdate ? '檢查中…' : '檢查更新'}
             </Button>
+            {onOpenChangelog ? (
+              <Button variant="ghost" onClick={onOpenChangelog}>
+                更新紀錄
+              </Button>
+            ) : null}
             <span className="cb-sub" role="status">
               {updateNote ?? (getCurrentAppVersion() ? `版本 ${formatAppVersion(getCurrentAppVersion())}` : '')}
             </span>

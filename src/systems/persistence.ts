@@ -72,10 +72,13 @@ interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
   passes?: number;
 }
 
-interface RawSettings extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe'> {
+interface RawSettings
+  extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe' | 'sound' | 'changelogSeen'> {
   lastRound: RawRoundConfig | null;
   examHistory?: unknown;
   bilingual?: unknown;
+  sound?: unknown;
+  changelogSeen?: unknown;
   wardrobe?: unknown;
 }
 
@@ -453,6 +456,10 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       ...(parsed.settings.shuffleOptions !== undefined ? { shuffleOptions: parsed.settings.shuffleOptions } : {}),
       ...(parsed.settings.cardsSeen !== undefined ? { cardsSeen: [...parsed.settings.cardsSeen] } : {}),
       ...(typeof parsed.settings.bilingual === 'boolean' ? { bilingual: parsed.settings.bilingual } : {}),
+      ...(typeof parsed.settings.sound === 'boolean' ? { sound: parsed.settings.sound } : {}),
+      ...(typeof parsed.settings.changelogSeen === 'string'
+        ? { changelogSeen: parsed.settings.changelogSeen }
+        : {}),
       ...(cleanExamHistory !== undefined ? { examHistory: cleanExamHistory } : {}),
       ...(cleanWardrobe !== undefined ? { wardrobe: cleanWardrobe } : {}),
     };

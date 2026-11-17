@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { dispatch } from '../core/commands';
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, STAMPS_PER_REWARD } from '../core/constants/daily';
-import type { DayKey } from '../core/types';
+import type { ChangelogEntry, DayKey } from '../core/types';
 import type { World } from '../core/world';
 import { currentQuestion, getSettings, readView, roundSummary, type RoundSummaryView } from '../selectors';
 import { isInstallHintDismissed } from '../selectors/backup';
@@ -20,6 +20,10 @@ import { ResultScreen } from './screens/ResultScreen';
 import { StampsScreen } from './screens/StampsScreen';
 import { WardrobeScreen } from './screens/WardrobeScreen';
 import { RewardToast } from './components/RewardToast';
+import { ChangelogSheet } from './components/ChangelogSheet';
+import { useSoundEffects } from './useSoundEffects';
+import { CHANGELOG } from '../core/constants/changelog';
+import { latestChangelog, unseenChangelog } from '../selectors/changelog';
 import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
 import { useAppVersion } from './useAppVersion';
 import { useWorld } from './useWorld';
@@ -33,6 +37,7 @@ export interface AppProps {
 /** 應用程式外殼：管理四個分頁、套用主題到 <html data-theme>、協調刷題流程與安裝引導。 */
 export function App({ world, papersLoading = false, loadError = false }: AppProps) {
   useWorld(world);
+  useSoundEffects(world);
   const hasUpdate = useAppVersion();
 
   const [tab, setTab] = useState<TabId>('today');
@@ -47,6 +52,22 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   );
   const [pendingCelebration, setPendingCelebration] = useState<StampCelebration | null>(null);
   const [examToast, setExamToast] = useState<string | null>(null);
+  // 更新紀錄：更新後第一次打開自動跳出沒看過的；今日頁也能打開全部。列表在打開時就固定，關閉動畫期間不會變空。
+  const [changelog, setChangelog] = useState<{ title: string; entries: ChangelogEntry[] } | null>(() => {
+    if (!isStandaloneApp() && !isInstallHintDismissed(world)) return null;
+    const unseen = unseenChangelog(world);
+    return unseen.length > 0 ? { title: '更新了什麼', entries: unseen } : null;
+  });
+  const [changelogOpen, setChangelogOpen] = useState(changelog !== null);
+  const openAllChangelog = () => {
+    setChangelog({ title: '更新紀錄', entries: [...CHANGELOG] });
+    setChangelogOpen(true);
+  };
+  const closeChangelog = () => {
+    setChangelogOpen(false);
+    const latest = latestChangelog();
+    if (latest) dispatch(world, { type: 'markChangelogSeen', id: latest.id });
+  };
 
   const settings = getSettings(world);
   const questionView = currentQuestion(world);
@@ -192,6 +213,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
             }}
             onGoStamps={() => setTab('stamps')}
             onGoCat={() => setTab('cat')}
+            onOpenChangelog={openAllChangelog}
           />
         );
       case 'cards':
@@ -244,6 +266,14 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
         {hasUpdate && <UpdateBanner onReload={() => window.location.reload()} />}
         <div className="cb-container">{renderMain()}</div>
       </main>
+      {changelog ? (
+        <ChangelogSheet
+          open={changelogOpen}
+          title={changelog.title}
+          entries={changelog.entries}
+          onClose={closeChangelog}
+        />
+      ) : null}
       {showInstallHint && (
         <InstallHintSheet
           open={installSheetOpen}

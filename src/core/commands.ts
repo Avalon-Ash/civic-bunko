@@ -14,9 +14,11 @@ import {
 import {
   dismissInstallHint,
   markCardSeen,
+  markChangelogSeen,
   setAccessory,
   setBilingual,
   setShuffleOptions,
+  setSound,
   setTheme,
 } from '../systems/settings';
 import { disableSync, setSyncCode, syncNow } from '../systems/sync';
@@ -98,6 +100,12 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'setShuffleOptions':
       setShuffleOptions(world, cmd.on);
+      break;
+    case 'setSound':
+      setSound(world, cmd.on);
+      break;
+    case 'markChangelogSeen':
+      markChangelogSeen(world, cmd.id);
       break;
     case 'setBilingual':
       setBilingual(world, cmd.on);

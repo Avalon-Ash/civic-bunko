@@ -282,6 +282,7 @@ export function Cat({
         className={`cb-cat-btn ${squishing ? 'is-squishing' : ''} ${spin ? 'is-spinning' : ''}`.trim()}
         onClick={handleTap}
         aria-label="點一點小貓看鼓勵的話"
+        data-sound="meow"
       >
         {svg}
       </button>
