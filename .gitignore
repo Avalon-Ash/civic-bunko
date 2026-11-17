@@ -6,3 +6,4 @@ dist/
 .env*
 tools/parser/.dump/
 .agy-*
+.gallery/
