@@ -7,7 +7,7 @@
     "dev": "vite --port=3100 --host=0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --port=3100",
-    "lint": "tsc --noEmit && node tools/lint/no-popups.mjs",
+    "lint": "tsc --noEmit && node tools/lint/no-popups.mjs && node tools/lint/engine-boundary.mjs",
     "test": "node --import tsx --test \"src/**/*.test.ts\" \"tools/**/*.test.mjs\"",
     "crawl": "node tools/crawler/crawl.mjs",
     "parse": "node tools/parser/parse.mjs",

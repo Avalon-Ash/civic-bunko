@@ -2,7 +2,8 @@
 // tools/parser 與 tools/validate 是 .mjs，產出的 JSON 必須符合這裡的形狀。
 
 export type Choice = 'A' | 'B' | 'C' | 'D';
-export type ExamKind = 'general' | 'local4';
+/** 考試別 key；有哪些 key 與顯示名稱由各題庫的 pack.json `exams` 登記（引擎不認識具體值）。 */
+export type ExamKind = string;
 export type BankId = string;
 export type SubjectKey = string;
 /** `<年度>-<考試>-<科目key>`，例 `115-general-admin-law` */
@@ -17,12 +18,18 @@ export interface SubjectInfo {
   /** 兩到四個字的短名，用在小標籤 */
   short: string;
 }
+export interface ExamInfo {
+  key: ExamKind;
+  label: string;
+}
 export interface Bank {
   id: BankId;
   title: string;
   /** 筆試第一天，ISO 日期 */
   examDate: string;
   subjects: SubjectInfo[];
+  /** 考試別登記：key 對應 Paper.exam，label 是畫面顯示名稱 */
+  exams: ExamInfo[];
 }
 
 // ── 官方層（data/packs/<packId>/official/**，只由 tools/parser 產生）──
