@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client';
 import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
-import { warmLawFiles } from './data/laws';
+import { OFFLINE_WARM_DELAY_MS } from './core/constants/offline';
+import { refreshOfflineCache } from './data/offline';
 import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics, loadZhFiles } from './data/source';
 import { loadBank, loadTopicList } from './systems/bankLoader';
 import { loadCards } from './systems/cardLoader';
@@ -11,6 +12,7 @@ import { attachPersistence } from './systems/persistence';
 import { attachSync } from './systems/sync';
 import { loadZh } from './systems/zhLoader';
 import { App } from './ui/App';
+import { getCurrentAppVersion } from './ui/useAppVersion';
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => undefined);
@@ -42,18 +44,24 @@ const papersPromise = Promise.all([
   loadZh(world, zhFiles);
 });
 
-// 題庫載入完、畫面穩定後，再把法規全文抓進離線快取（不擋首屏，離線或省流量模式不抓）。
-const LAW_WARM_DELAY_MS = 5000;
-papersPromise
-  .then(() => {
-    const saveData =
-      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    if (navigator.onLine === false || saveData) return;
-    window.setTimeout(() => {
-      void warmLawFiles();
-    }, LAW_WARM_DELAY_MS);
-  })
-  .catch(() => undefined);
+// 題庫載入完、畫面穩定後，把這一版的所有資產補進離線快取並清掉舊版殘留
+// （不擋首屏；只在正式版做，離線或省流量模式不做）。
+if (import.meta.env.PROD && 'caches' in window) {
+  papersPromise
+    .then(() => {
+      const saveData =
+        (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData ===
+        true;
+      if (navigator.onLine === false || saveData) return;
+      window.setTimeout(() => {
+        void refreshOfflineCache(getCurrentAppVersion(), document.baseURI, {
+          fetch: window.fetch.bind(window),
+          caches: window.caches,
+        }).catch(() => undefined);
+      }, OFFLINE_WARM_DELAY_MS);
+    })
+    .catch(() => undefined);
+}
 
 function Root({ world: appWorld }: { world: World }) {
   const [papersLoading, setPapersLoading] = useState(true);
