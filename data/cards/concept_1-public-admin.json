@@ -215,6 +215,116 @@
       ],
       "lawRefs": [],
       "essay": null
+    },
+    {
+      "id": "concept-pa-ppp",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "公私協力：BOT 家族",
+      "hook": "看誰蓋、誰經營、期滿還不還。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "BOT", "points": ["民間興建", "民間營運", "期滿移轉給政府"] },
+        "right": { "title": "OT", "points": ["政府興建", "民間營運", "期滿歸還政府"] }
+      },
+      "faces": [
+        { "heading": "BOT", "lines": ["民間出錢興建（Build）", "民間營運，自負營運風險（Operate）", "期滿把產權移轉給政府（Transfer）"] },
+        { "heading": "OT", "lines": ["政府蓋好", "委託民間營運", "期滿營運權歸還政府"] },
+        { "heading": "BOO", "lines": ["民間興建、擁有所有權、自己營運", "期滿不用移轉給政府"] },
+        { "heading": "ROT", "lines": ["政府現有的舊設施", "民間出錢整建後營運", "期滿營運權歸還政府"] },
+        { "heading": "為什麼要做", "lines": ["減輕政府的財政負擔", "引進民間資金與經營效率"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-npo",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "非營利組織為何存在",
+      "hook": "市場和政府都做不好的，第三部門來補。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "三種解釋", "points": ["市場失靈", "政府失靈", "第三方政府"] },
+        "right": { "title": "志願失靈", "points": ["慈善不足", "慈善特殊性", "家長制、業餘性"] }
+      },
+      "faces": [
+        { "heading": "三個解釋", "lines": ["市場失靈：市場不提供或提供不足", "政府失靈：政府照顧不到少數人的需求", "第三方政府：政府透過民間提供服務"] },
+        { "heading": "第三方政府", "lines": ["薩拉門（Salamon）提出", "政府出錢，非營利組織提供服務"] },
+        { "heading": "志願失靈四種", "lines": ["慈善不足：資源不夠、不穩定", "慈善特殊性：只照顧特定對象", "家長制與業餘性：捐助者主導、不夠專業"] },
+        { "heading": "沒有公權力", "lines": ["非營利組織沒有公權力", "不能像政府一樣做管制、開罰"] },
+        { "heading": "社會企業", "lines": ["用商業模式解決社會或環境問題", "兼顧經濟價值與社會價值"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-participation",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "公民參與與開放政府",
+      "hook": "參與有真有假：階梯越高，公民越有實權。",
+      "visual": {
+        "kind": "flow",
+        "lanes": [
+          { "steps": [{ "text": "無參與", "tone": "plain" }, { "text": "象徵參與", "tone": "plain" }, { "text": "公民權力", "tone": "key" }] }
+        ]
+      },
+      "faces": [
+        { "heading": "公民參與階梯", "lines": ["阿恩斯坦（Arnstein）提出，共八階", "越往上，公民的實質權力越大"] },
+        { "heading": "八階由低到高", "lines": ["無參與：操縱、治療", "象徵式參與：告知、諮詢、安撫", "公民權力：夥伴關係、授權、公民控制"] },
+        { "heading": "開放資料三條件", "lines": ["開放授權", "方便近用", "開放格式"] },
+        { "heading": "電子化政府", "lines": ["電子化參與：政府與公民雙向對話", "數位落差：科技資源不平等的問題", "資訊穀倉：各機關系統不互通"] },
+        { "heading": "跨域治理", "lines": ["跨行政疆界，也跨公、私、第三部門", "要打破本位主義", "牽涉地盤與經費，政治性高"] }
+      ],
+      "lawRefs": [],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-org-design",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "組織怎麼設計",
+      "hook": "首長制快而責任清；委員制慢而責任散。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "首長制", "points": ["一人決定", "行動快", "責任明確"] },
+        "right": { "title": "委員制", "points": ["合議決定", "行動慢", "責任分散"] }
+      },
+      "faces": [
+        { "heading": "分部化", "lines": ["依功能分：民政、社會、兵役各管一種", "依產品、地區、顧客分：事業部型", "分部化培養專才，容易本位主義"] },
+        { "heading": "控制幅度", "lines": ["一位主管能有效指揮的部屬人數", "部屬越強、工作越單純，幅度越大", "幅度大、層級少：組織扁平化"] },
+        { "heading": "機關與單位", "lines": ["機關：對外表示國家意思、行使公權力", "單位：機關內部依業務分工設立", "一到三級機關的組織要用法律定"] },
+        { "heading": "獨立機關", "lines": ["依法獨立行使職權的合議制機關", "二級：中選會、公平會、通傳會", "組織也要用法律定"] },
+        { "heading": "行政法人", "lines": ["是公法人，不是私法人", "執行特定公共事務，例：兩廳院"] }
+      ],
+      "lawRefs": [
+        { "law": "中央行政機關組織基準法", "article": "3" },
+        { "law": "中央行政機關組織基準法", "article": "4" },
+        { "law": "行政院組織法", "article": "9" }
+      ],
+      "essay": null
+    },
+    {
+      "id": "concept-pa-personnel",
+      "kind": "concept",
+      "subjectKey": "public-admin",
+      "title": "人事制度重點",
+      "hook": "分贓制看關係，功績制看考試與能力。",
+      "visual": {
+        "kind": "versus",
+        "left": { "title": "分贓制", "points": ["勝選換自己人", "回應快", "易貪污、不穩定"] },
+        "right": { "title": "功績制", "points": ["考試用人", "身分有保障", "限制主管用人裁量"] }
+      },
+      "faces": [
+        { "heading": "政務官與事務官", "lines": ["政務官：重短期政治效益", "事務官：重長期專業與程序"] },
+        { "heading": "代表性官僚", "lines": ["公務員的組成像社會的縮影", "讓文官反映多元族群與性別"] },
+        { "heading": "俸給", "lines": ["本俸到頂，還有年功俸可以晉", "法定加給三種：職務、技術或專業、地域", "沒有「績效加給」"] },
+        { "heading": "訓練評量四層次", "lines": ["柯派崔克（Kirkpatrick）提出", "反應、學習、行為、結果", "問學員滿不滿意：反應層次"] },
+        { "heading": "公務人員協會", "lines": ["公務員不能組一般工會", "可以依法組公務人員協會", "可談通案制度，不能談個人考績"] }
+      ],
+      "lawRefs": [],
+      "essay": null
     }
   ]
 }
