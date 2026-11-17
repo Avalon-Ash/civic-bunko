@@ -71,6 +71,30 @@ function toCardView(world: World, card: StudyCard, seenSet: ReadonlySet<string>)
   };
 }
 
+export interface CardSubjectView {
+  key: string;
+  short: string;
+  count: number;
+}
+
+/** 一組卡片裡出現的科目與張數，依第一次出現的順序；給圖卡列表的科目篩選用。 */
+export function cardSubjects(cards: readonly CardView[]): CardSubjectView[] {
+  const result: CardSubjectView[] = [];
+  const byKey = new Map<string, CardSubjectView>();
+  for (const card of cards) {
+    if (!card.subjectKey || !card.subjectShort) continue;
+    const existing = byKey.get(card.subjectKey);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      const entry = { key: card.subjectKey, short: card.subjectShort, count: 1 };
+      byKey.set(card.subjectKey, entry);
+      result.push(entry);
+    }
+  }
+  return result;
+}
+
 /** 依觀念、新法、申論順序統計各類圖卡總數與已看數；沒有卡片的類別不回傳。 */
 export function cardDecks(world: World): CardDeckView[] {
   const seenSet = buildSeenSet(world);

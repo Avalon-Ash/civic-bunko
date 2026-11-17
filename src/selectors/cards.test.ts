@@ -4,7 +4,7 @@ import { dispatch } from '../core/commands';
 import type { Paper, StudyCard } from '../core/types';
 import { createWorld } from '../core/world';
 import { otherBank, testBank } from '../testing/fixture';
-import { cardById, cardDecks, cardsOfKind } from './cards';
+import { cardById, cardDecks, cardSubjects, cardsOfKind } from './cards';
 
 function makeCard(overrides: Partial<StudyCard> = {}): StudyCard {
   return {
@@ -151,5 +151,22 @@ describe('cards selectors', () => {
     assert.equal(found.paperLabel, null);
 
     assert.equal(cardById(world, 'not-exist'), null);
+  });
+  it('lists subjects of a card group in first-seen order with counts, skipping cards without a subject', () => {
+    const world = createWorld();
+    world.banks = [testBank];
+    world.cards = [
+      makeCard({ id: 'c-1', subjectKey: 'subj-b' }),
+      makeCard({ id: 'c-2', subjectKey: 'subj-a' }),
+      makeCard({ id: 'c-3', subjectKey: 'subj-b' }),
+      makeCard({ id: 'c-4', subjectKey: null }),
+    ];
+
+    const subjects = cardSubjects(cardsOfKind(world, 'concept'));
+    assert.deepEqual(subjects, [
+      { key: 'subj-b', short: '乙科', count: 2 },
+      { key: 'subj-a', short: '甲科', count: 1 },
+    ]);
+    assert.deepEqual(cardSubjects([]), []);
   });
 });
