@@ -13,9 +13,9 @@
         "lanes": [
           {
             "steps": [
-              { "text": "有助於目的", "tone": "plain" },
+              { "text": "有助目的", "tone": "plain" },
               { "text": "損害最少", "tone": "plain" },
-              { "text": "利益不失衡", "tone": "key" }
+              { "text": "不失衡", "tone": "key" }
             ]
           }
         ]
@@ -227,7 +227,7 @@
           {
             "steps": [
               { "text": "委託", "tone": "key" },
-              { "text": "不相隸屬機關、民間", "tone": "plain" }
+              { "text": "他機關或民間", "tone": "plain" }
             ]
           },
           {
@@ -435,8 +435,8 @@
         "lanes": [
           {
             "steps": [
-              { "text": "直轄市、縣（市）", "tone": "plain" },
-              { "text": "主管機關報行政院", "tone": "key" }
+              { "text": "直轄市、縣市", "tone": "plain" },
+              { "text": "報行政院", "tone": "key" }
             ]
           },
           {
@@ -565,7 +565,7 @@
         "lanes": [
           {
             "steps": [
-              { "text": "四種目的之一", "tone": "plain" },
+              { "text": "四種目的", "tone": "plain" },
               { "text": "用法律", "tone": "key" },
               { "text": "有必要", "tone": "hot" }
             ]
