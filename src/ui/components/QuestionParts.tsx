@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
-import type { AccessoryId, Choice, Correction, Enrich, ExamKind, GroupZh, Paper, PassageGroup } from '../../core/types';
+import type { Choice, Outfit, Correction, Enrich, ExamKind, GroupZh, Paper, PassageGroup } from '../../core/types';
 import type { World } from '../../core/world';
 import { examLabel } from '../../selectors';
 import { Card, type CardTone } from '../kit/Card';
@@ -119,7 +119,7 @@ export interface EnrichCardProps {
   className?: string;
   catMood?: CatMood;
   catSpin?: boolean;
-  catAccessory?: AccessoryId | null;
+  catOutfit?: Outfit | null;
   label: ReactNode;
 }
 
@@ -130,13 +130,13 @@ export function EnrichCard({
   className = '',
   catMood = 'idle',
   catSpin = false,
-  catAccessory = null,
+  catOutfit = null,
   label,
 }: EnrichCardProps) {
   return (
     <Card tone={tone} className={`cb-kou ${className}`.trim()}>
       <div className="cb-row">
-        <Cat size={58} mood={catMood} spin={catSpin} accessory={catAccessory} interactive />
+        <Cat size={58} mood={catMood} spin={catSpin} outfit={catOutfit} interactive />
         <div className="cb-grow">
           <div className="cb-kou-head">
             {label}

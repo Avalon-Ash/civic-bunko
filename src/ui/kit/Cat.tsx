@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import type { AccessoryId } from '../../core/types';
+import { ITEMS, SLOTS } from '../../core/constants/wardrobe';
+import type { AccessoryId, ItemId, Outfit, SlotId } from '../../core/types';
+import { ITEM_ART } from './wardrobe/art';
 
 export type CatMood = 'idle' | 'yay' | 'oops' | 'sleepy';
 
@@ -22,172 +24,71 @@ export interface CatProps {
   mood?: CatMood;
   interactive?: boolean;
   spin?: boolean;
+  /** 舊的單一配件；有 outfit 時忽略 */
   accessory?: AccessoryId | null;
+  /** 分部位的穿著 */
+  outfit?: Outfit | null;
   className?: string;
 }
 
-const ACCESSORY_VIEWBOX: Record<AccessoryId, string> = {
-  bow: '35 12 24 20',
-  'straw-hat': '8 1 48 26',
-  scarf: '14 48 36 18',
-  flower: '5 12 20 20',
-  glasses: '8 28 48 24',
-  crown: '15 1 34 22',
-};
+/** 左右耳（分開畫才能各自抖動） */
+const EARS = ['M11 28L14 7l15 10z', 'M53 28L50 7 35 17z'] as const;
 
-function CatAccessoryLayer({ accessory }: { accessory: AccessoryId }) {
-  switch (accessory) {
-    case 'bow':
-      return (
-        <g transform="translate(47 22) rotate(18)">
-          <path
-            d="M-1 0 L-8 -4.5 L-8 4.5 Z"
-            fill="var(--pink-deep)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M1 0 L8 -4.5 L8 4.5 Z"
-            fill="var(--pink-deep)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-          />
-          <circle
-            cx="0"
-            cy="0"
-            r="2.6"
-            fill="var(--butter)"
-            stroke="var(--cat-line)"
-            strokeWidth="2"
-          />
-        </g>
-      );
-    case 'straw-hat':
-      return (
-        <g>
-          <ellipse
-            cx="32"
-            cy="18"
-            rx="22"
-            ry="4.5"
-            fill="var(--butter)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.4"
-          />
-          <path
-            d="M21 17 L23 7 Q32 4 41 7 L43 17 Z"
-            fill="var(--butter)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.4"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M21.8 14.8 Q32 16.8 42.2 14.8"
-            fill="none"
-            stroke="var(--pink-deep)"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-        </g>
-      );
-    case 'scarf':
-      return (
-        <g>
-          <path
-            d="M36 57.5 L42 57.5 L43 62.5 L35.5 62.5 Z"
-            fill="var(--mint)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M18 54 Q32 59.5 46 54 L44.5 59.5 Q32 62.5 19.5 59.5 Z"
-            fill="var(--mint)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-          />
-        </g>
-      );
-    case 'flower':
-      return (
-        <g transform="translate(15 22)">
-          <circle cx="0" cy="-4.5" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
-          <circle cx="4.3" cy="-1.4" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
-          <circle cx="2.6" cy="3.6" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
-          <circle cx="-2.6" cy="3.6" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
-          <circle cx="-4.3" cy="-1.4" r="3.2" fill="var(--pink-deep)" stroke="var(--cat-line)" strokeWidth="2" />
-          <circle cx="0" cy="0" r="2.8" fill="var(--butter)" stroke="var(--cat-line)" strokeWidth="1.8" />
-        </g>
-      );
-    case 'glasses':
-      return (
-        <g>
-          <circle
-            cx="22.5"
-            cy="40"
-            r="6.8"
-            fill="var(--blue)"
-            fillOpacity="0.18"
-            stroke="var(--cat-line)"
-            strokeWidth="2.3"
-          />
-          <circle
-            cx="41.5"
-            cy="40"
-            r="6.8"
-            fill="var(--blue)"
-            fillOpacity="0.18"
-            stroke="var(--cat-line)"
-            strokeWidth="2.3"
-          />
-          <path
-            d="M29.3 40 Q32 38 34.7 40"
-            fill="none"
-            stroke="var(--cat-line)"
-            strokeWidth="2.3"
-            strokeLinecap="round"
-          />
-          <path
-            d="M15.7 39.5 L10 38 M48.3 39.5 L54 38"
-            fill="none"
-            stroke="var(--cat-line)"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-          />
-        </g>
-      );
-    case 'crown':
-      return (
-        <g>
-          <path
-            d="M21 19 L19 7 L27 13 L32 4 L37 13 L45 7 L43 19 Z"
-            fill="var(--butter)"
-            stroke="var(--cat-line)"
-            strokeWidth="2.4"
-            strokeLinejoin="round"
-          />
-          <circle cx="32" cy="14" r="2" fill="var(--pink-deep)" />
-        </g>
-      );
-  }
+/** 配件 ID → 部位（從 ITEMS 建一次） */
+const ITEM_SLOT: ReadonlyMap<ItemId, SlotId> = new Map(ITEMS.map((item) => [item.id, item.slot]));
+
+/** 舊的單一配件轉成穿著（只有 accessory 沒有 outfit 的呼叫端用） */
+function legacyOutfit(accessory: AccessoryId | null | undefined): Outfit {
+  if (!accessory) return {};
+  const slot = ITEM_SLOT.get(accessory);
+  return slot ? { [slot]: accessory } : {};
 }
 
-/** 單獨顯示指定小貓配件的 SVG 圖示，共用 Cat 的幾何造型。 */
-export function AccessoryIcon({ id, size = 36 }: { id: AccessoryId; size?: number }) {
+/** 依 SLOTS 的順序畫出穿著的圖層；behind＝畫在貓本體後面的那幾層。 */
+function OutfitLayers({ outfit, behind }: { outfit: Outfit; behind: boolean }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={ACCESSORY_VIEWBOX[id]}
-      aria-hidden="true"
-      className="cb-acc-svg"
-    >
-      <CatAccessoryLayer accessory={id} />
+    <>
+      {SLOTS.map((slot) => {
+        if (!slot.layer || slot.behindCat !== behind) return null;
+        const id = outfit[slot.id];
+        if (!id || ITEM_SLOT.get(id) !== slot.id) return null;
+        const art = ITEM_ART[id];
+        if (!art || art.kind !== 'layer') return null;
+        return (
+          <g key={slot.id} className={`cb-slot cb-slot-${slot.id} ${art.motion ? `cb-motion-${art.motion}` : ''}`.trim()}>
+            {art.node}
+          </g>
+        );
+      })}
+    </>
+  );
+}
+
+/** 穿著的毛色 class（沒有就是空字串） */
+function furClass(outfit: Outfit): string {
+  const id = outfit.fur;
+  if (!id) return '';
+  const art = ITEM_ART[id];
+  return art && art.kind === 'fur' ? art.className : '';
+}
+
+/** 單獨顯示一件配件的圖示；毛色顯示成那個毛色的小貓。 */
+export function ItemIcon({ id, size = 36 }: { id: ItemId; size?: number }) {
+  const art = ITEM_ART[id];
+  if (!art) return null;
+  if (art.kind === 'fur') {
+    return <Cat size={size} interactive={false} outfit={{ fur: id }} />;
+  }
+  return (
+    <svg width={size} height={size} viewBox={art.box} aria-hidden="true" className="cb-acc-svg">
+      {art.node}
     </svg>
   );
+}
+
+/** 舊名稱：集章頁的配件圖示 */
+export function AccessoryIcon({ id, size = 36 }: { id: AccessoryId; size?: number }) {
+  return <ItemIcon id={id} size={size} />;
 }
 
 /** 原創角色：八字臉的圓貓。支援四種表情、待機眨眼、點擊壓扁回彈、配件疊加與隨機鼓勵氣泡。 */
@@ -197,8 +98,11 @@ export function Cat({
   interactive = true,
   spin = false,
   accessory = null,
+  outfit = null,
   className = '',
 }: CatProps) {
+  const wearing = outfit ?? legacyOutfit(accessory);
+  const fur = furClass(wearing);
   const [squishing, setSquishing] = useState(false);
   const [bubble, setBubble] = useState<string | null>(null);
   const lastIndexRef = useRef(-1);
@@ -257,15 +161,21 @@ export function Cat({
       height={size}
       viewBox="0 0 64 64"
       aria-hidden="true"
-      className="cb-cat-svg"
+      className={`cb-cat-svg ${interactive ? 'cb-cat-alive' : ''} ${fur}`.trim()}
+      overflow="visible"
     >
-      <path
-        d="M11 28L14 7l15 10zM53 28L50 7 35 17z"
-        fill="var(--cat-patch)"
-        stroke="var(--cat-line)"
-        strokeWidth="2.5"
-        strokeLinejoin="round"
-      />
+      <OutfitLayers outfit={wearing} behind />
+      {EARS.map((d, i) => (
+        <path
+          key={d}
+          className={i === 0 ? 'cb-cat-ear cb-cat-ear-l' : 'cb-cat-ear cb-cat-ear-r'}
+          d={d}
+          fill="var(--cat-patch)"
+          stroke="var(--cat-line)"
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+      ))}
       <ellipse cx="32" cy="39" rx="26" ry="21" fill="var(--cat-fur)" />
       <path
         d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z"
@@ -287,7 +197,7 @@ export function Cat({
         <path
           d="M19 41q3.5-5 7 0M38 41q3.5-5 7 0"
           fill="none"
-          stroke="var(--cat-line)"
+          stroke="var(--cat-feature)"
           strokeWidth="2.5"
           strokeLinecap="round"
         />
@@ -298,7 +208,7 @@ export function Cat({
           <path
             d="M19 40q3.5 3.5 7 0M38 40q3.5 3.5 7 0"
             fill="none"
-            stroke="var(--cat-line)"
+            stroke="var(--cat-feature)"
             strokeWidth="2.5"
             strokeLinecap="round"
           />
@@ -316,8 +226,8 @@ export function Cat({
 
       {(mood === 'idle' || mood === 'oops') && (
         <g className={mood === 'idle' ? 'cb-cat-eyes' : undefined}>
-          <circle cx="22.5" cy="40" r="2.8" fill="var(--cat-line)" />
-          <circle cx="41.5" cy="40" r="2.8" fill="var(--cat-line)" />
+          <circle cx="22.5" cy="40" r="2.8" fill="var(--cat-feature)" />
+          <circle cx="41.5" cy="40" r="2.8" fill="var(--cat-feature)" />
         </g>
       )}
 
@@ -325,7 +235,7 @@ export function Cat({
         <>
           <path
             d="M29 48h6"
-            stroke="var(--cat-line)"
+            stroke="var(--cat-feature)"
             strokeWidth="2.5"
             strokeLinecap="round"
           />
@@ -340,13 +250,13 @@ export function Cat({
         <path
           d="M27 46q2.5 3.5 5 0q2.5 3.5 5 0"
           fill="none"
-          stroke="var(--cat-line)"
+          stroke="var(--cat-feature)"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
       )}
-      {accessory && <CatAccessoryLayer accessory={accessory} />}
+      <OutfitLayers outfit={wearing} behind={false} />
     </svg>
   );
 

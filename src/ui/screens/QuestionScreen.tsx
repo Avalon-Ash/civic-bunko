@@ -7,7 +7,7 @@ import { formatLawRef } from '../../data/laws';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { bilingualOn, currentQuestion, currentRoundConfig, paperSubjectName, questionPaper } from '../../selectors';
-import { currentAccessory } from '../../selectors/daily';
+import { currentOutfit } from '../../selectors/wardrobe';
 import { examClock, examSheet } from '../../selectors/exam';
 import {
   BilingualToggle,
@@ -185,7 +185,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
 
   const { question, group, enrich, zh, groupZh, index, total, optionOrder } = view;
   const paper = questionPaper(world, question.paperId);
-  const accessory = currentAccessory(world);
+  const outfit = currentOutfit(world);
   const isAnswered = pick !== null;
   const bilingualEnabled = bilingualOn(world);
   const hasZh = Boolean(zh || groupZh);
@@ -473,7 +473,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
               <>
                 <Card tone="green" className="cb-kou cb-kou-compact">
                   <div className="cb-row">
-                    <Cat size={58} mood="yay" spin={catSpin} accessory={accessory} interactive />
+                    <Cat size={58} mood="yay" spin={catSpin} outfit={outfit} interactive />
                     <div className="cb-grow">
                       <div className="cb-kou-head">
                         <small>答對！</small>
@@ -493,7 +493,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                   className={isCorrect ? '' : 'is-miss'}
                   catMood={isCorrect ? 'yay' : 'oops'}
                   catSpin={catSpin}
-                  catAccessory={accessory}
+                  catOutfit={outfit}
                   label={
                     <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
                   }
@@ -522,7 +522,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                       size={58}
                       mood={isCorrect ? 'yay' : 'oops'}
                       spin={catSpin}
-                      accessory={accessory}
+                      outfit={outfit}
                       interactive
                     />
                     <div className="cb-grow">

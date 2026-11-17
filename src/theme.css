@@ -40,6 +40,22 @@
   --cat-patch: #c9ad94;
   --cat-blush: #ffc2cf;
   --cat-line: #5a4636;
+  --cat-feature: var(--cat-line); /* 眼睛、嘴巴；黑貓毛色會改成淺色 */
+
+  /* 衣櫥配件（只給小八喵的配件與毛色用，不拿來做介面色） */
+  --acc-coral: #f2836f;
+  --acc-navy: #4f6496;
+  --acc-sky: #a8d8f0;
+  --acc-lav: #cdb6ee;
+  --acc-gold: #f6c94e;
+  --acc-cream: #fff7e6;
+  --acc-wood: #a8754d;
+  --acc-silver: #c9d3dc;
+  --acc-leaf: #8ccf86;
+  --acc-shade: #3c3445;
+  --acc-night: #3b4a7a;
+  --acc-straw: #ffe9a8;
+  --acc-mint: #c4ebd3;
 
   --veil: rgba(90, 70, 54, 0.35);
   --bar-bg: rgba(255, 253, 249, 0.86);
@@ -93,6 +109,19 @@
     --cat-patch: #a98b72;
     --cat-blush: #e79aab;
     --cat-line: #3a2d24;
+    --acc-coral: #df7562;
+    --acc-navy: #7088c2;
+    --acc-sky: #8cc0dc;
+    --acc-lav: #b39fd8;
+    --acc-gold: #e6b740;
+    --acc-cream: #f1e6d1;
+    --acc-wood: #9a6a45;
+    --acc-silver: #b3bec8;
+    --acc-leaf: #78b972;
+    --acc-shade: #2a2430;
+    --acc-night: #2e3a66;
+    --acc-straw: #ecd58f;
+    --acc-mint: #a9d3b9;
     --veil: rgba(0, 0, 0, 0.55);
     --bar-bg: rgba(43, 37, 33, 0.86);
   }
@@ -126,8 +155,41 @@
   --cat-patch: #a98b72;
   --cat-blush: #e79aab;
   --cat-line: #3a2d24;
+  --acc-coral: #df7562;
+  --acc-navy: #7088c2;
+  --acc-sky: #8cc0dc;
+  --acc-lav: #b39fd8;
+  --acc-gold: #e6b740;
+  --acc-cream: #f1e6d1;
+  --acc-wood: #9a6a45;
+  --acc-silver: #b3bec8;
+  --acc-leaf: #78b972;
+  --acc-shade: #2a2430;
+  --acc-night: #2e3a66;
+  --acc-straw: #ecd58f;
+  --acc-mint: #a9d3b9;
   --veil: rgba(0, 0, 0, 0.55);
   --bar-bg: rgba(43, 37, 33, 0.86);
+}
+
+/* 小八喵毛色（衣櫥的 fur 部位）。套在貓外層，只換角色色票；深色模式沿用，與預設毛色一致不壓暗。 */
+.cb-fur-orange {
+  --cat-fur: #ffe2bf;
+  --cat-patch: #ef9f55;
+}
+.cb-fur-gray {
+  --cat-fur: #eceae8;
+  --cat-patch: #9d9894;
+}
+.cb-fur-black {
+  --cat-fur: #4b4249;
+  --cat-patch: #2e282d;
+  --cat-blush: #c9798b;
+  --cat-feature: #fff1d2;
+}
+.cb-fur-gold {
+  --cat-fur: #ffe993;
+  --cat-patch: #f0b93c;
 }
 
 *,

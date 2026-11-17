@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { dispatch } from '../../core/commands';
-import { ACCESSORIES, STAMPS_PER_REWARD } from '../../core/constants/daily';
 import { WEAK_MIN_ANSWERED, WEAK_ROUND_COUNT } from '../../core/constants/weak';
-import type { AccessoryId } from '../../core/types';
 import type { World } from '../../core/world';
 import { activeBank, availableCount, subjectStats } from '../../selectors';
-import { currentAccessory, stampTotals } from '../../selectors/daily';
+import { stampTotals } from '../../selectors/daily';
+import { currentOutfit } from '../../selectors/wardrobe';
 import { frequentRoundConfig, frequentTopics } from '../../selectors/frequent';
 import { topicStats, weakRoundConfig, weakSummary, weakTopics } from '../../selectors/weak';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
-import { AccessoryIcon, Cat } from '../kit/Cat';
+import { Cat } from '../kit/Cat';
 import { SyncBackupSection } from '../components/SyncBackupSection';
 import { TopicList } from '../components/TopicList';
 import { CountUp } from '../kit/CountUp';
@@ -22,39 +21,17 @@ export interface StampsScreenProps {
   world: World;
   papersLoading?: boolean;
   onStartQuiz?: () => void;
+  /** 打開小貓衣櫥分頁 */
+  onGoCat?: () => void;
 }
 
-function LockIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
-      <rect
-        x="5"
-        y="11"
-        width="14"
-        height="10"
-        rx="3"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-      />
-      <path
-        d="M8 11V7a4 4 0 0 1 8 0v4"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-/** 集章畫面：顯示我的章與小貓配件、弱點考點、各科總題數與答對率，以及最下方的同步與備份區塊。 */
-export function StampsScreen({ world, papersLoading = false, onStartQuiz }: StampsScreenProps) {
+/** 集章畫面：顯示我的章（換裝在小貓分頁）、弱點考點、各科總題數與答對率，以及最下方的同步與備份區塊。 */
+export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCat }: StampsScreenProps) {
   useWorld(world);
   const bank = activeBank(world);
   const stats = bank ? subjectStats(world, bank.id) : [];
   const totals = stampTotals(world);
-  const equipped = currentAccessory(world);
+  const outfit = currentOutfit(world);
 
   const now = new Date();
   const weakList = bank ? weakTopics(world, bank.id) : [];
@@ -73,39 +50,6 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
 
   const freqList = bank ? frequentTopics(world, bank.id) : [];
   const [freqOpen, setFreqOpen] = useState(false);
-
-  const [catSpin, setCatSpin] = useState(false);
-  const spinTimerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (spinTimerRef.current !== null) {
-        window.clearTimeout(spinTimerRef.current);
-      }
-    };
-  }, []);
-
-  const triggerCatSpin = () => {
-    if (spinTimerRef.current !== null) {
-      window.clearTimeout(spinTimerRef.current);
-    }
-    setCatSpin(false);
-    window.requestAnimationFrame(() => {
-      setCatSpin(true);
-      spinTimerRef.current = window.setTimeout(() => {
-        setCatSpin(false);
-        spinTimerRef.current = null;
-      }, 680);
-    });
-  };
-
-  const handleToggleAccessory = (id: AccessoryId) => {
-    const next = equipped === id ? null : id;
-    dispatch(world, { type: 'setAccessory', accessory: next });
-    if (next !== null) {
-      triggerCatSpin();
-    }
-  };
 
   const versionLabel = formatAppVersion(getCurrentAppVersion());
 
@@ -141,7 +85,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
 
       <Card tone="pink" className="cb-stack-sm cb-stamps-hero">
         <div className="cb-row">
-          <Cat size={76} mood="yay" accessory={equipped} spin={catSpin} interactive />
+          <Cat size={76} mood="yay" outfit={outfit} interactive />
           <div className="cb-grow">
             <div className="cb-sub-strong">我的章</div>
             <div className="cb-stamps-count">
@@ -158,51 +102,9 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
           </div>
         </div>
 
-        <div className="cb-acc-grid" role="group" aria-label="小貓配件">
-          {ACCESSORIES.map((acc, idx) => {
-            const threshold = (idx + 1) * STAMPS_PER_REWARD;
-            const isUnlocked = totals.unlocked.includes(acc.id);
-            const isEquipped = equipped === acc.id;
-            const need = Math.max(1, threshold - totals.total);
-
-            if (isUnlocked) {
-              return (
-                <button
-                  key={acc.id}
-                  type="button"
-                  className={`cb-acc-item cb-press ${isEquipped ? 'is-equipped' : ''}`.trim()}
-                  aria-pressed={isEquipped}
-                  onClick={() => handleToggleAccessory(acc.id)}
-                >
-                  <span className="cb-acc-circle">
-                    <AccessoryIcon id={acc.id} size={36} />
-                  </span>
-                  <span className="cb-acc-name">{acc.name}</span>
-                  <span className="cb-acc-meta">{isEquipped ? '配戴中' : '點我戴上'}</span>
-                </button>
-              );
-            }
-
-            return (
-              <div
-                key={acc.id}
-                className="cb-acc-item is-locked"
-                aria-label={`${acc.name}，未解鎖，再 ${need} 個章解鎖`}
-              >
-                <span className="cb-acc-circle">
-                  <span className="cb-acc-silhouette" aria-hidden="true">
-                    <AccessoryIcon id={acc.id} size={36} />
-                  </span>
-                  <span className="cb-acc-lock" aria-hidden="true">
-                    <LockIcon />
-                  </span>
-                </span>
-                <span className="cb-acc-name">{acc.name}</span>
-                <span className="cb-acc-meta">再 {need} 個章</span>
-              </div>
-            );
-          })}
-        </div>
+        <Button variant="butter" onClick={onGoCat}>
+          幫小貓換裝
+        </Button>
       </Card>
 
       <section className="cb-section">

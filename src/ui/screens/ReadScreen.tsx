@@ -5,7 +5,7 @@ import type { World } from '../../core/world';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { bilingualOn, paperSubjectName, questionPaper, readView } from '../../selectors';
-import { currentAccessory } from '../../selectors/daily';
+import { currentOutfit } from '../../selectors/wardrobe';
 import {
   BilingualToggle,
   OptionTextWithZh,
@@ -85,7 +85,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
 
   const { question, group, enrich, zh, groupZh, askType, pass, totalPasses, index, total, views } = view;
   const paper = questionPaper(world, question.paperId);
-  const accessory = currentAccessory(world);
+  const outfit = currentOutfit(world);
   const subjectName = paperSubjectName(world, paper);
   const sourceLabel = formatQuestionSource(world, paper, question.no, subjectName);
   const firstTopic = enrich?.topic[0];
@@ -336,7 +336,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
             enrich={enrich}
             tone="butter"
             catMood="idle"
-            catAccessory={accessory}
+            catOutfit={outfit}
             label={<span className="cb-read-kou-label">口訣記憶</span>}
           />
         )}
