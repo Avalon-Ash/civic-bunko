@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import {
   BACKDROP_ORIGIN,
   HEAD_ORIGIN,
@@ -96,7 +96,7 @@ function torsoShape(rx: number, ry: number): { outline: string; saddle: string }
   const end = toRump[3];
   /** 下緣：從屁股那端往回彎到脖子那端，往肚子垂 PET_SADDLE.drop（身體半厚的幾成） */
   const sag = ry * PET_SADDLE.drop;
-  const lower: Cubic = [end, [end[0] + rx * 0.3, sag], [start[0] - rx * 0.45, sag], start];
+  const lower: Cubic = [end, [end[0] + rx * PET_SADDLE.easeRear, sag], [start[0] - rx * PET_SADDLE.easeFront, sag], start];
   const saddle = `M${pt(start)}${curveTo(fromNeck)}${curveTo(toRump)}${curveTo(lower)}Z`;
   return { outline, saddle };
 }
@@ -161,8 +161,11 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
   const bgArt = bgId ? ITEM_ART[bgId] : undefined;
   const { torso } = spec;
   const shape = torsoShape(torso.rx, torso.ry);
-  /** 衣服的剪裁框用身體形狀當 id：同一個形狀就是同一個剪裁，頁面上有幾隻貓、分幾棵 React 樹畫都不會互相拿錯 */
-  const clip = `cb-torso-${torso.rx}x${torso.ry}`.replace(/\./g, '_');
+  /**
+   * 衣服的剪裁框 id：每隻貓自己一個（useId），再加上身體形狀。
+   * 只用 useId 的話，分開渲染的貓（看圖頁、不同的 React 樹）會撞同一個 id、拿到別隻貓的輪廓；加上形狀後就算撞了也是同一個形狀。
+   */
+  const clip = `${useId()}cb-torso-${torso.rx}x${torso.ry}`.replace(/\./g, '_');
   /** 身體的座標：原點在身體中心、+x 朝脖子 */
   const torsoFrame = `translate(${torso.cx} ${torso.cy}) rotate(${torso.rot})`;
   /** 衣服的座標：原點在脖子那端、+x 朝前（衣服從脖子往後穿） */

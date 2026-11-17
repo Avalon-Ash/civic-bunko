@@ -26,9 +26,10 @@ export const PET_PAW_H = 0.8;
 export const PET_EGG_SHIFT = 0.2;
 /**
  * 背上的花色：沿著身體輪廓的背側畫。front、rear＝從脖子那段、屁股那段輪廓的幾成處開始與結束（0–1），
- * drop＝花色下緣往肚子垂到身體半厚的幾成（負的在背側、正的過了身體中線）
+ * drop＝花色下緣往肚子垂到身體半厚的幾成（負的在背側、正的過了身體中線），
+ * easeRear、easeFront＝下緣從兩端往中間彎進去多遠（身體半長的幾成；兩個控制點都要落在身體輪廓內）
  */
-export const PET_SADDLE = { front: 0.3, rear: 0.82, drop: 0.1 } as const;
+export const PET_SADDLE = { front: 0.3, rear: 0.82, drop: 0.1, easeRear: 0.3, easeFront: 0.45 } as const;
 /** 背上配件沒有身體版圖時，照頭像的圖縮小接在背上 */
 const BACK = 1;
 
