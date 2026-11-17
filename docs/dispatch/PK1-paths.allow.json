@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "command(npm run lint)",
+      "command(npm run validate)",
+      "command(npm test)",
+      "command(npm run build)",
+      "command(node tools/zh/build.mjs)"
+    ]
+  }
+}
