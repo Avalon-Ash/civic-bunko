@@ -1,0 +1,178 @@
+/* ── 每日目標三貓掌、中央蓋章動畫與集章配件 ─────────────── */
+
+.cb-mission-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cb-daily-paws {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cb-daily-paw {
+  min-height: 44px;
+  border-radius: 16px;
+  border: var(--border-w) solid var(--hair);
+  background: var(--surface-raised);
+  display: grid;
+  place-items: center;
+}
+
+.cb-daily-paw svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--hair);
+}
+
+.cb-daily-paw.is-lit {
+  border-color: var(--line);
+  background: var(--pink);
+  box-shadow: 0 3px 0 var(--line);
+  animation: cb-paw-pop 0.36s var(--spring) both;
+}
+
+.cb-daily-paw.is-lit svg {
+  fill: var(--pink-deep);
+}
+
+@keyframes cb-paw-pop {
+  0% {
+    transform: scale(0.82);
+  }
+  55% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cb-daily-goal-note {
+  text-align: center;
+}
+
+.cb-daily-stamp-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 41;
+  pointer-events: none;
+}
+
+.cb-stamps-hero {
+  gap: 14px;
+}
+
+.cb-stamps-count {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.cb-stamps-count b {
+  font-size: 2.5rem;
+  line-height: 1.05;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-acc-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--hair);
+}
+
+@media (min-width: 600px) {
+  .cb-acc-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.cb-acc-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border-radius: 16px;
+  min-width: 0;
+  min-height: var(--tap-min);
+  text-align: center;
+}
+
+.cb-acc-circle {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: var(--border-w) solid var(--line);
+  background: var(--surface-raised);
+  box-shadow: 0 3px 0 var(--line);
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.cb-acc-item.is-equipped .cb-acc-circle {
+  border-width: 4px;
+  border-color: var(--ink);
+  background: var(--butter);
+  box-shadow: 0 4px 0 var(--line);
+}
+
+.cb-acc-item.is-locked .cb-acc-circle {
+  border-style: dashed;
+  border-color: var(--hair);
+  background: var(--surface-sunken);
+  box-shadow: none;
+}
+
+.cb-acc-silhouette {
+  filter: grayscale(1);
+  opacity: 0.35;
+  display: grid;
+  place-items: center;
+}
+
+.cb-acc-lock {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--hair);
+  color: var(--ink-soft);
+  display: grid;
+  place-items: center;
+}
+
+.cb-acc-name {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.cb-acc-item.is-locked .cb-acc-name {
+  color: var(--ink-soft);
+}
+
+.cb-acc-meta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  line-height: 1.2;
+}
+
+.cb-acc-svg {
+  display: block;
+}

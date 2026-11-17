@@ -1,0 +1,130 @@
+/* ── 弱點考點與弱點回合 ─────────────────────────────────── */
+
+/* 刷題頁：弱點回合與高頻回合並排的兩張小卡 */
+.cb-quick-rounds {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cb-quick-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 14px;
+  text-align: left;
+}
+
+.cb-quick-title {
+  display: block;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+/* 刷題頁：開始鈕貼在畫面底部，設定再長也不用捲到最下面 */
+.cb-start-dock {
+  /* 捲動容器 .cb-main 的下內距：黏住時要蓋到最底，下面才不會露出內容 */
+  --dock-under: 24px;
+  position: sticky;
+  bottom: calc(-1 * var(--dock-under));
+  z-index: 5;
+  margin: 0 calc(-1 * var(--gutter)) calc(-1 * var(--dock-under));
+  padding: 16px var(--gutter) calc(var(--dock-under) + 6px);
+  background: linear-gradient(to bottom, transparent, var(--bg-bottom) 40%);
+}
+
+@media (min-width: 700px) {
+  .cb-start-dock {
+    --dock-under: 28px;
+  }
+}
+
+.cb-weak-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cb-weak-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+}
+
+.cb-weak-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cb-weak-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  min-width: 0;
+}
+
+.cb-weak-tag {
+  flex: none;
+}
+
+.cb-weak-name {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--ink);
+  word-break: break-word;
+}
+
+.cb-weak-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--hair);
+  background: var(--surface-sunken);
+  overflow: hidden;
+}
+
+.cb-weak-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: var(--pink-deep);
+  transform-origin: left center;
+  transition: transform 0.3s var(--spring);
+}
+
+/* 高頻考點：進度條表示「刷過幾題」，用正解綠而不是弱點的粉紅 */
+.cb-freq-bar-fill {
+  background: var(--green);
+}
+
+.cb-weak-solo-btn {
+  width: auto;
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 6px 14px;
+  font-size: var(--text-small);
+  white-space: nowrap;
+}
+
+.cb-weak-empty {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 359px) {
+  .cb-weak-item {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .cb-weak-solo-btn {
+    padding: 6px 10px;
+  }
+}

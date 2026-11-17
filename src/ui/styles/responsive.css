@@ -1,0 +1,66 @@
+/* ── 寬螢幕自適應（≥700px：左側直欄導覽＋題目兩欄）───── */
+
+@media (min-width: 700px) {
+  .cb-shell {
+    flex-direction: row;
+  }
+
+  .cb-tabs {
+    order: 0;
+    width: calc(88px + env(safe-area-inset-left, 0px));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    border-top: 0;
+    border-right: var(--border-w) solid var(--line);
+    padding-top: max(20px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(8px, env(safe-area-inset-left, 0px));
+    padding-right: 8px;
+  }
+
+  .cb-tab-btn {
+    width: 68px;
+    min-height: 60px;
+    border-radius: 18px;
+  }
+
+  .cb-main {
+    order: 1;
+    padding-top: max(24px, env(safe-area-inset-top, 0px));
+    padding-bottom: max(28px, env(safe-area-inset-bottom, 0px));
+    padding-left: 24px;
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+  }
+
+  .cb-question-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .cb-q-topbar {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── 窄螢幕（iPhone SE 320px）細節防溢位 ───────────────── */
+
+@media (max-width: 359px) {
+  .cb-card {
+    padding: 14px 12px;
+  }
+
+  .cb-countdown-num b,
+  .cb-stepper-val {
+    font-size: 2.75rem;
+  }
+
+  .cb-round-btn {
+    width: 46px;
+    height: 46px;
+  }
+}

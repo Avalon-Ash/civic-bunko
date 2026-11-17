@@ -271,43 +271,39 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         <span className="cb-go">選考卷</span>
       </Card>
 
-      <Card
-        tone="mint"
-        className="cb-weak-entry"
-        onClick={handleStartWeakRound}
-        disabled={!weakReady}
-      >
-        <div className="cb-grow">
-          <strong className="cb-weak-entry-title">弱點回合：只刷你最常錯的考點</strong>
+      <div className="cb-quick-rounds">
+        <Card
+          tone="mint"
+          className="cb-quick-card"
+          onClick={handleStartWeakRound}
+          disabled={!weakReady}
+        >
+          <strong className="cb-quick-title">弱點回合</strong>
           <span className="cb-sub cb-block">
             {papersLoading
               ? '題庫載入中…'
               : weakReady
-                ? `針對 ${weakInfo.topicCount} 個常錯考點・每次 ${weakCount} 題`
+                ? `你最常錯的 ${weakInfo.topicCount} 個考點・${weakCount} 題`
                 : '再多刷幾題就會開放'}
           </span>
-        </div>
-        <span className="cb-go">開刷</span>
-      </Card>
+        </Card>
 
-      <Card
-        tone="pink"
-        className="cb-weak-entry"
-        onClick={handleStartFreqRound}
-        disabled={!freqReady}
-      >
-        <div className="cb-grow">
-          <strong className="cb-weak-entry-title">高頻回合：只刷歷年最常考的考點</strong>
+        <Card
+          tone="pink"
+          className="cb-quick-card"
+          onClick={handleStartFreqRound}
+          disabled={!freqReady}
+        >
+          <strong className="cb-quick-title">高頻回合</strong>
           <span className="cb-sub cb-block">
             {papersLoading
               ? '題庫載入中…'
               : freqReady
-                ? `每科題數最多的考點，共 ${freqTopicCount} 個・每次 ${freqCount} 題`
+                ? `每科最常考的 ${freqTopicCount} 個考點・${freqCount} 題`
                 : '目前沒有可用的題目'}
           </span>
-        </div>
-        <span className="cb-go">開刷</span>
-      </Card>
+        </Card>
+      </div>
 
       <section className="cb-section">
         <h2>怎麼刷</h2>
@@ -457,9 +453,11 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         )}
       </div>
 
-      <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
-        {startLabel}
-      </Button>
+      <div className="cb-start-dock">
+        <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
+          {startLabel}
+        </Button>
+      </div>
 
       <Sheet
         open={examSheetOpen}

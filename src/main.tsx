@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './theme.css';
 import './ui/app.css';
 import { createWorld, type World } from './core/world';
+import { warmLawFiles } from './data/laws';
 import { loadBankMeta, loadCardFiles, loadEnrichFiles, loadPapers, loadTopics, loadZhFiles } from './data/source';
 import { loadBank, loadTopicList } from './systems/bankLoader';
 import { loadCards } from './systems/cardLoader';
@@ -40,6 +41,19 @@ const papersPromise = Promise.all([
   loadTopicList(world, topics);
   loadZh(world, zhFiles);
 });
+
+// 題庫載入完、畫面穩定後，再把法規全文抓進離線快取（不擋首屏，離線或省流量模式不抓）。
+const LAW_WARM_DELAY_MS = 5000;
+papersPromise
+  .then(() => {
+    const saveData =
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    if (navigator.onLine === false || saveData) return;
+    window.setTimeout(() => {
+      void warmLawFiles();
+    }, LAW_WARM_DELAY_MS);
+  })
+  .catch(() => undefined);
 
 function Root({ world: appWorld }: { world: World }) {
   const [papersLoading, setPapersLoading] = useState(true);

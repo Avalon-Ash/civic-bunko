@@ -1,5 +1,5 @@
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
-import type { AccessoryId, ThemeChoice } from '../core/types';
+import type { AccessoryId, ExamRecord, ThemeChoice } from '../core/types';
 import type { World } from '../core/world';
 import { unlockedAccessories } from './daily';
 
@@ -73,6 +73,26 @@ export function markCardSeen(world: World, id: string): void {
   world.settings = {
     ...world.settings,
     cardsSeen: [...seen, id],
+  };
+  world.bus.emit({
+    type: 'settingsChanged',
+    settings: { ...world.settings },
+  });
+}
+
+/**
+ * 套用同步合併後的「看過的卡片」與「模擬考歷次成績」，並發出 settingsChanged。
+ * 這兩欄的擁有者是本系統；同步系統只負責算出合併結果再交給這裡寫入。
+ */
+export function applySyncedSettings(
+  world: World,
+  cardsSeen: readonly string[],
+  examHistory: readonly ExamRecord[],
+): void {
+  world.settings = {
+    ...world.settings,
+    cardsSeen: [...cardsSeen],
+    examHistory: examHistory.map((record) => ({ ...record })),
   };
   world.bus.emit({
     type: 'settingsChanged',
