@@ -1,5 +1,7 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import type { AccessoryId, Choice, Correction, Enrich, ExamKind, GroupZh, Paper, PassageGroup } from '../../core/types';
+import type { World } from '../../core/world';
+import { examLabel } from '../../selectors';
 import { Card, type CardTone } from '../kit/Card';
 import { Cat, type CatMood } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
@@ -15,19 +17,23 @@ export const TEXT_MODE_OPTIONS: readonly SegmentedOption<'official' | 'plain'>[]
   { value: 'plain', label: '白話' },
 ];
 
-/** 格式化考試別顯示名稱（general＝普考、local4＝地特四等）。 */
-export function formatExamLabel(exam: ExamKind): string {
-  return exam === 'general' ? '普考' : '地特四等';
+/** 格式化考試別顯示名稱（從所屬題庫的 exams 登記查詢，找不到時回傳 key）。 */
+export function formatExamLabel(
+  world: World,
+  paper: Paper | { bankId: string; exam: ExamKind },
+): string {
+  return examLabel(world, paper);
 }
 
 /** 格式化題目來源標籤（年度・考試・科目・題號）；subjectName 傳題庫登記的科目名稱，沒傳才用官方全名。 */
 export function formatQuestionSource(
+  world: World,
   paper: Paper | null,
   questionNo: number,
   subjectName?: string | null,
 ): string {
   if (!paper) return `第 ${questionNo} 題`;
-  return `${paper.year} ${formatExamLabel(paper.exam)}・${subjectName ?? paper.subjectName} 第 ${questionNo} 題`;
+  return `${paper.year} ${formatExamLabel(world, paper)}・${subjectName ?? paper.subjectName} 第 ${questionNo} 題`;
 }
 
 /** 依 marks 渲染四色標記題幹。 */

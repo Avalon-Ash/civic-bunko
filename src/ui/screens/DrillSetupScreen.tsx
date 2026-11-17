@@ -485,8 +485,8 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
                         onClick={() => setSelectedPaperId(paper.paperId)}
                       >
                         <span className="cb-grow">
-                          {paper.year} 年{formatExamLabel(paper.exam)}・{paper.count} 題・
-                          {paper.minutes} 分鐘
+                          {paper.year} 年{formatExamLabel(world, { bankId: bank.id, exam: paper.exam })}・
+                          {paper.count} 題・{paper.minutes} 分鐘
                         </span>
                         {(best !== null || active) && (
                           <span className="cb-exam-paper-meta">

@@ -87,7 +87,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
   const paper = questionPaper(world, question.paperId);
   const accessory = currentAccessory(world);
   const subjectName = paperSubjectName(world, paper);
-  const sourceLabel = formatQuestionSource(paper, question.no, subjectName);
+  const sourceLabel = formatQuestionSource(world, paper, question.no, subjectName);
   const firstTopic = enrich?.topic[0];
   const topicLabel = firstTopic
     ? resolveTopicLabel(topics, firstTopic)

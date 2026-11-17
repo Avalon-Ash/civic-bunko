@@ -6,6 +6,7 @@ import type {
   BankId,
   Choice,
   Enrich,
+  ExamKind,
   GroupZh,
   OfficialQuestion,
   Paper,
@@ -380,6 +381,16 @@ export function paperSubjectName(world: World, paper: Paper | null): string | nu
   const bank = world.banks.find((b) => b.id === paper.bankId);
   const subject = bank?.subjects.find((s) => s.key === paper.subjectKey);
   return subject?.name ?? paper.subjectName;
+}
+
+/** 取得試卷考試別的顯示名稱：從所屬題庫的 exams 登記查詢，找不到時回傳 key 本身。 */
+export function examLabel(
+  world: World,
+  paper: Paper | { bankId: string; exam: ExamKind },
+): string {
+  const bank = world.banks.find((b) => b.id === paper.bankId);
+  const exam = bank?.exams.find((e) => e.key === paper.exam);
+  return exam?.label ?? paper.exam;
 }
 
 /** 統計指定題庫的總題數與已刷題數。 */

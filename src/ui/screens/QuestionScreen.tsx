@@ -193,7 +193,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
   const showOptTranslation = Boolean(showZh && zh && (isAnswered || showOptionZh));
 
   const subjectName = paperSubjectName(world, paper);
-  const sourceLabel = formatQuestionSource(paper, question.no, subjectName);
+  const sourceLabel = formatQuestionSource(world, paper, question.no, subjectName);
   const firstTopic = enrich?.topic[0];
   const topicLabel = isExam
     ? (subjectName ?? '模擬考')

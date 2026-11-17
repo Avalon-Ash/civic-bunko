@@ -132,8 +132,8 @@ describe('cards selectors', () => {
     ];
 
     const essays = cardsOfKind(world, 'essay');
-    assert.equal(essays[0]?.paperLabel, '113 年普考・申論第 1 題');
-    assert.equal(essays[1]?.paperLabel, '114 年地特四等・申論第 2 題');
+    assert.equal(essays[0]?.paperLabel, '113 年測試甲考・申論第 1 題');
+    assert.equal(essays[1]?.paperLabel, '114 年測試乙考・申論第 2 題');
     assert.equal(essays[2]?.paperLabel, '申論第 3 題');
   });
 

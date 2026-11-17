@@ -95,7 +95,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
         {paper && (
           <div className="cb-row cb-center">
             <Chip tone="plain">
-              {paper.year} {formatExamLabel(paper.exam)}・{paperSubjectName(world, paper)}
+              {paper.year} {formatExamLabel(world, paper)}・{paperSubjectName(world, paper)}
             </Chip>
           </div>
         )}

@@ -1,5 +1,6 @@
 import type { CardKind, StudyCard } from '../core/types';
 import type { World } from '../core/world';
+import { examLabel } from './index';
 
 const DECK_ORDER: readonly { kind: CardKind; label: string }[] = [
   { kind: 'concept', label: '觀念' },
@@ -58,8 +59,7 @@ function formatEssayPaperLabel(world: World, card: StudyCard): string | null {
     return `申論第 ${card.essay.no} 題`;
   }
 
-  const examLabel = paper.exam === 'general' ? '普考' : '地特四等';
-  return `${paper.year} 年${examLabel}・申論第 ${card.essay.no} 題`;
+  return `${paper.year} 年${examLabel(world, paper)}・申論第 ${card.essay.no} 題`;
 }
 
 function toCardView(world: World, card: StudyCard, seenSet: ReadonlySet<string>): CardView {

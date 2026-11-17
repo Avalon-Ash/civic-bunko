@@ -12,6 +12,7 @@ import {
   dailyMissions,
   daysLeft,
   dueCount,
+  examLabel,
   getSettings,
   positiveCoverage,
   questionPaper,
@@ -28,6 +29,7 @@ import {
   makeConfig,
   makeSeededRng,
   otherBank,
+  otherPaper,
   testBank,
   testGroup,
   testPaperA,
@@ -433,5 +435,15 @@ describe('selectors', () => {
     assert.equal(seenRead.get('q-a1')?.groupZh?.id, testGroup.id);
     assert.equal(seenRead.get('q-a3')?.zh, null);
     assert.equal(seenRead.get('q-a3')?.groupZh, null);
+  });
+
+  it('resolves examLabel from bank exams and falls back to key when exam or bank is missing', () => {
+    const world = createTestWorld();
+
+    assert.equal(examLabel(world, testPaperA), '測試甲考');
+    assert.equal(examLabel(world, otherPaper), '測試乙考');
+    assert.equal(examLabel(world, { bankId: testBank.id, exam: 'local4' }), '測試乙考');
+    assert.equal(examLabel(world, { bankId: testBank.id, exam: 'unknown-exam' }), 'unknown-exam');
+    assert.equal(examLabel(world, { bankId: 'missing-bank', exam: 'general' }), 'general');
   });
 });

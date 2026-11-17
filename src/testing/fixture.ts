@@ -27,6 +27,10 @@ export const testBank: Bank = {
     { key: 'subj-a', name: '測試科目甲', short: '甲科' },
     { key: 'subj-b', name: '測試科目乙', short: '乙科' },
   ],
+  exams: [
+    { key: 'general', label: '測試甲考' },
+    { key: 'local4', label: '測試乙考' },
+  ],
 };
 
 export const otherBank: Bank = {
@@ -34,6 +38,10 @@ export const otherBank: Bank = {
   title: '其他測試題庫',
   examDate: '2026-12-10',
   subjects: [{ key: 'subj-x', name: '測試科目丙', short: '丙科' }],
+  exams: [
+    { key: 'general', label: '測試甲考' },
+    { key: 'local4', label: '測試乙考' },
+  ],
 };
 
 export const testPaperA: Paper = {
