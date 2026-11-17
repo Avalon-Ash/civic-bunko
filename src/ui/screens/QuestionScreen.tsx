@@ -6,7 +6,7 @@ import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
-import { bilingualOn, currentQuestion, currentRoundConfig, questionPaper } from '../../selectors';
+import { bilingualOn, currentQuestion, currentRoundConfig, paperSubjectName, questionPaper } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
 import { examClock, examSheet } from '../../selectors/exam';
 import {
@@ -192,13 +192,14 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
   const showZh = !isExam && bilingualEnabled && hasZh;
   const showOptTranslation = Boolean(showZh && zh && (isAnswered || showOptionZh));
 
-  const sourceLabel = formatQuestionSource(paper, question.no);
+  const subjectName = paperSubjectName(world, paper);
+  const sourceLabel = formatQuestionSource(paper, question.no, subjectName);
   const firstTopic = enrich?.topic[0];
   const topicLabel = isExam
-    ? (paper?.subjectName ?? '模擬考')
+    ? (subjectName ?? '模擬考')
     : firstTopic
       ? resolveTopicLabel(topics, firstTopic)
-      : (paper?.subjectName ?? '題目');
+      : (subjectName ?? '題目');
 
   const sheet = isExam ? examSheet(world) : null;
   const answeredCount = isExam ? (sheet?.answered ?? 0) : index + (isAnswered ? 1 : 0);

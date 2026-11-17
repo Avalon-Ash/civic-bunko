@@ -20,10 +20,14 @@ export function formatExamLabel(exam: ExamKind): string {
   return exam === 'general' ? '普考' : '地特四等';
 }
 
-/** 格式化題目來源標籤（年度・考試・科目・題號）。 */
-export function formatQuestionSource(paper: Paper | null, questionNo: number): string {
+/** 格式化題目來源標籤（年度・考試・科目・題號）；subjectName 傳題庫登記的科目名稱，沒傳才用官方全名。 */
+export function formatQuestionSource(
+  paper: Paper | null,
+  questionNo: number,
+  subjectName?: string | null,
+): string {
   if (!paper) return `第 ${questionNo} 題`;
-  return `${paper.year} ${formatExamLabel(paper.exam)}・${paper.subjectName} 第 ${questionNo} 題`;
+  return `${paper.year} ${formatExamLabel(paper.exam)}・${subjectName ?? paper.subjectName} 第 ${questionNo} 題`;
 }
 
 /** 依 marks 渲染四色標記題幹。 */

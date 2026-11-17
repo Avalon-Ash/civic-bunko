@@ -4,7 +4,7 @@ import { getResultTier } from '../../core/constants/result';
 import type { LawRef, QuestionId } from '../../core/types';
 import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
-import { bilingualOn, questionPaper, roundSummary } from '../../selectors';
+import { bilingualOn, paperSubjectName, questionPaper, roundSummary } from '../../selectors';
 import { currentAccessory } from '../../selectors/daily';
 import { examHistory, examQuestionDetail, examResult } from '../../selectors/exam';
 import {
@@ -95,7 +95,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
         {paper && (
           <div className="cb-row cb-center">
             <Chip tone="plain">
-              {paper.year} {formatExamLabel(paper.exam)}・{paper.subjectName}
+              {paper.year} {formatExamLabel(paper.exam)}・{paperSubjectName(world, paper)}
             </Chip>
           </div>
         )}
