@@ -34,7 +34,7 @@ function audio(create: boolean): AudioContext | null {
   return ctx;
 }
 
-function envelope(ac: AudioContext, t: number, dur: number, gain: number, attack: number): GainNode {
+function envelope(ac: BaseAudioContext, t: number, dur: number, gain: number, attack: number): GainNode {
   const g = ac.createGain();
   g.gain.setValueAtTime(SOUND_FLOOR, t);
   g.gain.linearRampToValueAtTime(gain, t + attack);
@@ -42,7 +42,7 @@ function envelope(ac: AudioContext, t: number, dur: number, gain: number, attack
   return g;
 }
 
-function playTone(ac: AudioContext, spec: ToneSpec, t0: number): void {
+function playTone(ac: BaseAudioContext, spec: ToneSpec, t0: number): void {
   const t = t0 + spec.at;
   const osc = ac.createOscillator();
   osc.type = spec.wave;
@@ -54,36 +54,89 @@ function playTone(ac: AudioContext, spec: ToneSpec, t0: number): void {
   osc.stop(t + spec.dur + SOUND_ATTACK);
 }
 
-function playMeow(ac: AudioContext, t: number): void {
+/** 一秒的白噪音（氣音用），建一次重用 */
+let noiseBuffer: AudioBuffer | null = null;
+function noise(ac: BaseAudioContext): AudioBuffer {
+  if (noiseBuffer && noiseBuffer.sampleRate === ac.sampleRate) return noiseBuffer;
+  const buf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i += 1) data[i] = Math.random() * 2 - 1;
+  noiseBuffer = buf;
+  return buf;
+}
+
+/** 在 [-1, 1] 之間隨機 */
+const spread = (): number => Math.random() * 2 - 1;
+
+function playMeow(ac: BaseAudioContext, t: number): void {
   const m = MEOW;
-  const k = 1 + (Math.random() * 2 - 1) * m.jitter;
-  const osc = ac.createOscillator();
-  osc.type = 'sawtooth';
-  osc.frequency.setValueAtTime(m.start * k, t);
-  osc.frequency.linearRampToValueAtTime(m.peak * k, t + m.rise);
-  osc.frequency.exponentialRampToValueAtTime(m.end * k, t + m.dur);
+  const isMew = Math.random() < m.mewChance;
+  const shape = isMew ? m.mew : m.meow;
+  const k = (1 + spread() * m.jitter) * (isMew ? m.mewPitch : 1);
+  const dur = (m.dur.min + Math.random() * (m.dur.max - m.dur.min)) * (isMew ? m.mewDur : 1);
+  const end = t + dur;
+  const gain = m.gain * (isMew ? m.mewGain : 1);
 
+  // 聲帶：鋸齒波，音高拱形＋顫音，再低通讓它不刺
+  const src = ac.createOscillator();
+  src.type = 'sawtooth';
+  src.frequency.setValueAtTime(m.pitch.start * k, t);
+  src.frequency.linearRampToValueAtTime(m.pitch.peak * k, t + dur * m.pitch.peakAt);
+  src.frequency.exponentialRampToValueAtTime(m.pitch.end * k, end);
   const lfo = ac.createOscillator();
-  lfo.frequency.setValueAtTime(m.vibratoHz, t);
+  lfo.frequency.setValueAtTime(m.vibrato.hz, t);
   const lfoGain = ac.createGain();
-  lfoGain.gain.setValueAtTime(m.vibratoDepth, t);
-  lfo.connect(lfoGain).connect(osc.frequency);
+  lfoGain.gain.setValueAtTime(m.vibrato.depth, t);
+  lfo.connect(lfoGain).connect(src.frequency);
+  const tilt = ac.createBiquadFilter();
+  tilt.type = 'lowpass';
+  tilt.frequency.setValueAtTime(m.tilt, t);
+  src.connect(tilt);
 
-  const out = envelope(ac, t, m.dur, m.gain, m.attack);
-  for (const f of m.formants) {
+  // 氣音：白噪音，跟著主聲一起走共振峰
+  const air = ac.createBufferSource();
+  air.buffer = noise(ac);
+  const airGain = ac.createGain();
+  airGain.gain.setValueAtTime(m.breath, t);
+  air.connect(airGain);
+
+  // 嘴型：三個共振峰沿著 [m]→[i]→[a]→[u] 移動；音量跟著嘴巴開合
+  const mouth = ac.createGain();
+  mouth.gain.setValueAtTime(SOUND_FLOOR, t);
+  for (const v of shape) mouth.gain.linearRampToValueAtTime(Math.max(SOUND_FLOOR, v.amp * gain), t + dur * v.at + SOUND_ATTACK);
+  mouth.gain.exponentialRampToValueAtTime(SOUND_FLOOR, end);
+
+  for (let i = 0; i < 3; i += 1) {
     const bp = ac.createBiquadFilter();
     bp.type = 'bandpass';
-    bp.Q.setValueAtTime(f.q, t);
-    bp.frequency.setValueAtTime(f.freq, t);
-    bp.frequency.linearRampToValueAtTime(f.open, t + m.rise);
-    bp.frequency.linearRampToValueAtTime(f.freq, t + m.dur);
-    osc.connect(bp).connect(out);
+    bp.Q.setValueAtTime(m.formantQ[i] ?? 1, t);
+    const first = shape[0];
+    if (first) bp.frequency.setValueAtTime(first.formants[i] ?? 1000, t);
+    for (const v of shape) bp.frequency.linearRampToValueAtTime(v.formants[i] ?? 1000, t + dur * v.at);
+    const level = ac.createGain();
+    level.gain.setValueAtTime(m.formantGain[i] ?? 0, t);
+    tilt.connect(bp);
+    airGain.connect(bp);
+    bp.connect(level).connect(mouth);
   }
-  out.connect(ac.destination);
-  osc.start(t);
+  mouth.connect(ac.destination);
+
+  src.start(t);
   lfo.start(t);
-  osc.stop(t + m.dur + SOUND_ATTACK);
-  lfo.stop(t + m.dur + SOUND_ATTACK);
+  air.start(t);
+  const stopAt = end + SOUND_ATTACK;
+  src.stop(stopAt);
+  lfo.stop(stopAt);
+  air.stop(stopAt);
+}
+
+/** 在指定的音訊環境裡排一個音效（離線算圖、測量音量也用這個）。 */
+export function scheduleSound(ac: BaseAudioContext, name: SoundName, t: number): void {
+  if (name === 'meow') {
+    playMeow(ac, t);
+    return;
+  }
+  for (const spec of TONES[name]) playTone(ac, spec, t);
 }
 
 /**
@@ -93,10 +146,5 @@ function playMeow(ac: AudioContext, t: number): void {
 export function playSound(name: SoundName, fromGesture: boolean): void {
   const ac = audio(fromGesture);
   if (!ac) return;
-  const t = ac.currentTime;
-  if (name === 'meow') {
-    playMeow(ac, t);
-    return;
-  }
-  for (const spec of TONES[name]) playTone(ac, spec, t);
+  scheduleSound(ac, name, ac.currentTime);
 }

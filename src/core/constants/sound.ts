@@ -28,20 +28,35 @@ export const TONES: Readonly<Record<Exclude<SoundName, 'meow'>, readonly ToneSpe
   ],
 };
 
-/** 喵：「m-i-a-u」嘴型由閉到開再收 */
+/**
+ * 喵：依 Schötz、Eklund、van de Weijer（2017）對貓叫的描述——成貓的喵是 [miau]，小貓的咪是高音的 [mɪu]；
+ * 音高呈拱形，最高點在嘴巴張最大時。共振峰取人類母音的位置再往上移（貓的聲道比較短）。
+ */
 export const MEOW: MeowSpec = {
-  start: 560,
-  peak: 860,
-  end: 500,
-  rise: 0.13,
-  dur: 0.52,
-  gain: 0.11,
-  formants: [
-    { freq: 700, open: 1150, q: 5 },
-    { freq: 1900, open: 2700, q: 7 },
+  pitch: { start: 620, peak: 900, end: 520, peakAt: 0.4 },
+  dur: { min: 0.5, max: 0.75 },
+  jitter: 0.1,
+  vibrato: { hz: 6.5, depth: 10 },
+  /** 量過：喵的平均 RMS 約 0.028，比按鍵聲（約 0.02）稍大 */
+  gain: 0.13,
+  tilt: 3200,
+  breath: 0.12,
+  formantQ: [6, 9, 11],
+  formantGain: [1, 0.55, 0.25],
+  meow: [
+    { at: 0, formants: [380, 1700, 2900], amp: 0.2 },
+    { at: 0.16, formants: [520, 2600, 3600], amp: 0.75 },
+    { at: 0.42, formants: [1050, 1750, 3300], amp: 1 },
+    { at: 0.82, formants: [560, 1050, 2900], amp: 0.45 },
   ],
-  vibratoHz: 7,
-  vibratoDepth: 14,
-  jitter: 0.12,
-  attack: 0.05,
+  mew: [
+    { at: 0, formants: [400, 1900, 3000], amp: 0.25 },
+    { at: 0.25, formants: [560, 2800, 3800], amp: 1 },
+    { at: 0.8, formants: [600, 1300, 3100], amp: 0.5 },
+  ],
+  mewChance: 0.35,
+  mewPitch: 1.25,
+  mewDur: 0.7,
+  /** 量過：不補時咪的 RMS 只有喵的 0.34 倍 */
+  mewGain: 2.9,
 };
