@@ -67,6 +67,24 @@ const LOAF: PetBuild = { chest: 11.5, shoulder: 9, hip: 9, belly: 1, flat: 0.15,
 /** 被拎著：身體垂下來，肉都往下掉 */
 const HANG: PetBuild = { chest: 9.5, shoulder: 9, hip: 12, belly: 1.1, flat: 0, patch: 0.05 };
 
+/**
+ * 坐在地上的身體：給屁股圓心的 x（屁股在頭後面多遠）、身體半長、脊椎的角度，算出身體中心與屁股半厚。
+ * 屁股那端是以 hip 為半徑的圓（ry＝hip、肚子不加厚時才是正圓），圓心在身體中心往屁股退 (rx - hip)；
+ * 這裡讓圓的最低點剛好落在 PET_GROUND，改體型或角度時貓不會浮起來或陷進地面。
+ */
+function seatedTorso(seat: { hipX: number; rx: number; rot: number }, build: PetBuild): PetPoseSpec['torso'] {
+  const angle = (seat.rot * Math.PI) / 180;
+  const toCenter = seat.rx - build.hip;
+  const round = (n: number) => Math.round(n * 100) / 100;
+  return {
+    cx: round(seat.hipX + toCenter * Math.cos(angle)),
+    cy: round(PET_GROUND - build.hip * build.belly + toCenter * Math.sin(angle)),
+    rx: seat.rx,
+    ry: build.hip,
+    rot: seat.rot,
+  };
+}
+
 const TAIL_UP = 'M31 62 Q17.5 60 16.5 47.5 Q17 39.5 23.5 42';
 /** 坐著時尾巴從屁股後面貼著地伸出來，尾巴尖往上捲回身體旁邊 */
 const TAIL_SIT = 'M33 80 Q19.5 83.6 17 76 Q15.6 70 21.5 69';
@@ -95,10 +113,9 @@ const stand: PetPoseDef = {
  * 坐姿的骨架（照貓坐著的樣子）：脊椎是斜的（rot -48），屁股在頭的後下方坐在地上、胸口在頭的正下方；
  * 兩隻前腳從胸口直直撐到地上，是整隻貓最前面的著地點（遠側那隻在胸口後面露出半邊）；
  * 後腳掌貼地往前伸，從大腿下露出來，停在前腳後面。
- * 屁股那端是半徑 ry 的圓，圓心在身體中心往屁股退 (rx - hip)；圓的最低點要剛好落在 PET_GROUND。
  */
 const sit: PetPoseDef = {
-  torso: { cx: 47.4, cy: 66.7, rx: 21, ry: 14.5, rot: -48 },
+  torso: seatedTorso({ hipX: 43, rx: 21, rot: -48 }, SEATED),
   build: SEATED,
   legs: [
     { x: 44, y: 82, len: 0, rot: 0 },

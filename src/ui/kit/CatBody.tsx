@@ -73,7 +73,7 @@ const curveTo = (c: Cubic) => `C${pt(c[1])} ${pt(c[2])} ${pt(c[3])}`;
 /**
  * 身體的形狀（以身體中心為原點、+x 朝脖子、-y 是背、+y 是肚子）：
  * outline＝輪廓。屁股那端比胸口厚，背線從肩膀滑到屁股，肚子那側比背厚（下垂）；
- * 站著是一顆豆子，坐著（身體直起來）是下大上小的梨形，屁股那端可以壓平貼地。
+ * 站著是一顆豆子，坐著是斜的（圓屁股在後下方、胸口在前上方），趴著時兩端可以收成方角。
  * saddle＝背上的花色：上緣直接取輪廓背側的那幾段、下緣的控制點都在輪廓內，所以它一定貼著身體，不靠剪裁。
  */
 function torsoShape(torso: PetPoseSpec['torso'], build: PetBuild): { outline: string; saddle: string } {
