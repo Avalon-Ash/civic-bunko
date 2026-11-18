@@ -596,6 +596,11 @@ export interface PetPoseSpec {
    * 身體左右兩側都看得到花色，衣服的布面也左右對稱。這種姿勢的身體一律畫成左右對稱（不讀 build.belly）。
    */
   frontal: boolean;
+  /**
+   * 背上的配件（披風、翅膀）用正面的圖（BodyArt.frontal）：身體直立、頭朝著你的姿勢——正面坐、被拎著、掉下來。
+   * 這些姿勢從側面的圖鏡像不出「披在背後」「左右展開」的樣子。frontal 的姿勢一定是 true。
+   */
+  backFront: boolean;
   mood: CatMood;
   motion: PetMotion;
 }

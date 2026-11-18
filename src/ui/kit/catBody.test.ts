@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { createElement as h } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { PET_POSES, PET_VIEW_H, PET_VIEW_W } from '../../core/constants/pet';
+import { HEAD_RADIUS, PET_POSES, PET_VIEW_H, PET_VIEW_W } from '../../core/constants/pet';
 import { ITEMS } from '../../core/constants/wardrobe';
 import type { Outfit, PetPose } from '../../core/types';
 import { svgBounds, type Bounds } from '../../testing/svgBounds';
@@ -107,11 +107,20 @@ describe('cat body', () => {
   const render = (pose: PetPose, outfit: Outfit) => renderToStaticMarkup(h(CatBody, { pose, outfit }));
   const count = (markup: string, needle: string) => markup.split(needle).length - 1;
 
-  it('sitting front-on uses the front-view art for things worn on the back', () => {
-    // 翅膀：正面一左一右兩片；側面是背上那一對（沒有 cb-pet-wing）
-    assert.equal(count(render('sit', { back: 'wings' }), 'class="cb-pet-wing"'), 2);
-    assert.equal(count(render('groom', { back: 'wings' }), 'class="cb-pet-wing"'), 2);
-    assert.equal(count(render('stand', { back: 'wings' }), 'class="cb-pet-wing"'), 0);
+  it('upright poses (sitting front-on, held up, falling) use the front-view art for things worn on the back', () => {
+    for (const pose of POSES) {
+      const upright = PET_POSES[pose].backFront;
+      // 翅膀：正面一左一右兩片；側面是背上那一對（沒有 cb-pet-wing）
+      assert.equal(count(render(pose, { back: 'wings' }), 'class="cb-pet-wing"'), upright ? 2 : 0, `${pose} 的翅膀`);
+      // 披風：正面有脖子前面的金色扣子；側面沒有
+      assert.equal(count(render(pose, { back: 'cape' }), 'var(--acc-gold)'), upright ? 1 : 0, `${pose} 的披風`);
+      // 正面坐一定算直立
+      if (PET_POSES[pose].frontal) assert.ok(upright, pose);
+    }
+    assert.deepEqual(
+      POSES.filter((pose) => PET_POSES[pose].backFront),
+      ['sit', 'groom', 'dangle', 'fall'],
+    );
     // 披風：正面有脖子前面的扣子（唯一用到金色的地方）；側面沒有
     assert.equal(count(render('sit', { back: 'cape' }), 'var(--acc-gold)'), 1);
     assert.equal(count(render('stand', { back: 'cape' }), 'var(--acc-gold)'), 0);
@@ -124,11 +133,29 @@ describe('cat body', () => {
     assert.ok(sit.indexOf('var(--acc-coral)') < sit.indexOf('class="cb-pet-torso"'));
   });
 
-  it('front-view back items are left-right symmetric', () => {
-    for (const back of ['cape', 'wings']) {
-      const b = svgBounds(render('sit', { back }), { within: 'cb-pet-back' });
-      assert.ok(b, back);
-      assert.ok(Math.abs(b.minX + b.maxX - PET_VIEW_W) <= EPS, `${back}：左 ${b.minX.toFixed(2)}、右 ${b.maxX.toFixed(2)}`);
+  it('front-view back items are left-right symmetric about the body', () => {
+    for (const pose of POSES.filter((p) => PET_POSES[p].backFront)) {
+      const centre = PET_POSES[pose].torso.cx;
+      for (const back of ['cape', 'wings']) {
+        const b = svgBounds(render(pose, { back }), { within: 'cb-pet-back' });
+        assert.ok(b, `${pose} ${back}`);
+        assert.ok(Math.abs(b.minX + b.maxX - centre * 2) <= EPS, `${pose} ${back}：左 ${b.minX.toFixed(2)}、右 ${b.maxX.toFixed(2)}`);
+      }
+    }
+  });
+
+  it('the cape collar sits just under the chin in every upright pose', () => {
+    // 領子的上緣藏在下巴後面、扣子露在下巴下面：頭蓋到身體的深度每個姿勢不同，領子要跟著走
+    for (const pose of POSES.filter((p) => PET_POSES[p].backFront)) {
+      const { head, torso } = PET_POSES[pose];
+      const chinY = head.y + HEAD_RADIUS.y * head.scale;
+      const markup = render(pose, { back: 'cape' });
+      const clasp = /<circle cx="0" cy="([\d.]+)" r="([\d.]+)" fill="var\(--acc-gold\)"/.exec(markup);
+      const shift = /<g transform="translate\(0 ([-\d.]+)\)"><path[^>]*fill="var\(--acc-coral\)"/.exec(markup);
+      assert.ok(clasp && shift, pose);
+      const claspY = torso.cy - torso.rx + Number(shift[1]) + Number(clasp[1]);
+      assert.ok(claspY - Number(clasp[2]) >= chinY - EPS, `${pose}：扣子被下巴蓋住`);
+      assert.ok(claspY - chinY <= 6, `${pose}：扣子離下巴太遠`);
     }
   });
 

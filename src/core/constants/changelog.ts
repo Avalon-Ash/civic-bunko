@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-18-sound-wake',
+    date: '2026-11-18',
+    title: '聲音不會再不見',
+    items: [
+      '切到別的 App、鎖螢幕或接電話之後，回來點一下畫面，音效就會恢復（以前可能一直沒聲音，要重開才有）',
+      '回到 App 時，不會把離開前沒播的聲音一次全放出來',
+      '小貓被拎著、掉下來時：披風披在背後、翅膀左右展開，跟坐著時一樣',
+    ],
+  },
+  {
     id: '2026-11-18-cat-front-wear',
     date: '2026-11-18',
     title: '小貓坐著時的穿搭重畫',

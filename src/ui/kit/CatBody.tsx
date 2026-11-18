@@ -2,6 +2,7 @@ import { useId, type ReactNode } from 'react';
 import {
   BACKDROP_ORIGIN,
   HEAD_ORIGIN,
+  HEAD_RADIUS,
   PET_BACKDROP,
   PET_HEAD_SCALE,
   PET_LINE_W,
@@ -13,7 +14,7 @@ import {
   PET_VIEW_W,
 } from '../../core/constants/pet';
 import { SLOTS } from '../../core/constants/wardrobe';
-import type { Outfit, PetAnchor, PetLeg, PetPose } from '../../core/types';
+import type { Outfit, PetAnchor, PetLeg, PetPose, PetPoseSpec } from '../../core/types';
 import { CatHead, furClass, type CatMood } from './Cat';
 import { frontalBuild, legPath, r2, torsoShape } from './petShape';
 import { ITEM_ART, type BodyArt, type BodyGeom } from './wardrobe/art';
@@ -67,6 +68,22 @@ function Leg({ leg, index, far, toe, sleeve }: { leg: PetLeg; index: number; far
   );
 }
 
+/**
+ * 頭的下緣蓋到身體脖子那端下面多遠（沿著身體的方向量；頭歪的角度不算）。
+ * 脖子那端＝身體中心沿著身體方向往前 rx；頭的最低點＝頭的對位點往下一個頭的半高。
+ */
+function chinDepth(spec: PetPoseSpec): number {
+  const { torso, head } = spec;
+  const rad = (torso.rot * Math.PI) / 180;
+  /** 身體的方向（從屁股指向脖子）在畫面上的單位向量 */
+  const ux = Math.cos(rad);
+  const uy = Math.sin(rad);
+  const neck = { x: torso.cx + ux * torso.rx, y: torso.cy + uy * torso.rx };
+  const chin = { x: head.x, y: head.y + HEAD_RADIUS.y * head.scale };
+  /** 下巴相對脖子那端，沿著「往屁股」的方向（-u）的分量 */
+  return -((chin.x - neck.x) * ux + (chin.y - neck.y) * uy);
+}
+
 /** 前腿在 PetPoseSpec.legs 裡的編號（順序：後腿遠、前腿遠、後腿近、前腿近）；袖子只套前腿 */
 const FRONT_LEGS: ReadonlySet<number> = new Set([1, 3]);
 
@@ -115,6 +132,7 @@ export function CatBody({
     chest: build.chest,
     shoulder: build.shoulder,
     hip: build.hip,
+    chin: chinDepth(spec),
   };
   /**
    * 衣服的剪裁框 id：每隻貓自己一個（useId），再加上姿勢（一個姿勢一種身體形狀）。
@@ -144,7 +162,8 @@ export function CatBody({
   /** 畫在身體前面的腿（照腿的編號）：後腿近、前腿近；正面坐時前腿遠那一條也在前面 */
   const nearLegs = (spec.frontal ? [1, 2, 3] : [2, 3]).map((index) => ({ index, leg: spec.legs[index] as PetLeg }));
   /**
-   * 正面的座標：原點在身體的脖子那端（頭的正下方）、+x 朝畫面右、+y 朝下。正面坐的配件（披在背後的披風、左右展開的翅膀）照它畫。
+   * 正面的座標：原點在身體的脖子那端（頭的正下方）、+x 朝畫面右、+y 朝下。身體直立的姿勢（backFront）背上的配件
+   * （披在背後的披風、左右展開的翅膀）照它畫。
    * inTorso＝已經在身體座標裡時用的那一段
    */
   const frontInTorso = `translate(${torso.rx} 0) rotate(90)`;
@@ -176,7 +195,7 @@ export function CatBody({
           ) : null}
 
           {worn.map(({ slot, art, motion }) =>
-            spec.frontal && art.frontal ? (
+            spec.backFront && art.frontal ? (
               art.frontal.behind ? (
                 <g key={slot} transform={frontFrame} className="cb-pet-back">
                   {art.frontal.behind(geom)}
@@ -229,7 +248,7 @@ export function CatBody({
               ) : null}
               <path d={shape.outline} {...outline} />
               {worn.map(({ slot, art }) =>
-                spec.frontal && art.frontal ? (
+                spec.backFront && art.frontal ? (
                   art.frontal.collar && !neckTaken ? (
                     <g key={slot} transform={frontInTorso} className="cb-pet-back">
                       {art.frontal.collar(geom)}

@@ -7,6 +7,8 @@ export const PET_VIEW_H = 90;
 export const PET_GROUND = 86;
 /** 頭的臉中心（Cat 的 64×64 座標裡）：對位點把這一點放到身體座標上 */
 export const HEAD_ORIGIN = { x: 32, y: 39 } as const;
+/** 頭的橢圓半徑（Cat 的 64×64 座標，不含耳朵）：畫頭、算下巴蓋到身體哪裡都讀它 */
+export const HEAD_RADIUS = { x: 26, y: 21 } as const;
 /** 背景配件（坐墊、月亮、彩虹）畫在頭像 64×64 座標裡；身體版把那張圖的中心放到這裡、放大到蓋住整隻貓 */
 export const BACKDROP_ORIGIN = { x: 32, y: 32 } as const;
 export const PET_BACKDROP = { x: PET_VIEW_W / 2, y: 46, rot: 0, scale: 1.25 } as const;
@@ -61,6 +63,7 @@ const stand: PetPoseSpec = {
   head: { x: 66, y: 47.5, rot: 0, scale: PET_HEAD_SCALE },
   back: { x: 42, y: 54, rot: 0, scale: BACK },
   frontal: false,
+  backFront: false,
   mood: 'idle',
   motion: 'breathe',
 };
@@ -96,6 +99,7 @@ const sit: PetPoseSpec = {
   head: { x: SIT_X, y: 40.5, rot: 0, scale: PET_HEAD_SCALE },
   back: { x: 36, y: 63, rot: -12, scale: BACK },
   frontal: true,
+  backFront: true,
   mood: 'idle',
   motion: 'breathe',
 };
@@ -116,6 +120,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     head: { x: 71, y: 49, rot: 6, scale: PET_HEAD_SCALE },
     back: { x: 42, y: 54, rot: -4, scale: BACK },
     frontal: false,
+    backFront: false,
     mood: 'yay',
     motion: 'run',
   },
@@ -148,6 +153,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     head: { x: 62, y: 62, rot: 4, scale: PET_HEAD_SCALE },
     back: { x: 40, y: 63, rot: 0, scale: BACK },
     frontal: false,
+    backFront: false,
     mood: 'sleepy',
     motion: 'breathe',
   },
@@ -165,6 +171,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     head: { x: 66, y: 41, rot: -4, scale: PET_HEAD_SCALE },
     back: { x: 42, y: 49, rot: -8, scale: BACK },
     frontal: false,
+    backFront: false,
     mood: 'yay',
     motion: 'still',
   },
@@ -196,6 +203,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     head: { x: 50, y: 32.5, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 54, rot: -22, scale: BACK },
     frontal: false,
+    backFront: true,
     mood: 'idle',
     motion: 'swing',
   },
@@ -212,6 +220,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     head: { x: 50, y: 32.5, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 53, rot: -22, scale: BACK },
     frontal: false,
+    backFront: true,
     mood: 'oops',
     motion: 'still',
   },

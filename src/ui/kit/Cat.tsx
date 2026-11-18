@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CAT_LINE_W } from '../../core/constants/pet';
+import { CAT_LINE_W, HEAD_ORIGIN, HEAD_RADIUS } from '../../core/constants/pet';
 import { ITEMS, SLOTS } from '../../core/constants/wardrobe';
 import type { AccessoryId, CatMood, CatScene, ItemId, Outfit, SlotId } from '../../core/types';
 import { useCatBubble, useCatVoice } from './catVoice';
@@ -115,12 +115,20 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
         <path d={ear.inner} fill="var(--cat-ear)" stroke="var(--cat-ear)" strokeWidth="1.2" strokeLinejoin="round" />
       </g>
     ))}
-    <ellipse cx="32" cy="39" rx="26" ry="21" fill="var(--cat-fur)" />
+    <ellipse cx={HEAD_ORIGIN.x} cy={HEAD_ORIGIN.y} rx={HEAD_RADIUS.x} ry={HEAD_RADIUS.y} fill="var(--cat-fur)" />
     <path
       d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z"
       fill="var(--cat-patch)"
     />
-    <ellipse cx="32" cy="39" rx="26" ry="21" fill="none" stroke="var(--cat-line)" strokeWidth={CAT_LINE_W} />
+    <ellipse
+      cx={HEAD_ORIGIN.x}
+      cy={HEAD_ORIGIN.y}
+      rx={HEAD_RADIUS.x}
+      ry={HEAD_RADIUS.y}
+      fill="none"
+      stroke="var(--cat-line)"
+      strokeWidth={CAT_LINE_W}
+    />
     <ellipse cx="15" cy="46" rx="4.5" ry="3" fill="var(--cat-blush)" />
     <ellipse cx="49" cy="46" rx="4.5" ry="3" fill="var(--cat-blush)" />
 

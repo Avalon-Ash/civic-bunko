@@ -23,6 +23,8 @@ export interface BodyGeom {
   chest: number;
   shoulder: number;
   hip: number;
+  /** 頭的下緣蓋到脖子那端下面多遠（沿著身體往屁股的方向量）：領口的裝飾要露在它下面 */
+  chin: number;
 }
 
 export interface BodyArt {
@@ -37,8 +39,9 @@ export interface BodyArt {
   /** 留在頭上的那一部分（領口、領結）。頭像座標，跟頭一起縮放 */
   head?: ReactNode;
   /**
-   * 正面坐（面向你）時的畫法：有給就取代側面用的 behind 和 over。披在背後的東西從正面看是從身體兩側露出來，
-   * 側面那張圖鏡像一下湊不出來，所以另外畫。座標：原點在身體的脖子那端（頭的正下方）、+x 朝畫面右、+y 朝下；
+   * 身體直立、頭朝著你的姿勢（PetPoseSpec.backFront：正面坐、被拎著、掉下來）的畫法：有給就取代側面用的 behind 和 over。
+   * 披在背後的東西從正面看是從身體兩側露出來，側面那張圖鏡像一下湊不出來，所以另外畫。
+   * 座標：原點在身體的脖子那端（頭的正下方）、+x 朝畫面右、+y 朝下；
    * 身體往下長 body.len，最寬處左右各 body.back。圖本身要左右對稱。
    */
   frontal?: {
@@ -98,9 +101,9 @@ const CAPE = { lift: 2.2, flow: 5, rear: 0.6, low: 0.22, hang: 0.3, teeth: 3, to
 /**
  * 披風（正面）：披在背後，從身體兩側和下面露出來；脖子前面一條領子、中間一顆扣子。
  * flare＝下擺比身體最寬處每邊多出多少；neck＝領口的半寬；hem＝下擺離身體底端多高；teeth、tooth＝下擺鋸齒；
- * band＝領子多寬（上緣藏在下巴後面）；droop＝領子中間比兩端低多少；clasp＝扣子的半徑
+ * band＝領子多寬；droop＝領子中間比兩端低多少；clasp＝扣子的半徑；tuck＝領子的上緣藏進下巴後面多深
  */
-const CAPE_FRONT = { flare: 6.5, neck: 9, hem: 2, teeth: 6, tooth: 3, band: 4.2, droop: 6, clasp: 2.3 } as const;
+const CAPE_FRONT = { flare: 6.5, neck: 9, hem: 2, teeth: 6, tooth: 3, band: 4.2, droop: 6, clasp: 2.3, tuck: 3.3 } as const;
 /**
  * 翅膀（正面）：一左一右從肩胛往外上方展開，翅根藏在身體後面。
  * in＝翅根離中線多遠（比胸口半厚往裡收多少）、down＝翅根在肩膀下面多遠
@@ -192,11 +195,11 @@ function capeFrontBehind(body: BodyGeom): ReactNode {
   return <path d={d} fill="var(--acc-coral)" {...bstroke} />;
 }
 
-/** 披風（正面）脖子前面的領子和扣子 */
-function capeFrontCollar(): ReactNode {
-  const { neck, band, droop, clasp } = CAPE_FRONT;
+/** 披風（正面）脖子前面的領子和扣子：貼著下巴下緣（每個姿勢頭蓋到身體的深度不一樣） */
+function capeFrontCollar(body: BodyGeom): ReactNode {
+  const { neck, band, droop, clasp, tuck } = CAPE_FRONT;
   return (
-    <g>
+    <g transform={`translate(0 ${n2(body.chin - tuck)})`}>
       <path
         d={`M${-neck} 0 Q0 ${droop} ${neck} 0 L${n2(neck - 0.6)} ${band} Q0 ${droop + band} ${n2(-neck + 0.6)} ${band} Z`}
         fill="var(--acc-coral)"
