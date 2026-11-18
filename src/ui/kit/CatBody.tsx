@@ -53,17 +53,22 @@ const outline = {
 const MIRROR = 'scale(1 -1)';
 function Leg({ leg, index, far, toe, sleeve }: { leg: PetLeg; index: number; far: boolean; toe: number; sleeve: ReactNode }) {
   if (leg.len <= 0) return null;
-  const d = legPath(leg.len, far, toe);
+  /** 腿根要不要封口：遠側的腿（從身體邊緣露出來）、從肩膀舉起來的手臂 */
+  const capped = far || leg.shoulder === true;
+  const d = legPath(leg.len, capped, toe);
   return (
     <g transform={`translate(${leg.x} ${leg.y}) rotate(${leg.rot})`}>
       <g className={`cb-pet-leg cb-pet-leg-${index}`}>
-        <path d={far ? d : `${d}Z`} fill={far ? 'var(--cat-fur-far)' : 'var(--cat-fur)'} />
+        <path d={capped ? d : `${d}Z`} fill={far ? 'var(--cat-fur-far)' : 'var(--cat-fur)'} />
         <path d={d} {...outline} />
         {sleeve}
       </g>
     </g>
   );
 }
+
+/** 前腿在 PetPoseSpec.legs 裡的編號（順序：後腿遠、前腿遠、後腿近、前腿近）；袖子只套前腿 */
+const FRONT_LEGS: ReadonlySet<number> = new Set([1, 3]);
 
 /** 穿著裡有「身體版」圖的配件，照 SLOTS 的圖層順序排好 */
 function bodyArts(outfit: Outfit): Array<{ slot: string; art: BodyArt; motion?: string }> {
@@ -120,9 +125,28 @@ export function CatBody({
   const torsoFrame = `translate(${torso.cx} ${torso.cy}) rotate(${torso.rot})`;
   /** 衣服的座標：原點在脖子那端、+x 朝前（衣服從脖子往後穿） */
   const neckFrame = `translate(${torso.rx} 0)`;
-  const sleeves = worn.map(({ slot, art }) => (art.sleeve ? <g key={slot}>{art.sleeve}</g> : null));
+  const sleeves = worn.map(({ slot, art }) =>
+    art.sleeve ? (
+      <g key={slot} className="cb-pet-sleeve">
+        {art.sleeve}
+      </g>
+    ) : null,
+  );
   const sleeve = worn.some(({ art }) => art.sleeve) ? sleeves : null;
+  /**
+   * 這條前腿要不要套袖子：側身時前腿從肩膀垂下來，套；正面坐時放下的兩隻前腳只是從身體下面露出來的腳掌，
+   * 袖子在衣服裡面看不到，不套；舉起來的手臂（shoulder）整隻露在外面，套。
+   */
+  const sleeveOn = (leg: PetLeg): ReactNode => (!spec.frontal || leg.shoulder ? sleeve : null);
   const toe = spec.frontal ? 0 : PET_PAW_TOE;
+  /** 畫在身體前面的腿（照腿的編號）：後腿近、前腿近；正面坐時前腿遠那一條也在前面 */
+  const nearLegs = (spec.frontal ? [1, 2, 3] : [2, 3]).map((index) => ({ index, leg: spec.legs[index] as PetLeg }));
+  /**
+   * 正面的座標：原點在身體的脖子那端（頭的正下方）、+x 朝畫面右、+y 朝下。正面坐的配件（披在背後的披風、左右展開的翅膀）照它畫。
+   * inTorso＝已經在身體座標裡時用的那一段
+   */
+  const frontInTorso = `translate(${torso.rx} 0) rotate(90)`;
+  const frontFrame = `${torsoFrame} ${frontInTorso}`;
 
   return (
     <svg
@@ -150,7 +174,13 @@ export function CatBody({
           ) : null}
 
           {worn.map(({ slot, art, motion }) =>
-            art.behind ? (
+            spec.frontal && art.frontal ? (
+              art.frontal.behind ? (
+                <g key={slot} transform={frontFrame} className="cb-pet-back">
+                  {art.frontal.behind(geom)}
+                </g>
+              ) : null
+            ) : art.behind ? (
               <g key={slot} transform={place(spec.back, 0, 0)} className="cb-pet-back">
                 <g className={motion ? `cb-pet-onback-${motion}` : undefined}>{art.behind}</g>
               </g>
@@ -172,7 +202,7 @@ export function CatBody({
 
           <g className="cb-pet-bob">
             <Leg leg={spec.legs[0]} index={0} far toe={toe} sleeve={null} />
-            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} sleeve={sleeve} />}
+            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} sleeve={sleeveOn(spec.legs[1])} />}
 
             <g className="cb-pet-torso" transform={torsoFrame}>
               <path className="cb-pet-torso-shape" d={shape.outline} fill="var(--cat-fur)" />
@@ -197,7 +227,13 @@ export function CatBody({
               ) : null}
               <path d={shape.outline} {...outline} />
               {worn.map(({ slot, art }) =>
-                art.over ? (
+                spec.frontal && art.frontal ? (
+                  art.frontal.over ? (
+                    <g key={slot} transform={frontInTorso} className="cb-pet-back">
+                      {art.frontal.over(geom)}
+                    </g>
+                  ) : null
+                ) : art.over ? (
                   <g key={slot} className="cb-pet-back">
                     {spec.frontal ? <g transform={`${MIRROR} ${neckFrame}`}>{art.over(geom)}</g> : null}
                     <g transform={neckFrame}>{art.over(geom)}</g>
@@ -206,16 +242,20 @@ export function CatBody({
               )}
             </g>
 
-            {/* 正面坐時兩隻前腳都在身體前面 */}
-            {spec.frontal ? <Leg leg={spec.legs[1]} index={1} far={false} toe={toe} sleeve={sleeve} /> : null}
-            <Leg leg={spec.legs[2]} index={2} far={false} toe={toe} sleeve={null} />
-            <Leg leg={spec.legs[3]} index={3} far={false} toe={toe} sleeve={sleeve} />
+            {/* 近側的腿：放下的畫在頭後面；從肩膀舉起來的手臂（shoulder）畫在頭前面，腳掌才碰得到臉頰 */}
+            {nearLegs.filter(({ leg }) => !leg.shoulder).map(({ leg, index }) => (
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={FRONT_LEGS.has(index) ? sleeveOn(leg) : null} />
+            ))}
 
             <g transform={place(spec.head, HEAD_ORIGIN.x, HEAD_ORIGIN.y)}>
               <g className="cb-pet-head">
                 <CatHead mood={mood ?? spec.mood} outfit={outfit} standalone={false} />
               </g>
             </g>
+
+            {nearLegs.filter(({ leg }) => leg.shoulder).map(({ leg, index }) => (
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={FRONT_LEGS.has(index) ? sleeveOn(leg) : null} />
+            ))}
           </g>
         </g>
       </g>

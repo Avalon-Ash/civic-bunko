@@ -36,6 +36,17 @@ export interface BodyArt {
   behind?: ReactNode;
   /** 留在頭上的那一部分（領口、領結）。頭像座標，跟頭一起縮放 */
   head?: ReactNode;
+  /**
+   * 正面坐（面向你）時的畫法：有給就取代側面用的 behind 和 over。披在背後的東西從正面看是從身體兩側露出來，
+   * 側面那張圖鏡像一下湊不出來，所以另外畫。座標：原點在身體的脖子那端（頭的正下方）、+x 朝畫面右、+y 朝下；
+   * 身體往下長 body.len，最寬處左右各 body.back。圖本身要左右對稱。
+   */
+  frontal?: {
+    /** 畫在身體後面 */
+    behind?: (body: BodyGeom) => ReactNode;
+    /** 畫在身體前面（會被頭和脖子上的配件蓋住上緣） */
+    over?: (body: BodyGeom) => ReactNode;
+  };
 }
 
 export type ItemArt =
@@ -75,11 +86,23 @@ const SLEEVE = { half: PET_LEG_W / 2 + 0.3, top: -1.5, len: 2.4, cuff: 2.2 } as 
 /** 水手領：領片從脖子往後多長、領尖繞到胸口多遠 */
 const COLLAR = { len: 14.5, front: 6 } as const;
 /**
- * 披風：lift＝比背線高出多少；teeth、tooth＝下擺鋸齒有幾齒、每齒多深；
- * low＝下擺最低的地方在身體長度的幾成處；rear、hang＝下擺在屁股那端、在最低處各垂到背半厚的幾成（rear 還在背那側、hang 過了身體中線）；
- * nape＝後頸那個結離脖子端多遠；chest、tuck＝下擺收回後頸時，在胸口鼓出、收進去到胸口半厚的幾成
+ * 披風（側面）：綁在後頸、沿著背披到屁股後面飄出去，只蓋住背，不包住身體（包住就變成衣服了）。
+ * lift＝比背線高出多少；flow＝尾端飄出屁股多遠；rear＝尾端的下緣在背半厚的幾成高（1＝背線、0＝身體中線）；
+ * low、hang＝下擺最靠前的那一點在身體長度的幾成處、在胸口半厚的幾成高（都在背那一側，不過中線）；
+ * teeth、tooth＝下擺鋸齒有幾齒、每齒多深；nape＝後頸那個結離脖子端多遠
  */
-const CAPE = { lift: 2.2, teeth: 3, tooth: 3.2, low: 0.34, rear: 0.35, hang: 0.45, nape: 3.5, chest: 0.75, tuck: 0.3 } as const;
+const CAPE = { lift: 2.2, flow: 5, rear: 0.6, low: 0.22, hang: 0.3, teeth: 3, tooth: 2.8, nape: 3.5 } as const;
+/**
+ * 披風（正面）：披在背後，從身體兩側和下面露出來；脖子前面一條領子、中間一顆扣子。
+ * flare＝下擺比身體最寬處每邊多出多少；neck＝領口的半寬；hem＝下擺離身體底端多高；teeth、tooth＝下擺鋸齒；
+ * band＝領子多寬（上緣藏在下巴後面）；droop＝領子中間比兩端低多少；clasp＝扣子的半徑
+ */
+const CAPE_FRONT = { flare: 6.5, neck: 9, hem: 2, teeth: 6, tooth: 3, band: 4.2, droop: 6, clasp: 2.3 } as const;
+/**
+ * 翅膀（正面）：一左一右從肩胛往外上方展開，翅根藏在身體後面。
+ * in＝翅根離中線多遠（比胸口半厚往裡收多少）、down＝翅根在肩膀下面多遠
+ */
+const WING_FRONT = { in: 5, down: 4 } as const;
 
 /** 毛衣的布面：從領口蓋到下擺，直的織紋，下擺一圈羅紋 */
 function sweaterWrap(body: BodyGeom): ReactNode {
@@ -110,34 +133,97 @@ function sailorWrap(body: BodyGeom): ReactNode {
   );
 }
 
-/** 披風：沿著背線從後頸披到屁股，下擺鋸齒斜斜垂到身體側面 */
+const n2 = (v: number) => Math.round(v * 100) / 100;
+
+/** 披風（側面）：從後頸沿著背披到屁股後面，尾端飄出去；下擺鋸齒留在背上，不垂到身體側面 */
 function capeOver(body: BodyGeom): ReactNode {
-  const n = (v: number) => Math.round(v * 100) / 100;
   const shoulder = [-body.shoulder, -body.chest - CAPE.lift] as const;
   const hip = [-(body.len - body.hip), -body.back - CAPE.lift] as const;
-  const rear = [-body.len + 1, -body.back * CAPE.rear] as const;
-  const low = [-body.len * CAPE.low, body.back * CAPE.hang] as const;
+  const tip = [-body.len - CAPE.flow, -body.back * CAPE.rear] as const;
+  const low = [-body.len * CAPE.low, -body.chest * CAPE.hang] as const;
   /** 披風的背線跟身體的背線用同一個緩急，才會一路貼著 */
   const ease = (shoulder[0] - hip[0]) * PET_BACK_EASE;
-  /** 下擺：從屁股那端到最低點之間切成幾齒，齒谷往背那側收 */
+  /** 下擺：從尾端到最靠前的那一點之間切成幾齒，齒谷往背那側收 */
   const steps = CAPE.teeth * 2;
   const hem: string[] = [];
   for (let i = 1; i <= steps; i += 1) {
     const t = i / steps;
-    const x = rear[0] + (low[0] - rear[0]) * t;
-    const y = rear[1] + (low[1] - rear[1]) * t - (i % 2 === 1 ? CAPE.tooth : 0);
-    hem.push(`L${n(x)} ${n(y)}`);
+    const x = tip[0] + (low[0] - tip[0]) * t;
+    const y = tip[1] + (low[1] - tip[1]) * t - (i % 2 === 1 ? CAPE.tooth : 0);
+    hem.push(`L${n2(x)} ${n2(y)}`);
   }
   const d = [
     `M${CAPE.nape} ${-CAPE.nape}`,
-    `Q-1 ${n(shoulder[1] - 1)} ${n(shoulder[0])} ${n(shoulder[1])}`,
-    `C${n(shoulder[0] - ease)} ${n(shoulder[1])} ${n(hip[0] + ease)} ${n(hip[1])} ${n(hip[0])} ${n(hip[1])}`,
-    `Q${n(rear[0] - 1.5)} ${n(hip[1])} ${n(rear[0])} ${n(rear[1])}`,
+    `Q-1 ${n2(shoulder[1] - 1)} ${n2(shoulder[0])} ${n2(shoulder[1])}`,
+    `C${n2(shoulder[0] - ease)} ${n2(shoulder[1])} ${n2(hip[0] + ease)} ${n2(hip[1])} ${n2(hip[0])} ${n2(hip[1])}`,
+    `Q${n2(-body.len)} ${n2(hip[1])} ${n2(tip[0])} ${n2(tip[1])}`,
     hem.join(''),
-    `Q${n(-body.shoulder * CAPE.tuck)} ${n(body.chest * CAPE.chest)} ${CAPE.nape} ${n(body.chest * CAPE.tuck)}`,
-    `Q${n(CAPE.nape * 1.5)} 0 ${CAPE.nape} ${-CAPE.nape}Z`,
+    `Q${n2(low[0] / 2)} ${n2(low[1] / 2)} ${CAPE.nape} 0`,
+    `Q${n2(CAPE.nape * 1.5)} ${n2(-CAPE.nape / 2)} ${CAPE.nape} ${-CAPE.nape}Z`,
   ].join('');
   return <path d={d} fill="var(--acc-coral)" {...bstroke} />;
+}
+
+/** 披風（正面）披在背後的那一片：從領口往兩邊展開，下擺鋸齒，比身體寬，所以從身體兩側和下面露出來 */
+function capeFrontBehind(body: BodyGeom): ReactNode {
+  const half = body.back + CAPE_FRONT.flare;
+  const widest = body.len - body.hip;
+  const hemY = body.len - CAPE_FRONT.hem;
+  const steps = CAPE_FRONT.teeth * 2;
+  const hem: string[] = [];
+  for (let i = 1; i <= steps; i += 1) {
+    const x = -half + (half * 2 * i) / steps;
+    hem.push(`L${n2(x)} ${n2(hemY - (i % 2 === 1 ? CAPE_FRONT.tooth : 0))}`);
+  }
+  const side = (sign: 1 | -1) =>
+    `${n2(sign * (CAPE_FRONT.neck + body.shoulder * 0.8))} 0 ${n2(sign * (half - 1.5))} ${n2(body.shoulder)} ${n2(sign * half)} ${n2(widest)}`;
+  const d = [
+    `M${-CAPE_FRONT.neck} 0`,
+    `C${side(-1)}`,
+    `L${-half} ${n2(hemY)}`,
+    hem.join(''),
+    `L${half} ${n2(widest)}`,
+    `C${n2(half - 1.5)} ${n2(body.shoulder)} ${n2(CAPE_FRONT.neck + body.shoulder * 0.8)} 0 ${CAPE_FRONT.neck} 0`,
+    'Z',
+  ].join('');
+  return <path d={d} fill="var(--acc-coral)" {...bstroke} />;
+}
+
+/** 披風（正面）脖子前面的領子和扣子 */
+function capeFrontOver(): ReactNode {
+  const { neck, band, droop, clasp } = CAPE_FRONT;
+  return (
+    <g>
+      <path
+        d={`M${-neck} 0 Q0 ${droop} ${neck} 0 L${n2(neck - 0.6)} ${band} Q0 ${droop + band} ${n2(-neck + 0.6)} ${band} Z`}
+        fill="var(--acc-coral)"
+        {...bthin}
+      />
+      <circle cx="0" cy={n2(droop / 2 + band)} r={clasp} fill="var(--acc-gold)" {...bthin} />
+    </g>
+  );
+}
+
+/** 一片翅膀（翅根在原點，往右上展開）；左邊那片由呼叫端鏡像 */
+const WING_FRONT_PATH = 'M0 0 C6 -12 16 -20 25 -21 Q28.5 -17 24 -14 Q28 -11 23 -8 Q26 -4 20 -2 Q22 2 15 3 Q8 5 0 0 Z';
+const WING_FRONT_SEAMS = 'M24 -14 Q16 -12 9 -8 M23 -8 Q16 -6 9 -3';
+
+/** 翅膀（正面）：一左一右從背後展開。每片各自從翅根拍（動畫在 styles/pet.css 的 cb-pet-wing） */
+function wingsFrontBehind(body: BodyGeom): ReactNode {
+  const x = body.chest - WING_FRONT.in;
+  const y = body.shoulder + WING_FRONT.down;
+  const wing = (
+    <g className="cb-pet-wing">
+      <path d={WING_FRONT_PATH} fill="var(--acc-cream)" {...bstroke} />
+      <path d={WING_FRONT_SEAMS} stroke="var(--acc-lav)" {...seam} />
+    </g>
+  );
+  return (
+    <g>
+      <g transform={`translate(${n2(-x)} ${n2(y)}) scale(-1 1)`}>{wing}</g>
+      <g transform={`translate(${n2(x)} ${n2(y)})`}>{wing}</g>
+    </g>
+  );
 }
 
 export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
@@ -548,8 +634,10 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   cape: {
     kind: 'layer',
     onBody: {
-      // 從後頸披過背、蓋住半邊身體，下擺鋸齒（頭像版畫在頭後面，接到身體上會整件被身體擋住）
+      // 側面：綁在後頸、沿著背披到屁股後面（頭像版畫在頭後面，接到身體上會整件被身體擋住）
       over: capeOver,
+      // 正面：披在背後，從身體兩側露出來，脖子前面一條領子加扣子
+      frontal: { behind: capeFrontBehind, over: capeFrontOver },
     },
     box: '-2 30 68 36',
     node: (
@@ -578,6 +666,8 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
           <path d="M-13.5 -19 Q-6 -16.5 -0.5 -10.5 M-15.5 -13 Q-8 -11.5 -1.5 -5.5" stroke="var(--acc-lav)" {...seam} />
         </g>
       ),
+      // 正面：一左一右展開
+      frontal: { behind: wingsFrontBehind },
     },
     node: (
       <g>

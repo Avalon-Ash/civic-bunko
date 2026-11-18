@@ -3,6 +3,17 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-18-cat-front-wear',
+    date: '2026-11-18',
+    title: '小貓坐著時的穿搭重畫',
+    items: [
+      '小披風：坐著時披在背後、從身體兩邊露出來，脖子前面有領子和金色扣子（原本整件蓋在身上像衣服）；走路時披在背上、尾端往後飄',
+      '天使翅膀：坐著時一左一右展開',
+      '理毛：手從肩膀整隻舉起來擦臉頰，像招財貓',
+      '毛衣：坐著時腳掌從下擺露出來，不再多兩圈袖口',
+    ],
+  },
+  {
     id: '2026-11-18-cat-name-sync',
     date: '2026-11-18',
     title: '小貓的名字會跟著同步',

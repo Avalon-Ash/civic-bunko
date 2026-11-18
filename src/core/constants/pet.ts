@@ -72,6 +72,12 @@ const SIT_HALF = 16;
 const SIT_PAW = PET_LEG_W / 2 - 0.1;
 /** 前腳從身體的哪個高度開始看得到（腿根），腳掌踩在 PET_GROUND */
 const SIT_LEG_TOP = 74;
+/**
+ * 正面坐時舉起來的手臂（理毛、招手）：從肩膀整隻舉起來，腳掌到臉頰旁邊，像招財貓。
+ * out＝肩膀離中線多遠、y＝肩膀的高度（在頭的下緣底下，手臂才看得到是從身體長出來的）、
+ * len＝手臂長度、rot＝舉起的角度（-180＝筆直朝上，越接近 -90 越往外張）
+ */
+const SIT_ARM = { out: 10.5, y: 63, len: 15.5, rot: -138 } as const;
 
 /**
  * 坐姿（正面，面向你）：小小的蛋形身體在頭的正下方、頭壓住上端看不到脖子，
@@ -116,8 +122,13 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
   sit,
   groom: {
     ...sit,
-    /** 一隻前腳舉到臉旁邊擦臉 */
-    legs: [sit.legs[0], sit.legs[1], sit.legs[2], { x: SIT_X + SIT_PAW + 0.6, y: 72, len: 13, rot: -165 }],
+    /** 一隻手從肩膀舉到臉頰旁邊擦臉；另一隻前腳留在原地 */
+    legs: [
+      sit.legs[0],
+      sit.legs[1],
+      sit.legs[2],
+      { x: SIT_X + SIT_ARM.out, y: SIT_ARM.y, len: SIT_ARM.len, rot: SIT_ARM.rot, shoulder: true },
+    ],
     head: { x: SIT_X, y: 41.5, rot: -8, scale: PET_HEAD_SCALE },
     mood: 'yay',
     motion: 'groom',

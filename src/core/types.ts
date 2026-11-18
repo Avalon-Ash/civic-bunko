@@ -555,6 +555,11 @@ export interface PetLeg {
   y: number;
   len: number;
   rot: number;
+  /**
+   * 這條腿是「從肩膀舉起來的手臂」：腿根露在身體輪廓上，畫成圓的肩膀；穿有袖子的衣服時袖子套在肩膀上。
+   * 沒標的腿，腿根藏在身體裡、不封口。
+   */
+  shoulder?: boolean;
 }
 /**
  * 身體輪廓的參數（身體座標的長度）。torso 的 rx＝身體的半長、ry＝屁股那端的半厚（背那一側）；

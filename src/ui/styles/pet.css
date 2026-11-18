@@ -71,6 +71,23 @@
   }
 }
 
+/* 正面坐的翅膀：一左一右各自從翅根（自己那片的左下角；左邊那片整片鏡像，所以寫法一樣）輕輕拍 */
+.cb-pet-wing {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: cb-pet-wing 1.9s ease-in-out infinite;
+}
+
+@keyframes cb-pet-wing {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-7deg);
+  }
+}
+
 /* 呼吸：身體與頭一起微微起伏 */
 .cb-pet-motion-breathe .cb-pet-bob {
   transform-origin: 50% 100%;
