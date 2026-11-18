@@ -106,6 +106,12 @@ export const DAILY_TIERS: ReadonlyArray<{ at: number; fish: number }> = [
   { at: DAILY_GOAL_QUESTIONS * 2, fish: 60 },
 ];
 
+/**
+ * 每日特價：每天從商店裡挑 count 件打折（照日期決定，兩台裝置同一天挑到同一批；已經買過的也可能被挑到，那格就沒得買）。
+ * off＝折掉幾成；特價＝原價 ×（1 − off）四捨五入。
+ */
+export const DAILY_SALE = { count: 4, off: 0.3 } as const;
+
 /** 衝刺限定：考試日（題庫 examDate）前幾天開始上架，到考試當天為止 */
 export const SPRINT_DAYS = 18;
 

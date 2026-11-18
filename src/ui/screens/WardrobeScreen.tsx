@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
-import { ACHIEVEMENTS, SLOTS } from '../../core/constants/wardrobe';
+import { ACHIEVEMENTS, DAILY_SALE, SLOTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
 import { RUNNER_HOP_MS } from '../../core/constants/pet';
 import type { ItemId, Outfit, SlotId } from '../../core/types';
@@ -119,6 +119,10 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
     return { ...outfit, [tryingStatus.item.slot]: tryingStatus.item.id };
   }, [outfit, tryingStatus]);
 
+  /** 今天特價、還沒買的配件 */
+  const onSale = statuses.filter((s) => s.base !== undefined);
+  const saleLabel = `${Math.round((1 - DAILY_SALE.off) * 10)} 折`;
+
   const visible = statuses.filter(
     (s) => s.state !== 'off' && (filter === 'all' || s.item.slot === filter),
   );
@@ -191,6 +195,13 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
             </span>
           </div>
         ) : null}
+        {onSale.length > 0 ? (
+          <div className="cb-wd-quest cb-wd-sale">
+            <span className="cb-wd-quest-tag">今日特價</span>
+            <span className="cb-grow">{onSale.map((s) => s.item.name).join('、')}</span>
+            <span className="cb-wd-tier-fish">{saleLabel}</span>
+          </div>
+        ) : null}
       </Card>
 
       <section className="cb-section cb-wd-dress">
@@ -204,6 +215,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                 <div className="cb-wd-try-name">
                   試穿：<b>{tryingStatus.item.name}</b>
                   {tryingStatus.item.sprint ? <Chip tone="orange">考前限定</Chip> : null}
+                  {tryingStatus.base !== undefined ? <Chip tone="pink">今日特價</Chip> : null}
                 </div>
                 {tryingStatus.state === 'buyable' ? null : tryingStatus.state === 'short' ? (
                   <p className="cb-sub-strong cb-m0">
@@ -220,6 +232,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                   {tryingStatus.state === 'buyable' ? (
                     <Button onClick={handleBuy}>
                       <FishIcon /> {tryingStatus.price} 買下來
+                      {tryingStatus.base !== undefined ? <s className="cb-wd-was">{tryingStatus.base}</s> : null}
                     </Button>
                   ) : null}
                   <Button variant="ghost" onClick={() => setTrying(null)}>
@@ -272,12 +285,16 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                   .filter(Boolean)
                   .join(' ')}
                 aria-pressed={owned ? wearing : isTrying}
-                aria-label={`${s.item.name}，${meta ?? `${s.price ?? 0} 條小魚乾`}`}
+                aria-label={`${s.item.name}，${meta ?? `${s.base !== undefined ? '今日特價 ' : ''}${s.price ?? 0} 條小魚乾`}`}
                 onClick={() => handleItem(s.item.id)}
               >
                 <span className="cb-acc-circle">
                   <ItemIcon id={s.item.id} size={38} />
-                  {s.item.sprint ? <span className="cb-wd-badge">限定</span> : null}
+                  {s.base !== undefined ? (
+                    <span className="cb-wd-badge is-sale">特價</span>
+                  ) : s.item.sprint ? (
+                    <span className="cb-wd-badge">限定</span>
+                  ) : null}
                 </span>
                 <span className="cb-acc-name">{s.item.name}</span>
                 {meta !== null ? (
@@ -286,6 +303,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                   <span className={`cb-acc-meta cb-wd-price ${s.state === 'short' ? 'is-short' : ''}`.trim()}>
                     <FishIcon size={13} />
                     {s.price}
+                    {s.base !== undefined ? <s className="cb-wd-was">{s.base}</s> : null}
                   </span>
                 )}
               </button>

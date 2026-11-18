@@ -378,7 +378,7 @@ export interface Quest {
 export type Celebration =
   | { kind: 'achievement'; id: AchievementId }
   | { kind: 'quest'; id: QuestId };
-/** 衣櫥狀態（存在 Settings.wardrobe）。owned、achievements、quests 跨裝置同步並取聯集；outfit 只存在各裝置。 */
+/** 衣櫥狀態（存在 Settings.wardrobe）。owned、achievements、quests 跨裝置同步並取聯集，saved 同步並取每件較大值；outfit 只存在各裝置。 */
 export interface WardrobeState {
   /** 用小魚乾買下的配件（不含集章與成就送的） */
   owned: ItemId[];
@@ -386,6 +386,11 @@ export interface WardrobeState {
   achievements: AchievementId[];
   /** 每天完成的小任務 */
   quests: Record<DayKey, QuestId[]>;
+  /**
+   * 趁每日特價買的配件各省了幾條小魚乾（沒有特價買過就沒有這欄）。
+   * 存「省了多少」而不是哪天買的：之後商店加了配件，哪天特價哪幾件會變，她已經省下的不能跟著變。
+   */
+  saved?: Record<ItemId, number>;
   /** 目前穿著；沒有這欄時沿用舊的 settings.accessory */
   outfit?: Outfit;
 }

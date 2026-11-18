@@ -76,6 +76,7 @@ function decodePutContent(bodyText: string): {
       achievements: string[];
       quests: Record<string, string[]>;
       outfit?: unknown;
+      saved?: Record<string, number>;
     };
   };
 } {
@@ -94,6 +95,7 @@ function decodePutContent(bodyText: string): {
         achievements: string[];
         quests: Record<string, string[]>;
         outfit?: unknown;
+        saved?: Record<string, number>;
       };
     },
   };
@@ -646,5 +648,94 @@ describe('sync system', () => {
     await waitForSync(worldCorruptRemote);
     assert.equal(worldCorruptRemote.sync.status, 'idle');
     assert.equal(worldCorruptRemote.progress.get('q1')?.seen, 2);
+  });
+
+  it('syncs what was saved in daily sales: larger amount per item wins, uploads when only that differs, and adds no field when unused', async () => {
+    const storage = createMemoryStorage({
+      [SYNC_STORAGE_KEY]: JSON.stringify(TEST_CRED),
+    });
+    const world = createWorld();
+    world.settings.wardrobe = {
+      owned: ['beanie', 'cape'],
+      achievements: [],
+      quests: {},
+      saved: { beanie: 24, cape: 40 },
+      outfit: { 'head-top': 'beanie' },
+    };
+    let putBodyRaw = '';
+    attachSync(world, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-s1',
+            content: encodeRemoteContent({}, '2026-11-20T00:00:00.000Z', undefined, {
+              wardrobe: { owned: ['beanie', 'cape'], achievements: [], quests: {}, saved: { cape: 60 } },
+            }),
+          });
+        }
+        putBodyRaw = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-s2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T10:00:00.000Z'),
+    });
+    await waitForSync(world);
+    assert.equal(world.sync.status, 'idle');
+    // owned 兩邊一樣，只有省下的金額不同：本機要更新、雲端也要更新
+    assert.deepEqual(world.settings.wardrobe, {
+      owned: ['beanie', 'cape'],
+      achievements: [],
+      quests: {},
+      saved: { beanie: 24, cape: 60 },
+      outfit: { 'head-top': 'beanie' },
+    });
+    assert.deepEqual(decodePutContent(putBodyRaw).payload.wardrobe, {
+      owned: ['beanie', 'cape'],
+      achievements: [],
+      quests: {},
+      saved: { beanie: 24, cape: 60 },
+    });
+
+    // 舊版 App 寫回的同步檔沒有 saved：本機的紀錄留著，並且補回雲端
+    const worldOldRemote = createWorld();
+    worldOldRemote.settings.wardrobe = { owned: ['beanie'], achievements: [], quests: {}, saved: { beanie: 24 } };
+    let putOld = '';
+    attachSync(worldOldRemote, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-o1',
+            content: encodeRemoteContent({}, '2026-11-20T00:00:00.000Z', undefined, {
+              wardrobe: { owned: ['beanie'], achievements: [], quests: {} },
+            }),
+          });
+        }
+        putOld = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-o2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T11:00:00.000Z'),
+    });
+    await waitForSync(worldOldRemote);
+    assert.deepEqual(worldOldRemote.settings.wardrobe?.saved, { beanie: 24 });
+    assert.deepEqual(decodePutContent(putOld).payload.wardrobe?.saved, { beanie: 24 });
+
+    // 沒趁特價買過的人：同步檔不多這一欄
+    const worldPlain = createWorld();
+    worldPlain.settings.wardrobe = { owned: ['beanie'], achievements: [], quests: {} };
+    let putPlain = '';
+    attachSync(worldPlain, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') return jsonResponse(404, {});
+        putPlain = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-p1' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T12:00:00.000Z'),
+    });
+    await waitForSync(worldPlain);
+    const plain = decodePutContent(putPlain).payload.wardrobe;
+    assert.ok(plain);
+    assert.equal('saved' in plain, false);
   });
 });

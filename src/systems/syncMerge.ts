@@ -8,7 +8,33 @@ import type {
   WardrobeState,
 } from '../core/types';
 
-export type SyncWardrobe = Pick<WardrobeState, 'owned' | 'achievements' | 'quests'>;
+export type SyncWardrobe = Pick<WardrobeState, 'owned' | 'achievements' | 'quests' | 'saved'>;
+
+/** 衣櫥裡要同步的那幾欄（outfit 不同步）；沒有衣櫥資料就是空的 */
+export function toSyncWardrobe(wardrobe: WardrobeState | undefined): SyncWardrobe {
+  if (!wardrobe) return { owned: [], achievements: [], quests: {} };
+  const saved = cleanSaved(wardrobe.saved);
+  return {
+    owned: wardrobe.owned,
+    achievements: wardrobe.achievements,
+    quests: wardrobe.quests,
+    ...(saved ? { saved } : {}),
+  };
+}
+
+/** 特價省下的紀錄：只留正的整數，鍵照字典序；一筆都沒有回傳 undefined（那一欄就不寫） */
+export function cleanSaved(saved: Readonly<Record<string, number>> | undefined): Record<string, number> | undefined {
+  const entries = Object.entries(saved ?? {})
+    .filter(([, amount]) => Number.isFinite(amount) && amount >= 1)
+    .map(([id, amount]): [string, number] => [id, Math.floor(amount)])
+    .sort(([a], [b]) => compareText(a, b));
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+}
+
+/** 兩份特價紀錄是不是一樣（清理過再比） */
+export function sameSaved(a: Readonly<Record<string, number>> | undefined, b: Readonly<Record<string, number>> | undefined): boolean {
+  return JSON.stringify(cleanSaved(a) ?? {}) === JSON.stringify(cleanSaved(b) ?? {});
+}
 
 function compareTimestamp(a: string, b: string): number {
   const msA = Date.parse(a);
@@ -155,6 +181,7 @@ function mergeSortedUnique(a: readonly string[], b: readonly string[]): string[]
 
 /**
  * 合併兩份衣櫥進度（owned、achievements、quests）：全部取聯集並排序，結果與參數順序無關。
+ * saved（特價省下的）每件取兩邊較大值：只會變多，兩台各自記到的都留下。
  * 不含 outfit（目前穿著只存在各裝置）。
  */
 export function mergeWardrobe(
@@ -182,7 +209,13 @@ export function mergeWardrobe(
     }
   }
 
-  return { owned, achievements, quests };
+  const savedAll: Record<string, number> = { ...cleanSaved(local?.saved) };
+  for (const [id, amount] of Object.entries(cleanSaved(remote?.saved) ?? {})) {
+    savedAll[id] = Math.max(savedAll[id] ?? 0, amount);
+  }
+  const saved = cleanSaved(savedAll);
+
+  return { owned, achievements, quests, ...(saved ? { saved } : {}) };
 }
 
 /**

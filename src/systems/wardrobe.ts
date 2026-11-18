@@ -1,6 +1,7 @@
 import { DAILY_GOAL_QUESTIONS } from '../core/constants/daily';
 import {
   ACHIEVEMENTS,
+  DAILY_SALE,
   DAILY_TIERS,
   FISH_PER_QUESTION,
   ITEMS,
@@ -29,7 +30,7 @@ import type {
 import type { World } from '../core/world';
 import { countTotalStamps, isValidDayKey, toDayKey, unlockedAccessories } from './daily';
 import { addDaysLocal, toLocalDateString } from './date';
-import type { SyncWardrobe } from './syncMerge';
+import { cleanSaved, type SyncWardrobe } from './syncMerge';
 
 const MS_PER_DAY = 86_400_000;
 const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -57,6 +58,16 @@ export interface FishBalanceView {
     achievements: number;
     quests: number;
   };
+}
+
+/** 一件商店配件今天的價格 */
+export interface ItemPriceView {
+  /** 今天買要付多少 */
+  price: number;
+  /** 原價 */
+  base: number;
+  /** 今天是不是特價 */
+  sale: boolean;
 }
 
 export interface TodayQuestView {
@@ -205,6 +216,40 @@ export function sprintOpen(world: World, now: Date): boolean {
   return false;
 }
 
+/** 現在買得到的商店配件（衝刺限定的只在衝刺期間） */
+function onShelf(world: World, now: Date): WardrobeItem[] {
+  const sprint = sprintOpen(world, now);
+  return ITEMS.filter((item) => item.source.kind === 'shop' && (!item.sprint || sprint));
+}
+
+/**
+ * 今天特價的配件：架上的商店配件照「日期＋配件 ID」的雜湊排序，取前 DAILY_SALE.count 件。
+ * 只看日期和商品清單，不看她買了什麼：買掉一件不會馬上遞補下一件（不然一天之內可以整間打折買完）。
+ */
+export function saleItems(world: World, now: Date): Set<ItemId> {
+  const today = currentDayKey(now);
+  const ranked = onShelf(world, now)
+    .map((item) => ({ id: item.id, rank: fnv1a(`${today}|${item.id}`) }))
+    .sort((a, b) => a.rank - b.rank || (a.id < b.id ? -1 : 1));
+  return new Set(ranked.slice(0, DAILY_SALE.count).map((entry) => entry.id));
+}
+
+/** 這件配件今天賣多少（唯一算價格的地方；買、畫面、狀態都讀它）。不是商店配件回傳 null */
+export function itemPrice(world: World, id: ItemId, now: Date): ItemPriceView | null {
+  const item = ITEM_BY_ID.get(id);
+  if (!item || item.source.kind !== 'shop') return null;
+  const base = item.source.price;
+  const sale = saleItems(world, now).has(id);
+  return { price: sale ? Math.round(base * (1 - DAILY_SALE.off)) : base, base, sale };
+}
+
+/** 這件配件實際花了多少：原價減掉特價時省下的（省下的夾在 0 到原價之間，壞資料不會讓餘額變多） */
+function paidFor(item: WardrobeItem, saved: Readonly<Record<ItemId, number>> | undefined): number {
+  if (item.source.kind !== 'shop') return 0;
+  const off = saved?.[item.id] ?? 0;
+  return item.source.price - Math.min(item.source.price, Math.max(0, off));
+}
+
 /** 計算小魚乾收入明細、已花費與餘額（balance 為顯示用 ≥ 0，raw 為原始餘額）。 */
 export function fishBalance(world: World, _now?: Date): FishBalanceView {
   let questions = 0;
@@ -242,8 +287,8 @@ export function fishBalance(world: World, _now?: Date): FishBalanceView {
   let spent = 0;
   for (const id of new Set(world.settings.wardrobe?.owned ?? [])) {
     const item = ITEM_BY_ID.get(id);
-    if (item && item.source.kind === 'shop') {
-      spent += item.source.price;
+    if (item) {
+      spent += paidFor(item, world.settings.wardrobe?.saved);
     }
   }
 
@@ -337,10 +382,18 @@ export function todayQuest(world: World, now: Date): TodayQuestView | null {
   return selectTodayQuest(world, now);
 }
 
+/** saved 欄位：有東西才寫（沒趁特價買過的人，存檔長得跟以前一樣） */
+function savedField(saved: Readonly<Record<ItemId, number>> | undefined): { saved?: Record<ItemId, number> } {
+  const clean = cleanSaved(saved);
+  return clean ? { saved: clean } : {};
+}
+
 function commitWardrobe(
   world: World,
   patch?: {
     owned?: ItemId[];
+    /** 這次特價買的那一件省了多少 */
+    savedOn?: { id: ItemId; amount: number };
     questCompleted?: { day: DayKey; questId: QuestId };
     outfit?: Outfit;
   },
@@ -389,6 +442,10 @@ function commitWardrobe(
         ? [...prevAchievements, ...addedAchievements]
         : [...prevAchievements],
     quests: nextQuests,
+    ...savedField({
+      ...prev?.saved,
+      ...(patch?.savedOn ? { [patch.savedOn.id]: patch.savedOn.amount } : {}),
+    }),
     ...(patch?.outfit !== undefined
       ? { outfit: { ...patch.outfit } }
       : prev?.outfit !== undefined
@@ -421,6 +478,7 @@ export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
       owned: [...merged.owned],
       achievements: [...merged.achievements],
       quests: nextQuests,
+      ...savedField(merged.saved),
       ...(prevOutfit !== undefined ? { outfit: { ...prevOutfit } } : {}),
     },
   };
@@ -430,7 +488,7 @@ export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
   });
 }
 
-/** 用小魚乾買一件商店配件；不符條件（不存在、非商店、已擁有、非衝刺期、餘額不足）時不動作。 */
+/** 用小魚乾買一件商店配件（照今天的價格；特價買的記下省了多少）；不符條件（不存在、非商店、已擁有、非衝刺期、餘額不足）時不動作。 */
 export function buyItem(
   world: World,
   id: ItemId,
@@ -447,13 +505,17 @@ export function buyItem(
   if (item.sprint && !sprintOpen(world, nowDate)) {
     return false;
   }
+  const cost = itemPrice(world, id, nowDate);
   const { raw } = fishBalance(world, nowDate);
-  if (raw < item.source.price) {
+  if (!cost || raw < cost.price) {
     return false;
   }
 
   const prevOwned = world.settings.wardrobe?.owned ?? [];
-  return commitWardrobe(world, { owned: [...prevOwned, id] });
+  return commitWardrobe(world, {
+    owned: [...prevOwned, id],
+    ...(cost.sale ? { savedOn: { id, amount: cost.base - cost.price } } : {}),
+  });
 }
 
 /** 穿脫指定部位的配件；不改動舊的 settings.accessory。 */

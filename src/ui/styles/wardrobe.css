@@ -245,6 +245,18 @@
   color: var(--ink-soft);
 }
 
+/* 今日特價：角落的標籤換成粉紅色；原價畫刪除線、縮小放在特價後面 */
+.cb-wd-badge.is-sale {
+  background: var(--pink);
+}
+
+.cb-wd-was {
+  margin-left: 3px;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
 .cb-wd-ach {
   display: grid;
   gap: 8px;

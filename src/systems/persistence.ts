@@ -30,6 +30,7 @@ import {
   parseDaysRecord,
 } from './daily';
 import { validateSavedRound } from './round';
+import { cleanSaved } from './syncMerge';
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -334,10 +335,20 @@ export function parseWardrobe(value: unknown): WardrobeState | undefined {
     outfit = cleanOutfit;
   }
 
+  // 特價省下的：只收「配件 ID → 正數」，其他丟掉；一筆都沒有就不留這欄
+  const saved = isRecord(value.saved)
+    ? cleanSaved(
+        Object.fromEntries(
+          Object.entries(value.saved).filter((entry): entry is [string, number] => typeof entry[1] === 'number'),
+        ),
+      )
+    : undefined;
+
   return {
     owned,
     achievements,
     quests,
+    ...(saved ? { saved } : {}),
     ...(outfit !== undefined ? { outfit } : {}),
   };
 }

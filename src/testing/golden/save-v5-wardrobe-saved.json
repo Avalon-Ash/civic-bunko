@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "progress": {
+    "115-general-admin-law-q08": {
+      "seen": 3,
+      "correct": 2,
+      "views": 1,
+      "streak": 2,
+      "lastPick": "B",
+      "lastAt": "2026-11-16T12:30:00.000Z",
+      "due": "2026-11-20"
+    }
+  },
+  "settings": {
+    "theme": "light",
+    "lastRound": {
+      "bankId": "local4-civil",
+      "subjectKeys": [
+        "admin-law",
+        "law-english"
+      ],
+      "count": 10,
+      "mode": "mixed",
+      "fast": false,
+      "study": "quiz",
+      "ask": "positive",
+      "passes": 1
+    },
+    "installHintDismissed": true,
+    "accessory": "bow",
+    "shuffleOptions": true,
+    "cardsSeen": [
+      "concept-law-rank",
+      "newlaw-lga-55-city"
+    ],
+    "bilingual": false,
+    "examHistory": [
+      {
+        "paperId": "115-general-admin-law",
+        "at": "2026-11-16T14:00:00.000Z",
+        "total": 50,
+        "answered": 48,
+        "correct": 31,
+        "score": 62
+      }
+    ],
+    "wardrobe": {
+      "owned": [
+        "beanie",
+        "future-item-v9",
+        "star-clip"
+      ],
+      "achievements": [
+        "exam-1",
+        "exam-60",
+        "future-ach-v9"
+      ],
+      "quests": {
+        "2026-11-17": [
+          "quiz-round",
+          "future-quest-v9"
+        ]
+      },
+      "outfit": {
+        "head-top": "beanie",
+        "head-side": "bow"
+      },
+      "saved": {
+        "beanie": 24,
+        "future-item-v9": 7
+      }
+    }
+  },
+  "days": {
+    "2026-11-15": 15,
+    "2026-11-16": 22,
+    "2026-11-17": 10
+  }
+}

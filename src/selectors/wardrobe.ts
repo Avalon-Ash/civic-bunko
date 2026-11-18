@@ -6,24 +6,30 @@ import { toLocalDateString } from '../systems/date';
 import {
   currentOutfit,
   fishBalance,
+  itemPrice,
   ownedItems,
+  saleItems,
   sprintOpen,
   todayQuest,
   unlockedAchievements,
   wardrobeMetrics,
   type FishBalanceView,
+  type ItemPriceView,
   type TodayQuestView,
 } from '../systems/wardrobe';
 
 export {
   currentOutfit,
   fishBalance,
+  itemPrice,
   ownedItems,
+  saleItems,
   sprintOpen,
   todayQuest,
   unlockedAchievements,
   wardrobeMetrics,
   type FishBalanceView,
+  type ItemPriceView,
   type TodayQuestView,
 };
 
@@ -38,7 +44,10 @@ export type ItemStatusState =
 export interface ItemStatusView {
   item: WardrobeItem;
   state: ItemStatusState;
+  /** 今天買要付多少（已擁有的是原價） */
   price?: number;
+  /** 今天特價時的原價（沒特價就沒有這欄） */
+  base?: number;
   need?: number;
   achievement?: AchievementId;
 }
@@ -86,14 +95,13 @@ export function itemStatuses(world: World, now: Date): ItemStatusView[] {
       };
     }
 
-    const { price } = item.source;
     if (item.sprint && !isSprint) {
-      return { item, state: 'off', price };
+      return { item, state: 'off', price: item.source.price };
     }
-    if (raw >= price) {
-      return { item, state: 'buyable', price };
-    }
-    return { item, state: 'short', price };
+    const cost = itemPrice(world, item.id, now);
+    const price = cost?.price ?? item.source.price;
+    const base = cost?.sale ? { base: cost.base } : {};
+    return { item, state: raw >= price ? 'buyable' : 'short', price, ...base };
   });
 }
 

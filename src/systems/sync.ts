@@ -35,6 +35,8 @@ import {
   mergeProgress,
   mergeWardrobe,
   sameCatProfile,
+  sameSaved,
+  toSyncWardrobe,
   type SyncWardrobe,
 } from './syncMerge';
 import { applySyncedWardrobe } from './wardrobe';
@@ -254,7 +256,7 @@ function sameStrings(a: readonly string[], b: readonly string[]): boolean {
 }
 
 function emptyWardrobe(): SyncWardrobe {
-  return { owned: [], achievements: [], quests: {} };
+  return toSyncWardrobe(undefined);
 }
 
 function stringSetDiffers(a: readonly string[], b: readonly string[]): boolean {
@@ -276,7 +278,7 @@ function wardrobeSetDiffers(a: SyncWardrobe, b: SyncWardrobe): boolean {
       return true;
     }
   }
-  return false;
+  return !sameSaved(a.saved, b.saved);
 }
 
 function sameExamHistory(a: readonly ExamRecord[], b: readonly ExamRecord[]): boolean {
@@ -326,13 +328,7 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
         : [];
     const examHistory = parseExamHistory(parsed.examHistory) ?? [];
     const parsedWardrobe = parseWardrobe(parsed.wardrobe);
-    const wardrobe: SyncWardrobe = parsedWardrobe
-      ? {
-          owned: parsedWardrobe.owned,
-          achievements: parsedWardrobe.achievements,
-          quests: parsedWardrobe.quests,
-        }
-      : emptyWardrobe();
+    const wardrobe: SyncWardrobe = toSyncWardrobe(parsedWardrobe);
 
     return { progress, days, cardsSeen, examHistory, wardrobe, cat: parseCatProfile(parsed.cat) };
   } catch {
@@ -462,14 +458,7 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       if (isStale(controller, gen)) return;
     }
 
-    const localWardrobeRaw = world.settings.wardrobe;
-    const localWardrobe: SyncWardrobe = localWardrobeRaw
-      ? {
-          owned: localWardrobeRaw.owned,
-          achievements: localWardrobeRaw.achievements,
-          quests: localWardrobeRaw.quests,
-        }
-      : emptyWardrobe();
+    const localWardrobe: SyncWardrobe = toSyncWardrobe(world.settings.wardrobe);
     const mergedWardrobe = mergeWardrobe(localWardrobe, remoteWardrobe);
     if (wardrobeSetDiffers(localWardrobe, mergedWardrobe)) {
       applySyncedWardrobe(world, mergedWardrobe);
