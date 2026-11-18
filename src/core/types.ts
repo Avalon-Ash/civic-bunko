@@ -449,16 +449,40 @@ export interface PetLeg {
   rot: number;
 }
 /**
- * 一個姿勢（像 RO 的一格動作）：身體橢圓、四條腿（遠側兩條畫在身體後面）、尾巴、
- * 頭的對位點（頭的臉中心 (32, 39) 放到哪）、背上配件的對位點、表情與會動的方式。
+ * 身體輪廓的參數（身體座標的長度）。torso 的 rx＝身體的半長、ry＝屁股那端的半厚（背那一側）；
+ * 這裡補上其餘的：屁股比胸口厚、肚子比背厚，身體才是軟的，不是一顆對稱的蛋。
+ */
+export interface PetBuild {
+  /** 胸口那端的半厚 */
+  chest: number;
+  /** 胸口最厚的地方離脖子那端多遠、屁股最厚的地方離屁股那端多遠 */
+  shoulder: number;
+  hip: number;
+  /** 肚子那側是背那側的幾倍厚（大於 1＝肚子下垂） */
+  belly: number;
+  /** 屁股那端多方（0＝圓，1＝方角）：趴著、正面坐時貼地的那一端收得比較方 */
+  flat: number;
+  /** 背上花色的下緣垂到屁股半厚的幾成（負的留在背那側、正的過了身體中線） */
+  patch: number;
+}
+/**
+ * 一個姿勢（像 RO 的一格動作）：身體（中心、半長、半厚、方向，輪廓的其餘參數在 build）、
+ * 四條腿（遠側兩條畫在身體後面）、尾巴、頭的對位點（頭的臉中心 (32, 39) 放到哪）、背上配件的對位點、表情與會動的方式。
  */
 export interface PetPoseSpec {
+  /** 身體座標裡的身體：中心 (cx, cy)、半長 rx（脖子到屁股的一半）、屁股那端的半厚 ry、轉幾度（0＝脖子朝右，-90＝直立） */
   torso: { cx: number; cy: number; rx: number; ry: number; rot: number };
+  build: PetBuild;
   /** 順序：後腿遠、前腿遠、後腿近、前腿近 */
   legs: [PetLeg, PetLeg, PetLeg, PetLeg];
   tail: string;
   head: PetAnchor;
   back: PetAnchor;
+  /**
+   * 正面坐（身體直起來、面向你）：兩隻前腳都畫在身體前面、腳掌朝你（不往前伸），
+   * 身體左右兩側都看得到花色，衣服的布面也左右對稱。這種姿勢的身體一律畫成左右對稱（不讀 build.belly）。
+   */
+  frontal: boolean;
   mood: 'idle' | 'yay' | 'oops' | 'sleepy';
   motion: PetMotion;
 }

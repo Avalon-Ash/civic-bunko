@@ -1,5 +1,5 @@
 // SSOT：有身體的小貓（姿勢表＝對位點、動線、速度與時間）。開案書 docs/plans/cat-wardrobe.md §7。
-import type { PetPose, PetPoseSpec, RoamBehavior } from '../types';
+import type { PetBuild, PetPose, PetPoseSpec, RoamBehavior } from '../types';
 
 /** 身體座標：0..PET_VIEW_W × 0..PET_VIEW_H，面向右；地面在 PET_GROUND */
 export const PET_VIEW_W = 100;
@@ -33,30 +33,6 @@ export const PET_SADDLE = { front: 0.35, rear: 0.7, easeRear: 0.3, easeFront: 0.
 /** 背上配件沒有身體版圖時，照頭像的圖縮小接在背上 */
 const BACK = 1;
 
-/**
- * 身體輪廓的參數（身體座標的長度）。torso 的 rx＝身體的半長、ry＝屁股那端的半厚（背那一側）；
- * 這裡補上其餘的：屁股比胸口厚、肚子比背厚，身體才是軟的，不是一顆對稱的蛋。
- */
-export interface PetBuild {
-  /** 胸口那端的半厚 */
-  chest: number;
-  /** 胸口最厚的地方離脖子那端多遠、屁股最厚的地方離屁股那端多遠 */
-  shoulder: number;
-  hip: number;
-  /** 肚子那側是背那側的幾倍厚（大於 1＝肚子下垂） */
-  belly: number;
-  /** 屁股那端多方（0＝圓，1＝方角）：趴著、正面坐時貼地的那一端收得比較方 */
-  flat: number;
-  /** 背上花色的下緣垂到屁股半厚的幾成（負的留在背那側、正的過了身體中線） */
-  patch: number;
-}
-/**
- * 姿勢表的一格：PetPoseSpec 加上畫法才用得到的欄位。
- * frontal＝正面坐（身體直起來、面向你）：兩隻前腳都畫在身體前面、腳掌朝你（不往前伸），
- * 身體左右兩側都看得到花色，衣服的布面也左右對稱。這種姿勢的身體一律畫成左右對稱（CatBody 不讀 belly）。
- */
-export type PetPoseDef = PetPoseSpec & { build: PetBuild; frontal: boolean };
-
 /** 站著、走、跳：一顆豆子，屁股比胸口大一點、肚子微微下垂 */
 const BEAN: PetBuild = { chest: 12, shoulder: 12, hip: 14, belly: 1.06, flat: 0, patch: 0.05 };
 /** 跑：拉長的豆子 */
@@ -72,7 +48,7 @@ const TAIL_UP = 'M31 62 Q17.5 60 16.5 47.5 Q17 39.5 23.5 42';
 /** 坐著時尾巴從身體後面往旁邊翹出來 */
 const TAIL_SIT = 'M37 80 Q24.5 81 22 70';
 const TAIL_HANG = 'M49.5 75 Q44.5 83 50 88.5';
-const stand: PetPoseDef = {
+const stand: PetPoseSpec = {
   torso: { cx: 47, cy: 66.5, rx: 19, ry: 14, rot: 0 },
   build: BEAN,
   legs: [
@@ -101,7 +77,7 @@ const SIT_LEG_TOP = 74;
  * 坐姿（正面，面向你）：小小的蛋形身體在頭的正下方、頭壓住上端看不到脖子，
  * 兩隻前腳併在身體中間，尾巴從旁邊翹出來；後腳收在身體下面，看不到。
  */
-const sit: PetPoseDef = {
+const sit: PetPoseSpec = {
   torso: { cx: SIT_X, cy: PET_GROUND - SIT_HALF, rx: SIT_HALF, ry: 18, rot: -90 },
   build: FRONT,
   legs: [
@@ -118,7 +94,7 @@ const sit: PetPoseDef = {
   motion: 'breathe',
 };
 
-export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
+export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
   stand,
   walk: { ...stand, motion: 'walk' },
   run: {
