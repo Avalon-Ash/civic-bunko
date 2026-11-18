@@ -139,6 +139,8 @@ export function CatBody({
    */
   const sleeveOn = (leg: PetLeg): ReactNode => (!spec.frontal || leg.shoulder ? sleeve : null);
   const toe = spec.frontal ? 0 : PET_PAW_TOE;
+  /** 脖子上有沒有東西：頸部的配件，或衣服自己留在下巴下面的領口。有的話，披風這類配件就不再畫自己的領子 */
+  const neckTaken = Boolean(outfit.neck) || worn.some(({ art }) => art.head !== undefined);
   /** 畫在身體前面的腿（照腿的編號）：後腿近、前腿近；正面坐時前腿遠那一條也在前面 */
   const nearLegs = (spec.frontal ? [1, 2, 3] : [2, 3]).map((index) => ({ index, leg: spec.legs[index] as PetLeg }));
   /**
@@ -228,9 +230,9 @@ export function CatBody({
               <path d={shape.outline} {...outline} />
               {worn.map(({ slot, art }) =>
                 spec.frontal && art.frontal ? (
-                  art.frontal.over ? (
+                  art.frontal.collar && !neckTaken ? (
                     <g key={slot} transform={frontInTorso} className="cb-pet-back">
-                      {art.frontal.over(geom)}
+                      {art.frontal.collar(geom)}
                     </g>
                   ) : null
                 ) : art.over ? (

@@ -44,8 +44,11 @@ export interface BodyArt {
   frontal?: {
     /** 畫在身體後面 */
     behind?: (body: BodyGeom) => ReactNode;
-    /** 畫在身體前面（會被頭和脖子上的配件蓋住上緣） */
-    over?: (body: BodyGeom) => ReactNode;
+    /**
+     * 脖子前面的領子、扣子，畫在身體前面（上緣會被下巴蓋住）。
+     * 脖子上已經有別的東西（頸部配件、衣服自己的領口）時不畫，免得兩樣東西疊在同一塊。
+     */
+    collar?: (body: BodyGeom) => ReactNode;
   };
 }
 
@@ -190,7 +193,7 @@ function capeFrontBehind(body: BodyGeom): ReactNode {
 }
 
 /** 披風（正面）脖子前面的領子和扣子 */
-function capeFrontOver(): ReactNode {
+function capeFrontCollar(): ReactNode {
   const { neck, band, droop, clasp } = CAPE_FRONT;
   return (
     <g>
@@ -637,7 +640,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       // 側面：綁在後頸、沿著背披到屁股後面（頭像版畫在頭後面，接到身體上會整件被身體擋住）
       over: capeOver,
       // 正面：披在背後，從身體兩側露出來，脖子前面一條領子加扣子
-      frontal: { behind: capeFrontBehind, over: capeFrontOver },
+      frontal: { behind: capeFrontBehind, collar: capeFrontCollar },
     },
     box: '-2 30 68 36',
     node: (

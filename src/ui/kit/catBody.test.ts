@@ -115,6 +115,10 @@ describe('cat body', () => {
     // 披風：正面有脖子前面的扣子（唯一用到金色的地方）；側面沒有
     assert.equal(count(render('sit', { back: 'cape' }), 'var(--acc-gold)'), 1);
     assert.equal(count(render('stand', { back: 'cape' }), 'var(--acc-gold)'), 0);
+    // 脖子上已經有東西（衣服的領口）時，披風不再畫自己的領子和扣子
+    assert.equal(count(render('sit', { back: 'cape', body: 'sweater' }), 'var(--acc-gold)'), 0);
+    const collarless = (outfit: Outfit) => svgBounds(render('sit', outfit), { within: 'cb-pet-back' });
+    assert.deepEqual(collarless({ back: 'cape', neck: 'scarf' }), collarless({ back: 'cape', body: 'sailor' }));
     // 正面的披風是一整片畫在身體後面，不是側面那張鏡像成兩片蓋在身體上
     const sit = render('sit', { back: 'cape' });
     assert.ok(sit.indexOf('var(--acc-coral)') < sit.indexOf('class="cb-pet-torso"'));
