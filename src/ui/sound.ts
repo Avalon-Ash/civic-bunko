@@ -1,6 +1,7 @@
 // 音效播放器（Web Audio 即時合成）。聲音設計在 core/constants/sound.ts；這裡只負責把它播出來。
 import { MEOW_CLIPS, MEOW_FADE, SOUND_ATTACK, SOUND_FLOOR, TONES } from '../core/constants/sound';
 import type { SoundName, ToneSpec } from '../core/types';
+import { createSoundPlayer } from './soundPlayer';
 
 type AudioCtor = typeof AudioContext;
 interface WindowWithWebkitAudio {
@@ -17,22 +18,17 @@ export function isSoundName(value: string): value is SoundName {
   return SOUND_NAMES.has(value);
 }
 
-let ctx: AudioContext | null = null;
-
-/** 只能在使用者手勢裡第一次建立（瀏覽器規定）；之後重用同一個。 */
-function audio(create: boolean): AudioContext | null {
+/** 建立音訊環境（只會在使用者手勢裡被呼叫）；瀏覽器不支援回 null */
+function createContext(): AudioContext | null {
   if (typeof window === 'undefined') return null;
-  if (!ctx && create) {
-    const Ctor: AudioCtor | undefined =
-      window.AudioContext ?? (window as Window & WindowWithWebkitAudio).webkitAudioContext;
-    if (!Ctor) return null;
-    const nav = navigator as Navigator & NavigatorWithAudioSession;
-    if (nav.audioSession) nav.audioSession.type = 'ambient';
-    ctx = new Ctor();
-    preloadClips(ctx);
-  }
-  if (ctx && ctx.state === 'suspended') void ctx.resume();
-  return ctx;
+  const Ctor: AudioCtor | undefined =
+    window.AudioContext ?? (window as Window & WindowWithWebkitAudio).webkitAudioContext;
+  if (!Ctor) return null;
+  const nav = navigator as Navigator & NavigatorWithAudioSession;
+  if (nav.audioSession) nav.audioSession.type = 'ambient';
+  const ac = new Ctor();
+  preloadClips(ac);
+  return ac;
 }
 
 function envelope(ac: BaseAudioContext, t: number, dur: number, gain: number, attack: number): GainNode {
@@ -115,12 +111,25 @@ export function scheduleSound(ac: BaseAudioContext, name: SoundName, t: number):
   for (const spec of TONES[name]) playTone(ac, spec, t);
 }
 
+/** 叫醒、恢復、重建的規則在 soundPlayer.ts；這裡接上真正的 Web Audio */
+const player = createSoundPlayer<AudioContext>({
+  createContext,
+  schedule: scheduleSound,
+  now: () => Date.now(),
+});
+
 /**
  * 播放一個音效。
  * fromGesture＝這次是使用者手勢觸發（可以建立音訊）；不是手勢時，聲音還沒解鎖就安靜略過。
  */
 export function playSound(name: SoundName, fromGesture: boolean): void {
-  const ac = audio(fromGesture);
-  if (!ac) return;
-  scheduleSound(ac, name, ac.currentTime);
+  player.play(name, fromGesture);
+}
+
+/**
+ * 在使用者手勢裡把音訊叫醒（不出聲）。切到背景、鎖螢幕、來電之後音訊會被系統暫停，
+ * 要在瀏覽器認的手勢（放開手指、點擊、按鍵）裡叫才會回來；每次手勢都可以叫。
+ */
+export function unlockSound(): void {
+  player.unlock();
 }
