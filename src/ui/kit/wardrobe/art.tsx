@@ -854,9 +854,10 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'fire-breath': {
     kind: 'layer',
     motion: 'flicker',
-    box: '32 37 26 22',
+    box: '32 36 34 26',
+    // 一大口火從嘴角往右下噴出去：比臉頰還遠；往下斜是因為戴頭套時臉的右上側被頭套蓋住
     node: (
-      <g>
+      <g transform="translate(35 49) rotate(16) scale(1.4) translate(-35 -49)">
         <path
           d="M35 47.4 Q41 39.6 50.5 40.6 Q46.6 43.8 54 44.4 Q48.4 47.4 55.5 50.6 Q47.8 51.4 50.6 55.6 Q42 56 35 50.4 Z"
           fill="var(--acc-coral)"
@@ -880,19 +881,32 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   },
-  'frog-tongue': {
+  'frog-bubble': {
     kind: 'layer',
-    box: '29 43 36 20',
-    // 長舌頭從嘴巴往右下甩出去（繞過頭套垂到臉頰的那一段，戴著頭套也看得到），舌尖前面一隻小蟲
+    motion: 'bob',
+    box: '34 40 30 22',
+    // 吹泡泡：一串泡泡從嘴邊往右下飄出去（繞過頭套垂到臉頰的那一段，戴著頭套也看得到）
     node: (
       <g>
-        <path d="M32.6 48.6 Q37 58.6 47 58 Q54 57.4 57 54.4" fill="none" stroke={LINE} strokeWidth="6.4" strokeLinecap="round" />
-        <path d="M32.6 48.6 Q37 58.6 47 58 Q54 57.4 57 54.4" fill="none" stroke="var(--pink-deep)" strokeWidth="3.4" strokeLinecap="round" />
-        <g transform="translate(60.4 50.6) rotate(-20)">
-          <ellipse cx="-1.9" cy="-1.8" rx="2.3" ry="1.5" transform="rotate(-30 -1.9 -1.8)" fill="var(--acc-cream)" stroke={LINE} strokeWidth="0.9" />
-          <ellipse cx="1.9" cy="-1.8" rx="2.3" ry="1.5" transform="rotate(30 1.9 -1.8)" fill="var(--acc-cream)" stroke={LINE} strokeWidth="0.9" />
-          <ellipse cx="0" cy="0.4" rx="1.8" ry="2.1" fill={HOOD_EYE} />
-        </g>
+        {(
+          [
+            [39.8, 48.8, 2.6],
+            [46.4, 45.8, 3.8],
+            [52, 53, 5.2],
+            [60, 57.4, 3.3],
+          ] as const
+        ).map(([x, y, r]) => (
+          <g key={x}>
+            <circle cx={x} cy={y} r={r} fill="var(--acc-sky)" fillOpacity="0.6" stroke={LINE} strokeWidth={WF} />
+            <path
+              d={`M${x - r * 0.5} ${y - r * 0.1} Q${x - r * 0.45} ${y - r * 0.5} ${x - r * 0.05} ${y - r * 0.55}`}
+              fill="none"
+              stroke="var(--acc-cream)"
+              strokeWidth={r > 3 ? 1.2 : 0.9}
+              strokeLinecap="round"
+            />
+          </g>
+        ))}
       </g>
     ),
   },

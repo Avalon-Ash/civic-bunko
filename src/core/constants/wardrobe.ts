@@ -70,7 +70,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'mask', slot: 'face-low', name: '口罩', source: shop(PRICE.s) },
   { id: 'fire-breath', slot: 'face-low', name: '噴火', source: shop(PRICE.m) },
   { id: 'honey-dipper', slot: 'face-low', name: '蜂蜜棒', source: shop(PRICE.m) },
-  { id: 'frog-tongue', slot: 'face-low', name: '長舌頭', source: shop(PRICE.m) },
+  { id: 'frog-bubble', slot: 'face-low', name: '吹泡泡', source: shop(PRICE.m) },
   { id: 'carrot', slot: 'face-low', name: '叼紅蘿蔔', source: shop(PRICE.m) },
   // 頸部
   { id: 'bell', slot: 'neck', name: '鈴鐺項圈', source: shop(PRICE.s) },
