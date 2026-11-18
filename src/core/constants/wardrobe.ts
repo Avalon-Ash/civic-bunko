@@ -52,7 +52,11 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'chick', slot: 'head-top', name: '頭上小雞', source: shop(PRICE.rare) },
   { id: 'hachimaki', slot: 'head-top', name: '必勝頭巾', source: shop(PRICE.s), sprint: true },
   { id: 'grad-cap', slot: 'head-top', name: '學士帽', source: byAchievement('exam-80') },
+  // 娃娃裝的頭套（跟「身上」的連身裝、「嘴邊」的裝飾成套；也可以拆開混搭）
   { id: 'dino-hood', slot: 'head-top', name: '小怪獸頭套', source: shop(PRICE.l) },
+  { id: 'bear-hood', slot: 'head-top', name: '小熊頭套', source: shop(PRICE.l) },
+  { id: 'frog-hood', slot: 'head-top', name: '青蛙頭套', source: shop(PRICE.l) },
+  { id: 'bunny-hood', slot: 'head-top', name: '兔子頭套', source: shop(PRICE.l) },
   // 頭側
   { id: 'star-clip', slot: 'head-side', name: '星星髮夾', source: shop(PRICE.s) },
   { id: 'sakura', slot: 'head-side', name: '櫻花', source: shop(PRICE.m) },
@@ -64,6 +68,10 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'fish-snack', slot: 'face-low', name: '叼小魚乾', source: shop(PRICE.l) },
   { id: 'mustache', slot: 'face-low', name: '紳士鬍', source: shop(PRICE.m) },
   { id: 'mask', slot: 'face-low', name: '口罩', source: shop(PRICE.s) },
+  { id: 'fire-breath', slot: 'face-low', name: '噴火', source: shop(PRICE.m) },
+  { id: 'honey-dipper', slot: 'face-low', name: '蜂蜜棒', source: shop(PRICE.m) },
+  { id: 'frog-tongue', slot: 'face-low', name: '長舌頭', source: shop(PRICE.m) },
+  { id: 'carrot', slot: 'face-low', name: '叼紅蘿蔔', source: shop(PRICE.m) },
   // 頸部
   { id: 'bell', slot: 'neck', name: '鈴鐺項圈', source: shop(PRICE.s) },
   { id: 'bowtie', slot: 'neck', name: '領結', source: shop(PRICE.m) },
@@ -73,6 +81,9 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'sweater', slot: 'body', name: '毛衣', source: shop(PRICE.xxl) },
   { id: 'sailor', slot: 'body', name: '水手領', source: shop(PRICE.xxl) },
   { id: 'dino-suit', slot: 'body', name: '小怪獸裝', source: shop(PRICE.xl) },
+  { id: 'bear-suit', slot: 'body', name: '小熊裝', source: shop(PRICE.xl) },
+  { id: 'frog-suit', slot: 'body', name: '青蛙裝', source: shop(PRICE.xl) },
+  { id: 'bunny-suit', slot: 'body', name: '兔子裝', source: shop(PRICE.xl) },
   // 背飾
   { id: 'balloon', slot: 'back', name: '氣球', source: shop(PRICE.xl) },
   { id: 'cape', slot: 'back', name: '小披風', source: shop(PRICE.rare) },

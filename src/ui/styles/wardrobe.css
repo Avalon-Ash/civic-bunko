@@ -364,6 +364,26 @@
   }
 }
 
+/* 噴火：火焰從嘴邊（左端）忽長忽短 */
+.cb-motion-flicker {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: cb-motion-flicker 0.7s ease-in-out infinite;
+}
+
+@keyframes cb-motion-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(1.12, 0.92);
+  }
+  70% {
+    transform: scale(0.94, 1.06);
+  }
+}
+
 .cb-motion-flap {
   transform-box: view-box;
   transform-origin: 32px 40px;

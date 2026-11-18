@@ -86,8 +86,8 @@ export function ItemIcon({ id, size = 36 }: { id: ItemId; size?: number }) {
     return <Cat size={size} interactive={false} outfit={{ fur: id }} />;
   }
   return (
-    <svg width={size} height={size} viewBox={art.box} aria-hidden="true" className="cb-acc-svg">
-      {art.node}
+    <svg width={size} height={size} viewBox={art.icon?.box ?? art.box} aria-hidden="true" className="cb-acc-svg">
+      {art.icon?.node ?? art.node}
     </svg>
   );
 }

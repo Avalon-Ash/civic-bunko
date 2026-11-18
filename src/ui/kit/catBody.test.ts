@@ -26,6 +26,10 @@ const OUTFITS: Array<[string, Outfit]> = [
   ['全套 C', { 'head-top': 'hachimaki', neck: 'exam-pass', bg: 'moon', fur: 'fur-black', 'face-low': 'fish-snack' }],
   ['小怪獸全套', { 'head-top': 'dino-hood', body: 'dino-suit' }],
   ['小怪獸全套＋披風', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'cape' }],
+  ['小怪獸全套＋噴火', { 'head-top': 'dino-hood', body: 'dino-suit', 'face-low': 'fire-breath' }],
+  ['小熊全套', { 'head-top': 'bear-hood', body: 'bear-suit', 'face-low': 'honey-dipper' }],
+  ['青蛙全套', { 'head-top': 'frog-hood', body: 'frog-suit', 'face-low': 'frog-tongue' }],
+  ['兔子全套＋翅膀', { 'head-top': 'bunny-hood', body: 'bunny-suit', 'face-low': 'carrot', back: 'wings' }],
 ];
 
 /** 整隻貓畫到哪（身體座標）；被身體輪廓剪掉的布面不算 */
@@ -181,6 +185,18 @@ describe('cat body', () => {
     for (const pose of POSES) {
       const plates = count(render(pose, suit), 'var(--acc-gold)');
       assert.equal(plates > 0, !PET_POSES[pose].backFront, `${pose} 的背鰭`);
+    }
+  });
+
+  it('every one-piece suit dresses the whole cat the same way: sleeves, trousers, matching tail; only the dino has back plates', () => {
+    const suits = ITEMS.filter((it) => it.id.endsWith('-suit'));
+    assert.deepEqual(suits.map((it) => it.id), ['dino-suit', 'bear-suit', 'frog-suit', 'bunny-suit']);
+    for (const { id } of suits) {
+      const stand = render('stand', { body: id });
+      assert.equal(count(stand, 'class="cb-pet-sleeve"'), 2, id);
+      assert.equal(count(stand, 'class="cb-pet-trouser"'), 2, id);
+      assert.ok(!(/<g class="cb-pet-tail">(.*?)<\/g>/.exec(stand)?.[1] ?? '').includes('var(--cat-patch)'), `${id} 的尾巴`);
+      assert.equal(stand.includes('var(--acc-gold)'), id === 'dino-suit', `${id} 的背鰭`);
     }
   });
 

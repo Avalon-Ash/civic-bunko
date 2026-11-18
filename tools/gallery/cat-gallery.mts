@@ -40,7 +40,10 @@ const bodyOutfits: Array<[string, Outfit]> = [
   ['全套 A', { 'head-top': 'beanie', neck: 'bell', bg: 'cushion', 'face-mid': 'glasses' }],
   ['全套 B', { 'head-top': 'grad-cap', body: 'sailor', back: 'wings', fur: 'fur-orange' }],
   ['全套 C', { 'head-top': 'hachimaki', neck: 'exam-pass', bg: 'moon', fur: 'fur-black', 'face-low': 'fish-snack' }],
-  ['小怪獸全套', { 'head-top': 'dino-hood', body: 'dino-suit' }],
+  ['小怪獸全套', { 'head-top': 'dino-hood', body: 'dino-suit', 'face-low': 'fire-breath' }],
+  ['小熊全套', { 'head-top': 'bear-hood', body: 'bear-suit', 'face-low': 'honey-dipper' }],
+  ['青蛙全套', { 'head-top': 'frog-hood', body: 'frog-suit', 'face-low': 'frog-tongue' }],
+  ['兔子全套', { 'head-top': 'bunny-hood', body: 'bunny-suit', 'face-low': 'carrot' }],
   ['小怪獸全套＋披風＋圍巾（灰貓）', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'cape', neck: 'scarf', fur: 'fur-gray' }],
   ['小怪獸全套＋翅膀＋眼鏡＋蝴蝶結（黑貓）', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'wings', 'face-mid': 'glasses', 'head-side': 'bow', fur: 'fur-black' }],
 ];
@@ -61,7 +64,8 @@ const realOutfits: Array<[string, Outfit]> = [
   ['學士帽＋口罩＋水手領＋披風', { 'head-top': 'grad-cap', 'face-low': 'mask', body: 'sailor', back: 'cape', fur: 'fur-orange' }],
   ['派對帽＋單片眼鏡＋領帶＋氣球', { 'head-top': 'party-hat', 'face-mid': 'monocle', neck: 'necktie', back: 'balloon', fur: 'fur-black' }],
   ['小怪獸全套', { 'head-top': 'dino-hood', body: 'dino-suit' }],
-  ['小怪獸全套（橘貓）', { 'head-top': 'dino-hood', body: 'dino-suit', fur: 'fur-orange' }],
+  ['小怪獸全套（橘貓）', { 'head-top': 'dino-hood', body: 'dino-suit', 'face-low': 'fire-breath', fur: 'fur-orange' }],
+  ['兔子全套（黑貓）', { 'head-top': 'bunny-hood', body: 'bunny-suit', 'face-low': 'carrot', fur: 'fur-black' }],
 ];
 const realSizes: Array<[string, number, PetPose[], boolean]> = [
   [`進度條跑者 ${RUNNER_WIDTH}px`, RUNNER_WIDTH, ['sit', 'run', 'hop', 'stumble', 'groom', 'loaf'], false],

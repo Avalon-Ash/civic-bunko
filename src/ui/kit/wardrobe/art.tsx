@@ -5,7 +5,7 @@ import { PET_BACK_EASE, PET_HEAD_SCALE, PET_LEG_W } from '../../../core/constant
 import type { ItemId } from '../../../core/types';
 
 /** 配件自己的小動作（動畫在 styles/wardrobe.css 的 cb-motion-*） */
-export type ItemMotion = 'bob' | 'hop' | 'flap';
+export type ItemMotion = 'bob' | 'hop' | 'flap' | 'flicker';
 
 /**
  * 有身體的小貓用的圖（身體座標 100×90，不縮放、只跟著姿勢移動與轉動）。
@@ -68,6 +68,8 @@ export type ItemArt =
       node: ReactNode;
       box: string;
       motion?: ItemMotion;
+      /** 單獨顯示時用的圖示（頭像版的圖單獨看認不出來的配件才給，例如連身裝）；沒給就用 node 和 box */
+      icon?: { node: ReactNode; box: string };
       onBody?: BodyArt;
       /** 背景配件的全身版（身體座標，地面在 PET_GROUND）：畫在整隻貓後面。沒有就把頭像的圖放大墊在後面 */
       stage?: ReactNode;
@@ -117,7 +119,7 @@ const CAPE_FRONT = { flare: 6.5, neck: 9, hem: 2, teeth: 6, tooth: 3, band: 4.2,
 const WING_FRONT = { in: 5, down: 4 } as const;
 
 /**
- * 小怪獸裝（連身裝）：整個身體包起來，肚子一塊淺色，背上幾個斑點和一排背鰭。
+ * 娃娃裝（連身裝）共用的尺寸：整個身體包起來，肚子一塊淺色，有的主題背上有斑點、背鰭。每個主題只給顏色（KIGURUMI）。
  * collar＝領口往前多出多少；trouser＝褲管從後腿腿根往下蓋多長（後腿的腿根埋在身體裡比前腿深，要蓋到露出身體的那一段）；
  * belly＝側面時肚子那塊從肚子半厚的幾成處開始；bellyLen、bellyHalf＝正面時肚子那塊占身體長度、背半厚的幾成（半徑）、
  * bellyAt＝它的中心在身體長度的幾成處；
@@ -126,7 +128,7 @@ const WING_FRONT = { in: 5, down: 4 } as const;
  * 頭很大、會擋住背的前半，所以背鰭排在後半到屁股；
  * plateHalf、plateH、plateSink、plateLean＝背鰭的半寬、高、底邊埋進身體多深、尖端往後倒多少
  */
-const DINO = {
+const ONESIE = {
   collar: 9,
   trouser: 6.2,
   belly: 0.42,
@@ -148,9 +150,23 @@ const DINO = {
   plateSink: 1.2,
   plateLean: 1,
 } as const;
-const DINO_FILL = 'var(--acc-leaf)';
-/** 頭套上小怪獸自己的眼睛、鼻孔：固定用深色。外框線的顏色在黑貓＋深色模式會換成淺色，畫在綠色上看不清楚 */
-const DINO_EYE = 'var(--acc-shade)';
+
+/** 一套娃娃裝的顏色：fill＝布、belly＝肚子那塊、spots＝斑點（身上和尾巴；沒有就不畫）、plates＝背鰭（沒有就不畫） */
+interface KigurumiTheme {
+  fill: string;
+  belly: string;
+  spots?: string;
+  plates?: string;
+}
+/** 每套娃娃裝的顏色只定義在這裡；頭套、連身裝、圖示都讀它 */
+const KIGURUMI = {
+  dino: { fill: 'var(--acc-leaf)', belly: 'var(--acc-cream)', spots: 'var(--acc-mint)', plates: 'var(--acc-gold)' },
+  bear: { fill: 'var(--acc-wood)', belly: 'var(--acc-straw)' },
+  frog: { fill: 'var(--acc-lime)', belly: 'var(--acc-cream)', spots: 'var(--acc-leaf)' },
+  bunny: { fill: 'var(--acc-rose)', belly: 'var(--acc-cream)' },
+} as const satisfies Record<string, KigurumiTheme>;
+/** 頭套上那隻動物自己的眼睛、鼻孔：固定用深色。外框線的顏色在黑貓＋深色模式會換成淺色，畫在布上看不清楚 */
+const HOOD_EYE = 'var(--acc-shade)';
 
 /** 套在腿上端的一截布（袖子、褲管）：原點在腿根、+y 往下；cuff＝袖口羅紋的顏色（不給就沒有羅紋） */
 function legCover(fill: string, len: number, cuff?: string): ReactNode {
@@ -172,85 +188,200 @@ function legCover(fill: string, len: number, cuff?: string): ReactNode {
   );
 }
 
-/** 小怪獸裝的布面：整個身體都蓋住。側面時肚子那塊在身體下緣；正面時在中間，斑點左右各一份 */
-function dinoWrap(body: BodyGeom): ReactNode {
-  const top = -(body.back + CLOTH_MARGIN);
-  const height = body.back + body.belly + CLOTH_MARGIN * 2;
-  const rear = -(body.len + CLOTH_MARGIN);
-  const sides = body.frontal ? [-1, 1] : [-1];
-  const bellyTop = body.belly * DINO.belly;
-  return (
-    <g>
-      <rect x={rear} y={top} width={DINO.collar - rear} height={height} fill={DINO_FILL} />
-      {body.frontal ? (
-        <ellipse
-          cx={n2(-body.len * DINO.bellyAt)}
-          cy="0"
-          rx={n2(body.len * DINO.bellyLen)}
-          ry={n2(body.back * DINO.bellyHalf)}
-          fill="var(--acc-cream)"
-          {...bthin}
-        />
-      ) : (
-        <path
-          d={`M-2 ${n2(-top)} V${n2(bellyTop * 1.2)} Q${n2(-body.len / 2)} ${n2(bellyTop * 0.6)} ${n2(-body.len + 3)} ${n2(bellyTop * 1.3)} V${n2(-top)} Z`}
-          fill="var(--acc-cream)"
-          {...bthin}
-        />
-      )}
-      {sides.flatMap((side) =>
-        DINO.spots.map(([at, up, r]) => (
-          <circle key={`${side},${at}`} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill="var(--acc-mint)" />
-        )),
-      )}
-    </g>
-  );
-}
-
-/** 小怪獸裝的背鰭（側面）：沿著背線排一排，底邊埋進身體一點 */
-function dinoPlates(body: BodyGeom): ReactNode {
-  const p0 = [-body.shoulder, -body.chest] as const;
-  const p3 = [-(body.len - body.hip), -body.back] as const;
-  /** 跟身體的背線同一條曲線（同一個緩急），背鰭才會站在背上 */
-  const ease = (p0[0] - p3[0]) * PET_BACK_EASE;
-  const xs = [p0[0], p0[0] - ease, p3[0] + ease, p3[0]] as const;
-  const ys = [p0[1], p0[1], p3[1], p3[1]] as const;
-  const bezier = (v: readonly [number, number, number, number], t: number) => {
-    const u = 1 - t;
-    return u * u * u * v[0] + 3 * u * u * t * v[1] + 3 * u * t * t * v[2] + t * t * t * v[3];
-  };
-  return (
-    <g>
-      {DINO.plates.map(([at, k]) => {
-        /** 屁股那段圓弧上轉了幾度（背線上是 0）：背鰭跟著輪廓的法線倒 */
-        const turn = Math.max(0, at - 1) * 90;
-        const rad = (turn * Math.PI) / 180;
-        const x = at <= 1 ? bezier(xs, at) : p3[0] - body.hip * Math.sin(rad);
-        const y = at <= 1 ? bezier(ys, at) : -body.back * Math.cos(rad);
-        const half = DINO.plateHalf * k;
-        return (
-          <path
-            key={at}
-            transform={`translate(${n2(x)} ${n2(y)}) rotate(${n2(-turn)})`}
-            d={`M${n2(half)} ${DINO.plateSink} L${-DINO.plateLean} ${n2(DINO.plateSink - DINO.plateH * k)} L${n2(-half)} ${DINO.plateSink} Z`}
-            fill="var(--acc-gold)"
+/** 連身裝的布面：整個身體都蓋住。側面時肚子那塊在身體下緣；正面時在中間，斑點左右各一份 */
+function onesieWrap(theme: KigurumiTheme): (body: BodyGeom) => ReactNode {
+  return (body) => {
+    const top = -(body.back + CLOTH_MARGIN);
+    const height = body.back + body.belly + CLOTH_MARGIN * 2;
+    const rear = -(body.len + CLOTH_MARGIN);
+    const sides = body.frontal ? [-1, 1] : [-1];
+    const bellyTop = body.belly * ONESIE.belly;
+    return (
+      <g>
+        <rect x={rear} y={top} width={ONESIE.collar - rear} height={height} fill={theme.fill} />
+        {body.frontal ? (
+          <ellipse
+            cx={n2(-body.len * ONESIE.bellyAt)}
+            cy="0"
+            rx={n2(body.len * ONESIE.bellyLen)}
+            ry={n2(body.back * ONESIE.bellyHalf)}
+            fill={theme.belly}
             {...bthin}
           />
-        );
-      })}
-    </g>
-  );
+        ) : (
+          <path
+            d={`M-2 ${n2(-top)} V${n2(bellyTop * 1.2)} Q${n2(-body.len / 2)} ${n2(bellyTop * 0.6)} ${n2(-body.len + 3)} ${n2(bellyTop * 1.3)} V${n2(-top)} Z`}
+            fill={theme.belly}
+            {...bthin}
+          />
+        )}
+        {theme.spots
+          ? sides.flatMap((side) =>
+              ONESIE.spots.map(([at, up, r]) => (
+                <circle key={`${side},${at}`} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill={theme.spots} />
+              )),
+            )
+          : null}
+      </g>
+    );
+  };
 }
 
-/** 小怪獸頭套的牙齒：一顆牙（原點在牙根中間、尖端朝 +y），和每顆牙在開口上緣的位置與朝向（頭像座標；朝臉的中心） */
-const DINO_TOOTH = 'M-2.8 -1.5 L0 4.4 L2.8 -1.5 Z';
-const DINO_TEETH = [
+/** 連身裝的背鰭（側面）：沿著背線排一排，底邊埋進身體一點 */
+function onesiePlates(fill: string): (body: BodyGeom) => ReactNode {
+  return (body) => {
+    const p0 = [-body.shoulder, -body.chest] as const;
+    const p3 = [-(body.len - body.hip), -body.back] as const;
+    /** 跟身體的背線同一條曲線（同一個緩急），背鰭才會站在背上 */
+    const ease = (p0[0] - p3[0]) * PET_BACK_EASE;
+    const xs = [p0[0], p0[0] - ease, p3[0] + ease, p3[0]] as const;
+    const ys = [p0[1], p0[1], p3[1], p3[1]] as const;
+    const bezier = (v: readonly [number, number, number, number], t: number) => {
+      const u = 1 - t;
+      return u * u * u * v[0] + 3 * u * u * t * v[1] + 3 * u * t * t * v[2] + t * t * t * v[3];
+    };
+    return (
+      <g>
+        {ONESIE.plates.map(([at, k]) => {
+          /** 屁股那段圓弧上轉了幾度（背線上是 0）：背鰭跟著輪廓的法線倒 */
+          const turn = Math.max(0, at - 1) * 90;
+          const rad = (turn * Math.PI) / 180;
+          const x = at <= 1 ? bezier(xs, at) : p3[0] - body.hip * Math.sin(rad);
+          const y = at <= 1 ? bezier(ys, at) : -body.back * Math.cos(rad);
+          const half = ONESIE.plateHalf * k;
+          return (
+            <path
+              key={at}
+              transform={`translate(${n2(x)} ${n2(y)}) rotate(${n2(-turn)})`}
+              d={`M${n2(half)} ${ONESIE.plateSink} L${-ONESIE.plateLean} ${n2(ONESIE.plateSink - ONESIE.plateH * k)} L${n2(-half)} ${ONESIE.plateSink} Z`}
+              fill={fill}
+              {...bthin}
+            />
+          );
+        })}
+      </g>
+    );
+  };
+}
+
+/**
+ * 一件連身裝（身上）：整個身體包起來、前腿套袖子、後腿套褲管、尾巴成套、腳掌露在外面。
+ * 圖示另外畫成一件看得出來的小連身衣（頭像版只是下巴下面那一圈領口，單獨看認不出是衣服）。
+ */
+function onesieArt(theme: KigurumiTheme): ItemArt {
+  return {
+    kind: 'layer',
+    box: '6 50 52 26',
+    icon: {
+      box: '0 0 32 32',
+      node: (
+        <g>
+          <path
+            d="M10 6.5 Q16 3.5 22 6.5 L27.4 12 Q29 15 26.2 16.8 L22.5 14.6 V24 Q22.5 29 19.5 29 H17.3 V24.6 H14.7 V29 H12.5 Q9.5 29 9.5 24 V14.6 L5.8 16.8 Q3 15 4.6 12 Z"
+            fill={theme.fill}
+            stroke={LINE}
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          />
+          <ellipse cx="16" cy="17.6" rx="3.9" ry="4.8" fill={theme.belly} stroke={LINE} strokeWidth="1" />
+          <path d="M12.6 5.6 Q16 8.6 19.4 5.6" fill="none" stroke={LINE} strokeWidth="1.1" strokeLinecap="round" />
+          {theme.spots ? (
+            <g fill={theme.spots}>
+              <circle cx="7.6" cy="12.6" r="1.1" />
+              <circle cx="24.4" cy="12.6" r="1.1" />
+              <circle cx="11.6" cy="26" r="1" />
+              <circle cx="20.4" cy="26" r="1" />
+            </g>
+          ) : null}
+          {theme.plates ? <path d="M14.2 4.6 L16 1.2 L17.8 4.6 Z" fill={theme.plates} stroke={LINE} strokeWidth="1" strokeLinejoin="round" /> : null}
+        </g>
+      ),
+    },
+    onBody: {
+      wrap: onesieWrap(theme),
+      sleeve: legCover(theme.fill, SLEEVE.len),
+      trouser: legCover(theme.fill, ONESIE.trouser),
+      tail: { fill: theme.fill, ...(theme.spots ? { spots: theme.spots } : {}) },
+      // 側面：背上一排背鰭；直立朝著你的姿勢從正面看不到背鰭（給空的 frontal 就不畫側面那排）
+      ...(theme.plates ? { over: onesiePlates(theme.plates), frontal: {} } : {}),
+      // 下巴下面的領口
+      head: <path d="M20.5 56.6 Q32 61.4 43.5 56.6 L43.2 62 Q32 66.6 20.8 62 Z" fill={theme.fill} {...stroke} />,
+    },
+    node: (
+      <g>
+        <path d="M11 55 Q32 64.5 53 55 L54 63.5 Q32 73 10 63.5 Z" fill={theme.fill} {...stroke} />
+        <path d="M24.5 61.6 Q32 63.6 39.5 61.6 L40 68.4 Q32 70.8 24 68.4 Z" fill={theme.belly} {...thin} />
+        {theme.spots ? (
+          <g fill={theme.spots}>
+            <circle cx="16.5" cy="61.4" r="1.8" />
+            <circle cx="47.5" cy="61.4" r="1.8" />
+          </g>
+        ) : null}
+      </g>
+    ),
+  };
+}
+
+/**
+ * 頭套的輪廓（頭像座標）：包住頭頂、兩邊蓋到臉頰，不繞到下巴（頸部配件露在外面）；中間的開口露出臉。
+ * 貓耳朵豎在頭頂兩側（耳尖約 (14,7)、(50,7)，頭像的耳朵還會抖，最多轉 9 度），每個頭套都要把它們整個包住：
+ * pointed＝耳朵的地方鼓成尖耳罩；dome＝圓頂，耳朵那兩塊由各主題自己的圓耳朵、大眼睛、垂耳蓋住（HOOD_EAR 那一圈之內）。
+ */
+const HOOD_SIDES_AND_OPENING =
+  'Q61.2 40 59 48.5 Q57.6 52 55 49.5 C55.5 34 46 25.5 32 25.5 C18 25.5 8.5 34 9 49.5 Q6.4 52 5 48.5 Z';
+const HOOD_OUTLINE = {
+  pointed: `M5 48.5 Q2.8 40 4.4 32 Q5 28.5 6.4 25.5 L9.2 5.6 Q10.6 2.4 13.6 4.2 L27.5 12.6 Q32 11.2 36.5 12.6 L50.4 4.2 Q53.4 2.4 54.8 5.6 L57.6 25.5 Q59 28.5 59.6 32 ${HOOD_SIDES_AND_OPENING}`,
+  dome: `M5 48.5 Q2.8 40 4.4 32 Q5.6 22 14 16.5 Q32 4.5 50 16.5 Q58.4 22 59.6 32 ${HOOD_SIDES_AND_OPENING}`,
+} as const;
+/** 圓頂頭套上蓋住貓耳朵的那一圈（左邊那顆；右邊是 x 鏡像）：圓心與半徑。圓耳朵、大眼睛都畫成這麼大 */
+const HOOD_EAR = { x: 13.6, y: 11.4, r: 9.4 } as const;
+/** 左右各畫一份（右邊是沿頭像中線 x=32 的鏡像） */
+function mirrored(node: ReactNode): ReactNode {
+  return (
+    <>
+      {node}
+      <g transform="translate(64 0) scale(-1 1)">{node}</g>
+    </>
+  );
+}
+/** 頭套開口上緣的牙齒：一顆牙（原點在牙根中間、尖端朝 +y），和每顆牙的位置與朝向（頭像座標；朝臉的中心） */
+const HOOD_TOOTH = 'M-2.8 -1.5 L0 4.4 L2.8 -1.5 Z';
+const HOOD_TEETH = [
   [15.1, 31.6, -44],
   [23.2, 26.9, -19],
   [32, 25.5, 0],
   [40.8, 26.9, 19],
   [48.9, 31.6, 44],
 ] as const;
+
+/**
+ * 一件頭套（頭頂）：整顆頭套進去。疊的順序：under（畫在布後面：頭頂的背鰭、圓耳朵）→ 牙齒 → 布（輪廓）→ over（布上面：耳朵裡面、動物自己的眼睛鼻子、垂耳）。
+ */
+function hoodArt(spec: {
+  theme: KigurumiTheme;
+  outline: string;
+  box: string;
+  under?: ReactNode;
+  teeth?: boolean;
+  over?: ReactNode;
+}): ItemArt {
+  return {
+    kind: 'layer',
+    box: spec.box,
+    node: (
+      <g>
+        {spec.under}
+        {spec.teeth
+          ? HOOD_TEETH.map(([x, y, rot]) => (
+              <path key={x} transform={`translate(${x} ${y}) rotate(${rot})`} d={HOOD_TOOTH} fill="var(--acc-cream)" {...thin} />
+            ))
+          : null}
+        <path d={spec.outline} fill={spec.theme.fill} {...stroke} />
+        {spec.over}
+      </g>
+    ),
+  };
+}
 
 /** 毛衣的布面：從領口蓋到下擺，直的織紋，下擺一圈羅紋 */
 function sweaterWrap(body: BodyGeom): ReactNode {
@@ -528,31 +659,82 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   },
-  'dino-hood': {
-    kind: 'layer',
+  'dino-hood': hoodArt({
+    theme: KIGURUMI.dino,
+    outline: HOOD_OUTLINE.pointed,
     box: '0 0 64 54',
-    // 整顆頭套進小怪獸的嘴巴裡：頭套包住頭頂和耳朵（耳朵的地方鼓起來）、兩邊蓋到臉頰，不繞到下巴（頸部配件露在外面）；
-    // 耳罩比耳朵寬：頭像的耳朵會抖（wardrobe.css 的 cb-cat-ear，最多轉 9 度），抖的時候耳尖不能戳出來；
-    // 開口上緣一排牙齒，頭頂一片背鰭，額頭上是小怪獸自己的眼睛和鼻孔
-    node: (
+    // 整顆頭套進小怪獸的嘴巴裡：開口上緣一排牙齒，頭頂一片背鰭，額頭上是小怪獸自己的眼睛和鼻孔
+    under: <path d="M28.4 13.4 L32 5 L35.6 13.4 Z" fill={KIGURUMI.dino.plates} {...thin} />,
+    teeth: true,
+    over: (
       <g>
-        <path d="M28.4 13.4 L32 5 L35.6 13.4 Z" fill="var(--acc-gold)" {...thin} />
-        {DINO_TEETH.map(([x, y, rot]) => (
-          <path key={x} transform={`translate(${x} ${y}) rotate(${rot})`} d={DINO_TOOTH} fill="var(--acc-cream)" {...thin} />
-        ))}
-        <path
-          d="M5 48.5 Q2.8 40 4.4 32 Q5 28.5 6.4 25.5 L9.2 5.6 Q10.6 2.4 13.6 4.2 L27.5 12.6 Q32 11.2 36.5 12.6 L50.4 4.2 Q53.4 2.4 54.8 5.6 L57.6 25.5 Q59 28.5 59.6 32 Q61.2 40 59 48.5 Q57.6 52 55 49.5 C55.5 34 46 25.5 32 25.5 C18 25.5 8.5 34 9 49.5 Q6.4 52 5 48.5 Z"
-          fill={DINO_FILL}
-          {...stroke}
-        />
-        <path d="M12.3 10 L10.9 19.5 L18.4 14.4 Z M51.7 10 L53.1 19.5 L45.6 14.4 Z" fill="var(--acc-mint)" />
-        <circle cx="25.5" cy="19.6" r="1.7" fill={DINO_EYE} />
-        <circle cx="38.5" cy="19.6" r="1.7" fill={DINO_EYE} />
-        <circle cx="30.3" cy="22.4" r="0.8" fill={DINO_EYE} />
-        <circle cx="33.7" cy="22.4" r="0.8" fill={DINO_EYE} />
+        <path d="M12.3 10 L10.9 19.5 L18.4 14.4 Z M51.7 10 L53.1 19.5 L45.6 14.4 Z" fill={KIGURUMI.dino.spots} />
+        <circle cx="25.5" cy="19.6" r="1.7" fill={HOOD_EYE} />
+        <circle cx="38.5" cy="19.6" r="1.7" fill={HOOD_EYE} />
+        <circle cx="30.3" cy="22.4" r="0.8" fill={HOOD_EYE} />
+        <circle cx="33.7" cy="22.4" r="0.8" fill={HOOD_EYE} />
       </g>
     ),
-  },
+  }),
+  'bear-hood': hoodArt({
+    theme: KIGURUMI.bear,
+    outline: HOOD_OUTLINE.dome,
+    box: '0 0 64 54',
+    // 兩顆圓耳朵（包住貓耳朵），額頭上是小熊的眼睛和淺色的鼻口
+    under: mirrored(<circle cx={HOOD_EAR.x} cy={HOOD_EAR.y} r={HOOD_EAR.r} fill={KIGURUMI.bear.fill} {...stroke} />),
+    over: (
+      <g>
+        {mirrored(<circle cx={HOOD_EAR.x} cy={HOOD_EAR.y - 1.4} r="4.4" fill={KIGURUMI.bear.belly} />)}
+        <circle cx="24.6" cy="17.6" r="1.6" fill={HOOD_EYE} />
+        <circle cx="39.4" cy="17.6" r="1.6" fill={HOOD_EYE} />
+        <ellipse cx="32" cy="20.6" rx="4.6" ry="3.1" fill={KIGURUMI.bear.belly} {...thin} strokeWidth={WF} />
+        <ellipse cx="32" cy="19.6" rx="1.7" ry="1.2" fill={HOOD_EYE} />
+      </g>
+    ),
+  }),
+  'frog-hood': hoodArt({
+    theme: KIGURUMI.frog,
+    outline: HOOD_OUTLINE.dome,
+    box: '0 0 64 54',
+    // 頭頂兩顆凸出來的大眼睛（包住貓耳朵），額頭上兩個鼻孔
+    under: mirrored(<circle cx={HOOD_EAR.x} cy={HOOD_EAR.y} r={HOOD_EAR.r} fill={KIGURUMI.frog.fill} {...stroke} />),
+    over: (
+      <g>
+        {mirrored(
+          <g>
+            <circle cx={HOOD_EAR.x} cy={HOOD_EAR.y - 0.6} r="5.8" fill="var(--acc-cream)" {...thin} strokeWidth={WF} />
+            <circle cx={HOOD_EAR.x + 1.2} cy={HOOD_EAR.y} r="2.9" fill={HOOD_EYE} />
+            <circle cx={HOOD_EAR.x + 0.2} cy={HOOD_EAR.y - 1.1} r="0.9" fill="var(--acc-cream)" />
+          </g>,
+        )}
+        <circle cx="29.8" cy="19.4" r="0.9" fill={HOOD_EYE} />
+        <circle cx="34.2" cy="19.4" r="0.9" fill={HOOD_EYE} />
+      </g>
+    ),
+  }),
+  'bunny-hood': hoodArt({
+    theme: KIGURUMI.bunny,
+    outline: HOOD_OUTLINE.dome,
+    box: '-4 0 72 54',
+    // 垂耳兔：兩隻長耳朵從頭頂兩側垂下來（耳根包住貓耳朵），額頭上是兔子的眼睛和小鼻子
+    over: (
+      <g>
+        {mirrored(
+          <g>
+            <path
+              d="M24.5 12.6 Q13 0.6 5 5.6 Q-3 13 -2.2 30 Q-1.6 44 3.8 46.6 Q9 47.2 9.6 38 Q9.4 25 13.6 19.4 Q19.5 17.5 24.5 12.6 Z"
+              fill={KIGURUMI.bunny.fill}
+              {...stroke}
+            />
+            <path d="M3.4 15 Q1 27 2.6 39.4 Q3.8 42.6 5.6 39.4 Q5.2 26 8.2 15.6 Q5.6 12.6 3.4 15 Z" fill="var(--pink-deep)" fillOpacity="0.6" />
+          </g>,
+        )}
+        <circle cx="25.6" cy="18.6" r="1.6" fill={HOOD_EYE} />
+        <circle cx="38.4" cy="18.6" r="1.6" fill={HOOD_EYE} />
+        <path d="M30.6 20.6 H33.4 L32 22.4 Z" fill="var(--pink-deep)" stroke="var(--pink-deep)" strokeWidth="0.8" strokeLinejoin="round" />
+      </g>
+    ),
+  }),
 
   // ── 頭側 ────────────────────────────────────────────────
   'star-clip': {
@@ -668,6 +850,64 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     ),
   },
 
+  // 娃娃裝的嘴邊裝飾：從嘴巴往右邊伸出去（不超過 x=64，接在身體上才不會頂出圖外）
+  'fire-breath': {
+    kind: 'layer',
+    motion: 'flicker',
+    box: '32 37 26 22',
+    node: (
+      <g>
+        <path
+          d="M35 47.4 Q41 39.6 50.5 40.6 Q46.6 43.8 54 44.4 Q48.4 47.4 55.5 50.6 Q47.8 51.4 50.6 55.6 Q42 56 35 50.4 Z"
+          fill="var(--acc-coral)"
+          {...thin}
+        />
+        <path d="M36.6 48 Q41.4 43.8 46.4 44.2 Q44 46.6 48.2 47.6 Q44.2 49.2 46 52 Q41 52 36.6 49.6 Z" fill="var(--acc-gold)" />
+      </g>
+    ),
+  },
+  'honey-dipper': {
+    kind: 'layer',
+    box: '30 41 28 24',
+    // 叼著一根蜂蜜棒：木柄從嘴角伸出去，棒頭沾滿蜂蜜、往下滴
+    node: (
+      <g>
+        <path d="M34 48.4 L46.4 52.6" stroke={LINE} strokeWidth="4.2" strokeLinecap="round" />
+        <path d="M34 48.4 L46.4 52.6" stroke="var(--acc-wood)" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M49.4 58 Q48 61.4 50 63 Q52 61.4 50.8 58 Z" fill="var(--acc-gold)" {...thin} strokeWidth={WF} />
+        <ellipse cx="50" cy="54" rx="4.4" ry="3.9" transform="rotate(20 50 54)" fill="var(--acc-gold)" {...thin} />
+        <path d="M47.4 51.6 L46.2 55.6 M50.4 50.4 L49 57.4 M53.2 51.6 L52.2 56.6" stroke={LINE} strokeWidth={WF} strokeLinecap="round" strokeOpacity="0.55" />
+      </g>
+    ),
+  },
+  'frog-tongue': {
+    kind: 'layer',
+    box: '29 43 36 20',
+    // 長舌頭從嘴巴往右下甩出去（繞過頭套垂到臉頰的那一段，戴著頭套也看得到），舌尖前面一隻小蟲
+    node: (
+      <g>
+        <path d="M32.6 48.6 Q37 58.6 47 58 Q54 57.4 57 54.4" fill="none" stroke={LINE} strokeWidth="6.4" strokeLinecap="round" />
+        <path d="M32.6 48.6 Q37 58.6 47 58 Q54 57.4 57 54.4" fill="none" stroke="var(--pink-deep)" strokeWidth="3.4" strokeLinecap="round" />
+        <g transform="translate(60.4 50.6) rotate(-20)">
+          <ellipse cx="-1.9" cy="-1.8" rx="2.3" ry="1.5" transform="rotate(-30 -1.9 -1.8)" fill="var(--acc-cream)" stroke={LINE} strokeWidth="0.9" />
+          <ellipse cx="1.9" cy="-1.8" rx="2.3" ry="1.5" transform="rotate(30 1.9 -1.8)" fill="var(--acc-cream)" stroke={LINE} strokeWidth="0.9" />
+          <ellipse cx="0" cy="0.4" rx="1.8" ry="2.1" fill={HOOD_EYE} />
+        </g>
+      </g>
+    ),
+  },
+  carrot: {
+    kind: 'layer',
+    box: '30 39 34 20',
+    // 叼著一根紅蘿蔔：尖的那頭在嘴裡，葉子在外面
+    node: (
+      <g>
+        <path d="M54 48.4 Q57.6 42.4 60.6 44.6 Q59 47.6 56 48.4 Q60.8 48.6 61.2 52 Q57.4 53.4 54 48.4 Z" fill="var(--acc-leaf)" {...thin} />
+        <path d="M34 48.6 L51 43.8 Q55.4 48.6 51 53.4 Z" fill="var(--acc-coral)" {...thin} />
+        <path d="M42 46.6 L42.8 49 M46.6 45.4 L47.6 48.6 M44 51 L44.8 53" stroke={LINE} strokeWidth={WF} strokeLinecap="round" strokeOpacity="0.5" />
+      </g>
+    ),
+  },
   // ── 頸部 ────────────────────────────────────────────────
   bell: {
     kind: 'layer',
@@ -765,30 +1005,10 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   },
-  'dino-suit': {
-    kind: 'layer',
-    box: '6 50 52 26',
-    onBody: {
-      // 連身裝：整個身體包起來，前腿套袖子、後腿套褲管，腳掌露在外面
-      wrap: dinoWrap,
-      sleeve: legCover(DINO_FILL, SLEEVE.len),
-      trouser: legCover(DINO_FILL, DINO.trouser),
-      tail: { fill: DINO_FILL, spots: 'var(--acc-mint)' },
-      // 側面：背上一排背鰭；直立朝著你的姿勢從正面看不到背鰭（給空的 frontal 就不畫側面那排）
-      over: dinoPlates,
-      frontal: {},
-      // 下巴下面的領口
-      head: <path d="M20.5 56.6 Q32 61.4 43.5 56.6 L43.2 62 Q32 66.6 20.8 62 Z" fill={DINO_FILL} {...stroke} />,
-    },
-    node: (
-      <g>
-        <path d="M11 55 Q32 64.5 53 55 L54 63.5 Q32 73 10 63.5 Z" fill={DINO_FILL} {...stroke} />
-        <path d="M24.5 61.6 Q32 63.6 39.5 61.6 L40 68.4 Q32 70.8 24 68.4 Z" fill="var(--acc-cream)" {...thin} />
-        <circle cx="16.5" cy="61.4" r="1.8" fill="var(--acc-mint)" />
-        <circle cx="47.5" cy="61.4" r="1.8" fill="var(--acc-mint)" />
-      </g>
-    ),
-  },
+  'dino-suit': onesieArt(KIGURUMI.dino),
+  'bear-suit': onesieArt(KIGURUMI.bear),
+  'frog-suit': onesieArt(KIGURUMI.frog),
+  'bunny-suit': onesieArt(KIGURUMI.bunny),
 
   // ── 背飾（畫在貓後面）────────────────────────────────────
   balloon: {
