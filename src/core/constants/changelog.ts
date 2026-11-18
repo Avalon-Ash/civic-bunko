@@ -3,12 +3,13 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
-    id: '2026-11-18-cat-sit',
+    id: '2026-11-18-cat-front',
     date: '2026-11-18',
-    title: '小貓坐好了',
+    title: '小貓面向你坐好',
     items: [
-      '坐姿重畫：前腳從胸口直直撐到地上，圓圓的屁股坐在後面，大腿下露出後腳掌',
-      '坐著理毛、穿毛衣、披披風時也是這個坐法',
+      '坐著的時候面向你：小小的身體在頭的正下方，兩隻前腳併在中間，尾巴從旁邊翹出來',
+      '坐著時身體兩邊是花色、中間是白肚子',
+      '坐著理毛、穿毛衣、水手領、披風時也是這個坐法',
     ],
   },
   {

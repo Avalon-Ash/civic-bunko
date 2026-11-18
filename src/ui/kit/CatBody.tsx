@@ -47,6 +47,8 @@ const outline = {
   strokeLinecap: 'round' as const,
   strokeLinejoin: 'round' as const,
 };
+/** 沿脊椎鏡像（身體座標的 y 反向：背那側 ↔ 肚子那側）。正面坐時身體左右對稱，背那側的花色、布面鏡像到另一側再畫一次 */
+const MIRROR = 'scale(1 -1)';
 /** 貝茲曲線近似四分之一圓的把手長度 */
 const ARC = 0.5523;
 const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -73,7 +75,7 @@ const curveTo = (c: Cubic) => `C${pt(c[1])} ${pt(c[2])} ${pt(c[3])}`;
 /**
  * 身體的形狀（以身體中心為原點、+x 朝脖子、-y 是背、+y 是肚子）：
  * outline＝輪廓。屁股那端比胸口厚，背線從肩膀滑到屁股，肚子那側比背厚（下垂）；
- * 站著是一顆豆子，坐著是斜的（圓屁股在後下方、胸口在前上方），趴著時兩端可以收成方角。
+ * 站著是一顆豆子，正面坐著是直立、下大上小的蛋形，趴著時兩端可以收成方角。
  * saddle＝背上的花色：上緣直接取輪廓背側的那幾段、下緣的控制點都在輪廓內，所以它一定貼著身體，不靠剪裁。
  */
 function torsoShape(torso: PetPoseSpec['torso'], build: PetBuild): { outline: string; saddle: string } {
@@ -111,19 +113,19 @@ function torsoShape(torso: PetPoseSpec['torso'], build: PetBuild): { outline: st
 }
 
 /**
- * 一條腿的輪廓（原點在腿根、+y 往下）：短短胖胖的腿，底下是往前伸一點的圓腳掌。
+ * 一條腿的輪廓（原點在腿根、+y 往下）：短短胖胖的腿，底下是圓腳掌。toe＝腳掌往前（+x）多伸多少；正面坐時腳掌朝你，給 0。
  * 近側的腿上端不封口，跟身體接在一起；遠側的腿畫在身體後面，上端收成圓頭（從身體邊緣露出來時才有肩膀）。
  */
-function legPath(len: number, capped: boolean): string {
+function legPath(len: number, capped: boolean, toe: number): string {
   const w = PET_LEG_W / 2;
   const pawTop = Math.max(0, len - PET_LEG_W * PET_PAW_H);
   const heel = Math.max(0, len - w);
-  const front = w + PET_PAW_TOE;
+  const front = w + toe;
   return [
     `M${-w} 0`,
     `L${-w} ${r2(heel)}`,
     `Q${-w} ${len} 0 ${len}`,
-    `L${PET_PAW_TOE} ${len}`,
+    `L${toe} ${len}`,
     `Q${r2(front)} ${len} ${r2(front)} ${r2((len + pawTop) / 2)}`,
     `Q${r2(front)} ${r2(pawTop)} ${w} ${r2(pawTop)}`,
     `L${w} 0`,
@@ -131,9 +133,9 @@ function legPath(len: number, capped: boolean): string {
   ].join('');
 }
 
-function Leg({ leg, index, far, sleeve }: { leg: PetLeg; index: number; far: boolean; sleeve: ReactNode }) {
+function Leg({ leg, index, far, toe, sleeve }: { leg: PetLeg; index: number; far: boolean; toe: number; sleeve: ReactNode }) {
   if (leg.len <= 0) return null;
-  const d = legPath(leg.len, far);
+  const d = legPath(leg.len, far, toe);
   return (
     <g transform={`translate(${leg.x} ${leg.y}) rotate(${leg.rot})`}>
       <g className={`cb-pet-leg cb-pet-leg-${index}`}>
@@ -190,6 +192,7 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
   const neckFrame = `translate(${torso.rx} 0)`;
   const sleeves = worn.map(({ slot, art }) => (art.sleeve ? <g key={slot}>{art.sleeve}</g> : null));
   const sleeve = worn.some(({ art }) => art.sleeve) ? sleeves : null;
+  const toe = spec.frontal ? 0 : PET_PAW_TOE;
 
   return (
     <svg
@@ -236,12 +239,13 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
           </g>
 
           <g className="cb-pet-bob">
-            <Leg leg={spec.legs[0]} index={0} far sleeve={null} />
-            <Leg leg={spec.legs[1]} index={1} far sleeve={sleeve} />
+            <Leg leg={spec.legs[0]} index={0} far toe={toe} sleeve={null} />
+            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} sleeve={sleeve} />}
 
             <g className="cb-pet-torso" transform={torsoFrame}>
               <path className="cb-pet-torso-shape" d={shape.outline} fill="var(--cat-fur)" />
               <path className="cb-pet-saddle" d={shape.saddle} fill="var(--cat-patch)" />
+              {spec.frontal ? <path className="cb-pet-saddle" d={shape.saddle} transform={MIRROR} fill="var(--cat-patch)" /> : null}
               {worn.some(({ art }) => art.wrap) ? (
                 <>
                   <clipPath id={clip}>
@@ -250,8 +254,9 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
                   <g clipPath={`url(#${clip})`} className="cb-pet-wrap">
                     {worn.map(({ slot, art }) =>
                       art.wrap ? (
-                        <g key={slot} transform={neckFrame}>
-                          {art.wrap(geom)}
+                        <g key={slot}>
+                          <g transform={neckFrame}>{art.wrap(geom)}</g>
+                          {spec.frontal ? <g transform={`${MIRROR} ${neckFrame}`}>{art.wrap(geom)}</g> : null}
                         </g>
                       ) : null,
                     )}
@@ -261,17 +266,18 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
               <path d={shape.outline} {...outline} />
               {worn.map(({ slot, art }) =>
                 art.over ? (
-                  <g key={slot} transform={neckFrame} className="cb-pet-back">
-                    {art.over(geom)}
+                  <g key={slot} className="cb-pet-back">
+                    {spec.frontal ? <g transform={`${MIRROR} ${neckFrame}`}>{art.over(geom)}</g> : null}
+                    <g transform={neckFrame}>{art.over(geom)}</g>
                   </g>
                 ) : null,
               )}
             </g>
 
-            {/* 身體上的摺線（坐著時大腿前緣的弧線） */}
-            {spec.crease ? <path className="cb-pet-crease" d={spec.crease} {...outline} /> : null}
-            <Leg leg={spec.legs[2]} index={2} far={false} sleeve={null} />
-            <Leg leg={spec.legs[3]} index={3} far={false} sleeve={sleeve} />
+            {/* 正面坐時兩隻前腳都在身體前面 */}
+            {spec.frontal ? <Leg leg={spec.legs[1]} index={1} far={false} toe={toe} sleeve={sleeve} /> : null}
+            <Leg leg={spec.legs[2]} index={2} far={false} toe={toe} sleeve={null} />
+            <Leg leg={spec.legs[3]} index={3} far={false} toe={toe} sleeve={sleeve} />
 
             <g transform={place(spec.head, HEAD_ORIGIN.x, HEAD_ORIGIN.y)}>
               <g className="cb-pet-head">
