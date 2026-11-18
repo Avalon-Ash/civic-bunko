@@ -424,7 +424,8 @@
   }
 }
 
-/* ── 表情符號泡泡（kit/Emote.tsx）：冒出來彈一下；once 的停一下就消失，stay 的一直掛著、符號自己動 ── */
+/* ── 表情符號泡泡（kit/Emote.tsx）：冒出來彈一下；once 的停一下就消失，stay 的一直掛著、整顆輕輕浮動、符號自己動。
+   位移的單位是小貓圖的座標（泡泡半徑 8）：符號本身很小，用外框的百分比只動得了 1px，等於沒動 ── */
 .cb-emote,
 .cb-emote-glyph {
   transform-box: fill-box;
@@ -435,7 +436,9 @@
 }
 
 .cb-emote-stay {
-  animation: cb-emote-pop 0.28s ease-out;
+  animation:
+    cb-emote-pop 0.28s ease-out,
+    cb-emote-bob 1.8s ease-in-out 0.28s infinite;
 }
 
 /* 沒有動畫（減少動態）時不顯示：一閃而過的符號停在畫面上會變成一直掛著 */
@@ -444,17 +447,20 @@
   animation: cb-emote-once var(--emote-once-ms, 1800ms) ease-out forwards;
 }
 
-.cb-emote-note .cb-emote-glyph {
+.cb-emote-glyph {
   transform-origin: 50% 50%;
-  animation: cb-emote-sway 0.6s ease-in-out infinite;
+}
+
+.cb-emote-note .cb-emote-glyph {
+  animation: cb-emote-sway 0.5s ease-in-out infinite;
 }
 
 .cb-emote-zzz .cb-emote-glyph {
-  animation: cb-emote-float 2.4s ease-in-out infinite;
+  animation: cb-emote-float 2.2s ease-in-out infinite;
 }
 
 .cb-emote-sweat .cb-emote-glyph {
-  animation: cb-emote-drip 1.1s ease-in infinite;
+  animation: cb-emote-drip 1s ease-in infinite;
 }
 
 @keyframes cb-emote-pop {
@@ -466,6 +472,16 @@
   }
   100% {
     transform: scale(1);
+  }
+}
+
+@keyframes cb-emote-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.4px);
   }
 }
 
@@ -484,42 +500,47 @@
   }
   100% {
     opacity: 0;
-    transform: scale(1) translateY(-18%);
+    transform: scale(1) translateY(-4px);
   }
 }
 
 @keyframes cb-emote-sway {
   0%,
   100% {
-    transform: rotate(-10deg);
+    transform: translateY(1px) rotate(-16deg);
   }
   50% {
-    transform: rotate(10deg);
+    transform: translateY(-1px) rotate(16deg);
   }
 }
 
 @keyframes cb-emote-float {
   0%,
   100% {
-    transform: translateY(8%);
-    opacity: 0.55;
+    transform: translate(-1px, 1.6px) scale(0.72);
+    opacity: 0.5;
   }
   50% {
-    transform: translateY(-8%);
+    transform: translate(0.6px, -1px) scale(1.08);
     opacity: 1;
   }
 }
 
 @keyframes cb-emote-drip {
   0% {
-    transform: translateY(-14%);
+    transform: translateY(-3.2px) scale(0.6);
     opacity: 0;
   }
-  30% {
+  35% {
     opacity: 1;
+    transform: translateY(-1px) scale(1);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(2.6px) scale(1);
   }
   100% {
-    transform: translateY(14%);
-    opacity: 1;
+    opacity: 0;
+    transform: translateY(3.2px) scale(1);
   }
 }

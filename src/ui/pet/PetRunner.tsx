@@ -90,7 +90,8 @@ export function PetRunner({ world, outfit, value }: PetRunnerProps) {
 
   return (
     <span ref={hostRef} className="cb-pet-runner">
-      <CatBody pose={pose} outfit={outfit} facing={facing} width={RUNNER_WIDTH} pivot />
+      {/* 模擬考要安靜：不冒表情符號泡泡 */}
+      <CatBody pose={pose} outfit={outfit} facing={facing} width={RUNNER_WIDTH} pivot quiet={Boolean(world.round?.config.exam)} />
     </span>
   );
 }

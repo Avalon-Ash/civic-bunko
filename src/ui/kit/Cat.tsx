@@ -202,12 +202,15 @@ export function Cat({
       overflow="visible"
     >
       <CatHead mood={mood} outfit={wearing} standalone />
+      {/* 轉圈的時候（答對的慶祝、載入中）不冒：泡泡跟著整張圖轉會上下顛倒 */}
+      {spin ? null : (
       <Emote
         mood={mood}
         at={{ x: HEAD_ORIGIN.x + HEAD_RADIUS.x * EMOTE.corner.x, y: HEAD_ORIGIN.y - HEAD_RADIUS.y * EMOTE.corner.y }}
         side={1}
         pxPerUnit={size / HEAD_VIEW}
       />
+      )}
     </svg>
   );
 

@@ -37,6 +37,8 @@ export interface CatBodyProps {
    * 不開的話側身的頭在前面、正面坐的頭在中間，一換姿勢頭就往回跳。
    */
   pivot?: boolean;
+  /** 不冒表情符號泡泡（模擬考：要安靜） */
+  quiet?: boolean;
 }
 
 /** 對位點 → SVG transform：把零件的原點 (ox, oy) 放到 anchor 上 */
@@ -86,8 +88,11 @@ function chinDepth(spec: PetPoseSpec): number {
   return -((chin.x - neck.x) * ux + (chin.y - neck.y) * uy);
 }
 
-/** 尾巴上的斑點（衣服有給斑點色時）：直徑是尾巴粗細的幾成、每隔多遠一顆 */
-const TAIL_SPOT = { size: 0.42, gap: 8 } as const;
+/**
+ * 尾巴上的斑點（衣服有給斑點色時）：圓頭的虛線，每一段短到只剩兩個圓頭疊成一顆圓點。
+ * size＝直徑是尾巴粗細的幾成、gap＝每隔多遠一顆、dot＝每一段的長度（不給 0：有些瀏覽器會把長度 0 的虛線整段丟掉）
+ */
+const TAIL_SPOT = { size: 0.42, gap: 8, dot: 0.01 } as const;
 
 /** 前腿在 PetPoseSpec.legs 裡的編號（順序：後腿遠、前腿遠、後腿近、前腿近）；袖子只套前腿 */
 const FRONT_LEGS: ReadonlySet<number> = new Set([1, 3]);
@@ -117,6 +122,7 @@ export function CatBody({
   className = '',
   backdrop = false,
   pivot = false,
+  quiet = false,
 }: CatBodyProps) {
   const spec = PET_POSES[pose];
   /** 支點對齊：平移量換成圖寬的百分比（translateX 的 % 是元素自己的寬） */
@@ -255,7 +261,7 @@ export function CatBody({
                 stroke={tailArt.spots}
                 strokeWidth={PET_TAIL_W * TAIL_SPOT.size}
                 strokeLinecap="round"
-                strokeDasharray={`0 ${TAIL_SPOT.gap}`}
+                strokeDasharray={`${TAIL_SPOT.dot} ${TAIL_SPOT.gap}`}
                 strokeDashoffset={-TAIL_SPOT.gap / 2}
               />
             ) : null}
@@ -320,7 +326,7 @@ export function CatBody({
           </g>
         </g>
       </g>
-      {spec.quiet ? null : (
+      {quiet || spec.quiet ? null : (
         <Emote mood={mood ?? spec.mood} at={emoteAt} side={facing === 'left' ? 1 : -1} pxPerUnit={width / PET_VIEW_W} />
       )}
     </svg>
