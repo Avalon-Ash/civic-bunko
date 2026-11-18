@@ -1,7 +1,7 @@
 // 小八喵配件的圖（每件一個 SVG 片段，畫在貓的 64×64 座標裡）。
 // 配件清單（ID、部位、取得方式）在 src/core/constants/wardrobe.ts；這裡只放圖。顏色只用 theme.css 的 token。
 import type { ReactNode } from 'react';
-import { PET_HEAD_SCALE } from '../../../core/constants/pet';
+import { PET_HEAD_SCALE, PET_LEG_W } from '../../../core/constants/pet';
 import type { ItemId } from '../../../core/types';
 
 /** 配件自己的小動作（動畫在 styles/wardrobe.css 的 cb-motion-*） */
@@ -11,11 +11,25 @@ export type ItemMotion = 'bob' | 'hop' | 'flap';
  * 有身體的小貓用的圖（身體座標 100×90，不縮放、只跟著姿勢移動與轉動）。
  * 有這份圖的配件，在身體版就不畫頭像的 node，改照這裡穿到身體上。
  */
+/**
+ * 身體的尺寸（身體座標），CatBody 照姿勢算好傳進來。衣服照它長，身體換姿勢、改體型時衣服跟著走，不各自寫死一份身體的大小。
+ * len＝脖子那端到屁股那端；back、belly＝屁股最厚處往背、往肚子的半厚；chest＝胸口的半厚；
+ * shoulder、hip＝胸口、屁股最厚的地方各離自己那端多遠。
+ */
+export interface BodyGeom {
+  len: number;
+  back: number;
+  belly: number;
+  chest: number;
+  shoulder: number;
+  hip: number;
+}
+
 export interface BodyArt {
   /** 衣服的布面：剪裁在身體輪廓內，所以每個姿勢都合身。原點在脖子那端、+x 朝前、-y 是背，身體往 -x 延伸 */
-  wrap?: ReactNode;
+  wrap?: (body: BodyGeom) => ReactNode;
   /** 蓋在身體上、不剪裁（披風）。座標同 wrap */
-  over?: ReactNode;
+  over?: (body: BodyGeom) => ReactNode;
   /** 前腿上端的袖子。原點在腿根、+y 往下，腿寬是 PET_LEG_W */
   sleeve?: ReactNode;
   /** 畫在身體後面（翅膀、氣球）。原點在姿勢的背對位點 */
@@ -51,6 +65,75 @@ const bstroke = { ...stroke, strokeWidth: W * PET_HEAD_SCALE };
 const bthin = { ...thin, strokeWidth: WT * PET_HEAD_SCALE };
 /** 布面上的織紋、摺線 */
 const seam = { fill: 'none', strokeWidth: 1.1, strokeLinecap: 'round' as const };
+
+/** 布面往背、往肚子各多畫一點，確定蓋滿身體（多的由身體輪廓裁掉） */
+const CLOTH_MARGIN = 1;
+/** 毛衣：下擺蓋到身體長度的幾成、領口往前多出多少、織紋的間距、下擺羅紋的寬度 */
+const SWEATER = { cover: 0.64, collar: 9, rib: 5, hem: 4.2 } as const;
+/** 袖子：比腿寬一點，從腿根往下蓋多長；袖口羅紋的高度 */
+const SLEEVE = { half: PET_LEG_W / 2 + 0.3, top: -1.5, len: 2.4, cuff: 2.2 } as const;
+/** 水手領：領片從脖子往後多長、領尖繞到胸口多遠 */
+const COLLAR = { len: 14.5, front: 6 } as const;
+/** 披風：比背線高出多少、下擺鋸齒有幾齒、每齒多深、下擺最低的地方在身體長度的幾成處 */
+const CAPE = { lift: 2.2, teeth: 3, tooth: 3.2, low: 0.34 } as const;
+
+/** 毛衣的布面：從領口蓋到下擺，直的織紋，下擺一圈羅紋 */
+function sweaterWrap(body: BodyGeom): ReactNode {
+  const top = -(body.back + CLOTH_MARGIN);
+  const height = body.back + body.belly + CLOTH_MARGIN * 2;
+  const hem = -body.len * SWEATER.cover;
+  const ribs: string[] = [];
+  for (let x = -SWEATER.rib / 2; x > hem + SWEATER.hem / 2; x -= SWEATER.rib) ribs.push(`M${x} ${top}v${height}`);
+  return (
+    <g>
+      <rect x={hem} y={top} width={SWEATER.collar - hem} height={height} fill="var(--acc-lav)" />
+      <path d={ribs.join('')} stroke="var(--acc-cream)" strokeOpacity="0.7" {...seam} />
+      <rect x={hem - SWEATER.hem / 2} y={top} width={SWEATER.hem} height={height} fill="var(--acc-cream)" {...bthin} />
+    </g>
+  );
+}
+
+/** 水手領的領片：披在肩背上，邊上一道白線 */
+function sailorWrap(body: BodyGeom): ReactNode {
+  const top = -(body.back + CLOTH_MARGIN);
+  const edge = `V1 Q${-COLLAR.len * 0.4} 6.5 ${COLLAR.front} 4`;
+  return (
+    <g>
+      <path d={`M${COLLAR.front} ${top} H${-COLLAR.len} ${edge} Z`} fill="var(--acc-navy)" />
+      <path d={`M${-COLLAR.len + 2.9} ${top} V-0.6 Q${-COLLAR.len * 0.35} 3.4 ${COLLAR.front} 1.4`} stroke="var(--acc-cream)" {...seam} strokeWidth="1.3" />
+      <path d={`M${-COLLAR.len} ${top} ${edge}`} fill="none" {...bthin} />
+    </g>
+  );
+}
+
+/** 披風：沿著背線從後頸披到屁股，下擺鋸齒斜斜垂到身體側面 */
+function capeOver(body: BodyGeom): ReactNode {
+  const n = (v: number) => Math.round(v * 100) / 100;
+  const shoulder = [-body.shoulder, -body.chest - CAPE.lift] as const;
+  const hip = [-(body.len - body.hip), -body.back - CAPE.lift] as const;
+  const rear = [-body.len + 1, -body.back * 0.35] as const;
+  const low = [-body.len * CAPE.low, body.back * 0.45] as const;
+  const ease = (shoulder[0] - hip[0]) * 0.45;
+  /** 下擺：從屁股那端到最低點之間切成幾齒，齒谷往背那側收 */
+  const steps = CAPE.teeth * 2;
+  const hem: string[] = [];
+  for (let i = 1; i <= steps; i += 1) {
+    const t = i / steps;
+    const x = rear[0] + (low[0] - rear[0]) * t;
+    const y = rear[1] + (low[1] - rear[1]) * t - (i % 2 === 1 ? CAPE.tooth : 0);
+    hem.push(`L${n(x)} ${n(y)}`);
+  }
+  const d = [
+    'M3.5 -3.5',
+    `Q-1 ${n(shoulder[1] - 1)} ${n(shoulder[0])} ${n(shoulder[1])}`,
+    `C${n(shoulder[0] - ease)} ${n(shoulder[1])} ${n(hip[0] + ease)} ${n(hip[1])} ${n(hip[0])} ${n(hip[1])}`,
+    `Q${n(rear[0] - 1.5)} ${n(hip[1])} ${n(rear[0])} ${n(rear[1])}`,
+    hem.join(''),
+    `Q${n(-body.shoulder * 0.3)} ${n(body.chest * 0.75)} 3 ${n(body.chest * 0.3)}`,
+    'Q5.2 0 3.5 -3.5Z',
+  ].join('');
+  return <path d={d} fill="var(--acc-coral)" {...bstroke} />;
+}
 
 export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   // ── 舊集章配件（沿用原本的造型）──────────────────────────
@@ -377,17 +460,19 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     box: '6 50 52 26',
     onBody: {
       // 從脖子往後套到腰，下擺是一圈羅紋；屁股露在外面
-      wrap: (
-        <g>
-          <rect x="-23" y="-15" width="32" height="30" fill="var(--acc-lav)" />
-          <path d="M-17.5 -15 V15 M-12.5 -15 V15 M-7.5 -15 V15 M-2.5 -15 V15" stroke="var(--acc-cream)" strokeOpacity="0.7" {...seam} />
-          <rect x="-25.2" y="-15" width="4.2" height="30" fill="var(--acc-cream)" {...bthin} />
-        </g>
-      ),
+      wrap: sweaterWrap,
       sleeve: (
         <g>
-          <path d="M-4.3 -1.5 V5.4 H4.3 V-1.5" fill="var(--acc-lav)" {...bstroke} />
-          <rect x="-4.9" y="4.4" width="9.8" height="3.2" rx="1.6" fill="var(--acc-cream)" {...bthin} />
+          <path d={`M${-SLEEVE.half} ${SLEEVE.top} V${SLEEVE.len} H${SLEEVE.half} V${SLEEVE.top}`} fill="var(--acc-lav)" {...bstroke} />
+          <rect
+            x={-SLEEVE.half - 0.6}
+            y={SLEEVE.len - SLEEVE.cuff / 2}
+            width={SLEEVE.half * 2 + 1.2}
+            height={SLEEVE.cuff}
+            rx={SLEEVE.cuff / 2}
+            fill="var(--acc-cream)"
+            {...bthin}
+          />
         </g>
       ),
       // 下巴下面的高領
@@ -410,13 +495,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     box: '4 50 56 26',
     onBody: {
       // 領片披在肩背上，邊上一道白線
-      wrap: (
-        <g>
-          <path d="M6 -20 H-14.5 V1 Q-6 6.5 6 4 Z" fill="var(--acc-navy)" />
-          <path d="M-11.6 -20 V-0.6 Q-5 3.4 6 1.4" stroke="var(--acc-cream)" {...seam} strokeWidth="1.3" />
-          <path d="M-14.5 -20 V1 Q-6 6.5 6 4" fill="none" {...bthin} />
-        </g>
-      ),
+      wrap: sailorWrap,
       // 下巴下面的領巾結
       head: (
         <g>
@@ -465,13 +544,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     onBody: {
       // 從後頸披過背、蓋住半邊身體，下擺鋸齒（頭像版畫在頭後面，接到身體上會整件被身體擋住）
-      over: (
-        <path
-          d="M4 -4 Q-1 -16 -17 -15.6 Q-29 -15 -36.5 -7 L-31 -6.4 L-33.6 0.6 L-27 -0.6 L-27.6 6.6 L-21.4 4 L-18.6 10 L-13 5.4 Q-3 8.4 3 3.4 Q5.4 0 4 -4 Z"
-          fill="var(--acc-coral)"
-          {...bstroke}
-        />
-      ),
+      over: capeOver,
     },
     box: '-2 30 68 36',
     node: (

@@ -16,73 +16,119 @@ export const CAT_LINE_W = 2.5;
 export const PET_HEAD_SCALE = 0.8;
 /** 身體座標裡的外框粗細：跟縮小後的頭同粗，整隻貓的線才一致 */
 export const PET_LINE_W = CAT_LINE_W * PET_HEAD_SCALE;
-/** 腿與尾巴的粗細（身體座標） */
-export const PET_LEG_W = 7.4;
-export const PET_TAIL_W = 5.6;
+/** 腿與尾巴的粗細（身體座標）：腿短而胖，才有軟軟的感覺 */
+export const PET_LEG_W = 8;
+export const PET_TAIL_W = 6.2;
 /** 腳掌往前多出的長度、腳掌的高度（腿寬的幾倍） */
-export const PET_PAW_TOE = 2.4;
-export const PET_PAW_H = 0.8;
-/** 身體是蛋形：最胖的地方往屁股那端偏（身體半長的幾成） */
-export const PET_EGG_SHIFT = 0.2;
+export const PET_PAW_TOE = 1.8;
+export const PET_PAW_H = 0.62;
+/** 背線、肚子線從胸口滑到屁股的緩急：兩端的把手占這段長度的幾成（越大越像 S 形） */
+export const PET_BACK_EASE = 0.45;
 /**
  * 背上的花色：沿著身體輪廓的背側畫。front、rear＝從脖子那段、屁股那段輪廓的幾成處開始與結束（0–1），
- * drop＝花色下緣往肚子垂到身體半厚的幾成（負的在背側、正的過了身體中線），
- * easeRear、easeFront＝下緣從兩端往中間彎進去多遠（身體半長的幾成；兩個控制點都要落在身體輪廓內）
+ * easeRear、easeFront＝下緣從兩端往中間彎進去多遠（身體半長的幾成；兩個控制點都要落在身體輪廓內）。
+ * 下緣垂到哪裡跟體型有關，在 PetBuild.patch
  */
-export const PET_SADDLE = { front: 0.3, rear: 0.82, drop: 0.1, easeRear: 0.3, easeFront: 0.45 } as const;
+export const PET_SADDLE = { front: 0.35, rear: 0.7, easeRear: 0.3, easeFront: 0.45 } as const;
 /** 背上配件沒有身體版圖時，照頭像的圖縮小接在背上 */
 const BACK = 1;
 
-const TAIL_UP = 'M30 64 Q17 61 17 48 Q17.5 39.5 24 42';
-/** 坐著時尾巴從屁股往上捲成問號，靠在背後 */
-const TAIL_SIT = 'M38 82.5 Q22.5 86 20.5 75 Q19.5 67 26 66.5';
-const TAIL_HANG = 'M49.5 75 Q44.5 83 50 88.5';
+/**
+ * 身體輪廓的參數（身體座標的長度）。torso 的 rx＝身體的半長、ry＝屁股那端的半厚（背那一側）；
+ * 這裡補上其餘的：屁股比胸口厚、肚子比背厚，身體才是軟的，不是一顆對稱的蛋。
+ */
+export interface PetBuild {
+  /** 胸口那端的半厚 */
+  chest: number;
+  /** 胸口最厚的地方離脖子那端多遠、屁股最厚的地方離屁股那端多遠 */
+  shoulder: number;
+  hip: number;
+  /** 肚子那側是背那側的幾倍厚（大於 1＝肚子下垂） */
+  belly: number;
+  /** 屁股那端多方（0＝圓，1＝方角）：坐著、趴著時貼地的那一面要壓平 */
+  flat: number;
+  /** 背上花色的下緣垂到屁股半厚的幾成（負的留在背那側、正的過了身體中線） */
+  patch: number;
+}
+/**
+ * 姿勢表的一格：PetPoseSpec 加上畫法才用得到的欄位。
+ * frontal＝正面坐（身體直起來朝前）：兩隻前腳都畫在身體前面；
+ * crease＝身體上的摺線（坐著時大腿的弧線；身體座標），沒有就給 null。
+ */
+export type PetPoseDef = PetPoseSpec & { build: PetBuild; frontal: boolean; crease: string | null };
 
-const stand: PetPoseSpec = {
-  torso: { cx: 47, cy: 66, rx: 19, ry: 11.5, rot: 0 },
+/** 站著、走、跳：一顆豆子，屁股比胸口大一點、肚子微微下垂 */
+const BEAN: PetBuild = { chest: 12, shoulder: 12, hip: 14, belly: 1.06, flat: 0, patch: 0.05 };
+/** 跑：拉長的豆子 */
+const STRETCH: PetBuild = { chest: 10, shoulder: 10, hip: 11.5, belly: 1.05, flat: 0, patch: 0.05 };
+/** 坐：下大上小的梨形，底部壓平貼地；胸口那側（belly 小於 1）比背那側直一點；花色只留在背那側，露出白肚子 */
+const PEAR: PetBuild = { chest: 14, shoulder: 10, hip: 12, belly: 0.98, flat: 0.45, patch: -0.62 };
+/** 趴成吐司：兩端圓、上下平 */
+const LOAF: PetBuild = { chest: 11.5, shoulder: 9, hip: 9, belly: 1, flat: 0.15, patch: 0.05 };
+/** 被拎著：身體垂下來，肉都往下掉 */
+const HANG: PetBuild = { chest: 9.5, shoulder: 9, hip: 12, belly: 1.1, flat: 0, patch: 0.05 };
+
+const TAIL_UP = 'M31 62 Q17.5 60 16.5 47.5 Q17 39.5 23.5 42';
+/** 坐著時尾巴從屁股後面貼著地伸出來，尾巴尖往上捲回身體旁邊 */
+const TAIL_SIT = 'M34 80 Q20.5 83.6 18 76 Q16.6 70 22.5 69';
+const TAIL_HANG = 'M49.5 75 Q44.5 83 50 88.5';
+/** 坐著時大腿的弧線：從身體側邊鼓出來，收在露出來的後腳掌上 */
+const CREASE_SIT = 'M31.5 71.5 Q44.5 70 46.4 80.5';
+
+const stand: PetPoseDef = {
+  torso: { cx: 47, cy: 66.5, rx: 19, ry: 14, rot: 0 },
+  build: BEAN,
   legs: [
-    { x: 34.5, y: 74, len: 11, rot: 0 },
-    { x: 54, y: 72, len: 13, rot: 0 },
-    { x: 39.5, y: 75, len: 11, rot: 0 },
-    { x: 58.5, y: 72.5, len: 13.5, rot: 0 },
+    { x: 37, y: 76, len: 10, rot: 0 },
+    { x: 53.5, y: 76, len: 10, rot: 0 },
+    { x: 41.5, y: 76, len: 10, rot: 0 },
+    { x: 57.5, y: 75, len: 11, rot: 0 },
   ],
   tail: TAIL_UP,
-  head: { x: 67, y: 46, rot: 0, scale: PET_HEAD_SCALE },
-  back: { x: 42, y: 56, rot: 0, scale: BACK },
+  head: { x: 66, y: 47.5, rot: 0, scale: PET_HEAD_SCALE },
+  back: { x: 42, y: 54, rot: 0, scale: BACK },
+  frontal: false,
+  crease: null,
   mood: 'idle',
   motion: 'breathe',
 };
 
-/** 坐姿：身體直起來（rot 接近 -90＝脖子朝上），前腿直直撐地，後腳掌從屁股下露出來 */
-const sit: PetPoseSpec = {
-  torso: { cx: 45, cy: 68.5, rx: 17, ry: 14, rot: -72 },
+/** 坐姿：梨形的身體直起來（rot -90＝脖子朝上）、頭壓在上端看不到脖子，兩隻前腳靠攏在前面，大腿下露出一隻後腳掌 */
+const sit: PetPoseDef = {
+  torso: { cx: 50, cy: 70.5, rx: 15.5, ry: 22, rot: -90 },
+  build: PEAR,
   legs: [
     { x: 44, y: 82, len: 0, rot: 0 },
-    { x: 59.5, y: 71, len: 14.5, rot: -2 },
-    { x: 48.5, y: 82, len: 4, rot: 0 },
-    { x: 55, y: 70, len: 16, rot: 0 },
+    { x: 54, y: 78.5, len: 7.5, rot: 0 },
+    { x: 41.5, y: 82.2, len: 3.8, rot: 0 },
+    { x: 61.5, y: 78.5, len: 7.5, rot: 0 },
   ],
   tail: TAIL_SIT,
-  head: { x: 54, y: 41, rot: 0, scale: PET_HEAD_SCALE },
-  back: { x: 36, y: 60, rot: -10, scale: BACK },
+  head: { x: 55, y: 42.5, rot: 0, scale: PET_HEAD_SCALE },
+  back: { x: 35, y: 65, rot: -10, scale: BACK },
+  frontal: true,
+  crease: CREASE_SIT,
   mood: 'idle',
   motion: 'breathe',
 };
 
-export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
+export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
   stand,
   walk: { ...stand, motion: 'walk' },
   run: {
-    torso: { cx: 47, cy: 64, rx: 21, ry: 10.5, rot: -4 },
+    torso: { cx: 47, cy: 65, rx: 21, ry: 11.5, rot: -4 },
+    build: STRETCH,
     legs: [
-      { x: 33, y: 69, len: 13, rot: 42 },
-      { x: 60, y: 69, len: 13, rot: -48 },
-      { x: 37, y: 70, len: 13, rot: 30 },
-      { x: 64, y: 70, len: 13, rot: -38 },
+      { x: 34, y: 70, len: 11, rot: 42 },
+      { x: 59, y: 70, len: 11, rot: -48 },
+      { x: 38, y: 71, len: 11, rot: 30 },
+      { x: 63, y: 71, len: 11, rot: -38 },
     ],
-    tail: 'M27 62 Q14 59 8 51',
-    head: { x: 71, y: 48, rot: 6, scale: PET_HEAD_SCALE },
+    tail: 'M27.5 62 Q14 59 8 51',
+    head: { x: 71, y: 49, rot: 6, scale: PET_HEAD_SCALE },
     back: { x: 42, y: 54, rot: -4, scale: BACK },
+    frontal: false,
+    crease: null,
     mood: 'yay',
     motion: 'run',
   },
@@ -90,13 +136,14 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
   groom: {
     ...sit,
     /** 近側前腳舉到臉旁邊擦臉 */
-    legs: [sit.legs[0], sit.legs[1], sit.legs[2], { x: 56.5, y: 68, len: 15, rot: -152 }],
-    head: { x: 54, y: 42, rot: -10, scale: PET_HEAD_SCALE },
+    legs: [sit.legs[0], sit.legs[1], sit.legs[2], { x: 61.5, y: 73, len: 13, rot: -150 }],
+    head: { x: 55, y: 43, rot: -8, scale: PET_HEAD_SCALE },
     mood: 'yay',
     motion: 'groom',
   },
   loaf: {
-    torso: { cx: 46, cy: 74.5, rx: 23, ry: 11.5, rot: 0 },
+    torso: { cx: 46, cy: 73.5, rx: 22, ry: 12.5, rot: 0 },
+    build: LOAF,
     legs: [
       { x: 40, y: 80, len: 0, rot: 0 },
       { x: 62, y: 80, len: 0, rot: 0 },
@@ -107,65 +154,76 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     tail: 'M30 78 Q36 82 45 80',
     /** 頭靠在身體前端上，下巴壓進身體 */
     head: { x: 62, y: 63, rot: 4, scale: PET_HEAD_SCALE },
-    back: { x: 40, y: 65, rot: 0, scale: BACK },
+    back: { x: 40, y: 63, rot: 0, scale: BACK },
+    frontal: false,
+    crease: null,
     mood: 'sleepy',
     motion: 'breathe',
   },
   /** 跳起來：離地不高，頭上戴高帽子時也不會頂出身體座標（試衣間的框會裁掉） */
   hop: {
-    torso: { cx: 47, cy: 60, rx: 19, ry: 11.5, rot: -8 },
+    torso: { cx: 47, cy: 60, rx: 19, ry: 14, rot: -8 },
+    build: BEAN,
     legs: [
-      { x: 35, y: 66, len: 11, rot: 38 },
-      { x: 57, y: 64, len: 11, rot: -42 },
-      { x: 39.5, y: 67, len: 11, rot: 30 },
-      { x: 61.5, y: 65, len: 11, rot: -36 },
+      { x: 36, y: 67, len: 10, rot: 38 },
+      { x: 57, y: 66, len: 10, rot: -42 },
+      { x: 40.5, y: 68, len: 10, rot: 30 },
+      { x: 61, y: 66, len: 10, rot: -36 },
     ],
-    tail: 'M29 59 Q15 53 18 39',
-    head: { x: 66, y: 40, rot: -4, scale: PET_HEAD_SCALE },
-    back: { x: 42, y: 50, rot: -8, scale: BACK },
+    tail: 'M30 57 Q16 52 18 39',
+    head: { x: 66, y: 41, rot: -4, scale: PET_HEAD_SCALE },
+    back: { x: 42, y: 49, rot: -8, scale: BACK },
+    frontal: false,
+    crease: null,
     mood: 'yay',
     motion: 'still',
   },
   stumble: {
     ...stand,
-    torso: { cx: 47, cy: 67, rx: 19, ry: 11.5, rot: 8 },
+    torso: { cx: 47, cy: 67, rx: 19, ry: 14, rot: 8 },
     legs: [
-      { x: 35, y: 72, len: 13, rot: -14 },
-      { x: 57, y: 75, len: 11, rot: 28 },
-      { x: 39.5, y: 73, len: 13, rot: -8 },
-      { x: 61.5, y: 76, len: 10, rot: 34 },
+      { x: 36, y: 73, len: 12, rot: -14 },
+      { x: 57, y: 76, len: 10, rot: 28 },
+      { x: 40.5, y: 74, len: 12, rot: -8 },
+      { x: 61, y: 75, len: 11, rot: 34 },
     ],
-    head: { x: 68, y: 52, rot: 16, scale: PET_HEAD_SCALE },
-    back: { x: 41, y: 56, rot: 8, scale: BACK },
+    head: { x: 67, y: 53, rot: 16, scale: PET_HEAD_SCALE },
+    back: { x: 41, y: 55, rot: 8, scale: BACK },
     mood: 'oops',
     motion: 'still',
   },
   /** 被拎著後頸：身體垂直（rot -90），四條腿垂下來 */
   dangle: {
-    torso: { cx: 50, cy: 60, rx: 17, ry: 10.5, rot: -90 },
+    torso: { cx: 50, cy: 60, rx: 17, ry: 13, rot: -90 },
+    build: HANG,
     legs: [
-      { x: 45.5, y: 73, len: 12, rot: 8 },
-      { x: 42, y: 54, len: 11, rot: 26 },
-      { x: 54.5, y: 73, len: 12, rot: -6 },
-      { x: 57, y: 55, len: 11, rot: -20 },
+      { x: 45, y: 71, len: 11, rot: 8 },
+      { x: 43, y: 54, len: 10, rot: 26 },
+      { x: 55.5, y: 71, len: 11, rot: -6 },
+      { x: 57.5, y: 55, len: 10, rot: -20 },
     ],
     tail: TAIL_HANG,
     head: { x: 50, y: 31, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 54, rot: -22, scale: BACK },
+    frontal: false,
+    crease: null,
     mood: 'idle',
     motion: 'swing',
   },
   fall: {
-    torso: { cx: 50, cy: 59, rx: 17, ry: 10.5, rot: -90 },
+    torso: { cx: 50, cy: 59, rx: 17, ry: 13, rot: -90 },
+    build: HANG,
     legs: [
-      { x: 45, y: 72, len: 12, rot: 36 },
-      { x: 42, y: 52, len: 11, rot: 62 },
-      { x: 55, y: 72, len: 12, rot: -36 },
-      { x: 58, y: 53, len: 11, rot: -62 },
+      { x: 44.5, y: 70, len: 11, rot: 36 },
+      { x: 43, y: 52, len: 10, rot: 62 },
+      { x: 56, y: 70, len: 11, rot: -36 },
+      { x: 58, y: 53, len: 10, rot: -62 },
     ],
     tail: 'M50 74 Q58 82 62 78',
     head: { x: 50, y: 30, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 53, rot: -22, scale: BACK },
+    frontal: false,
+    crease: null,
     mood: 'oops',
     motion: 'still',
   },
