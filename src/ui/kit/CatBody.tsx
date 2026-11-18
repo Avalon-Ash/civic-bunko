@@ -182,10 +182,10 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
       aria-hidden="true"
       className={`cb-pet-svg ${furClass(outfit)} ${className}`.trim()}
     >
-      <g
-        className={`cb-pet cb-pet-motion-${spec.motion}`}
-        transform={facing === 'left' ? `translate(${PET_VIEW_W} 0) scale(-1 1)` : undefined}
-      >
+      {/* 面向左＝整張圖沿身體座標的中線翻面。翻面單獨放在外層：動作的 CSS 動畫（transform、fill-box 支點）掛在內層，
+          兩者放同一個元素時，翻面會以外框左上角為支點（整隻貓偏掉、靠邊被切），被拎著時還會被動畫蓋掉 */}
+      <g transform={facing === 'left' ? `translate(${PET_VIEW_W} 0) scale(-1 1)` : undefined}>
+      <g className={`cb-pet cb-pet-motion-${spec.motion}`}>
         {bgArt && bgArt.kind === 'layer' ? (
           bgArt.stage ? (
             <g className="cb-slot cb-slot-bg">{bgArt.stage}</g>
@@ -259,6 +259,7 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
             </g>
           </g>
         </g>
+      </g>
       </g>
     </svg>
   );

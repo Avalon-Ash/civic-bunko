@@ -84,20 +84,29 @@ const realHeads =
     .join('') +
   '</div>';
 
+/** 面向左：每種姿勢左右各畫一隻（穿有背飾、衣服的一套，外框才會被撐大），給頁尾的鏡像檢查量 */
+const MIRROR_OUTFIT: Outfit = { 'head-top': 'party-hat', body: 'sweater', back: 'balloon' };
+const mirrorRow = (facing: 'left' | 'right') =>
+  `<div class="row" id="face-${facing}">` +
+  poses.map((pose) => cell(`${pose} ${facing === 'left' ? '←' : '→'}`, h(CatBody, { pose, outfit: MIRROR_OUTFIT, width: bodyWidth, facing }))).join('') +
+  '</div>';
+const mirror = mirrorRow('right') + mirrorRow('left');
+
 /**
  * 自動檢查（用瀏覽器量，結果印在頁尾）：
  * 1. 超出身體座標的組合：頭放大或配件加高後，會不會被容器切到。
  * 2. 花紋有沒有貼在身體上：背上花色的外框必須落在身體輪廓的外框裡。
  * 3. 剪裁框的 id：同一個 id 只能對應同一個形狀（不同形狀共用 id，衣服會被別隻貓的身體裁到）。
+ * 4. 面向左是不是面向右的鏡像：整隻貓在畫面上的外框，左右對調後要一樣（不一樣＝翻面時整隻貓偏掉，靠邊會被切）。
  */
 const checkScript = `<script>
 addEventListener('load', () => {
-  const W = ${PET_VIEW_W}, H = ${PET_VIEW_H}, EPS = 0.05;
+  const W = ${PET_VIEW_W}, H = ${PET_VIEW_H}, EPS = 0.05, MIRROR_EPS = 0.5;
   const over = [];
   document.querySelectorAll('#bodies .row').forEach((row) => {
     const name = row.previousElementSibling.textContent;
     row.querySelectorAll('figure').forEach((fig) => {
-      const g = fig.querySelector('svg > g');
+      const g = fig.querySelector('g.cb-pet');
       if (!g) return;
       const b = g.getBBox();
       const o = [Math.min(0, b.x), Math.min(0, b.y), Math.max(0, b.x + b.width - W), Math.max(0, b.y + b.height - H)].map((n) => Math.round(n));
@@ -124,6 +133,22 @@ addEventListener('load', () => {
   document.getElementById('attach').textContent =
     '花紋：檢查 ' + saddles.length + ' 隻，超出身體 ' + loose.length + ' 隻' + (loose.length ? '（' + loose.join('、') + '）' : '') +
     '\\n剪裁框：' + shapes.size + ' 個 id，形狀對不上的 ' + clash.size + ' 個' + (clash.size ? '（' + [...clash].join('、') + '）' : '');
+
+  /** 外框換成身體座標（相對於這隻貓的 svg） */
+  const span = (fig) => {
+    const svg = fig.querySelector('svg');
+    const s = svg.getBoundingClientRect(), g = svg.querySelector('g').getBoundingClientRect(), k = W / s.width;
+    return { l: (g.left - s.left) * k, r: (g.right - s.left) * k };
+  };
+  const rights = document.querySelectorAll('#face-right figure'), lefts = document.querySelectorAll('#face-left figure');
+  const off = [];
+  rights.forEach((fig, i) => {
+    const a = span(fig), b = span(lefts[i]);
+    const d = Math.max(Math.abs(b.l - (W - a.r)), Math.abs(b.r - (W - a.l)));
+    if (d > MIRROR_EPS) off.push(fig.querySelector('figcaption').textContent.split(' ')[0] + ' 偏 ' + d.toFixed(1));
+  });
+  document.getElementById('mirror').textContent =
+    '檢查 ' + rights.length + ' 種姿勢，不是鏡像的 ' + off.length + ' 種' + (off.length ? '（' + off.join('、') + '；單位：身體座標）' : '');
 });
 </script>`;
 
@@ -141,6 +166,7 @@ figure{margin:0;text-align:center;font-size:12px}.stage{background:var(--surface
 <h3>實際大小</h3>${real}${realHeads}
 <h3>身體姿勢（含背景，試衣間的畫法）</h3><div id="bodies">${bodies}</div>
 <h3>超出身體座標 ${PET_VIEW_W}×${PET_VIEW_H} 的組合（單位：身體座標）</h3><pre id="overflow"></pre>
-<h3>花紋與剪裁有沒有貼在身體上</h3><pre id="attach"></pre>${checkScript}`,
+<h3>花紋與剪裁有沒有貼在身體上</h3><pre id="attach"></pre>
+<h3>面向左是不是面向右的鏡像</h3>${mirror}<pre id="mirror"></pre>${checkScript}`,
 );
 console.log(`ok ${out}`);
