@@ -1,7 +1,7 @@
 // 小八喵配件的圖（每件一個 SVG 片段，畫在貓的 64×64 座標裡）。
 // 配件清單（ID、部位、取得方式）在 src/core/constants/wardrobe.ts；這裡只放圖。顏色只用 theme.css 的 token。
 import type { ReactNode } from 'react';
-import { PET_HEAD_SCALE, PET_LEG_W } from '../../../core/constants/pet';
+import { PET_BACK_EASE, PET_HEAD_SCALE, PET_LEG_W } from '../../../core/constants/pet';
 import type { ItemId } from '../../../core/types';
 
 /** 配件自己的小動作（動畫在 styles/wardrobe.css 的 cb-motion-*） */
@@ -74,8 +74,12 @@ const SWEATER = { cover: 0.64, collar: 9, rib: 5, hem: 4.2 } as const;
 const SLEEVE = { half: PET_LEG_W / 2 + 0.3, top: -1.5, len: 2.4, cuff: 2.2 } as const;
 /** 水手領：領片從脖子往後多長、領尖繞到胸口多遠 */
 const COLLAR = { len: 14.5, front: 6 } as const;
-/** 披風：比背線高出多少、下擺鋸齒有幾齒、每齒多深、下擺最低的地方在身體長度的幾成處 */
-const CAPE = { lift: 2.2, teeth: 3, tooth: 3.2, low: 0.34 } as const;
+/**
+ * 披風：lift＝比背線高出多少；teeth、tooth＝下擺鋸齒有幾齒、每齒多深；
+ * low＝下擺最低的地方在身體長度的幾成處；rear、hang＝下擺在屁股那端、在最低處各垂到背半厚的幾成（rear 還在背那側、hang 過了身體中線）；
+ * nape＝後頸那個結離脖子端多遠；chest、tuck＝下擺收回後頸時，在胸口鼓出、收進去到胸口半厚的幾成
+ */
+const CAPE = { lift: 2.2, teeth: 3, tooth: 3.2, low: 0.34, rear: 0.35, hang: 0.45, nape: 3.5, chest: 0.75, tuck: 0.3 } as const;
 
 /** 毛衣的布面：從領口蓋到下擺，直的織紋，下擺一圈羅紋 */
 function sweaterWrap(body: BodyGeom): ReactNode {
@@ -111,9 +115,10 @@ function capeOver(body: BodyGeom): ReactNode {
   const n = (v: number) => Math.round(v * 100) / 100;
   const shoulder = [-body.shoulder, -body.chest - CAPE.lift] as const;
   const hip = [-(body.len - body.hip), -body.back - CAPE.lift] as const;
-  const rear = [-body.len + 1, -body.back * 0.35] as const;
-  const low = [-body.len * CAPE.low, body.back * 0.45] as const;
-  const ease = (shoulder[0] - hip[0]) * 0.45;
+  const rear = [-body.len + 1, -body.back * CAPE.rear] as const;
+  const low = [-body.len * CAPE.low, body.back * CAPE.hang] as const;
+  /** 披風的背線跟身體的背線用同一個緩急，才會一路貼著 */
+  const ease = (shoulder[0] - hip[0]) * PET_BACK_EASE;
   /** 下擺：從屁股那端到最低點之間切成幾齒，齒谷往背那側收 */
   const steps = CAPE.teeth * 2;
   const hem: string[] = [];
@@ -124,13 +129,13 @@ function capeOver(body: BodyGeom): ReactNode {
     hem.push(`L${n(x)} ${n(y)}`);
   }
   const d = [
-    'M3.5 -3.5',
+    `M${CAPE.nape} ${-CAPE.nape}`,
     `Q-1 ${n(shoulder[1] - 1)} ${n(shoulder[0])} ${n(shoulder[1])}`,
     `C${n(shoulder[0] - ease)} ${n(shoulder[1])} ${n(hip[0] + ease)} ${n(hip[1])} ${n(hip[0])} ${n(hip[1])}`,
     `Q${n(rear[0] - 1.5)} ${n(hip[1])} ${n(rear[0])} ${n(rear[1])}`,
     hem.join(''),
-    `Q${n(-body.shoulder * 0.3)} ${n(body.chest * 0.75)} 3 ${n(body.chest * 0.3)}`,
-    'Q5.2 0 3.5 -3.5Z',
+    `Q${n(-body.shoulder * CAPE.tuck)} ${n(body.chest * CAPE.chest)} ${CAPE.nape} ${n(body.chest * CAPE.tuck)}`,
+    `Q${n(CAPE.nape * 1.5)} 0 ${CAPE.nape} ${-CAPE.nape}Z`,
   ].join('');
   return <path d={d} fill="var(--acc-coral)" {...bstroke} />;
 }
@@ -614,9 +619,10 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'book-stack': {
     kind: 'layer',
     box: '44 26 24 38',
-    // 全身版：三本書疊在小貓前面的地上，上面橫著一枝鉛筆（疊太高會頂到臉）
+    // 全身版：三本書疊在小貓前面的地上，上面橫著一枝鉛筆（疊太高會頂到臉）。
+    // 整疊往右挪 5：坐著的身體前緣到 x≈72，書放在腳邊，不壓在身體後面
     stage: (
-      <g>
+      <g transform="translate(5 0)">
         <rect x="68" y="78.6" width="19" height="7" rx="1.4" fill="var(--acc-sky)" {...bthin} />
         <rect x="70" y="71.6" width="16" height="7" rx="1.4" fill="var(--acc-coral)" {...bthin} />
         <rect x="68.6" y="64.6" width="17.4" height="7" rx="1.4" fill="var(--acc-leaf)" {...bthin} />
