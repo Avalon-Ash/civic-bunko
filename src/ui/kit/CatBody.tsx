@@ -133,6 +133,7 @@ export function CatBody({
     shoulder: build.shoulder,
     hip: build.hip,
     chin: chinDepth(spec),
+    frontal: spec.frontal,
   };
   /**
    * 衣服的剪裁框 id：每隻貓自己一個（useId），再加上姿勢（一個姿勢一種身體形狀）。
@@ -156,6 +157,18 @@ export function CatBody({
    * 袖子在衣服裡面看不到，不套；舉起來的手臂（shoulder）整隻露在外面，套。
    */
   const sleeveOn = (leg: PetLeg): ReactNode => (!spec.frontal || leg.shoulder ? sleeve : null);
+  /** 後腿的褲管（連身裝）：後腿的腿根疊在身體上，褲管把那一截蓋成衣服的顏色。正面坐時後腿收在身體下面，不畫 */
+  const trouser = worn.some(({ art }) => art.trouser)
+    ? worn.map(({ slot, art }) =>
+        art.trouser ? (
+          <g key={slot} className="cb-pet-trouser">
+            {art.trouser}
+          </g>
+        ) : null,
+      )
+    : null;
+  /** 這條腿上端穿什麼：前腿是袖子、後腿是褲管 */
+  const legWear = (index: number, leg: PetLeg): ReactNode => (FRONT_LEGS.has(index) ? sleeveOn(leg) : spec.frontal ? null : trouser);
   const toe = spec.frontal ? 0 : PET_PAW_TOE;
   /** 脖子上有沒有東西：頸部的配件，或衣服自己留在下巴下面的領口。有的話，披風這類配件就不再畫自己的領子 */
   const neckTaken = Boolean(outfit.neck) || worn.some(({ art }) => art.head !== undefined);
@@ -222,8 +235,8 @@ export function CatBody({
           </g>
 
           <g className="cb-pet-bob">
-            <Leg leg={spec.legs[0]} index={0} far toe={toe} sleeve={null} />
-            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} sleeve={sleeveOn(spec.legs[1])} />}
+            <Leg leg={spec.legs[0]} index={0} far toe={toe} sleeve={legWear(0, spec.legs[0])} />
+            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} sleeve={legWear(1, spec.legs[1])} />}
 
             <g className="cb-pet-torso" transform={torsoFrame}>
               <path className="cb-pet-torso-shape" d={shape.outline} fill="var(--cat-fur)" />
@@ -265,7 +278,7 @@ export function CatBody({
 
             {/* 近側的腿：放下的畫在頭後面；從肩膀舉起來的手臂（shoulder）畫在頭前面，腳掌才碰得到臉頰 */}
             {nearLegs.filter(({ leg }) => !leg.shoulder).map(({ leg, index }) => (
-              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={FRONT_LEGS.has(index) ? sleeveOn(leg) : null} />
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={legWear(index, leg)} />
             ))}
 
             <g transform={place(spec.head, HEAD_ORIGIN.x, HEAD_ORIGIN.y)}>
@@ -275,7 +288,7 @@ export function CatBody({
             </g>
 
             {nearLegs.filter(({ leg }) => leg.shoulder).map(({ leg, index }) => (
-              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={FRONT_LEGS.has(index) ? sleeveOn(leg) : null} />
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={legWear(index, leg)} />
             ))}
           </g>
         </g>

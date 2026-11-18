@@ -25,6 +25,8 @@ export interface BodyGeom {
   hip: number;
   /** 頭的下緣蓋到脖子那端下面多遠（沿著身體往屁股的方向量）：領口的裝飾要露在它下面 */
   chin: number;
+  /** 身體是不是正面朝著你（正面坐）：這時布面會沿脊椎鏡像再畫一次，蓋滿整個身體的布面要自己畫成左右對稱 */
+  frontal: boolean;
 }
 
 export interface BodyArt {
@@ -34,6 +36,8 @@ export interface BodyArt {
   over?: (body: BodyGeom) => ReactNode;
   /** 前腿上端的袖子。原點在腿根、+y 往下，腿寬是 PET_LEG_W */
   sleeve?: ReactNode;
+  /** 後腿上端的褲管（連身裝）。座標同 sleeve */
+  trouser?: ReactNode;
   /** 畫在身體後面（翅膀、氣球）。原點在姿勢的背對位點 */
   behind?: ReactNode;
   /** 留在頭上的那一部分（領口、領結）。頭像座標，跟頭一起縮放 */
@@ -109,6 +113,140 @@ const CAPE_FRONT = { flare: 6.5, neck: 9, hem: 2, teeth: 6, tooth: 3, band: 4.2,
  * in＝翅根離中線多遠（比胸口半厚往裡收多少）、down＝翅根在肩膀下面多遠
  */
 const WING_FRONT = { in: 5, down: 4 } as const;
+
+/**
+ * 小怪獸裝（連身裝）：整個身體包起來，肚子一塊淺色，背上幾個斑點和一排背鰭。
+ * collar＝領口往前多出多少；trouser＝褲管從後腿腿根往下蓋多長（後腿的腿根埋在身體裡比前腿深，要蓋到露出身體的那一段）；
+ * belly＝側面時肚子那塊從肚子半厚的幾成處開始；bellyLen、bellyHalf＝正面時肚子那塊占身體長度、背半厚的幾成（半徑）、
+ * bellyAt＝它的中心在身體長度的幾成處；
+ * spots＝斑點（在身體長度的幾成處、背半厚的幾成高、半徑）；
+ * plates＝背鰭排在背上的哪裡、各是標準大小的幾倍：位置 0–1 是背線（肩膀到屁股最厚處）、1–2 是屁股那段圓弧（2＝屁股端）。
+ * 頭很大、會擋住背的前半，所以背鰭排在後半到屁股；
+ * plateHalf、plateH、plateSink、plateLean＝背鰭的半寬、高、底邊埋進身體多深、尖端往後倒多少
+ */
+const DINO = {
+  collar: 9,
+  trouser: 6.2,
+  belly: 0.42,
+  bellyLen: 0.36,
+  bellyHalf: 0.42,
+  bellyAt: 0.56,
+  spots: [
+    [0.32, 0.62, 2],
+    [0.56, 0.74, 1.7],
+    [0.78, 0.5, 2.2],
+  ],
+  plates: [
+    [0.35, 0.85],
+    [1, 1],
+    [1.5, 0.9],
+  ],
+  plateHalf: 3.4,
+  plateH: 6,
+  plateSink: 1.2,
+  plateLean: 1,
+} as const;
+const DINO_FILL = 'var(--acc-leaf)';
+
+/** 套在腿上端的一截布（袖子、褲管）：原點在腿根、+y 往下；cuff＝袖口羅紋的顏色（不給就沒有羅紋） */
+function legCover(fill: string, len: number, cuff?: string): ReactNode {
+  return (
+    <g>
+      <path d={`M${-SLEEVE.half} ${SLEEVE.top} V${len} H${SLEEVE.half} V${SLEEVE.top}`} fill={fill} {...bstroke} />
+      {cuff ? (
+        <rect
+          x={-SLEEVE.half - 0.6}
+          y={len - SLEEVE.cuff / 2}
+          width={SLEEVE.half * 2 + 1.2}
+          height={SLEEVE.cuff}
+          rx={SLEEVE.cuff / 2}
+          fill={cuff}
+          {...bthin}
+        />
+      ) : null}
+    </g>
+  );
+}
+
+/** 小怪獸裝的布面：整個身體都蓋住。側面時肚子那塊在身體下緣；正面時在中間，斑點左右各一份 */
+function dinoWrap(body: BodyGeom): ReactNode {
+  const top = -(body.back + CLOTH_MARGIN);
+  const height = body.back + body.belly + CLOTH_MARGIN * 2;
+  const rear = -(body.len + CLOTH_MARGIN);
+  const sides = body.frontal ? [-1, 1] : [-1];
+  const bellyTop = body.belly * DINO.belly;
+  return (
+    <g>
+      <rect x={rear} y={top} width={DINO.collar - rear} height={height} fill={DINO_FILL} />
+      {body.frontal ? (
+        <ellipse
+          cx={n2(-body.len * DINO.bellyAt)}
+          cy="0"
+          rx={n2(body.len * DINO.bellyLen)}
+          ry={n2(body.back * DINO.bellyHalf)}
+          fill="var(--acc-cream)"
+          {...bthin}
+        />
+      ) : (
+        <path
+          d={`M-2 ${n2(-top)} V${n2(bellyTop * 1.2)} Q${n2(-body.len / 2)} ${n2(bellyTop * 0.6)} ${n2(-body.len + 3)} ${n2(bellyTop * 1.3)} V${n2(-top)} Z`}
+          fill="var(--acc-cream)"
+          {...bthin}
+        />
+      )}
+      {sides.flatMap((side) =>
+        DINO.spots.map(([at, up, r]) => (
+          <circle key={`${side},${at}`} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill="var(--acc-mint)" />
+        )),
+      )}
+    </g>
+  );
+}
+
+/** 小怪獸裝的背鰭（側面）：沿著背線排一排，底邊埋進身體一點 */
+function dinoPlates(body: BodyGeom): ReactNode {
+  const p0 = [-body.shoulder, -body.chest] as const;
+  const p3 = [-(body.len - body.hip), -body.back] as const;
+  /** 跟身體的背線同一條曲線（同一個緩急），背鰭才會站在背上 */
+  const ease = (p0[0] - p3[0]) * PET_BACK_EASE;
+  const xs = [p0[0], p0[0] - ease, p3[0] + ease, p3[0]] as const;
+  const ys = [p0[1], p0[1], p3[1], p3[1]] as const;
+  const bezier = (v: readonly [number, number, number, number], t: number) => {
+    const u = 1 - t;
+    return u * u * u * v[0] + 3 * u * u * t * v[1] + 3 * u * t * t * v[2] + t * t * t * v[3];
+  };
+  return (
+    <g>
+      {DINO.plates.map(([at, k]) => {
+        /** 屁股那段圓弧上轉了幾度（背線上是 0）：背鰭跟著輪廓的法線倒 */
+        const turn = Math.max(0, at - 1) * 90;
+        const rad = (turn * Math.PI) / 180;
+        const x = at <= 1 ? bezier(xs, at) : p3[0] - body.hip * Math.sin(rad);
+        const y = at <= 1 ? bezier(ys, at) : -body.back * Math.cos(rad);
+        const half = DINO.plateHalf * k;
+        return (
+          <path
+            key={at}
+            transform={`translate(${n2(x)} ${n2(y)}) rotate(${n2(-turn)})`}
+            d={`M${n2(half)} ${DINO.plateSink} L${-DINO.plateLean} ${n2(DINO.plateSink - DINO.plateH * k)} L${n2(-half)} ${DINO.plateSink} Z`}
+            fill="var(--acc-gold)"
+            {...bthin}
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/** 小怪獸頭套的牙齒：一顆牙（原點在牙根中間、尖端朝 +y），和每顆牙在開口上緣的位置與朝向（頭像座標；朝臉的中心） */
+const DINO_TOOTH = 'M-2.8 -1.5 L0 4.4 L2.8 -1.5 Z';
+const DINO_TEETH = [
+  [15.1, 31.6, -44],
+  [23.2, 26.9, -19],
+  [32, 25.5, 0],
+  [40.8, 26.9, 19],
+  [48.9, 31.6, 44],
+] as const;
 
 /** 毛衣的布面：從領口蓋到下擺，直的織紋，下擺一圈羅紋 */
 function sweaterWrap(body: BodyGeom): ReactNode {
@@ -386,6 +524,30 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   },
+  'dino-hood': {
+    kind: 'layer',
+    box: '0 0 64 54',
+    // 整顆頭套進小怪獸的嘴巴裡：頭套包住頭頂和耳朵（耳朵的地方鼓起來）、兩邊蓋到臉頰，不繞到下巴（頸部配件露在外面）；
+    // 開口上緣一排牙齒，頭頂一片背鰭，額頭上是小怪獸自己的眼睛和鼻孔
+    node: (
+      <g>
+        <path d="M28.4 13.4 L32 5 L35.6 13.4 Z" fill="var(--acc-gold)" {...thin} />
+        {DINO_TEETH.map(([x, y, rot]) => (
+          <path key={x} transform={`translate(${x} ${y}) rotate(${rot})`} d={DINO_TOOTH} fill="var(--acc-cream)" {...thin} />
+        ))}
+        <path
+          d="M5 48.5 Q2.8 40 4.4 32 Q5.4 28.5 7.6 25.5 L11.2 5.8 Q12.4 2.8 15 4.6 L27.5 12.6 Q32 11.2 36.5 12.6 L49 4.6 Q51.6 2.8 52.8 5.8 L56.4 25.5 Q58.6 28.5 59.6 32 Q61.2 40 59 48.5 Q57.6 52 55 49.5 C55.5 34 46 25.5 32 25.5 C18 25.5 8.5 34 9 49.5 Q6.4 52 5 48.5 Z"
+          fill={DINO_FILL}
+          {...stroke}
+        />
+        <path d="M13.3 10.5 L11.9 19.5 L19 14.6 Z M50.7 10.5 L52.1 19.5 L45 14.6 Z" fill="var(--acc-mint)" />
+        <circle cx="25.5" cy="19.6" r="1.7" fill={LINE} />
+        <circle cx="38.5" cy="19.6" r="1.7" fill={LINE} />
+        <circle cx="30.3" cy="22.4" r="0.8" fill={LINE} />
+        <circle cx="33.7" cy="22.4" r="0.8" fill={LINE} />
+      </g>
+    ),
+  },
 
   // ── 頭側 ────────────────────────────────────────────────
   'star-clip': {
@@ -558,20 +720,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     onBody: {
       // 從脖子往後套到腰，下擺是一圈羅紋；屁股露在外面
       wrap: sweaterWrap,
-      sleeve: (
-        <g>
-          <path d={`M${-SLEEVE.half} ${SLEEVE.top} V${SLEEVE.len} H${SLEEVE.half} V${SLEEVE.top}`} fill="var(--acc-lav)" {...bstroke} />
-          <rect
-            x={-SLEEVE.half - 0.6}
-            y={SLEEVE.len - SLEEVE.cuff / 2}
-            width={SLEEVE.half * 2 + 1.2}
-            height={SLEEVE.cuff}
-            rx={SLEEVE.cuff / 2}
-            fill="var(--acc-cream)"
-            {...bthin}
-          />
-        </g>
-      ),
+      sleeve: legCover('var(--acc-lav)', SLEEVE.len, 'var(--acc-cream)'),
       // 下巴下面的高領
       head: (
         <g>
@@ -608,6 +757,29 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
         <path d="M11.6 59.2 Q32 69.6 52.4 59.2" fill="none" stroke="var(--acc-cream)" strokeWidth="1.4" strokeLinecap="round" />
         <path d="M27 62.4 L37 62.4 L32 71 Z" fill="var(--acc-coral)" {...thin} />
         <circle cx="32" cy="62.6" r="2.3" fill="var(--acc-coral)" {...thin} />
+      </g>
+    ),
+  },
+  'dino-suit': {
+    kind: 'layer',
+    box: '6 50 52 26',
+    onBody: {
+      // 連身裝：整個身體包起來，前腿套袖子、後腿套褲管，腳掌露在外面
+      wrap: dinoWrap,
+      sleeve: legCover(DINO_FILL, SLEEVE.len),
+      trouser: legCover(DINO_FILL, DINO.trouser),
+      // 側面：背上一排背鰭；直立朝著你的姿勢從正面看不到背鰭（給空的 frontal 就不畫側面那排）
+      over: dinoPlates,
+      frontal: {},
+      // 下巴下面的領口
+      head: <path d="M20.5 56.6 Q32 61.4 43.5 56.6 L43.2 62 Q32 66.6 20.8 62 Z" fill={DINO_FILL} {...stroke} />,
+    },
+    node: (
+      <g>
+        <path d="M11 55 Q32 64.5 53 55 L54 63.5 Q32 73 10 63.5 Z" fill={DINO_FILL} {...stroke} />
+        <path d="M24.5 61.6 Q32 63.6 39.5 61.6 L40 68.4 Q32 70.8 24 68.4 Z" fill="var(--acc-cream)" {...thin} />
+        <circle cx="16.5" cy="61.4" r="1.8" fill="var(--acc-mint)" />
+        <circle cx="47.5" cy="61.4" r="1.8" fill="var(--acc-mint)" />
       </g>
     ),
   },

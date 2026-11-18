@@ -51,6 +51,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'chick', slot: 'head-top', name: '頭上小雞', source: shop(PRICE.rare) },
   { id: 'hachimaki', slot: 'head-top', name: '必勝頭巾', source: shop(PRICE.s), sprint: true },
   { id: 'grad-cap', slot: 'head-top', name: '學士帽', source: byAchievement('exam-80') },
+  { id: 'dino-hood', slot: 'head-top', name: '小怪獸頭套', source: shop(PRICE.l) },
   // 頭側
   { id: 'star-clip', slot: 'head-side', name: '星星髮夾', source: shop(PRICE.s) },
   { id: 'sakura', slot: 'head-side', name: '櫻花', source: shop(PRICE.m) },
@@ -70,6 +71,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   // 身上
   { id: 'sweater', slot: 'body', name: '毛衣', source: shop(PRICE.xxl) },
   { id: 'sailor', slot: 'body', name: '水手領', source: shop(PRICE.xxl) },
+  { id: 'dino-suit', slot: 'body', name: '小怪獸裝', source: shop(PRICE.xl) },
   // 背飾
   { id: 'balloon', slot: 'back', name: '氣球', source: shop(PRICE.xl) },
   { id: 'cape', slot: 'back', name: '小披風', source: shop(PRICE.rare) },

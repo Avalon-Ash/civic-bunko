@@ -24,6 +24,8 @@ const OUTFITS: Array<[string, Outfit]> = [
   ['全套 A', { 'head-top': 'beanie', neck: 'bell', bg: 'cushion', 'face-mid': 'glasses' }],
   ['全套 B', { 'head-top': 'grad-cap', body: 'sailor', back: 'wings', fur: 'fur-orange' }],
   ['全套 C', { 'head-top': 'hachimaki', neck: 'exam-pass', bg: 'moon', fur: 'fur-black', 'face-low': 'fish-snack' }],
+  ['小怪獸全套', { 'head-top': 'dino-hood', body: 'dino-suit' }],
+  ['小怪獸全套＋披風', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'cape' }],
 ];
 
 /** 整隻貓畫到哪（身體座標）；被身體輪廓剪掉的布面不算 */
@@ -164,6 +166,22 @@ describe('cat body', () => {
     assert.equal(count(render('sit', { body: 'sweater' }), 'class="cb-pet-sleeve"'), 0);
     // 理毛時舉起來的那隻手整隻露在外面：套袖子
     assert.equal(count(render('groom', { body: 'sweater' }), 'class="cb-pet-sleeve"'), 1);
+  });
+
+  it('a one-piece suit covers the hind legs too, and shows no back plates when the body faces you', () => {
+    const suit: Outfit = { body: 'dino-suit' };
+    // 側身：前腿兩隻袖子、後腿兩隻褲管；正面坐：後腿收在身體下面、放下的前腳只露腳掌
+    assert.equal(count(render('stand', suit), 'class="cb-pet-sleeve"'), 2);
+    assert.equal(count(render('stand', suit), 'class="cb-pet-trouser"'), 2);
+    assert.equal(count(render('sit', suit), 'class="cb-pet-trouser"'), 0);
+    assert.equal(count(render('sit', suit), 'class="cb-pet-sleeve"'), 0);
+    // 沒有褲管的衣服不受影響
+    assert.equal(count(render('stand', { body: 'sweater' }), 'class="cb-pet-trouser"'), 0);
+    // 背鰭（身體上唯一的金色）只在側面看得到
+    for (const pose of POSES) {
+      const plates = count(render(pose, suit), 'var(--acc-gold)');
+      assert.equal(plates > 0, !PET_POSES[pose].backFront, `${pose} 的背鰭`);
+    }
   });
 
   it('an arm raised from the shoulder is drawn in front of the head; lowered legs stay behind it', () => {

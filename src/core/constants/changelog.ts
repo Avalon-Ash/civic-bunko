@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-18-dino-suit',
+    date: '2026-11-18',
+    title: '新衣服：小怪獸娃娃裝',
+    items: [
+      '小怪獸頭套（頭頂，100 條小魚乾）：整顆頭套進小怪獸的嘴巴裡，一排牙齒咬在額頭上',
+      '小怪獸裝（身上，120 條小魚乾）：連身裝，背上有一排背鰭，腳掌露在外面',
+      '兩件可以分開穿，也可以跟眼鏡、圍巾、披風、翅膀一起搭',
+    ],
+  },
+  {
     id: '2026-11-18-sound-wake',
     date: '2026-11-18',
     title: '修正：切出去再回來，聲音可能回不來',
