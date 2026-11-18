@@ -7,6 +7,35 @@
   gap: 12px;
 }
 
+.cb-wd-title {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  min-width: 0;
+}
+
+.cb-wd-title h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 名字牌：標題旁的小按鈕，顯示名字（沒取名時是「取名字」），點了改名 */
+.cb-wd-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap-min);
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  border: 2px dashed var(--line);
+}
+
 .cb-fish-pill {
   display: inline-flex;
   align-items: center;

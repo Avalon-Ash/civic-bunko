@@ -420,6 +420,103 @@ export interface MeowClip {
   gain: number;
 }
 
+// ── 小貓的大腦（點牠時說什麼）──────────────────────────────
+// 分三層，各自可以單獨換掉：角色包（名字與台詞，constants/catLines.ts）、
+// 判斷（條件與挑句子，systems/catBrain.ts）、說話的介面（CatVoice，由 ui/pet/CatVoiceProvider 注入）。
+/** 小貓的表情 */
+export type CatMood = 'idle' | 'yay' | 'oops' | 'sleepy';
+/** 在哪裡點到牠：avatar＝頭像、roam＝跑出來玩的那隻 */
+export type CatPlace = 'avatar' | 'roam';
+/** 畫面明講的情境：剛答對、剛答錯。沒講就只看表情 */
+export type CatScene = 'correct' | 'wrong';
+/** 點牠的那一下（畫面給的） */
+export interface CatTap {
+  mood: CatMood;
+  place: CatPlace;
+  scene?: CatScene;
+}
+/** 小貓看得到的處境：selectors/cat.ts 從 world 整理出來，大腦只讀這個、不碰 world */
+export interface CatSituation extends CatTap {
+  /** 現在幾點（0–23） */
+  hour: number;
+  /** 離考試幾天（考試當天是 0）；沒有題庫是 null */
+  daysToExam: number | null;
+  /** 今天刷了幾題、每日目標幾題 */
+  todayCount: number;
+  dailyGoal: number;
+  /** 連續幾天蓋章（今天還沒蓋就算到昨天） */
+  streak: number;
+  /** 身上穿了幾件（毛色不算） */
+  wearing: number;
+  /** 使用者取的名字；沒取是 null */
+  name: string | null;
+  /** 這一輪連續點了幾下（含這一下） */
+  taps: number;
+}
+/** 條件的名字；每個條件怎麼判斷只寫在 systems/catBrain.ts 的 CAT_CONDITIONS，門檻在 constants/cat.ts */
+export type CatCondition =
+  | 'correct'
+  | 'wrong'
+  | 'calm'
+  | 'cheerful'
+  | 'down'
+  | 'sleepy'
+  | 'roaming'
+  | 'morning'
+  | 'midday'
+  | 'afternoon'
+  | 'evening'
+  | 'lateNight'
+  | 'examFar'
+  | 'examMid'
+  | 'examNear'
+  | 'examEve'
+  | 'examDay'
+  | 'notStarted'
+  | 'underway'
+  | 'goalDone'
+  | 'onStreak'
+  | 'dressed'
+  | 'undressed'
+  | 'named'
+  | 'unnamed'
+  | 'petted'
+  | 'pettedALot';
+/** 台詞裡可以用的佔位符（寫成 {NAME}）；值從處境算出來，算不出來的那句不會被挑 */
+export type CatLineVar = 'NAME' | 'DAYS' | 'N' | 'LEFT' | 'GOAL' | 'STREAK';
+/** 一個話題：when 的條件全部成立才會被挑，weight 越大越常出現 */
+export interface CatTopic {
+  id: string;
+  when: readonly CatCondition[];
+  weight: number;
+  lines: readonly string[];
+}
+/** 角色包：預設稱呼與台詞。跟程式無關，可以整包換掉 */
+export interface CatCharacter {
+  id: string;
+  /** 使用者沒取名時，台詞裡的 {NAME} 用這個 */
+  defaultName: string;
+  topics: readonly CatTopic[];
+}
+/** 大腦記得的事（只在記憶體，不存檔）：最近說過的話、上一個話題、連續點了幾下 */
+export interface CatMemory {
+  recentLines: readonly string[];
+  lastTopic: string | null;
+  taps: number;
+  /** 上一下是什麼時候點的（毫秒時間戳）；沒點過是 null */
+  lastTapAt: number | null;
+}
+export interface CatLine {
+  text: string;
+  /** 出自哪個話題（CatTopic.id） */
+  topic: string;
+}
+/**
+ * 說話的介面：給一下點擊，回一句話（null＝不說）。畫面只認得這個函式；
+ * 現在的實作是本機規則表（systems/catBrain.ts），要換成別的來源只要換掉注入的函式。
+ */
+export type CatVoice = (tap: CatTap) => CatLine | null;
+
 // ── 有身體的小貓（姿勢表在 constants/pet.ts）──────────────────
 export type PetPose =
   | 'stand'
@@ -483,7 +580,7 @@ export interface PetPoseSpec {
    * 身體左右兩側都看得到花色，衣服的布面也左右對稱。這種姿勢的身體一律畫成左右對稱（不讀 build.belly）。
    */
   frontal: boolean;
-  mood: 'idle' | 'yay' | 'oops' | 'sleepy';
+  mood: CatMood;
   motion: PetMotion;
 }
 
@@ -514,6 +611,8 @@ export interface Settings {
   sound?: boolean;
   /** 看過的最新一則更新紀錄 ID；各裝置自己的設定，不同步 */
   changelogSeen?: string;
+  /** 使用者幫小貓取的名字（規則在 constants/cat.ts）；沒有這欄＝沒取名。各裝置自己的設定，不同步 */
+  catName?: string;
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────
@@ -586,4 +685,6 @@ export type UICommand =
   | { type: 'dismissCelebrations' }
   | { type: 'setSound'; on: boolean }
   /** 更新紀錄看完了（記下最新一則的 ID） */
-  | { type: 'markChangelogSeen'; id: string };
+  | { type: 'markChangelogSeen'; id: string }
+  /** 幫小貓取名；空字串＝改回沒取名 */
+  | { type: 'setCatName'; name: string };

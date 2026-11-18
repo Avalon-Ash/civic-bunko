@@ -17,6 +17,7 @@ import {
   markChangelogSeen,
   setAccessory,
   setBilingual,
+  setCatName,
   setShuffleOptions,
   setSound,
   setTheme,
@@ -106,6 +107,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'markChangelogSeen':
       markChangelogSeen(world, cmd.id);
+      break;
+    case 'setCatName':
+      setCatName(world, cmd.name);
       break;
     case 'setBilingual':
       setBilingual(world, cmd.on);

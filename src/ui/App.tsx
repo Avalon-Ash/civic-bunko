@@ -22,6 +22,7 @@ import { WardrobeScreen } from './screens/WardrobeScreen';
 import { RewardToast } from './components/RewardToast';
 import { ChangelogSheet } from './components/ChangelogSheet';
 import { useSoundEffects } from './useSoundEffects';
+import { CatVoiceProvider } from './pet/CatVoiceProvider';
 import { PetLayer } from './pet/PetLayer';
 import { CHANGELOG } from '../core/constants/changelog';
 import { latestChangelog, unseenChangelog } from '../selectors/changelog';
@@ -256,36 +257,38 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   const isWideContent = tab === 'quiz' && hasActiveRound;
 
   return (
-    <div className="cb-shell">
-      <Toast message={examToast} onDismiss={() => setExamToast(null)} />
-      <RewardToast world={world} />
-      <PetLayer world={world} tab={tab} allowed={!hasActiveRound} />
-      <TabBar active={tab} onSelect={handleTabSelect} />
-      <main
-        ref={mainRef}
-        className={`cb-main ${isWideContent ? 'is-wide' : ''}`.trim()}
-      >
-        {hasUpdate && <UpdateBanner onReload={() => window.location.reload()} />}
-        <div className="cb-container">{renderMain()}</div>
-      </main>
-      {changelog ? (
-        <ChangelogSheet
-          open={changelogOpen}
-          title={changelog.title}
-          entries={changelog.entries}
-          onClose={closeChangelog}
-        />
-      ) : null}
-      {showInstallHint && (
-        <InstallHintSheet
-          open={installSheetOpen}
-          onLater={() => setInstallSheetOpen(false)}
-          onDismissForever={() => {
-            dispatch(world, { type: 'dismissInstallHint' });
-            setInstallSheetOpen(false);
-          }}
-        />
-      )}
-    </div>
+    <CatVoiceProvider world={world}>
+      <div className="cb-shell">
+        <Toast message={examToast} onDismiss={() => setExamToast(null)} />
+        <RewardToast world={world} />
+        <PetLayer world={world} tab={tab} allowed={!hasActiveRound} />
+        <TabBar active={tab} onSelect={handleTabSelect} />
+        <main
+          ref={mainRef}
+          className={`cb-main ${isWideContent ? 'is-wide' : ''}`.trim()}
+        >
+          {hasUpdate && <UpdateBanner onReload={() => window.location.reload()} />}
+          <div className="cb-container">{renderMain()}</div>
+        </main>
+        {changelog ? (
+          <ChangelogSheet
+            open={changelogOpen}
+            title={changelog.title}
+            entries={changelog.entries}
+            onClose={closeChangelog}
+          />
+        ) : null}
+        {showInstallHint && (
+          <InstallHintSheet
+            open={installSheetOpen}
+            onLater={() => setInstallSheetOpen(false)}
+            onDismissForever={() => {
+              dispatch(world, { type: 'dismissInstallHint' });
+              setInstallSheetOpen(false);
+            }}
+          />
+        )}
+      </div>
+    </CatVoiceProvider>
   );
 }

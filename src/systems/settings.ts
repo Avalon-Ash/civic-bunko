@@ -1,3 +1,4 @@
+import { cleanCatName } from './catBrain';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type { AccessoryId, ExamRecord, ThemeChoice } from '../core/types';
 import type { World } from '../core/world';
@@ -155,6 +156,15 @@ export function attachSettings(world: World): () => void {
 /** 開關音效，並發出 settingsChanged。 */
 export function setSound(world: World, on: boolean): void {
   world.settings = { ...world.settings, sound: on };
+  world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+}
+
+/** 幫小貓取名：清理後存起來；清完是空的＝改回沒取名（拿掉這一欄）。跟現在一樣就不動作。 */
+export function setCatName(world: World, name: string): void {
+  const next = cleanCatName(name);
+  if (next === cleanCatName(world.settings.catName)) return;
+  const { catName: _previous, ...rest } = world.settings;
+  world.settings = next === null ? rest : { ...rest, catName: next };
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }
 

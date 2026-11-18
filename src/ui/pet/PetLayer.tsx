@@ -29,6 +29,7 @@ import type { World } from '../../core/world';
 import { soundOn } from '../../selectors/sound';
 import { currentOutfit } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
+import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
 import { between, clamp, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
@@ -147,6 +148,8 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   tabRef.current = tab;
   const seqRef = useRef(getPet().seq);
   const drag = useRef<{ id: number; sx: number; sy: number; t0: number; lastX: number; active: boolean } | null>(null);
+  const voice = useCatVoice();
+  const { bubble, say } = useCatBubble();
 
   // 跟著 store：放出來、叫回家
   useEffect(
@@ -475,8 +478,10 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     drag.current = null;
     if (!d || !e) return;
     if (!d.active) {
-      // 點一下：喵一聲、原地跳一下
+      // 點一下：喵一聲、說句話、原地跳一下
       if (soundOn(world)) playSound('meow', true);
+      const line = voice({ mood: 'idle', place: 'roam' });
+      if (line) say(line.text);
       e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: e.y }, start: performance.now(), land: e.surface };
       setPose('hop');
       return;
@@ -528,7 +533,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         style={{ width: W, height: H }}
         role="button"
         tabIndex={0}
-        aria-label="小貓：按住可以拎起來，放回頭像就回家；按 Enter 叫牠回家"
+        aria-label="小貓：點一下牠會說話，按住可以拎起來，放回頭像就回家；按 Enter 叫牠回家"
         data-sound="none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -536,6 +541,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
       >
+        {bubble}
         <div className="cb-pet-actor-inner">
           <CatBody pose={pose} outfit={outfit} facing={facing} width={W} pivot />
         </div>

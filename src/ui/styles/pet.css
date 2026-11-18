@@ -253,6 +253,15 @@
   will-change: transform;
 }
 
+/* 跑出來玩的小貓說話：泡泡貼近頭頂（圖框上緣到耳尖還有一段空白）；頂到螢幕上緣時 is-below 改放到腳下 */
+.cb-pet-actor .cb-cat-bubble {
+  bottom: calc(100% - 2px);
+}
+
+.cb-pet-actor .cb-cat-bubble.is-below {
+  bottom: auto;
+}
+
 .cb-pet-actor:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 2px;

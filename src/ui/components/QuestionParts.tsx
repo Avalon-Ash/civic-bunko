@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
-import type { Choice, Outfit, Correction, Enrich, ExamKind, GroupZh, Paper, PassageGroup } from '../../core/types';
+import type { CatScene, Choice, Outfit, Correction, Enrich, ExamKind, GroupZh, Paper, PassageGroup } from '../../core/types';
 import type { World } from '../../core/world';
 import { examLabel } from '../../selectors';
 import { Card, type CardTone } from '../kit/Card';
@@ -118,6 +118,8 @@ export interface EnrichCardProps {
   tone?: CardTone;
   className?: string;
   catMood?: CatMood;
+  /** 這張卡是剛答對還是剛答錯（小貓說話用）；看答案模式不給 */
+  catScene?: CatScene;
   catSpin?: boolean;
   catOutfit?: Outfit | null;
   label: ReactNode;
@@ -129,6 +131,7 @@ export function EnrichCard({
   tone = 'surface',
   className = '',
   catMood = 'idle',
+  catScene,
   catSpin = false,
   catOutfit = null,
   label,
@@ -136,7 +139,7 @@ export function EnrichCard({
   return (
     <Card tone={tone} className={`cb-kou ${className}`.trim()}>
       <div className="cb-row">
-        <Cat size={58} mood={catMood} spin={catSpin} outfit={catOutfit} interactive />
+        <Cat size={58} mood={catMood} scene={catScene} spin={catSpin} outfit={catOutfit} interactive />
         <div className="cb-grow">
           <div className="cb-kou-head">
             {label}

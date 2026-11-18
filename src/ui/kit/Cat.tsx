@@ -1,28 +1,17 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CAT_LINE_W } from '../../core/constants/pet';
 import { ITEMS, SLOTS } from '../../core/constants/wardrobe';
-import type { AccessoryId, ItemId, Outfit, SlotId } from '../../core/types';
+import type { AccessoryId, CatMood, CatScene, ItemId, Outfit, SlotId } from '../../core/types';
+import { useCatBubble, useCatVoice } from './catVoice';
 import { ITEM_ART } from './wardrobe/art';
 
-export type CatMood = 'idle' | 'yay' | 'oops' | 'sleepy';
-
-/** 點擊角色時隨機冒出的鼓勵語句。 */
-export const CAT_ENCOURAGEMENTS: readonly string[] = [
-  '今天刷一題，離上榜就更近一步！',
-  '慢慢看沒關係，看懂比刷快更重要。',
-  '答錯只是先把地雷踩掉，考試就不會踩了！',
-  '深呼吸，你記住的比你以為的多。',
-  '再刷 5 題就休息一下，我陪你！',
-  '看到「何者錯誤」記得先圈起來喔。',
-  '法條有點長，抓住關鍵字就對了。',
-  '每天一點點，累積起來超驚人！',
-  '你超棒的，繼續保持這個節奏！',
-  '累了就看看我，充飽電再出發！',
-];
+export type { CatMood };
 
 export interface CatProps {
   size?: number;
   mood?: CatMood;
+  /** 這個畫面明講的情境（剛答對、剛答錯）；點牠時說的話會照這個挑。沒給就只看表情 */
+  scene?: CatScene;
   interactive?: boolean;
   spin?: boolean;
   /** 舊的單一配件；有 outfit 時忽略 */
@@ -176,10 +165,11 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
   );
 }
 
-/** 原創角色：八字臉的圓貓。支援四種表情、待機眨眼、點擊壓扁回彈、配件疊加與隨機鼓勵氣泡。 */
+/** 原創角色：八字臉的圓貓。支援四種表情、待機眨眼、點擊壓扁回彈、配件疊加；點牠會說話（說什麼由 CatVoice 決定）。 */
 export function Cat({
   size = 64,
   mood = 'idle',
+  scene,
   interactive = true,
   spin = false,
   accessory = null,
@@ -189,32 +179,8 @@ export function Cat({
   const wearing = outfit ?? legacyOutfit(accessory);
   const fur = furClass(wearing);
   const [squishing, setSquishing] = useState(false);
-  const [bubble, setBubble] = useState<string | null>(null);
-  const lastIndexRef = useRef(-1);
-  const bubbleRef = useRef<HTMLSpanElement | null>(null);
-
-  // 泡泡以小貓為中心；靠近螢幕邊緣時往內推，頂到上緣時改放在小貓下方。
-  useLayoutEffect(() => {
-    const el = bubbleRef.current;
-    if (!bubble || !el) return;
-    el.style.setProperty('--cb-bubble-shift', '0px');
-    el.classList.remove('is-below');
-    const margin = 8;
-    const rect = el.getBoundingClientRect();
-    const viewport = document.documentElement.clientWidth;
-    let shift = 0;
-    if (rect.left < margin) shift = margin - rect.left;
-    else if (rect.right > viewport - margin) shift = viewport - margin - rect.right;
-    el.style.setProperty('--cb-bubble-shift', `${Math.round(shift)}px`);
-    if (rect.top < margin) el.classList.add('is-below');
-  }, [bubble]);
-
-
-  useEffect(() => {
-    if (!bubble) return;
-    const id = window.setTimeout(() => setBubble(null), 2600);
-    return () => window.clearTimeout(id);
-  }, [bubble]);
+  const voice = useCatVoice();
+  const { bubble, say } = useCatBubble();
 
   useEffect(() => {
     if (!squishing) return;
@@ -226,18 +192,8 @@ export function Cat({
     if (!interactive) return;
     setSquishing(false);
     window.requestAnimationFrame(() => setSquishing(true));
-    const len = CAT_ENCOURAGEMENTS.length;
-    if (len > 0) {
-      let idx = Math.floor(Math.random() * len);
-      if (len > 1 && idx === lastIndexRef.current) {
-        idx = (idx + 1) % len;
-      }
-      lastIndexRef.current = idx;
-      const msg = CAT_ENCOURAGEMENTS[idx];
-      if (msg) {
-        setBubble(msg);
-      }
-    }
+    const line = voice({ mood, place: 'avatar', ...(scene ? { scene } : {}) });
+    if (line) say(line.text);
   };
 
   const svg = (
@@ -265,16 +221,12 @@ export function Cat({
 
   return (
     <span className={`cb-cat-host ${className}`.trim()}>
-      {bubble && (
-        <span ref={bubbleRef} className="cb-cat-bubble" role="status" aria-live="polite">
-          {bubble}
-        </span>
-      )}
+      {bubble}
       <button
         type="button"
         className={`cb-cat-btn ${squishing ? 'is-squishing' : ''} ${spin ? 'is-spinning' : ''}`.trim()}
         onClick={handleTap}
-        aria-label="點一點小貓看鼓勵的話"
+        aria-label="點一點小貓，牠會跟你說話"
         data-sound="meow"
       >
         {svg}

@@ -3,6 +3,7 @@ import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import { SLOTS } from '../core/constants/wardrobe';
+import { cleanCatName } from './catBrain';
 import { bumpStore, subscribe } from '../core/store';
 import type {
   AskFilter,
@@ -73,13 +74,14 @@ interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
 }
 
 interface RawSettings
-  extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe' | 'sound' | 'changelogSeen'> {
+  extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe' | 'sound' | 'changelogSeen' | 'catName'> {
   lastRound: RawRoundConfig | null;
   examHistory?: unknown;
   bilingual?: unknown;
   sound?: unknown;
   changelogSeen?: unknown;
   wardrobe?: unknown;
+  catName?: unknown;
 }
 
 function isValidProgress(value: unknown): value is RawProgress {
@@ -446,6 +448,8 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       parsed.settings.wardrobe !== undefined
         ? parseWardrobe(parsed.settings.wardrobe)
         : undefined;
+    // 名字不合規則（不是字串、清理後是空的）只丟這一欄
+    const cleanName = cleanCatName(parsed.settings.catName);
     cleanSettings = {
       theme: parsed.settings.theme,
       lastRound: parsed.settings.lastRound
@@ -462,6 +466,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
         : {}),
       ...(cleanExamHistory !== undefined ? { examHistory: cleanExamHistory } : {}),
       ...(cleanWardrobe !== undefined ? { wardrobe: cleanWardrobe } : {}),
+      ...(cleanName !== null ? { catName: cleanName } : {}),
     };
   }
 

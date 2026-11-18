@@ -476,7 +476,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
               <>
                 <Card tone="green" className="cb-kou cb-kou-compact">
                   <div className="cb-row">
-                    <Cat size={58} mood="yay" spin={catSpin} outfit={outfit} interactive />
+                    <Cat size={58} mood="yay" scene="correct" spin={catSpin} outfit={outfit} interactive />
                     <div className="cb-grow">
                       <div className="cb-kou-head">
                         <small>答對！</small>
@@ -495,6 +495,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                   tone={isCorrect ? 'green' : 'butter'}
                   className={isCorrect ? '' : 'is-miss'}
                   catMood={isCorrect ? 'yay' : 'oops'}
+                  catScene={isCorrect ? 'correct' : 'wrong'}
                   catSpin={catSpin}
                   catOutfit={outfit}
                   label={
@@ -524,6 +525,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                     <Cat
                       size={58}
                       mood={isCorrect ? 'yay' : 'oops'}
+                      scene={isCorrect ? 'correct' : 'wrong'}
                       spin={catSpin}
                       outfit={outfit}
                       interactive

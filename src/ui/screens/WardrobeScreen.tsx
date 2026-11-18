@@ -19,6 +19,7 @@ import { CatBody } from '../kit/CatBody';
 import { Chip } from '../kit/Chip';
 import { CountUp } from '../kit/CountUp';
 import { ProgressBar } from '../kit/ProgressBar';
+import { CatNameEditor } from '../pet/CatNameEditor';
 import { useWorld } from '../useWorld';
 
 /** 成就列表收合時顯示幾個「還沒解鎖」的 */
@@ -151,7 +152,10 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   return (
     <div className="cb-stack">
       <div className="cb-page-head cb-wd-head">
-        <h1>小貓衣櫥</h1>
+        <div className="cb-wd-title">
+          <h1>小貓衣櫥</h1>
+          <CatNameEditor world={world} />
+        </div>
         <span className="cb-fish-pill" aria-label={`小魚乾 ${fish.balance} 條`}>
           <FishIcon />
           <b className="cb-num-tabular">
