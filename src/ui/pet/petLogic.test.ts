@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { RoamBehavior } from '../../core/types';
 import { ROAM_ROUTES } from '../../core/constants/pet';
-import { clamp, jumpPoint, pickBehavior, pickWalkTarget } from './petLogic';
+import { clamp, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
 
 const seq = (...values: number[]) => {
   let i = 0;
@@ -60,5 +60,31 @@ describe('pet logic', () => {
     assert.equal(clamp(-1, 0, 10), 0);
     assert.equal(clamp(20, 0, 10), 10);
     assert.equal(clamp(5, 10, 0), 10);
+  });
+});
+
+describe('walking on a card', () => {
+  it('stepWalk moves toward the target and stops exactly on it', () => {
+    assert.deepEqual(stepWalk(10, 50, 100, 0.1), { x: 20, arrived: false });
+    assert.deepEqual(stepWalk(50, 10, 100, 0.1), { x: 40, arrived: false });
+    assert.deepEqual(stepWalk(45, 50, 100, 0.1), { x: 50, arrived: true });
+    assert.deepEqual(stepWalk(50, 50, 100, 0.1), { x: 50, arrived: true });
+  });
+
+  it('the spot reached by walking is where the next staying-put action happens', () => {
+    const perchLeft = 30;
+    // 跳上卡片時落在離左緣 20 的地方，接著在卡片上往右走到 x＝130
+    let dx = perchOffset(50, perchLeft);
+    let x = perchLeft + dx;
+    for (let i = 0; i < 100; i += 1) {
+      const step = stepWalk(x, 130, 40, 0.05);
+      x = step.x;
+      dx = perchOffset(x, perchLeft);
+      if (step.arrived) break;
+    }
+    // 換成原地動作（坐、理毛）或點一下原地跳時，位置由 dx 算回來：要留在走到的地方
+    assert.equal(perchLeft + dx, 130);
+    // 卡片跟著頁面橫移時，小貓跟著卡片
+    assert.equal(perchLeft + 12 + dx, 142);
   });
 });

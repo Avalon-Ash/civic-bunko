@@ -31,7 +31,7 @@ import { currentOutfit } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
-import { between, clamp, jumpPoint, pickBehavior, pickWalkTarget } from './petLogic';
+import { between, clamp, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
 import { getPet, petHome, subscribePet } from './petStore';
 
 const W = ROAM_WIDTH;
@@ -337,10 +337,13 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             next(e, now);
           }
         } else if (m.kind === 'walk') {
-          const dir = Math.sign(m.to - e.x);
-          e.x += dir * m.speed * dt;
-          if ((dir > 0 && e.x >= m.to) || (dir < 0 && e.x <= m.to) || dir === 0) {
-            e.x = m.to;
+          const step = stepWalk(e.x, m.to, m.speed, dt);
+          e.x = step.x;
+          // 在卡片上走：把走到的位置寫回 dx（卡片上的 x 只由 dx 決定，之後的原地動作、原地跳都讀它）
+          if (e.surface.kind === 'perch' && e.surface.el.isConnected) {
+            e.surface.dx = perchOffset(e.x, rectOf(e.surface.el).left);
+          }
+          if (step.arrived) {
             if (e.homeTrip) {
               const h = homeRect();
               if (h) {
@@ -534,7 +537,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         onKeyDown={onKeyDown}
       >
         <div className="cb-pet-actor-inner">
-          <CatBody pose={pose} outfit={outfit} facing={facing} width={W} />
+          <CatBody pose={pose} outfit={outfit} facing={facing} width={W} pivot />
         </div>
       </div>
     </div>

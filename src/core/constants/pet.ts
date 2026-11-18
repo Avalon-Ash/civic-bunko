@@ -230,6 +230,22 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
   },
 };
 
+/**
+ * 會移動的小貓換姿勢或轉身時，畫面上留在原地的那一點（支點）在頭和身體中心之間的哪裡：0＝身體中心、1＝頭。
+ * 取中點時，頭和身體的位移一樣大，兩者中較大的那個最小（側身走換成正面坐、左右轉身都是）。
+ */
+export const PET_PIVOT_HEAD = 0.5;
+/**
+ * 每個姿勢要往右平移多少（身體座標，面向右），支點才會落在 PET_VIEW_W / 2；由姿勢表導出。
+ * 面向左時整張圖已經沿中線翻面，平移量取負。CatBody 的 pivot 讀它。
+ */
+export const PET_PIVOT_SHIFT = Object.fromEntries(
+  Object.entries(PET_POSES).map(([pose, { head, torso }]) => [
+    pose,
+    PET_VIEW_W / 2 - (torso.cx + (head.x - torso.cx) * PET_PIVOT_HEAD),
+  ]),
+) as Readonly<Record<PetPose, number>>;
+
 // ── 答題頁：沿進度條跑 ─────────────────────────────────────
 /** 進度條上的小貓寬度（px） */
 export const RUNNER_WIDTH = 42;

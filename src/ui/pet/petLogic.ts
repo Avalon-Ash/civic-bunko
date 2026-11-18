@@ -73,6 +73,24 @@ export function jumpPoint(
   };
 }
 
+/**
+ * 走一步：從 x 往 to 走 speed×dt，不超過 to。回傳新的 x 和有沒有走到。
+ */
+export function stepWalk(x: number, to: number, speed: number, dt: number): { x: number; arrived: boolean } {
+  const gap = to - x;
+  const step = speed * dt;
+  if (Math.abs(gap) <= step) return { x: to, arrived: true };
+  return { x: x + Math.sign(gap) * step, arrived: false };
+}
+
+/**
+ * 站在卡片上時，小貓的 x 只由「離卡片左緣多遠」（dx）決定：卡片跟著頁面動，小貓跟著卡片動。
+ * 在卡片上走路後要用這個把走到的位置寫回 dx，否則下一個原地動作會被拉回剛跳上來的那一點。
+ */
+export function perchOffset(x: number, perchLeft: number): number {
+  return x - perchLeft;
+}
+
 /** 把 v 限制在 [min, max]（max < min 時回 min） */
 export function clamp(v: number, min: number, max: number): number {
   return Math.min(Math.max(v, min), Math.max(min, max));

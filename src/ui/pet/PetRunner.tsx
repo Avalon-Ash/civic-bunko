@@ -90,7 +90,7 @@ export function PetRunner({ world, outfit, value }: PetRunnerProps) {
 
   return (
     <span ref={hostRef} className="cb-pet-runner">
-      <CatBody pose={pose} outfit={outfit} facing={facing} width={RUNNER_WIDTH} />
+      <CatBody pose={pose} outfit={outfit} facing={facing} width={RUNNER_WIDTH} pivot />
     </span>
   );
 }

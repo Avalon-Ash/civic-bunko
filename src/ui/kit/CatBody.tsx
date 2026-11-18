@@ -9,6 +9,7 @@ import {
   PET_LINE_W,
   PET_PAW_H,
   PET_PAW_TOE,
+  PET_PIVOT_SHIFT,
   PET_POSES,
   PET_SADDLE,
   PET_TAIL_W,
@@ -32,6 +33,11 @@ export interface CatBodyProps {
   className?: string;
   /** 畫背景配件（坐墊、月亮…）：試衣間要；出來亂跑時不要（背景跟著貓跑很怪） */
   backdrop?: boolean;
+  /**
+   * 會移動的小貓（亂跑、進度條）要開：換姿勢、轉身時整隻貓以自己的中心為軸（PET_PIVOT_SHIFT），
+   * 不開的話側身的頭在前面、正面坐的頭在中間，一換姿勢頭就往回跳。
+   */
+  pivot?: boolean;
 }
 
 /** 對位點 → SVG transform：把零件的原點 (ox, oy) 放到 anchor 上 */
@@ -163,8 +169,19 @@ function bodyArts(outfit: Outfit): Array<{ slot: string; art: BodyArt; motion?: 
  * 頭沿用 CatHead（含頭上、臉上、頸部的配件），接在姿勢的頭對位點；
  * 有身體版圖的配件（衣服、披風、翅膀、氣球）照 art.tsx 的 onBody 穿到身體上，沒有的照頭像的圖接在背上。
  */
-export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, className = '', backdrop = false }: CatBodyProps) {
+export function CatBody({
+  pose,
+  outfit,
+  mood,
+  facing = 'right',
+  width = 72,
+  className = '',
+  backdrop = false,
+  pivot = false,
+}: CatBodyProps) {
   const spec = PET_POSES[pose];
+  /** 支點對齊：平移量換成圖寬的百分比（translateX 的 % 是元素自己的寬） */
+  const shift = pivot ? (PET_PIVOT_SHIFT[pose] * (facing === 'left' ? -1 : 1) * 100) / PET_VIEW_W : 0;
   const worn = bodyArts(outfit);
   const backId = outfit.back;
   const backArt = backId ? ITEM_ART[backId] : undefined;
@@ -204,6 +221,8 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
       overflow="visible"
       aria-hidden="true"
       className={`cb-pet-svg ${furClass(outfit)} ${className}`.trim()}
+      data-pose={pose}
+      style={pivot ? { transform: `translateX(${r2(shift)}%)` } : undefined}
     >
       {/* 面向左＝整張圖沿身體座標的中線翻面。翻面單獨放在外層：動作的 CSS 動畫（transform、fill-box 支點）掛在內層，
           兩者放同一個元素時，翻面會以外框左上角為支點（整隻貓偏掉、靠邊被切），被拎著時還會被動畫蓋掉 */}
