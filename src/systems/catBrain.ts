@@ -18,6 +18,7 @@ import type {
   CatLine,
   CatLineVar,
   CatMemory,
+  CatProfile,
   CatSituation,
   CatTopic,
 } from '../core/types';
@@ -173,4 +174,26 @@ export function cleanCatName(value: unknown): string | null {
   const clipped = kept.join('').trim();
   const text = [...clipped].slice(0, CAT_NAME_MAX).join('').trim();
   return text.length > 0 ? text : null;
+}
+
+/** 時間欄清理：解析得出日期的字串才留，其餘當成不知道（空字串） */
+function cleanProfileTime(value: unknown): string {
+  return typeof value === 'string' && !Number.isNaN(Date.parse(value)) ? value : '';
+}
+
+/** 從存檔的兩欄（catName、catNameAt）組出個人設定；兩欄都沒有＝從沒取過名，回 null */
+export function catProfileOf(settings: { catName?: unknown; catNameAt?: unknown }): CatProfile | null {
+  const name = cleanCatName(settings.catName);
+  const at = cleanProfileTime(settings.catNameAt);
+  return name === null && at === '' ? null : { name, at };
+}
+
+/** 解析同步檔裡的 cat 欄；格式不對回 null（只丟這一欄，不讓整份同步失敗） */
+export function parseCatProfile(value: unknown): CatProfile | null {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return null;
+  const raw = value as { name?: unknown; at?: unknown };
+  if (raw.name !== null && typeof raw.name !== 'string') return null;
+  const name = cleanCatName(raw.name);
+  const at = cleanProfileTime(raw.at);
+  return name === null && at === '' ? null : { name, at };
 }

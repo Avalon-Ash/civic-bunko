@@ -1,4 +1,5 @@
 import type {
+  CatProfile,
   DayKey,
   ExamRecord,
   Progress,
@@ -182,4 +183,22 @@ export function mergeWardrobe(
   }
 
   return { owned, achievements, quests };
+}
+
+/**
+ * 合併兩台裝置的小貓個人設定：改動時間較新的那一包整包留下（不是誰後同步誰贏，兩台算出來一樣）。
+ * 時間一樣或都不知道時：有名字的贏過沒名字的，再不行比名字的字串，確保結果與順序無關。
+ */
+export function mergeCatProfile(a: CatProfile | null, b: CatProfile | null): CatProfile | null {
+  if (a === null) return b;
+  if (b === null) return a;
+  const byTime = compareTimestamp(a.at, b.at);
+  if (byTime !== 0) return byTime > 0 ? a : b;
+  if ((a.name === null) !== (b.name === null)) return a.name !== null ? a : b;
+  return compareText(a.name ?? '', b.name ?? '') >= 0 ? a : b;
+}
+
+export function sameCatProfile(a: CatProfile | null, b: CatProfile | null): boolean {
+  if (a === null || b === null) return a === b;
+  return a.name === b.name && a.at === b.at;
 }

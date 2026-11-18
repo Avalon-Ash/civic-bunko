@@ -9,7 +9,7 @@ import { useWorld } from '../useWorld';
 
 /**
  * 小貓的名字牌：取了名字就顯示名字，沒取顯示「取名字」；點了跳出對話框輸入。
- * 留空存檔＝改回預設稱呼。名字只存在這台裝置。
+ * 留空存檔＝改回預設稱呼。名字連同改動時間跨裝置同步（較新的那次改動留下）。
  */
 export function CatNameEditor({ world }: { world: World }) {
   useWorld(world);
@@ -62,7 +62,7 @@ export function CatNameEditor({ world }: { world: World }) {
             {cleaned === null
               ? '留空的話，就叫回原本的稱呼。'
               : cleaned === draft
-                ? '牠跟你說話時會用這個名字。只存在這台裝置。'
+                ? '牠跟你說話時會用這個名字；有設同步的話，其他裝置同步後也會跟著改。'
                 : `會存成「${cleaned}」。`}
           </p>
           <div className="cb-acts">

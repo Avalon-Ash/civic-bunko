@@ -109,7 +109,7 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       markChangelogSeen(world, cmd.id);
       break;
     case 'setCatName':
-      setCatName(world, cmd.name);
+      setCatName(world, cmd.name, now);
       break;
     case 'setBilingual':
       setBilingual(world, cmd.on);

@@ -1,6 +1,6 @@
-import { cleanCatName } from './catBrain';
+import { catProfileOf, cleanCatName } from './catBrain';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
-import type { AccessoryId, ExamRecord, ThemeChoice } from '../core/types';
+import type { AccessoryId, CatProfile, ExamRecord, Settings, ThemeChoice } from '../core/types';
 import type { World } from '../core/world';
 import { unlockedAccessories } from './daily';
 
@@ -159,12 +159,32 @@ export function setSound(world: World, on: boolean): void {
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }
 
-/** 幫小貓取名：清理後存起來；清完是空的＝改回沒取名（拿掉這一欄）。跟現在一樣就不動作。 */
-export function setCatName(world: World, name: string): void {
+/** 把小貓的個人設定寫進 settings 的兩欄（catName、catNameAt）；沒有名字、不知道時間就不留那一欄 */
+function withCatProfile(settings: Settings, profile: CatProfile): Settings {
+  const { catName: _name, catNameAt: _at, ...rest } = settings;
+  return {
+    ...rest,
+    ...(profile.name !== null ? { catName: profile.name } : {}),
+    ...(profile.at !== '' ? { catNameAt: profile.at } : {}),
+  };
+}
+
+/**
+ * 幫小貓取名：清理後存起來，並記下改動時間（同步時用它判斷哪一台的比較新）。
+ * 清完是空的＝改回沒取名（也算一次改動）。跟現在一樣就不動作、時間也不更新。
+ */
+export function setCatName(world: World, name: string, now: () => Date): void {
   const next = cleanCatName(name);
   if (next === cleanCatName(world.settings.catName)) return;
-  const { catName: _previous, ...rest } = world.settings;
-  world.settings = next === null ? rest : { ...rest, catName: next };
+  world.settings = withCatProfile(world.settings, { name: next, at: now().toISOString() });
+  world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+}
+
+/** 寫入同步合併後的小貓個人設定（擁有者是本系統；同步系統只負責算出結果）。跟現在一樣就不動作。 */
+export function applySyncedCatProfile(world: World, profile: CatProfile): void {
+  const current = catProfileOf(world.settings);
+  if (current !== null && current.name === profile.name && current.at === profile.at) return;
+  world.settings = withCatProfile(world.settings, profile);
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }
 

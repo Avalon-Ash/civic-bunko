@@ -512,6 +512,17 @@ export interface CatLine {
   topic: string;
 }
 /**
+ * 小貓的個人設定：現在只有名字，之後大腦的設定（例如換角色包）也放這一包。
+ * 整包跨裝置同步：兩邊比 at，較新的那包整包取代較舊的（systems/syncMerge.ts 的 mergeCatProfile）。
+ * 存檔裡是 settings.catName＋settings.catNameAt；同步檔裡是選填的 cat 欄。
+ */
+export interface CatProfile {
+  /** null＝沒取名（把名字清掉也是一次改動，會同步過去） */
+  name: string | null;
+  /** 這包最後一次被使用者改動的時間（ISO）；空字串＝不知道 */
+  at: string;
+}
+/**
  * 說話的介面：給一下點擊，回一句話（null＝不說）。畫面只認得這個函式；
  * 現在的實作是本機規則表（systems/catBrain.ts），要換成別的來源只要換掉注入的函式。
  */
@@ -611,8 +622,10 @@ export interface Settings {
   sound?: boolean;
   /** 看過的最新一則更新紀錄 ID；各裝置自己的設定，不同步 */
   changelogSeen?: string;
-  /** 使用者幫小貓取的名字（規則在 constants/cat.ts）；沒有這欄＝沒取名。各裝置自己的設定，不同步 */
+  /** 使用者幫小貓取的名字（規則在 constants/cat.ts）；沒有這欄＝沒取名。和 catNameAt 一起組成 CatProfile 跨裝置同步 */
   catName?: string;
+  /** 名字最後一次被改動（含清掉）的時間（ISO）；沒有這欄＝不知道（加這欄之前取的名字） */
+  catNameAt?: string;
 }
 
 // ── 同步（私人 GitHub repo）────────────────────────────

@@ -1,16 +1,16 @@
-// 小貓的名字（settings.catName，2026-11-18 新增的選填欄位）：新樣本 save-v3-cat-name.json。
-// 舊樣本與 persistenceGolden.test.ts 不動；這裡另外確認舊存檔照樣讀、新欄位不進同步檔。
+// 小貓的名字（settings.catName 與改動時間 settings.catNameAt，2026-11-18 新增的選填欄位）。
+// 新樣本：save-v3-cat-name.json（只有名字，第一版出貨的樣子）、save-v4-cat-profile.json（名字＋時間）。
+// 舊樣本與 persistenceGolden.test.ts 不動。跨裝置同步的測試在 syncCatProfile.test.ts。
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import { dispatch } from '../core/commands';
 import { CAT_NAME_MAX } from '../core/constants/cat';
 import { STORAGE_KEY } from '../core/constants/round';
-import { SYNC_STORAGE_KEY } from '../core/constants/sync';
 import { createWorld, type World } from '../core/world';
 import { catDisplayName, catName } from '../selectors/cat';
 import { attachPersistence, exportProgress, importProgress } from './persistence';
-import { attachSync, waitForSync, type SyncStorageLike } from './sync';
+import type { SyncStorageLike } from './sync';
 
 function golden(name: string): string {
   return readFileSync(new URL(`../testing/golden/${name}`, import.meta.url), 'utf8');
@@ -55,6 +55,28 @@ describe('persistence: cat name', () => {
 
     world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
     assert.deepEqual(JSON.parse(storage.data[STORAGE_KEY] ?? 'null'), JSON.parse(raw));
+    // 第一版只存名字、沒有時間：照樣讀，不會自己補一個時間
+    assert.equal(world.settings.catNameAt, undefined);
+  });
+
+  it('reads a save that has a name and its change time, and writes both back unchanged', () => {
+    const raw = golden('save-v4-cat-profile.json');
+    const { world, storage } = loadSave(raw);
+    assert.equal(world.settings.catName, '阿福');
+    assert.equal(world.settings.catNameAt, '2026-11-18T05:00:00.000Z');
+    world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+    assert.deepEqual(JSON.parse(storage.data[STORAGE_KEY] ?? 'null'), JSON.parse(raw));
+  });
+
+  it('a change time that is not a date drops only that field', () => {
+    for (const bad of [42, 'yesterday', '', null, {}]) {
+      const payload = JSON.parse(golden('save-v4-cat-profile.json')) as { settings: Record<string, unknown> };
+      payload.settings.catNameAt = bad;
+      const { world } = loadSave(JSON.stringify(payload));
+      assert.equal(world.settings.catName, '阿福', JSON.stringify(bad));
+      assert.equal(world.settings.catNameAt, undefined, JSON.stringify(bad));
+      assert.equal(world.progress.size, 1);
+    }
   });
 
   it('older saves load as before: no name, and no name field appears when they are written back', () => {
@@ -88,17 +110,24 @@ describe('persistence: cat name', () => {
 
   it('setCatName saves a cleaned name, clears it with an empty one, and does nothing when unchanged', () => {
     const { world, storage } = loadSave(golden('save-v2-wardrobe.json'));
-    dispatch(world, { type: 'setCatName', name: '  麻糬 ' });
+    const at = (iso: string) => ({ now: () => new Date(iso) });
+    dispatch(world, { type: 'setCatName', name: '  麻糬 ' }, at('2026-11-18T06:00:00.000Z'));
     assert.equal(world.settings.catName, '麻糬');
+    assert.equal(world.settings.catNameAt, '2026-11-18T06:00:00.000Z');
     assert.equal(saved(storage).settings?.catName, '麻糬');
+    assert.equal(saved(storage).settings?.catNameAt, '2026-11-18T06:00:00.000Z');
     const writes = storage.writes;
 
-    dispatch(world, { type: 'setCatName', name: '麻糬' });
+    // 一樣的名字：不寫檔，改動時間也不往後推（不然沒改的那台會在同步時蓋掉別台真正的改動）
+    dispatch(world, { type: 'setCatName', name: '麻糬' }, at('2026-11-18T07:00:00.000Z'));
     assert.equal(storage.writes, writes);
+    assert.equal(world.settings.catNameAt, '2026-11-18T06:00:00.000Z');
 
-    dispatch(world, { type: 'setCatName', name: '   ' });
+    // 清掉名字也是一次改動：名字那欄拿掉，時間留著（同步時才知道「清掉」比別台的舊名字新）
+    dispatch(world, { type: 'setCatName', name: '   ' }, at('2026-11-18T08:00:00.000Z'));
     assert.equal(world.settings.catName, undefined);
     assert.ok(!('catName' in (saved(storage).settings ?? {})));
+    assert.equal(world.settings.catNameAt, '2026-11-18T08:00:00.000Z');
     // 取名、清掉名字都不動其他設定
     assert.equal(world.settings.accessory, 'bow');
     assert.deepEqual(world.settings.wardrobe?.outfit, { 'head-top': 'beanie', 'head-side': 'bow' });
@@ -111,27 +140,5 @@ describe('persistence: cat name', () => {
     const result = importProgress(other, exportProgress(world));
     assert.equal(result.ok, true);
     assert.equal(other.settings.catName, '阿福');
-  });
-
-  it('the name stays on this device: it is not written to the sync file', async () => {
-    const { world } = loadSave(golden('save-v3-cat-name.json'));
-    const storage = memoryStorage({
-      [SYNC_STORAGE_KEY]: JSON.stringify({ owner: 'family', repo: 'civic-sync', token: 'test-token-not-real' }),
-    });
-    const puts: string[] = [];
-    const fakeFetch: typeof fetch = async (_input, init) => {
-      if ((init?.method ?? 'GET') === 'GET') return new Response('{}', { status: 404 });
-      puts.push(String(init?.body));
-      return new Response('{}', { status: 200 });
-    };
-    attachSync(world, { fetch: fakeFetch, storage, now: () => new Date('2026-11-18T04:00:00.000Z') });
-    await waitForSync(world);
-
-    assert.equal(puts.length, 1);
-    const body = JSON.parse(puts[0] ?? '{}') as { content: string };
-    const text = Buffer.from(body.content, 'base64').toString('utf8');
-    assert.ok(!text.includes('阿福') && !text.includes('catName'), text);
-    // 同步完本機的名字還在
-    assert.equal(world.settings.catName, '阿福');
   });
 });

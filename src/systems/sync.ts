@@ -8,6 +8,7 @@ import {
 } from '../core/constants/sync';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type {
+  CatProfile,
   DayKey,
   ExamRecord,
   Progress,
@@ -23,14 +24,17 @@ import {
   parseWardrobe,
   type StorageLike,
 } from './persistence';
-import { applySyncedSettings } from './settings';
+import { catProfileOf, parseCatProfile } from './catBrain';
+import { applySyncedCatProfile, applySyncedSettings } from './settings';
 import { base64ToUtf8, decodeSyncCode, utf8ToBase64, validateSyncCredentials } from './syncCode';
 import {
+  mergeCatProfile,
   mergeCardsSeen,
   mergeDays,
   mergeExamHistory,
   mergeProgress,
   mergeWardrobe,
+  sameCatProfile,
   type SyncWardrobe,
 } from './syncMerge';
 import { applySyncedWardrobe } from './wardrobe';
@@ -68,6 +72,8 @@ interface RemoteContent {
   examHistory: ExamRecord[];
   /** 衣櫥進度（不含 outfit）；舊版或損毀視為空 */
   wardrobe: SyncWardrobe;
+  /** 小貓的個人設定（名字＋改動時間）；舊版同步檔沒有這欄，或格式不對，都是 null */
+  cat: CatProfile | null;
 }
 
 type RemoteFetchResult =
@@ -328,7 +334,7 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
         }
       : emptyWardrobe();
 
-    return { progress, days, cardsSeen, examHistory, wardrobe };
+    return { progress, days, cardsSeen, examHistory, wardrobe, cat: parseCatProfile(parsed.cat) };
   } catch {
     return null;
   }
@@ -470,6 +476,16 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       if (isStale(controller, gen)) return;
     }
 
+    // 小貓的個人設定：兩邊比改動時間，較新的那包整包留下
+    const remoteCat = remote.kind === 'ok' ? remote.cat : null;
+    const localCat = catProfileOf(world.settings);
+    const mergedCat = mergeCatProfile(localCat, remoteCat);
+    if (mergedCat !== null && !sameCatProfile(localCat, mergedCat)) {
+      applySyncedCatProfile(world, mergedCat);
+      if (isStale(controller, gen)) return;
+    }
+    const catDiffers = !sameCatProfile(remoteCat, mergedCat);
+
     // 卡片已看、模擬考成績與衣櫥只比內容：遠端順序不同不必寫回
     const remoteCardSet = new Set(remoteCards);
     const cardsDiffer =
@@ -486,7 +502,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       !dayMapsEqual(mergedDays, remoteDays) ||
       cardsDiffer ||
       examsDiffer ||
-      wardrobeDiffers;
+      wardrobeDiffers ||
+      catDiffers;
     if (!shouldPut) {
       setSyncState(world, {
         status: 'idle',
@@ -504,6 +521,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       cardsSeen: mergedCards,
       examHistory: mergedExams,
       wardrobe: mergedWardrobe,
+      // 沒取過名字就不寫這一欄：沒用到這個功能的人，同步檔長得跟以前一樣
+      ...(mergedCat !== null ? { cat: mergedCat } : {}),
     });
     const putBody: Record<string, unknown> = {
       message: 'chore: sync progress',
