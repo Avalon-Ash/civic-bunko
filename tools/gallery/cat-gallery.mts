@@ -101,15 +101,35 @@ const mirror = mirrorRow('right') + mirrorRow('left');
  */
 const checkScript = `<script>
 addEventListener('load', () => {
-  const W = ${PET_VIEW_W}, H = ${PET_VIEW_H}, EPS = 0.05, MIRROR_EPS = 0.5;
+  const W = ${PET_VIEW_W}, H = ${PET_VIEW_H}, EPS = 0.05, MIRROR_EPS = 0.5, SAMPLES = 48;
+  /**
+   * 這隻貓實際畫到哪（身體座標）：沿每個形狀的輪廓取樣、換算到身體座標再取極值。
+   * 不用 getBBox：轉過角度的零件（斜著坐的身體）它會回報外框的四個角，比實際畫到的地方大，會誤報。
+   * 被身體輪廓剪掉的布面（cb-pet-wrap）不算；線寬不算。
+   */
+  const reach = (g) => {
+    const toBody = g.ownerSVGElement.getScreenCTM().inverse();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    g.querySelectorAll('path, rect, ellipse, circle').forEach((el) => {
+      if (el.closest('clipPath, .cb-pet-wrap')) return;
+      const len = el.getTotalLength();
+      if (!len) return;
+      const m = toBody.multiply(el.getScreenCTM());
+      for (let i = 0; i <= SAMPLES; i += 1) {
+        const p = el.getPointAtLength((len * i) / SAMPLES).matrixTransform(m);
+        x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y);
+      }
+    });
+    return { x0, y0, x1, y1 };
+  };
   const over = [];
   document.querySelectorAll('#bodies .row').forEach((row) => {
     const name = row.previousElementSibling.textContent;
     row.querySelectorAll('figure').forEach((fig) => {
       const g = fig.querySelector('g.cb-pet');
       if (!g) return;
-      const b = g.getBBox();
-      const o = [Math.min(0, b.x), Math.min(0, b.y), Math.max(0, b.x + b.width - W), Math.max(0, b.y + b.height - H)].map((n) => Math.round(n));
+      const b = reach(g);
+      const o = [Math.min(0, b.x0), Math.min(0, b.y0), Math.max(0, b.x1 - W), Math.max(0, b.y1 - H)].map((n) => Math.round(n));
       if (o.some((n) => n !== 0)) over.push(name + ' / ' + fig.querySelector('figcaption').textContent + '：左 ' + o[0] + '　上 ' + o[1] + '　右 ' + o[2] + '　下 ' + o[3]);
     });
   });

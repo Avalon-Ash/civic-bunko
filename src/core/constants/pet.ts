@@ -45,24 +45,23 @@ export interface PetBuild {
   hip: number;
   /** 肚子那側是背那側的幾倍厚（大於 1＝肚子下垂） */
   belly: number;
-  /** 屁股那端多方（0＝圓，1＝方角）：坐著、趴著時貼地的那一面要壓平 */
+  /** 屁股那端多方（0＝圓，1＝方角）：趴著時兩端收成吐司的方角 */
   flat: number;
   /** 背上花色的下緣垂到屁股半厚的幾成（負的留在背那側、正的過了身體中線） */
   patch: number;
 }
 /**
  * 姿勢表的一格：PetPoseSpec 加上畫法才用得到的欄位。
- * frontal＝正面坐（身體直起來朝前）：兩隻前腳都畫在身體前面；
- * crease＝身體上的摺線（坐著時大腿的弧線；身體座標），沒有就給 null。
+ * crease＝身體上的摺線（坐著時大腿前緣的弧線；身體座標），沒有就給 null。
  */
-export type PetPoseDef = PetPoseSpec & { build: PetBuild; frontal: boolean; crease: string | null };
+export type PetPoseDef = PetPoseSpec & { build: PetBuild; crease: string | null };
 
 /** 站著、走、跳：一顆豆子，屁股比胸口大一點、肚子微微下垂 */
 const BEAN: PetBuild = { chest: 12, shoulder: 12, hip: 14, belly: 1.06, flat: 0, patch: 0.05 };
 /** 跑：拉長的豆子 */
 const STRETCH: PetBuild = { chest: 10, shoulder: 10, hip: 11.5, belly: 1.05, flat: 0, patch: 0.05 };
-/** 坐：下大上小的梨形，底部壓平貼地；胸口那側（belly 小於 1）比背那側直一點；花色只留在背那側，露出白肚子 */
-const PEAR: PetBuild = { chest: 14, shoulder: 10, hip: 12, belly: 0.98, flat: 0.45, patch: -0.62 };
+/** 坐：身體斜著，圓圓的大屁股坐在地上（hip＝ry，屁股那端是正圓），胸口在前上方、比屁股小；花色留在背那側 */
+const SEATED: PetBuild = { chest: 12, shoulder: 11, hip: 14.5, belly: 1, flat: 0, patch: -0.15 };
 /** 趴成吐司：兩端圓、上下平 */
 const LOAF: PetBuild = { chest: 11.5, shoulder: 9, hip: 9, belly: 1, flat: 0.15, patch: 0.05 };
 /** 被拎著：身體垂下來，肉都往下掉 */
@@ -70,10 +69,10 @@ const HANG: PetBuild = { chest: 9.5, shoulder: 9, hip: 12, belly: 1.1, flat: 0, 
 
 const TAIL_UP = 'M31 62 Q17.5 60 16.5 47.5 Q17 39.5 23.5 42';
 /** 坐著時尾巴從屁股後面貼著地伸出來，尾巴尖往上捲回身體旁邊 */
-const TAIL_SIT = 'M34 80 Q20.5 83.6 18 76 Q16.6 70 22.5 69';
+const TAIL_SIT = 'M33 80 Q19.5 83.6 17 76 Q15.6 70 21.5 69';
 const TAIL_HANG = 'M49.5 75 Q44.5 83 50 88.5';
-/** 坐著時大腿的弧線：從身體側邊鼓出來，收在露出來的後腳掌上 */
-const CREASE_SIT = 'M31.5 71.5 Q44.5 70 46.4 80.5';
+/** 坐著時大腿前緣的弧線：從後腳掌往上、往背彎回去 */
+const CREASE_SIT = 'M50.6 80.5 Q52.5 69 43.5 64.5';
 
 const stand: PetPoseDef = {
   torso: { cx: 47, cy: 66.5, rx: 19, ry: 14, rot: 0 },
@@ -87,26 +86,29 @@ const stand: PetPoseDef = {
   tail: TAIL_UP,
   head: { x: 66, y: 47.5, rot: 0, scale: PET_HEAD_SCALE },
   back: { x: 42, y: 54, rot: 0, scale: BACK },
-  frontal: false,
   crease: null,
   mood: 'idle',
   motion: 'breathe',
 };
 
-/** 坐姿：梨形的身體直起來（rot -90＝脖子朝上）、頭壓在上端看不到脖子，兩隻前腳靠攏在前面，大腿下露出一隻後腳掌 */
+/**
+ * 坐姿的骨架（照貓坐著的樣子）：脊椎是斜的（rot -48），屁股在頭的後下方坐在地上、胸口在頭的正下方；
+ * 兩隻前腳從胸口直直撐到地上，是整隻貓最前面的著地點（遠側那隻在胸口後面露出半邊）；
+ * 後腳掌貼地往前伸，從大腿下露出來，停在前腳後面。
+ * 屁股那端是半徑 ry 的圓，圓心在身體中心往屁股退 (rx - hip)；圓的最低點要剛好落在 PET_GROUND。
+ */
 const sit: PetPoseDef = {
-  torso: { cx: 50, cy: 70.5, rx: 15.5, ry: 22, rot: -90 },
-  build: PEAR,
+  torso: { cx: 47.4, cy: 66.7, rx: 21, ry: 14.5, rot: -48 },
+  build: SEATED,
   legs: [
     { x: 44, y: 82, len: 0, rot: 0 },
-    { x: 54, y: 78.5, len: 7.5, rot: 0 },
-    { x: 41.5, y: 82.2, len: 3.8, rot: 0 },
-    { x: 61.5, y: 78.5, len: 7.5, rot: 0 },
+    { x: 61.5, y: 69, len: 17, rot: 0 },
+    { x: 44.5, y: 82.2, len: 3.8, rot: 0 },
+    { x: 56, y: 71, len: 15, rot: 0 },
   ],
   tail: TAIL_SIT,
-  head: { x: 55, y: 42.5, rot: 0, scale: PET_HEAD_SCALE },
-  back: { x: 35, y: 65, rot: -10, scale: BACK },
-  frontal: true,
+  head: { x: 57, y: 41.5, rot: 0, scale: PET_HEAD_SCALE },
+  back: { x: 36.5, y: 60, rot: -20, scale: BACK },
   crease: CREASE_SIT,
   mood: 'idle',
   motion: 'breathe',
@@ -127,8 +129,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
     tail: 'M27.5 62 Q14 59 8 51',
     head: { x: 71, y: 49, rot: 6, scale: PET_HEAD_SCALE },
     back: { x: 42, y: 54, rot: -4, scale: BACK },
-    frontal: false,
-    crease: null,
+      crease: null,
     mood: 'yay',
     motion: 'run',
   },
@@ -136,8 +137,8 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
   groom: {
     ...sit,
     /** 近側前腳舉到臉旁邊擦臉 */
-    legs: [sit.legs[0], sit.legs[1], sit.legs[2], { x: 61.5, y: 73, len: 13, rot: -150 }],
-    head: { x: 55, y: 43, rot: -8, scale: PET_HEAD_SCALE },
+    legs: [sit.legs[0], sit.legs[1], sit.legs[2], { x: 56.5, y: 69, len: 14, rot: -152 }],
+    head: { x: 57, y: 42.5, rot: -8, scale: PET_HEAD_SCALE },
     mood: 'yay',
     motion: 'groom',
   },
@@ -155,8 +156,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
     /** 頭靠在身體前端上，下巴壓進身體 */
     head: { x: 62, y: 63, rot: 4, scale: PET_HEAD_SCALE },
     back: { x: 40, y: 63, rot: 0, scale: BACK },
-    frontal: false,
-    crease: null,
+      crease: null,
     mood: 'sleepy',
     motion: 'breathe',
   },
@@ -173,8 +173,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
     tail: 'M30 57 Q16 52 18 39',
     head: { x: 66, y: 41, rot: -4, scale: PET_HEAD_SCALE },
     back: { x: 42, y: 49, rot: -8, scale: BACK },
-    frontal: false,
-    crease: null,
+      crease: null,
     mood: 'yay',
     motion: 'still',
   },
@@ -205,8 +204,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
     tail: TAIL_HANG,
     head: { x: 50, y: 31, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 54, rot: -22, scale: BACK },
-    frontal: false,
-    crease: null,
+      crease: null,
     mood: 'idle',
     motion: 'swing',
   },
@@ -222,8 +220,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseDef>> = {
     tail: 'M50 74 Q58 82 62 78',
     head: { x: 50, y: 30, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 53, rot: -22, scale: BACK },
-    frontal: false,
-    crease: null,
+      crease: null,
     mood: 'oops',
     motion: 'still',
   },

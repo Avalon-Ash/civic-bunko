@@ -237,7 +237,7 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
 
           <g className="cb-pet-bob">
             <Leg leg={spec.legs[0]} index={0} far sleeve={null} />
-            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far sleeve={sleeve} />}
+            <Leg leg={spec.legs[1]} index={1} far sleeve={sleeve} />
 
             <g className="cb-pet-torso" transform={torsoFrame}>
               <path className="cb-pet-torso-shape" d={shape.outline} fill="var(--cat-fur)" />
@@ -268,9 +268,8 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
               )}
             </g>
 
-            {/* 身體上的摺線（坐著時大腿的弧線），和正面坐時的兩隻前腳：都畫在身體前面 */}
+            {/* 身體上的摺線（坐著時大腿前緣的弧線） */}
             {spec.crease ? <path className="cb-pet-crease" d={spec.crease} {...outline} /> : null}
-            {spec.frontal ? <Leg leg={spec.legs[1]} index={1} far={false} sleeve={sleeve} /> : null}
             <Leg leg={spec.legs[2]} index={2} far={false} sleeve={null} />
             <Leg leg={spec.legs[3]} index={3} far={false} sleeve={sleeve} />
 
