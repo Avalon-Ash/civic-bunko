@@ -160,6 +160,25 @@ describe('syncing the cat profile between devices', () => {
     assert.equal(phone.settings.catNameAt, '2026-11-18T07:00:00.000Z');
   });
 
+  it('a device whose clock runs fast does not win forever: renaming after pulling its name still wins', async () => {
+    const remote = fakeRemote();
+    const phone = await device(remote);
+    const tablet = await device(remote);
+    // 平板的時鐘快了一天
+    rename(tablet, '麻糬', '2026-11-19T06:00:00.000Z');
+    await sync(tablet);
+    await sync(phone);
+    assert.equal(catName(phone), '麻糬');
+
+    // 手機（時鐘是對的，比平板記下的時間早）拉下來之後再改名
+    rename(phone, '阿福', '2026-11-18T07:00:00.000Z');
+    assert.ok(Date.parse(phone.settings.catNameAt ?? '') > Date.parse('2026-11-19T06:00:00.000Z'));
+    await sync(phone);
+    await sync(tablet);
+    assert.equal(catName(tablet), '阿福');
+    assert.equal(catName(phone), '阿福');
+  });
+
   it('a name from before change times existed is uploaded and reaches a device that has none', async () => {
     const remote = fakeRemote();
     const phone = await device(remote, { catName: '阿福' });

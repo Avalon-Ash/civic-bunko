@@ -89,6 +89,17 @@ describe('persistence: cat name', () => {
     }
   });
 
+  it('a settings field this version does not know is skipped, not a reason to reject the save', () => {
+    // 回退到舊版、或別台裝置比較新時，存檔裡會有這一版不認得的欄位：整份照樣讀回來
+    const payload = JSON.parse(golden('save-v4-cat-profile.json')) as { settings: Record<string, unknown> };
+    payload.settings.somethingFromTheFuture = { any: ['shape', 1] };
+    const { world } = loadSave(JSON.stringify(payload));
+    assert.equal(world.progress.size, 1);
+    assert.equal(world.settings.catName, '阿福');
+    assert.equal(world.settings.accessory, 'bow');
+    assert.ok(!('somethingFromTheFuture' in world.settings));
+  });
+
   it('a broken name drops only that field, not the save', () => {
     for (const bad of [42, '', '   ', null, { text: '阿福' }, ['阿福']]) {
       const payload = JSON.parse(golden('save-v3-cat-name.json')) as { settings: Record<string, unknown> };

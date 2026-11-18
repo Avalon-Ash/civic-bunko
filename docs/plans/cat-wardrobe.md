@@ -128,4 +128,5 @@
 - 挑法：條件全部成立的話題照 `weight` 抽，避開上一個話題；句子避開最近說過的 12 句；佔位符（`{NAME}`、`{DAYS}`、`{N}`、`{LEFT}`、`{GOAL}`、`{STREAK}`）填不出來的句子不說。記憶只在記憶體，不存檔。
 - 台詞不寫考試名稱、年度、科目（引擎邊界守門），不寫法條內容。資料測試（`src/systems/catBrain.test.ts`）：每句填滿後 ≤ 24 字、佔位符都認得、沒有重複句、每個話題的條件能同時成立。
 - 名字：`settings.catName`（選填、最多 6 個字、清理規則 `cleanCatName`）＋改動時間 `settings.catNameAt`；寫入走 `UICommand` `setCatName`。新樣本 `src/testing/golden/save-v3-cat-name.json`（只有名字）、`save-v4-cat-profile.json`（名字＋時間），測試 `src/systems/persistenceCatName.test.ts`；舊樣本與守門測試沒動。
-- 同步（使用者 2026-11-18 決定）：名字和改動時間組成一包 `CatProfile`（之後大腦的設定，例如換角色包，也放這包），同步檔多一個選填的 `cat: { name, at }`。合併 `mergeCatProfile`：改動時間較新的那包整包留下；時間一樣或不知道時，有名字的贏、再比字串，所以兩台算出來一樣，跟誰先同步無關。清掉名字也是一次改動，會同步過去。沒取過名字的人同步檔不會多這一欄；舊版 App 寫回時把這欄丟掉，新版下次同步會補回。測試 `src/systems/syncCatProfile.test.ts`（兩台裝置共用一個假雲端）。
+- 同步（使用者 2026-11-18 決定）：名字和改動時間組成一包 `CatProfile`（之後大腦的設定，例如換角色包，也放這包），同步檔多一個選填的 `cat: { name, at }`。合併 `mergeCatProfile`：改動時間較新的那包整包留下；時間一樣或不知道時，有名字的贏、再比字串，所以兩台算出來一樣，跟誰先同步無關。清掉名字也是一次改動，會同步過去。沒取過名字的人同步檔不會多這一欄；舊版 App 寫回時把這欄丟掉，新版下次同步會補回。測試 `src/systems/syncCatProfile.test.ts`（兩台裝置共用一個假雲端）。改動時間取「現在」和「目前記錄的時間＋1ms」較晚者，所以別台時鐘快時，拉下來再改一定贏。
+- 目前這一包只有名字：大腦還沒有使用者可以改的設定。之後往 `CatProfile` 加欄位（例如角色包 ID）要注意兩件事：`parseCatProfile`、`withCatProfile`、`sameCatProfile` 都要認得新欄位（現在的版本寫回時會把不認得的欄位丟掉，而 `at` 不變）；任何一欄被使用者改動都要更新 `at`，整包一起比。

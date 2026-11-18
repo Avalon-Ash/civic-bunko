@@ -169,14 +169,22 @@ function withCatProfile(settings: Settings, profile: CatProfile): Settings {
   };
 }
 
+/** 新的改動時間至少比目前記錄的晚這麼多毫秒 */
+const CAT_PROFILE_STEP_MS = 1;
+
 /**
  * 幫小貓取名：清理後存起來，並記下改動時間（同步時用它判斷哪一台的比較新）。
  * 清完是空的＝改回沒取名（也算一次改動）。跟現在一樣就不動作、時間也不更新。
+ * 改動時間取「現在」和「目前記錄的時間再晚一點」較晚的那個：別台的時鐘比這台快時，
+ * 同步拉下來之後在這台再改，一定比拉下來的那一筆新，不會下次同步又被蓋回去。
  */
 export function setCatName(world: World, name: string, now: () => Date): void {
   const next = cleanCatName(name);
   if (next === cleanCatName(world.settings.catName)) return;
-  world.settings = withCatProfile(world.settings, { name: next, at: now().toISOString() });
+  const previous = catProfileOf(world.settings)?.at ?? '';
+  const after = previous === '' ? 0 : Date.parse(previous) + CAT_PROFILE_STEP_MS;
+  const at = new Date(Math.max(now().getTime(), after)).toISOString();
+  world.settings = withCatProfile(world.settings, { name: next, at });
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }
 
