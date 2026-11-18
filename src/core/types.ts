@@ -425,6 +425,11 @@ export interface MeowClip {
 // 判斷（條件與挑句子，systems/catBrain.ts）、說話的介面（CatVoice，由 ui/pet/CatVoiceProvider 注入）。
 /** 小貓的表情 */
 export type CatMood = 'idle' | 'yay' | 'oops' | 'sleepy';
+/** 表情符號泡泡（像 RO 的表情）：glyph＝泡泡裡的符號；hold＝once 冒出來一下就消失、stay 表情還在就一直掛著 */
+export interface CatEmote {
+  glyph: 'note' | 'sweat' | 'zzz';
+  hold: 'once' | 'stay';
+}
 /** 在哪裡點到牠：avatar＝頭像、roam＝跑出來玩的那隻 */
 export type CatPlace = 'avatar' | 'roam';
 /** 畫面明講的情境：剛答對、剛答錯。沒講就只看表情 */
@@ -602,6 +607,8 @@ export interface PetPoseSpec {
    */
   backFront: boolean;
   mood: CatMood;
+  /** 這個姿勢不冒表情符號泡泡（跑步只是路過，每跑一步冒一次太吵） */
+  quiet?: boolean;
   motion: PetMotion;
 }
 

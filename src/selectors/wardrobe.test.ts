@@ -7,6 +7,7 @@ import {
   achievementStatuses,
   currentOutfit,
   dailyTierStatus,
+  fishBalance,
   itemStatuses,
 } from './wardrobe';
 
@@ -16,11 +17,13 @@ describe('wardrobe selectors', () => {
     // 1 stamp (need 2 more for 'bow' which requires 3)
     world.dayLog.set('2026-11-17', 15);
     world.settings.wardrobe = {
-      owned: ['beanie', 'hachimaki'], // beanie = 80, hachimaki (sprint) = 60 -> spent = 140
+      // beanie = 80, hachimaki (sprint) = 60, wings = 300, cape = 200 -> spent = 640
+      owned: ['beanie', 'hachimaki', 'wings', 'cape'],
       achievements: [],
       quests: {},
     };
-    // Earned = 15 (questions) + 5 + 10 (tiers) + 150 (welcome) = 180; raw = 40 -> < 60 (short for star-clip)
+    // 賺到的（15 題、兩個關卡、見面禮、低門檻成就）比花掉的少：買不起最便宜的 star-clip
+    assert.ok(fishBalance(world, new Date(2026, 10, 16, 12, 0, 0)).raw < 60);
 
     const outsideSprint = new Date(2026, 10, 16, 12, 0, 0);
     const statusesOutside = itemStatuses(world, outsideSprint);
@@ -42,17 +45,19 @@ describe('wardrobe selectors', () => {
     // Achievement item
     assert.equal(byIdOutside.get('grad-cap')?.state, 'achievement');
     assert.equal(byIdOutside.get('grad-cap')?.achievement, 'exam-80');
-    // Shop item too expensive (raw=40 < 60)
+    // Shop item too expensive (raw < 60)
     assert.equal(byIdOutside.get('star-clip')?.state, 'short');
     assert.equal(byIdOutside.get('star-clip')?.price, 60);
 
-    // Add 20 more questions on 2026-11-18 -> +20 + 5 + 10 = +35 -> raw = 75 (>= 60)
+    // 11-18 再刷 20 題（每題、兩個關卡、新解的成就）：買得起 60 的，還買不起 200 的
     world.dayLog.set('2026-11-18', 20);
     const insideSprint = new Date(2026, 10, 18, 12, 0, 0);
+    const rawInside = fishBalance(world, insideSprint).raw;
+    assert.ok(rawInside >= 60 && rawInside < 200, `raw=${rawInside}`);
     const byIdInside = new Map(itemStatuses(world, insideSprint).map((s) => [s.item.id, s]));
     assert.equal(byIdInside.get('clover')?.state, 'buyable');
     assert.equal(byIdInside.get('star-clip')?.state, 'buyable');
-    assert.equal(byIdInside.get('wings')?.state, 'short');
+    assert.equal(byIdInside.get('chick')?.state, 'short');
   });
 
   it('dailyTierStatus reports today count and reached flags for DAILY_TIERS', () => {

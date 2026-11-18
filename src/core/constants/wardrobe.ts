@@ -1,5 +1,6 @@
 // SSOT：小八喵衣櫥（部位、配件、小魚乾、成就、每日小任務）。開案書 docs/plans/cat-wardrobe.md。
-// ID、價格、獎勵上線後不改：ID 是使用者資料的鍵；價格與獎勵一改，她的餘額就會跟著變。
+// ID 上線後不改（使用者資料的鍵）。價格不調高、獎勵不調低：餘額是從這些數字算出來的，一改她的餘額就跟著變；
+// 往「她拿到更多」的方向改要使用者同意（2026-11-18 同意過一次：每題、每日關卡、每日任務、成就都加碼）。
 import type { AccessoryId, Achievement, Quest, SlotId, WardrobeItem } from '../types';
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, MISSION_SIZE, STAMPS_PER_REWARD } from './daily';
 
@@ -94,12 +95,15 @@ export const WARDROBE_START_DAY = '2026-11-17';
 /** 見面禮 */
 export const WELCOME_FISH = 150;
 /** 每刷一題（作答或看答案）給幾條 */
-export const FISH_PER_QUESTION = 1;
-/** 每日題數關卡：當天題數達 at 就再給 fish（各一次）。第二關＝蓋章。 */
+export const FISH_PER_QUESTION = 2;
+/**
+ * 每日題數關卡：當天題數達 at 就再給 fish（各一次）。第二關＝蓋章，給最多：
+ * 每天蓋一個章、偶爾缺席，考前幾天就買得完整間商店（2026-11-18 使用者要「輕鬆點」，試算在開案書 §3.2）。
+ */
 export const DAILY_TIERS: ReadonlyArray<{ at: number; fish: number }> = [
-  { at: MISSION_SIZE, fish: 5 },
-  { at: DAILY_GOAL_QUESTIONS, fish: 10 },
-  { at: DAILY_GOAL_QUESTIONS * 2, fish: 15 },
+  { at: MISSION_SIZE, fish: 40 },
+  { at: DAILY_GOAL_QUESTIONS, fish: 150 },
+  { at: DAILY_GOAL_QUESTIONS * 2, fish: 60 },
 ];
 
 /** 衝刺限定：考試日（題庫 examDate）前幾天開始上架，到考試當天為止 */
@@ -107,52 +111,61 @@ export const SPRINT_DAYS = 18;
 
 // ── 成就 ──────────────────────────────────────────────────
 export const ACHIEVEMENTS: readonly Achievement[] = [
-  { id: 'answered-100', name: '起步走', desc: '累計刷 100 題', metric: 'answeredTotal', at: 100, fish: 30 },
-  { id: 'answered-300', name: '漸入佳境', desc: '累計刷 300 題', metric: 'answeredTotal', at: 300, fish: 50 },
-  { id: 'answered-600', name: '刷題達人', desc: '累計刷 600 題', metric: 'answeredTotal', at: 600, fish: 80 },
+  { id: 'answered-30', name: '開張', desc: '累計刷 30 題', metric: 'answeredTotal', at: 30, fish: 60 },
+  { id: 'answered-100', name: '起步走', desc: '累計刷 100 題', metric: 'answeredTotal', at: 100, fish: 60 },
+  { id: 'answered-200', name: '有在刷', desc: '累計刷 200 題', metric: 'answeredTotal', at: 200, fish: 100 },
+  { id: 'answered-300', name: '漸入佳境', desc: '累計刷 300 題', metric: 'answeredTotal', at: 300, fish: 100 },
+  { id: 'answered-600', name: '刷題達人', desc: '累計刷 600 題', metric: 'answeredTotal', at: 600, fish: 160 },
   {
     id: 'answered-1000',
     name: '千題貓',
     desc: '累計刷 1000 題',
     metric: 'answeredTotal',
     at: 1000,
-    fish: 100,
+    fish: 200,
     item: 'fur-gold',
   },
-  { id: 'mastered-50', name: '小有把握', desc: '熟練 50 題', metric: 'mastered', at: 50, fish: 50 },
-  { id: 'mastered-150', name: '胸有成竹', desc: '熟練 150 題', metric: 'mastered', at: 150, fish: 80 },
+  { id: 'mastered-10', name: '記住了', desc: '熟練 10 題', metric: 'mastered', at: 10, fish: 60 },
+  { id: 'mastered-50', name: '小有把握', desc: '熟練 50 題', metric: 'mastered', at: 50, fish: 100 },
+  { id: 'mastered-100', name: '越來越熟', desc: '熟練 100 題', metric: 'mastered', at: 100, fish: 120 },
+  { id: 'mastered-150', name: '胸有成竹', desc: '熟練 150 題', metric: 'mastered', at: 150, fish: 160 },
   {
     id: 'mastered-300',
     name: '學者風範',
     desc: '熟練 300 題',
     metric: 'mastered',
     at: 300,
-    fish: 100,
+    fish: 200,
     item: 'monocle',
   },
-  { id: 'stamps-3', name: '第一頁', desc: '累計蓋 3 個章', metric: 'stamps', at: 3, fish: 30 },
-  { id: 'stamps-10', name: '集章本', desc: '累計蓋 10 個章', metric: 'stamps', at: 10, fish: 60 },
-  { id: 'streak-3', name: '三天不斷', desc: '連續 3 天蓋章', metric: 'stampStreak', at: 3, fish: 40 },
+  { id: 'stamps-1', name: '第一個章', desc: '蓋到第 1 個章', metric: 'stamps', at: 1, fish: 60 },
+  { id: 'stamps-3', name: '第一頁', desc: '累計蓋 3 個章', metric: 'stamps', at: 3, fish: 60 },
+  { id: 'stamps-6', name: '半本了', desc: '累計蓋 6 個章', metric: 'stamps', at: 6, fish: 100 },
+  { id: 'stamps-10', name: '集章本', desc: '累計蓋 10 個章', metric: 'stamps', at: 10, fish: 120 },
+  { id: 'streak-3', name: '三天不斷', desc: '連續 3 天蓋章', metric: 'stampStreak', at: 3, fish: 80 },
+  { id: 'streak-5', name: '五天連發', desc: '連續 5 天蓋章', metric: 'stampStreak', at: 5, fish: 120 },
   {
     id: 'streak-7',
     name: '一週全勤',
     desc: '連續 7 天蓋章',
     metric: 'stampStreak',
     at: 7,
-    fish: 80,
+    fish: 160,
     item: 'rainbow',
   },
-  { id: 'cards-10', name: '翻翻看', desc: '看過 10 張圖卡', metric: 'cardsSeen', at: 10, fish: 30 },
-  { id: 'cards-40', name: '圖卡收藏家', desc: '看過 40 張圖卡', metric: 'cardsSeen', at: 40, fish: 60 },
-  { id: 'exam-1', name: '模擬考初體驗', desc: '交一份模擬考', metric: 'examCount', at: 1, fish: 40 },
-  { id: 'exam-60', name: '及格線', desc: '模擬考考到 60 分', metric: 'examBest', at: 60, fish: 60 },
+  { id: 'cards-3', name: '看圖說故事', desc: '看過 3 張圖卡', metric: 'cardsSeen', at: 3, fish: 50 },
+  { id: 'cards-10', name: '翻翻看', desc: '看過 10 張圖卡', metric: 'cardsSeen', at: 10, fish: 60 },
+  { id: 'cards-25', name: '圖卡迷', desc: '看過 25 張圖卡', metric: 'cardsSeen', at: 25, fish: 100 },
+  { id: 'cards-40', name: '圖卡收藏家', desc: '看過 40 張圖卡', metric: 'cardsSeen', at: 40, fish: 120 },
+  { id: 'exam-1', name: '模擬考初體驗', desc: '交一份模擬考', metric: 'examCount', at: 1, fish: 80 },
+  { id: 'exam-60', name: '及格線', desc: '模擬考考到 60 分', metric: 'examBest', at: 60, fish: 120 },
   {
     id: 'exam-80',
     name: '準榜首',
     desc: '模擬考考到 80 分',
     metric: 'examBest',
     at: 80,
-    fish: 100,
+    fish: 200,
     item: 'grad-cap',
   },
 ];
@@ -162,9 +175,9 @@ export const ACHIEVEMENTS: readonly Achievement[] = [
 export const QUEST_ROUND_MIN = MISSION_SIZE;
 /** 任務池；每天依日期從「今天做得到的」任務裡挑一個（兩台同一天挑到同一個）。 */
 export const QUESTS: readonly Quest[] = [
-  { id: 'quiz-round', kind: 'quiz-round', name: `完成一回作答（${QUEST_ROUND_MIN} 題以上）`, fish: 20 },
-  { id: 'wrong-round', kind: 'wrong-round', name: '錯題重做一回', fish: 20 },
-  { id: 'topic-round', kind: 'topic-round', name: '刷一回弱點或高頻考點', fish: 20 },
-  { id: 'new-card', kind: 'new-card', name: '看一張新圖卡', fish: 15 },
-  { id: 'exam', kind: 'exam', name: '交一份模擬考', fish: 40 },
+  { id: 'quiz-round', kind: 'quiz-round', name: `完成一回作答（${QUEST_ROUND_MIN} 題以上）`, fish: 40 },
+  { id: 'wrong-round', kind: 'wrong-round', name: '錯題重做一回', fish: 40 },
+  { id: 'topic-round', kind: 'topic-round', name: '刷一回弱點或高頻考點', fish: 40 },
+  { id: 'new-card', kind: 'new-card', name: '看一張新圖卡', fish: 30 },
+  { id: 'exam', kind: 'exam', name: '交一份模擬考', fish: 60 },
 ];

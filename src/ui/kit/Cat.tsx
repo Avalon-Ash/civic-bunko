@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { CAT_LINE_W, HEAD_ORIGIN, HEAD_RADIUS } from '../../core/constants/pet';
+import { CAT_LINE_W, EMOTE, HEAD_ORIGIN, HEAD_RADIUS } from '../../core/constants/pet';
 import { ITEMS, SLOTS } from '../../core/constants/wardrobe';
 import type { AccessoryId, CatMood, CatScene, ItemId, Outfit, SlotId } from '../../core/types';
 import { useCatBubble, useCatVoice } from './catVoice';
+import { Emote } from './Emote';
 import { ITEM_ART } from './wardrobe/art';
 
 export type { CatMood };
@@ -21,6 +22,8 @@ export interface CatProps {
   className?: string;
 }
 
+/** 頭像的座標邊長 */
+const HEAD_VIEW = 64;
 /** 左右耳（分開畫才能各自抖動）：外耳、耳朵裡面 */
 const EARS = [
   { side: 'l', outer: 'M11 28L14 7l15 10z', inner: 'M16.4 21.4L17.3 14.2l5.2 3.5z' },
@@ -134,14 +137,7 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
 
     {mood === 'yay' && <path d="M19 41q3.5-5 7 0M38 41q3.5-5 7 0" {...feature} />}
 
-    {mood === 'sleepy' && (
-      <>
-        <path d="M19 40q3.5 3.5 7 0M38 40q3.5 3.5 7 0" {...feature} />
-        <text x="50" y="22" fill="var(--ink-soft)" fontSize="11" fontWeight="900">
-          z
-        </text>
-      </>
-    )}
+    {mood === 'sleepy' && <path d="M19 40q3.5 3.5 7 0M38 40q3.5 3.5 7 0" {...feature} />}
 
     {(mood === 'idle' || mood === 'oops') && (
       <g className={mood === 'idle' ? 'cb-cat-eyes' : undefined}>
@@ -156,15 +152,7 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
 
     <path d="M30.3 43.7Q32 43 33.7 43.7Q33.4 45.5 32 46.1Q30.6 45.5 30.3 43.7Z" fill="var(--cat-nose)" />
     {mood === 'oops' ? (
-      <>
-        <path d="M29 48.4h6" {...feature} />
-        <path
-          d="M56 14q4 6 0 8q-4-2 0-8z"
-          fill="var(--blue-bg)"
-          stroke="var(--cat-line)"
-          strokeWidth="1.8"
-        />
-      </>
+      <path d="M29 48.4h6" {...feature} />
     ) : (
       <path d="M27 46.4q2.5 3.5 5 0q2.5 3.5 5 0" {...feature} />
     )}
@@ -208,12 +196,18 @@ export function Cat({
     <svg
       width={size}
       height={size}
-      viewBox="0 0 64 64"
+      viewBox={`0 0 ${HEAD_VIEW} ${HEAD_VIEW}`}
       aria-hidden="true"
       className={`cb-cat-svg ${interactive ? 'cb-cat-alive' : ''} ${fur}`.trim()}
       overflow="visible"
     >
       <CatHead mood={mood} outfit={wearing} standalone />
+      <Emote
+        mood={mood}
+        at={{ x: HEAD_ORIGIN.x + HEAD_RADIUS.x * EMOTE.corner.x, y: HEAD_ORIGIN.y - HEAD_RADIUS.y * EMOTE.corner.y }}
+        side={1}
+        pxPerUnit={size / HEAD_VIEW}
+      />
     </svg>
   );
 

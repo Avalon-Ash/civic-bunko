@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { STORAGE_KEY } from '../core/constants/round';
+import { ACHIEVEMENTS } from '../core/constants/wardrobe';
 import { createWorld, type World } from '../core/world';
 import { unlockedAchievements } from '../selectors/wardrobe';
 import {
@@ -50,7 +51,13 @@ describe('persistence wardrobe', () => {
       quests: { '2026-11-17': ['quiz-round', 'future-quest-v9'] },
       outfit: { 'head-top': 'beanie', 'head-side': 'bow' },
     });
-    assert.deepEqual(world.celebrations, []);
+    // 存檔裡已經有的成就不再慶祝一次；存檔之後才新增的低門檻成就（這份樣本的紀錄已經達標）照常補發
+    const saved = new Set(world.settings.wardrobe?.achievements ?? []);
+    assert.ok(world.celebrations.every((c) => !saved.has(c.id)));
+    assert.deepEqual(
+      world.celebrations.map((c) => c.id),
+      ACHIEVEMENTS.filter((a) => !saved.has(a.id) && unlockedAchievements(world).has(a.id)).map((a) => a.id),
+    );
     assert.equal(storage.writes, 0);
 
     world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
@@ -185,10 +192,11 @@ describe('persistence wardrobe', () => {
     const unlocked = unlockedAchievements(world);
     assert.equal(unlocked.has('answered-100'), true);
     assert.equal(unlocked.has('answered-300'), true);
-    assert.deepEqual(world.celebrations, [
-      { kind: 'achievement', id: 'answered-100' },
-      { kind: 'achievement', id: 'answered-300' },
-    ]);
+    // 補發的是「目前條件已達成」的全部成就，照 ACHIEVEMENTS 的順序
+    assert.deepEqual(
+      world.celebrations,
+      ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).map((a) => ({ kind: 'achievement', id: a.id })),
+    );
     const getWardrobe = (w: World) => w.settings.wardrobe;
     assert.equal(getWardrobe(world), undefined);
     assert.equal(storage.writes, 0);
@@ -198,8 +206,9 @@ describe('persistence wardrobe', () => {
     world.bus.emit({ type: 'dayLogChanged', day: '2026-11-17', count: 1 });
 
     assert.equal(storage.writes > 0, true);
-    assert.deepEqual(getWardrobe(world)?.achievements, ['answered-100', 'answered-300']);
+    const backfilled = ACHIEVEMENTS.filter((a) => unlocked.has(a.id)).map((a) => a.id);
+    assert.deepEqual(getWardrobe(world)?.achievements, backfilled);
     // Does not duplicate celebrations
-    assert.equal(world.celebrations.length, 2);
+    assert.equal(world.celebrations.length, backfilled.length);
   });
 });

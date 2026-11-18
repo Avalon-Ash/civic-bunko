@@ -38,6 +38,8 @@ export interface BodyArt {
   sleeve?: ReactNode;
   /** 後腿上端的褲管（連身裝）。座標同 sleeve */
   trouser?: ReactNode;
+  /** 成套的尾巴：尾巴換成這個顏色（連身裝把尾巴也包起來）；spots＝尾巴上一排斑點的顏色 */
+  tail?: { fill: string; spots?: string };
   /** 畫在身體後面（翅膀、氣球）。原點在姿勢的背對位點 */
   behind?: ReactNode;
   /** 留在頭上的那一部分（領口、領結）。頭像座標，跟頭一起縮放 */
@@ -771,6 +773,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       wrap: dinoWrap,
       sleeve: legCover(DINO_FILL, SLEEVE.len),
       trouser: legCover(DINO_FILL, DINO.trouser),
+      tail: { fill: DINO_FILL, spots: 'var(--acc-mint)' },
       // 側面：背上一排背鰭；直立朝著你的姿勢從正面看不到背鰭（給空的 frontal 就不畫側面那排）
       over: dinoPlates,
       frontal: {},

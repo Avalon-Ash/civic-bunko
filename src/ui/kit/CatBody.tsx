@@ -1,6 +1,7 @@
 import { useId, type ReactNode } from 'react';
 import {
   BACKDROP_ORIGIN,
+  EMOTE,
   HEAD_ORIGIN,
   HEAD_RADIUS,
   PET_BACKDROP,
@@ -16,6 +17,7 @@ import {
 import { SLOTS } from '../../core/constants/wardrobe';
 import type { Outfit, PetAnchor, PetLeg, PetPose, PetPoseSpec } from '../../core/types';
 import { CatHead, furClass, type CatMood } from './Cat';
+import { Emote } from './Emote';
 import { frontalBuild, legPath, r2, torsoShape } from './petShape';
 import { ITEM_ART, type BodyArt, type BodyGeom } from './wardrobe/art';
 
@@ -83,6 +85,9 @@ function chinDepth(spec: PetPoseSpec): number {
   /** 下巴相對脖子那端，沿著「往屁股」的方向（-u）的分量 */
   return -((chin.x - neck.x) * ux + (chin.y - neck.y) * uy);
 }
+
+/** 尾巴上的斑點（衣服有給斑點色時）：直徑是尾巴粗細的幾成、每隔多遠一顆 */
+const TAIL_SPOT = { size: 0.42, gap: 8 } as const;
 
 /** 前腿在 PetPoseSpec.legs 裡的編號（順序：後腿遠、前腿遠、後腿近、前腿近）；袖子只套前腿 */
 const FRONT_LEGS: ReadonlySet<number> = new Set([1, 3]);
@@ -181,6 +186,17 @@ export function CatBody({
    */
   const frontInTorso = `translate(${torso.rx} 0) rotate(90)`;
   const frontFrame = `${torsoFrame} ${frontInTorso}`;
+  /**
+   * 表情符號泡泡指在頭的哪裡：頭靠身體那一側的上角（側身時在背的上方，那裡是空的；不會頂出身體座標的前緣）。
+   * 泡泡不放進翻面、搖晃的那幾層：面向左時位置自己鏡像，符號才不會反過來，頭歪的時候泡泡也還是正的。
+   */
+  const emoteX = spec.head.x - HEAD_RADIUS.x * spec.head.scale * EMOTE.corner.x;
+  const emoteAt = {
+    x: facing === 'left' ? PET_VIEW_W - emoteX : emoteX,
+    y: spec.head.y - HEAD_RADIUS.y * spec.head.scale * EMOTE.corner.y,
+  };
+  /** 尾巴的顏色：穿了成套的衣服（連身裝）就照衣服的，不然是毛色 */
+  const tailArt = worn.find(({ art }) => art.tail)?.art.tail;
 
   return (
     <svg
@@ -231,7 +247,18 @@ export function CatBody({
 
           <g className="cb-pet-tail">
             <path d={spec.tail} {...outline} strokeWidth={PET_TAIL_W + PET_LINE_W * 2} />
-            <path d={spec.tail} fill="none" stroke="var(--cat-patch)" strokeWidth={PET_TAIL_W} strokeLinecap="round" />
+            <path d={spec.tail} fill="none" stroke={tailArt?.fill ?? 'var(--cat-patch)'} strokeWidth={PET_TAIL_W} strokeLinecap="round" />
+            {tailArt?.spots ? (
+              <path
+                d={spec.tail}
+                fill="none"
+                stroke={tailArt.spots}
+                strokeWidth={PET_TAIL_W * TAIL_SPOT.size}
+                strokeLinecap="round"
+                strokeDasharray={`0 ${TAIL_SPOT.gap}`}
+                strokeDashoffset={-TAIL_SPOT.gap / 2}
+              />
+            ) : null}
           </g>
 
           <g className="cb-pet-bob">
@@ -293,6 +320,9 @@ export function CatBody({
           </g>
         </g>
       </g>
+      {spec.quiet ? null : (
+        <Emote mood={mood ?? spec.mood} at={emoteAt} side={facing === 'left' ? 1 : -1} pxPerUnit={width / PET_VIEW_W} />
+      )}
     </svg>
   );
 }

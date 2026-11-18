@@ -184,6 +184,45 @@ describe('cat body', () => {
     }
   });
 
+  it('a one-piece suit recolours the tail to match; without it the tail is fur', () => {
+    const tail = (outfit: Outfit) => /<g class="cb-pet-tail">(.*?)<\/g>/.exec(render('stand', outfit))?.[1] ?? '';
+    assert.ok(tail({}).includes('var(--cat-patch)'));
+    assert.ok(!tail({}).includes('var(--acc-leaf)'));
+    assert.ok(tail({ body: 'dino-suit' }).includes('var(--acc-leaf)'));
+    assert.ok(!tail({ body: 'dino-suit' }).includes('var(--cat-patch)'));
+    assert.ok(!tail({ body: 'sweater' }).includes('var(--acc-leaf)'));
+  });
+
+  it('mood shows as an emote bubble drawn after everything else, upright and unflipped, inside the picture at natural size', () => {
+    const emoteOf = (pose: PetPose) => /cb-emote cb-emote-(\w+) cb-emote-(\w+)/.exec(render(pose, {}))?.slice(1, 3) ?? null;
+    assert.deepEqual(emoteOf('loaf'), ['stay', 'zzz']);
+    assert.deepEqual(emoteOf('fall'), ['stay', 'sweat']);
+    assert.deepEqual(emoteOf('hop'), ['once', 'note']);
+    // 平常的表情不冒；跑步是路過，也不冒
+    assert.equal(emoteOf('stand'), null);
+    assert.equal(emoteOf('run'), null);
+    // 舊的畫法（畫在頭上的 z 字）拿掉了
+    assert.ok(!render('loaf', {}).includes('<text'));
+    for (const pose of POSES) {
+      for (const facing of ['right', 'left'] as const) {
+        // 自然大小（圖寬＝身體座標寬）時泡泡不放大，要整顆落在圖裡；縮小顯示時泡泡刻意不跟著縮，會超出去
+        const markup = renderToStaticMarkup(h(CatBody, { pose, outfit: { 'head-top': 'dino-hood' }, facing, width: PET_VIEW_W, mood: 'oops' }));
+        if (PET_POSES[pose].quiet) continue;
+        // 泡泡在翻面的那一層外面（符號不會左右顛倒），而且在整隻貓之後才畫（帽子擋不到）
+        assert.ok(markup.indexOf('cb-emote-host') > markup.lastIndexOf('cb-pet-head'), pose);
+        const b = svgBounds(markup, { within: 'cb-emote-host' });
+        assert.ok(b, pose);
+        assert.ok(b.minX >= -EPS && b.maxX <= PET_VIEW_W + EPS && b.minY >= -EPS && b.maxY <= PET_VIEW_H + EPS, `${pose} ${facing}`);
+      }
+    }
+    const span = (facing: 'left' | 'right') =>
+      svgBounds(renderToStaticMarkup(h(CatBody, { pose: 'sit', outfit: {}, facing, width: PET_VIEW_W, mood: 'yay' })), { within: 'cb-emote-host' });
+    const right = span('right');
+    const left = span('left');
+    assert.ok(right && left);
+    assert.ok(Math.abs(left.minX - (PET_VIEW_W - right.maxX)) <= EPS && Math.abs(left.maxX - (PET_VIEW_W - right.minX)) <= EPS);
+  });
+
   it('an arm raised from the shoulder is drawn in front of the head; lowered legs stay behind it', () => {
     const groom = render('groom', {});
     const head = groom.indexOf('class="cb-pet-head"');

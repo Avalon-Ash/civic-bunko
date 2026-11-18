@@ -1,5 +1,5 @@
 // SSOT：有身體的小貓（姿勢表＝對位點、動線、速度與時間）。開案書 docs/plans/cat-wardrobe.md §7。
-import type { PetBuild, PetPose, PetPoseSpec, RoamBehavior } from '../types';
+import type { CatEmote, CatMood, PetBuild, PetPose, PetPoseSpec, RoamBehavior } from '../types';
 
 /** 身體座標：0..PET_VIEW_W × 0..PET_VIEW_H，面向右；地面在 PET_GROUND */
 export const PET_VIEW_W = 100;
@@ -32,6 +32,20 @@ export const PET_BACK_EASE = 0.45;
  * 下緣垂到哪裡跟體型有關，在 PetBuild.patch
  */
 export const PET_SADDLE = { front: 0.35, rear: 0.7, easeRear: 0.3, easeFront: 0.45 } as const;
+/** 每種表情冒什麼表情符號泡泡（沒有就不冒）。泡泡畫在所有配件上面，帽子、頭套擋不到 */
+export const CAT_EMOTES: Readonly<Record<CatMood, CatEmote | null>> = {
+  idle: null,
+  yay: { glyph: 'note', hold: 'once' },
+  oops: { glyph: 'sweat', hold: 'stay' },
+  sleepy: { glyph: 'zzz', hold: 'stay' },
+};
+/**
+ * 表情符號泡泡的大小與位置。r＝泡泡半徑（小貓圖的座標；頭像 64、身體 100 都用同一個數）；
+ * minPx＝泡泡在畫面上的直徑至少幾 px（小貓縮得很小時泡泡不跟著縮，不然又看不到）；
+ * corner＝泡泡的尖角指在頭的哪裡（從臉中心往旁邊、往上各是頭半徑的幾成）；
+ * reach＝泡泡的圓心離尖角多遠（半徑的幾倍，往斜上方）；onceMs＝hold 是 once 的泡泡停多久（wardrobe.css 讀 --emote-once-ms）
+ */
+export const EMOTE = { r: 8, minPx: 16, corner: { x: 0.72, y: 0.86 }, reach: 0.95, onceMs: 1800 } as const;
 /** 背上配件沒有身體版圖時，照頭像的圖縮小接在背上 */
 const BACK = 1;
 
@@ -122,6 +136,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     frontal: false,
     backFront: false,
     mood: 'yay',
+    quiet: true,
     motion: 'run',
   },
   sit,
