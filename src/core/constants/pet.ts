@@ -134,7 +134,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     /** 縮成一條吐司：尾巴整條收在身體底下（尾巴畫在身體後面，繞到前面會像墊了個盤子） */
     tail: 'M30 78 Q36 82 45 80',
     /** 頭靠在身體前端上，下巴壓進身體 */
-    head: { x: 62, y: 63, rot: 4, scale: PET_HEAD_SCALE },
+    head: { x: 62, y: 62, rot: 4, scale: PET_HEAD_SCALE },
     back: { x: 40, y: 63, rot: 0, scale: BACK },
     frontal: false,
     mood: 'sleepy',
@@ -182,7 +182,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
       { x: 57.5, y: 55, len: 10, rot: -20 },
     ],
     tail: TAIL_HANG,
-    head: { x: 50, y: 31, rot: 0, scale: PET_HEAD_SCALE },
+    head: { x: 50, y: 32.5, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 54, rot: -22, scale: BACK },
     frontal: false,
     mood: 'idle',
@@ -198,7 +198,7 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
       { x: 58, y: 53, len: 10, rot: -62 },
     ],
     tail: 'M50 74 Q58 82 62 78',
-    head: { x: 50, y: 30, rot: 0, scale: PET_HEAD_SCALE },
+    head: { x: 50, y: 32.5, rot: 0, scale: PET_HEAD_SCALE },
     back: { x: 41, y: 53, rot: -22, scale: BACK },
     frontal: false,
     mood: 'oops',
