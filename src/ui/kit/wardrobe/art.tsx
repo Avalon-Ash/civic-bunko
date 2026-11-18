@@ -620,7 +620,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     box: '44 26 24 38',
     // 全身版：三本書疊在小貓前面的地上，上面橫著一枝鉛筆（疊太高會頂到臉）。
-    // 整疊往右挪 5：坐著時最前面的前腳掌到 x≈67，書放在腳邊，不壓在腳後面
+    // 整疊往右挪 5：坐著的身體右緣到 x≈68，書放在身體旁邊，不壓在身體後面
     stage: (
       <g transform="translate(5 0)">
         <rect x="68" y="78.6" width="19" height="7" rx="1.4" fill="var(--acc-sky)" {...bthin} />

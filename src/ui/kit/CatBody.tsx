@@ -170,7 +170,9 @@ export function CatBody({ pose, outfit, mood, facing = 'right', width = 72, clas
   const backArt = backId ? ITEM_ART[backId] : undefined;
   const bgId = backdrop ? outfit.bg : undefined;
   const bgArt = bgId ? ITEM_ART[bgId] : undefined;
-  const { torso, build } = spec;
+  const { torso } = spec;
+  /** 正面坐的身體一定左右對稱（鏡像畫的花色、布面才會落在輪廓裡），所以不讀體型的 belly */
+  const build = spec.frontal ? { ...spec.build, belly: 1 } : spec.build;
   const shape = torsoShape(torso, build);
   /** 給衣服看的身體尺寸：衣服照它長，換姿勢、改體型都會跟著身體 */
   const geom: BodyGeom = {

@@ -45,7 +45,7 @@ export interface PetBuild {
   hip: number;
   /** 肚子那側是背那側的幾倍厚（大於 1＝肚子下垂） */
   belly: number;
-  /** 屁股那端多方（0＝圓，1＝方角）：趴著時兩端收成吐司的方角 */
+  /** 屁股那端多方（0＝圓，1＝方角）：趴著、正面坐時貼地的那一端收得比較方 */
   flat: number;
   /** 背上花色的下緣垂到屁股半厚的幾成（負的留在背那側、正的過了身體中線） */
   patch: number;
@@ -53,7 +53,7 @@ export interface PetBuild {
 /**
  * 姿勢表的一格：PetPoseSpec 加上畫法才用得到的欄位。
  * frontal＝正面坐（身體直起來、面向你）：兩隻前腳都畫在身體前面、腳掌朝你（不往前伸），
- * 身體左右兩側都看得到花色，衣服的布面也左右對稱。這種姿勢的體型要左右對稱（belly＝1）。
+ * 身體左右兩側都看得到花色，衣服的布面也左右對稱。這種姿勢的身體一律畫成左右對稱（CatBody 不讀 belly）。
  */
 export type PetPoseDef = PetPoseSpec & { build: PetBuild; frontal: boolean };
 
