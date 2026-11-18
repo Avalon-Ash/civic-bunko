@@ -1,5 +1,7 @@
 # F1-cat-render：小八喵角色成像優化（交給 Fable 工作階段）
 
+> **已完成（2026-11-18）**。下面是交辦當時的樣子，裡面提到的 `body`、`onBack`、`TORSO_REF` 已經不存在：衣服改成照身體尺寸畫的 `wrap`／`over`／`sleeve`，背上的配件是 `behind`。現況看 `docs/plans/cat-wardrobe.md` §7.2。
+
 ```text
 包 ID／對應開案書章節：F1-cat-render／docs/plans/cat-wardrobe.md §3（紙娃娃）、§7（身體與亂跑）
 目標（做完後使用者多了什麼）：
