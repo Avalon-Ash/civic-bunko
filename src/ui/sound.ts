@@ -27,6 +27,8 @@ function createContext(): AudioContext | null {
   const nav = navigator as Navigator & NavigatorWithAudioSession;
   if (nav.audioSession) nav.audioSession.type = 'ambient';
   const ac = new Ctor();
+  // 換新的音訊環境時，貓叫錄音重新解碼：舊環境上沒解完的工作可能永遠不會結束，不能沿用
+  clipBuffers.clear();
   preloadClips(ac);
   return ac;
 }
