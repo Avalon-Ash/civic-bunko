@@ -97,13 +97,14 @@ export const WELCOME_FISH = 150;
 /** 每刷一題（作答或看答案）給幾條 */
 export const FISH_PER_QUESTION = 2;
 /**
- * 每日題數關卡：當天題數達 at 就再給 fish（各一次）。第二關＝蓋章，給最多：
- * 每天蓋一個章、偶爾缺席，考前幾天就買得完整間商店（2026-11-18 使用者要「輕鬆點」，試算在開案書 §3.2）。
+ * 每日題數關卡：當天題數達 at 就再給 fish（各一次）。第一關（一回合的題數）給最多、第二關＝蓋章：
+ * 每天只刷 5 題、偶爾缺席，到考試也買得完整間商店，還有餘裕買之後新增的衣服
+ * （2026-11-18 使用者：「5 題也要能買完，因為有空我還是會產新衣服」，試算在開案書 §3.2）。
  */
 export const DAILY_TIERS: ReadonlyArray<{ at: number; fish: number }> = [
-  { at: MISSION_SIZE, fish: 40 },
-  { at: DAILY_GOAL_QUESTIONS, fish: 150 },
-  { at: DAILY_GOAL_QUESTIONS * 2, fish: 60 },
+  { at: MISSION_SIZE, fish: 250 },
+  { at: DAILY_GOAL_QUESTIONS, fish: 100 },
+  { at: DAILY_GOAL_QUESTIONS * 2, fish: 50 },
 ];
 
 /**

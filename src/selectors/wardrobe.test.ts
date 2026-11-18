@@ -8,6 +8,7 @@ import {
   currentOutfit,
   dailyTierStatus,
   fishBalance,
+  itemPrice,
   itemStatuses,
 } from './wardrobe';
 
@@ -17,13 +18,26 @@ describe('wardrobe selectors', () => {
     // 1 stamp (need 2 more for 'bow' which requires 3)
     world.dayLog.set('2026-11-17', 15);
     world.settings.wardrobe = {
-      // beanie = 80, hachimaki (sprint) = 60, wings = 300, cape = 200 -> spent = 640
-      owned: ['beanie', 'hachimaki', 'wings', 'cape'],
+      owned: ['beanie', 'hachimaki'],
       achievements: [],
       quests: {},
     };
-    // 賺到的（15 題、兩個關卡、見面禮、低門檻成就）比花掉的少：買不起最便宜的 star-clip
-    assert.ok(fishBalance(world, new Date(2026, 10, 16, 12, 0, 0)).raw < 60);
+    // 不管獎勵的數字怎麼調，把餘額花到剩不到 60（最便宜的配件的價格）：拿其他商店配件來墊，從貴的開始買
+    const CHEAPEST = 60;
+    const asserted = new Set(['beanie', 'hachimaki', 'star-clip', 'clover', 'chick']);
+    const padding = ITEMS.filter((i) => i.source.kind === 'shop' && !i.sprint && !asserted.has(i.id)).sort(
+      (a, b) => (b.source.kind === 'shop' ? b.source.price : 0) - (a.source.kind === 'shop' ? a.source.price : 0),
+    );
+    const spendDownTo = (when: Date) => {
+      for (const item of padding) {
+        const cost = item.source.kind === 'shop' ? item.source.price : 0;
+        const owned = world.settings.wardrobe?.owned ?? [];
+        if (!owned.includes(item.id) && fishBalance(world, when).raw - cost >= 0) owned.push(item.id);
+      }
+      return fishBalance(world, when).raw;
+    };
+    const rawOutside = spendDownTo(new Date(2026, 10, 16, 12, 0, 0));
+    assert.ok(rawOutside >= 0 && rawOutside < CHEAPEST, `raw=${rawOutside}`);
 
     const outsideSprint = new Date(2026, 10, 16, 12, 0, 0);
     const statusesOutside = itemStatuses(world, outsideSprint);
@@ -45,15 +59,21 @@ describe('wardrobe selectors', () => {
     // Achievement item
     assert.equal(byIdOutside.get('grad-cap')?.state, 'achievement');
     assert.equal(byIdOutside.get('grad-cap')?.achievement, 'exam-80');
-    // Shop item too expensive (raw < 60)
-    assert.equal(byIdOutside.get('star-clip')?.state, 'short');
-    assert.equal(byIdOutside.get('star-clip')?.price, 60);
+    // Shop item too expensive（chick 原價 200、特價也要 140，餘額不到 60）
+    assert.equal(byIdOutside.get('chick')?.state, 'short');
+    assert.equal(byIdOutside.get('chick')?.price, itemPrice(world, 'chick', outsideSprint)?.price);
 
-    // 11-18 再刷 20 題（每題、兩個關卡、新解的成就）：買得起 60 的，還買不起 200 的
+    // 11-18 再刷 20 題，賺到的再花到「買得起 60 的、還買不起 chick」
     world.dayLog.set('2026-11-18', 20);
     const insideSprint = new Date(2026, 10, 18, 12, 0, 0);
+    assert.ok(fishBalance(world, insideSprint).raw >= CHEAPEST * 2);
+    for (const item of padding) {
+      const cost = item.source.kind === 'shop' ? item.source.price : 0;
+      const owned = world.settings.wardrobe.owned;
+      if (!owned.includes(item.id) && fishBalance(world, insideSprint).raw - cost >= CHEAPEST) owned.push(item.id);
+    }
     const rawInside = fishBalance(world, insideSprint).raw;
-    assert.ok(rawInside >= 60 && rawInside < 200, `raw=${rawInside}`);
+    assert.ok(rawInside >= CHEAPEST && rawInside < CHEAPEST * 2, `raw=${rawInside}`);
     const byIdInside = new Map(itemStatuses(world, insideSprint).map((s) => [s.item.id, s]));
     assert.equal(byIdInside.get('clover')?.state, 'buyable');
     assert.equal(byIdInside.get('star-clip')?.state, 'buyable');
