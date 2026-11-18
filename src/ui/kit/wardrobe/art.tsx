@@ -147,6 +147,8 @@ const DINO = {
   plateLean: 1,
 } as const;
 const DINO_FILL = 'var(--acc-leaf)';
+/** 頭套上小怪獸自己的眼睛、鼻孔：固定用深色。外框線的顏色在黑貓＋深色模式會換成淺色，畫在綠色上看不清楚 */
+const DINO_EYE = 'var(--acc-shade)';
 
 /** 套在腿上端的一截布（袖子、褲管）：原點在腿根、+y 往下；cuff＝袖口羅紋的顏色（不給就沒有羅紋） */
 function legCover(fill: string, len: number, cuff?: string): ReactNode {
@@ -528,6 +530,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     kind: 'layer',
     box: '0 0 64 54',
     // 整顆頭套進小怪獸的嘴巴裡：頭套包住頭頂和耳朵（耳朵的地方鼓起來）、兩邊蓋到臉頰，不繞到下巴（頸部配件露在外面）；
+    // 耳罩比耳朵寬：頭像的耳朵會抖（wardrobe.css 的 cb-cat-ear，最多轉 9 度），抖的時候耳尖不能戳出來；
     // 開口上緣一排牙齒，頭頂一片背鰭，額頭上是小怪獸自己的眼睛和鼻孔
     node: (
       <g>
@@ -536,15 +539,15 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
           <path key={x} transform={`translate(${x} ${y}) rotate(${rot})`} d={DINO_TOOTH} fill="var(--acc-cream)" {...thin} />
         ))}
         <path
-          d="M5 48.5 Q2.8 40 4.4 32 Q5.4 28.5 7.6 25.5 L11.2 5.8 Q12.4 2.8 15 4.6 L27.5 12.6 Q32 11.2 36.5 12.6 L49 4.6 Q51.6 2.8 52.8 5.8 L56.4 25.5 Q58.6 28.5 59.6 32 Q61.2 40 59 48.5 Q57.6 52 55 49.5 C55.5 34 46 25.5 32 25.5 C18 25.5 8.5 34 9 49.5 Q6.4 52 5 48.5 Z"
+          d="M5 48.5 Q2.8 40 4.4 32 Q5 28.5 6.4 25.5 L9.2 5.6 Q10.6 2.4 13.6 4.2 L27.5 12.6 Q32 11.2 36.5 12.6 L50.4 4.2 Q53.4 2.4 54.8 5.6 L57.6 25.5 Q59 28.5 59.6 32 Q61.2 40 59 48.5 Q57.6 52 55 49.5 C55.5 34 46 25.5 32 25.5 C18 25.5 8.5 34 9 49.5 Q6.4 52 5 48.5 Z"
           fill={DINO_FILL}
           {...stroke}
         />
-        <path d="M13.3 10.5 L11.9 19.5 L19 14.6 Z M50.7 10.5 L52.1 19.5 L45 14.6 Z" fill="var(--acc-mint)" />
-        <circle cx="25.5" cy="19.6" r="1.7" fill={LINE} />
-        <circle cx="38.5" cy="19.6" r="1.7" fill={LINE} />
-        <circle cx="30.3" cy="22.4" r="0.8" fill={LINE} />
-        <circle cx="33.7" cy="22.4" r="0.8" fill={LINE} />
+        <path d="M12.3 10 L10.9 19.5 L18.4 14.4 Z M51.7 10 L53.1 19.5 L45.6 14.4 Z" fill="var(--acc-mint)" />
+        <circle cx="25.5" cy="19.6" r="1.7" fill={DINO_EYE} />
+        <circle cx="38.5" cy="19.6" r="1.7" fill={DINO_EYE} />
+        <circle cx="30.3" cy="22.4" r="0.8" fill={DINO_EYE} />
+        <circle cx="33.7" cy="22.4" r="0.8" fill={DINO_EYE} />
       </g>
     ),
   },
