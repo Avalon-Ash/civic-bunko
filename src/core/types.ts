@@ -330,6 +330,8 @@ export interface WardrobeItem {
 }
 /** 每個部位穿哪一件；沒有鍵＝那個部位空著 */
 export type Outfit = Partial<Record<SlotId, ItemId>>;
+/** 試衣間裡試穿中（還沒拿到）的配件：每個部位最多一件。只是畫面的暫時狀態，不進存檔、不同步。 */
+export type TryOn = Partial<Record<SlotId, ItemId>>;
 export type AchievementMetric =
   /** 累計刷題數（dayLog 全部加總，作答與看答案都算） */
   | 'answeredTotal'
