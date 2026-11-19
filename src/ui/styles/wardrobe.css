@@ -115,12 +115,75 @@
   gap: 8px;
 }
 
-.cb-wd-try-name {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* 試穿籤：排在小貓與說明下面、佔滿試衣間寬度（320pt 寬也一列放得下 3 件）；只放圖示和價格，名稱在 aria-label、title。
+   試衣間是黏住的，籤要小、要橫著排才不會長太高 */
+.cb-wd-room.has-try {
   flex-wrap: wrap;
+}
+
+.cb-wd-try-list {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cb-wd-try-pill {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 4px 8px 4px 5px;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-size: var(--text-small);
   font-weight: 700;
+  white-space: nowrap;
+}
+
+/* 買的按鈕：名稱一行、價格一行，試衣間在 320pt 寬時也不會把字拆散 */
+.cb-wd-buy {
+  flex-direction: column;
+  line-height: 1.25;
+  padding-inline: 12px;
+}
+
+.cb-wd-buy-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-small);
+  white-space: nowrap;
+}
+
+/* 配件圖是深色線條，淺色小圓底讓深色模式也看得清楚 */
+.cb-wd-try-icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--cat-fur);
+}
+
+.cb-wd-try-price,
+.cb-wd-try-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.cb-wd-try-x {
+  margin-left: 1px;
+  color: var(--ink-soft);
+  font-weight: 800;
 }
 
 .cb-wd-tiers {
@@ -690,7 +753,8 @@
   font-weight: 800;
 }
 
-.cb-wd-fx-near {
+.cb-wd-fx-near,
+.cb-wd-fx-pending {
   color: var(--ink-soft);
 }
 

@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useEffect, useRef, useState, type RefObject } from 'react';
 import { ACHIEVEMENTS, DAILY_SALE, SLOTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
 import { RUNNER_HOP_MS } from '../../core/constants/pet';
-import type { ItemId, Outfit, SlotId } from '../../core/types';
+import type { ItemId, Outfit, SlotId, TryOn } from '../../core/types';
 import type { World } from '../../core/world';
 import {
   achievementStatuses,
@@ -10,8 +10,12 @@ import {
   dailyTierStatus,
   fishBalance,
   itemStatuses,
-  outfitSpecialHints,
   todayQuest,
+  toggleTryOn,
+  tryOnBasket,
+  tryOnEffects,
+  tryOnPreview,
+  type ItemStatusView,
 } from '../../selectors/wardrobe';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -41,6 +45,16 @@ export function FishIcon({ size = 18 }: { size?: number }) {
 
 function achievementName(id: string): string {
   return ACHIEVEMENTS.find((a) => a.id === id)?.name ?? id;
+}
+
+function nonShopCondition(status: ItemStatusView): string | null {
+  if (status.state === 'stamps') {
+    return `再蓋 ${status.need} 個章就會送你`;
+  }
+  if (status.state === 'achievement' && status.achievement) {
+    return `解鎖成就「${achievementName(status.achievement)}」就會送你`;
+  }
+  return null;
 }
 
 /** 試衣間的小貓圖寬（px）；照片框比它窄（wardrobe.css .cb-wd-room-cat），裁掉姿勢圖兩側的空白 */
@@ -107,21 +121,18 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   const achievements = achievementStatuses(world);
 
   const [filter, setFilter] = useState<SlotFilter>('all');
-  /** 試穿中（還沒買）的配件 */
-  const [trying, setTrying] = useState<ItemId | null>(null);
+  /** 試穿中（還沒拿到）的配件，每個部位最多一件 */
+  const [tryOn, setTryOn] = useState<TryOn>({});
   const [showAllAch, setShowAllAch] = useState(false);
   const [happy, setHappy] = useState(0);
   const roomRef = useRef<HTMLDivElement | null>(null);
   const stuck = useStuck(roomRef);
 
-  const tryingStatus = trying ? statuses.find((s) => s.item.id === trying) ?? null : null;
-  const preview: Outfit = useMemo(() => {
-    if (!tryingStatus) return outfit;
-    return { ...outfit, [tryingStatus.item.slot]: tryingStatus.item.id };
-  }, [outfit, tryingStatus]);
+  const basket = tryOnBasket(statuses, tryOn, fish.raw);
+  const preview: Outfit = tryOnPreview(outfit, basket.tryOn);
 
-  /** 現在這身（含試穿中的那件）的套裝效果 */
-  const effects = outfitSpecialHints(preview);
+  /** 現在這身（含試穿中的配件）的套裝效果 */
+  const effects = tryOnEffects(outfit, basket.tryOn);
 
   /** 今天特價、還沒買的配件 */
   const onSale = statuses.filter((s) => s.base !== undefined);
@@ -135,23 +146,45 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
     const status = statuses.find((s) => s.item.id === id);
     if (!status) return;
     if (status.state === 'owned') {
-      setTrying(null);
-      const wearing = outfit[status.item.slot] === id;
-      dispatch(world, { type: 'wear', slot: status.item.slot, item: wearing ? null : id });
+      const slot = status.item.slot;
+      setTryOn((cur) => {
+        if (!(slot in cur)) return cur;
+        const next = { ...cur };
+        delete next[slot];
+        return next;
+      });
+      const wearing = outfit[slot] === id;
+      dispatch(world, { type: 'wear', slot, item: wearing ? null : id });
       if (!wearing) setHappy((n) => n + 1);
       return;
     }
-    setTrying((cur) => (cur === id ? null : id));
+    setTryOn((cur) => toggleTryOn(cur, status.item));
   };
 
-  const handleBuy = () => {
-    if (!tryingStatus || tryingStatus.state !== 'buyable') return;
-    const { id, slot } = tryingStatus.item;
-    dispatch(world, { type: 'buyItem', id });
-    dispatch(world, { type: 'wear', slot, item: id });
-    setTrying(null);
+  const handleBuyAll = () => {
+    if (basket.shop.length === 0 || basket.short > 0) return;
+    for (const s of basket.shop) {
+      dispatch(world, { type: 'buyItem', id: s.item.id });
+    }
+    for (const s of basket.shop) {
+      dispatch(world, { type: 'wear', slot: s.item.slot, item: s.item.id });
+    }
+    setTryOn({});
     setHappy((n) => n + 1);
   };
+
+  const nonShopHint =
+    basket.items.length > 0 && basket.shop.length === 0
+      ? basket.items.length === 1
+        ? nonShopCondition(basket.items[0]!)
+        : basket.items
+            .map((s) => {
+              const cond = nonShopCondition(s);
+              return cond ? `${s.item.name}：${cond}` : null;
+            })
+            .filter(Boolean)
+            .join('；')
+      : null;
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
   const locked = achievements.filter((a) => !a.unlocked);
@@ -211,35 +244,29 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
       <section className="cb-section cb-wd-dress">
         <h2>換裝</h2>
         {/* 試衣間：捲到下面挑配件時黏在上方，一直看得到小貓穿起來的樣子 */}
-        <div ref={roomRef} className={`cb-wd-room ${stuck ? 'is-stuck' : ''}`.trim()}>
+        <div ref={roomRef} className={['cb-wd-room', stuck ? 'is-stuck' : '', basket.items.length > 0 ? 'has-try' : ''].filter(Boolean).join(' ')}>
           <DressingCat outfit={preview} cheer={happy} />
           <div className="cb-wd-room-info" aria-live="polite">
-            {tryingStatus ? (
+            {basket.items.length > 0 ? (
               <>
-                <div className="cb-wd-try-name">
-                  試穿：<b>{tryingStatus.item.name}</b>
-                  {tryingStatus.item.sprint ? <Chip tone="orange">考前限定</Chip> : null}
-                  {tryingStatus.base !== undefined ? <Chip tone="pink">今日特價</Chip> : null}
-                </div>
-                {tryingStatus.state === 'buyable' ? null : tryingStatus.state === 'short' ? (
+                {basket.shop.length > 0 && basket.short > 0 ? (
                   <p className="cb-sub-strong cb-m0">
-                    還差 {tryingStatus.price !== undefined ? tryingStatus.price - fish.raw : 0} 條小魚乾，再刷幾題就買得起！
+                    還差 {basket.short} 條小魚乾，再刷幾題、或先脫掉幾件就買得起！
                   </p>
-                ) : tryingStatus.state === 'stamps' ? (
-                  <p className="cb-sub-strong cb-m0">再蓋 {tryingStatus.need} 個章就會送你</p>
-                ) : tryingStatus.state === 'achievement' && tryingStatus.achievement ? (
-                  <p className="cb-sub-strong cb-m0">
-                    解鎖成就「{achievementName(tryingStatus.achievement)}」就會送你
-                  </p>
+                ) : nonShopHint ? (
+                  <p className="cb-sub-strong cb-m0">{nonShopHint}</p>
                 ) : null}
                 <div className="cb-wd-room-actions">
-                  {tryingStatus.state === 'buyable' ? (
-                    <Button onClick={handleBuy}>
-                      <FishIcon /> {tryingStatus.price} 買下來
-                      {tryingStatus.base !== undefined ? <s className="cb-wd-was">{tryingStatus.base}</s> : null}
+                  {basket.shop.length > 0 && basket.short === 0 ? (
+                    <Button className="cb-wd-buy" onClick={handleBuyAll}>
+                      <span>{basket.shop.length === 1 ? '買下來' : '全部買下來'}</span>
+                      <span className="cb-wd-buy-price">
+                        <FishIcon size={16} /> {basket.total}
+                        {basket.base > basket.total ? <s className="cb-wd-was">{basket.base}</s> : null}
+                      </span>
                     </Button>
                   ) : null}
-                  <Button variant="ghost" onClick={() => setTrying(null)}>
+                  <Button variant="ghost" onClick={() => setTryOn({})}>
                     不試了
                   </Button>
                 </div>
@@ -251,7 +278,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                 <p className="cb-sub cb-m0">
                   {effects.active.length > 0
                     ? '這身有套裝效果，把小貓放出來玩就看得到：'
-                    : '點下面的配件，小貓先穿給你看；買過的點一下就換上。'}
+                    : '點下面的配件，小貓先穿給你看，可以同時試好幾個部位；買過的點一下就換上。'}
                 </p>
               </>
             )}
@@ -261,6 +288,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                   <li key={fx.id} className="cb-wd-fx-on">
                     <b>{fx.name}</b>
                     {fx.text}
+                    {fx.pending ? <span className="cb-wd-fx-pending">（買下來才有）</span> : null}
                   </li>
                 ))}
                 {effects.near.map((fx) => (
@@ -271,6 +299,35 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
               </ul>
             ) : null}
           </div>
+          {basket.items.length > 0 ? (
+            <div className="cb-wd-try-list" role="group" aria-label="試穿中的配件">
+              {basket.items.map((s) => (
+                <button
+                  key={s.item.id}
+                  type="button"
+                  className="cb-wd-try-pill cb-press"
+                  aria-label={`脫掉 ${s.item.name}`}
+                  title={s.item.name}
+                  onClick={() => setTryOn((cur) => toggleTryOn(cur, s.item))}
+                >
+                  <span className="cb-wd-try-icon">
+                    <ItemIcon id={s.item.id} size={20} />
+                  </span>
+                  {s.state === 'buyable' || s.state === 'short' ? (
+                    <span className="cb-wd-try-price">
+                      <FishIcon size={12} />
+                      {s.price}
+                    </span>
+                  ) : s.state === 'stamps' ? (
+                    <span className="cb-wd-try-meta">再 {s.need} 個章</span>
+                  ) : (
+                    <span className="cb-wd-try-meta">成就獎勵</span>
+                  )}
+                  <span className="cb-wd-try-x" aria-hidden="true">×</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
         <div className="cb-wd-filters" role="group" aria-label="部位">
           <Chip tone="plain" active={filter === 'all'} onClick={() => setFilter('all')}>
@@ -285,7 +342,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
         <div className="cb-acc-grid cb-wd-grid">
           {visible.map((s) => {
             const wearing = outfit[s.item.slot] === s.item.id;
-            const isTrying = trying === s.item.id;
+            const isTrying = basket.tryOn[s.item.slot] === s.item.id;
             const owned = s.state === 'owned';
             const meta = owned
               ? wearing

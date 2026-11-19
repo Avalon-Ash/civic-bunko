@@ -97,6 +97,7 @@
 | W4-dino | 娃娃裝：小怪獸頭套（`dino-hood`，頭頂）＋小怪獸裝（`dino-suit`，身上）。原創造型，不照搬任何既有角色。連身裝要蓋住後腿，`BodyArt` 加 `trouser`（後腿的褲管）；蓋滿身體的布面要知道是不是正面坐，`BodyGeom` 加 `frontal` | 主代理（Fable） | 完成（2026-11-18） |
 | W5-sets | 娃娃裝再三套：小熊、青蛙、兔子（各有頭套＋連身裝），四套各一個嘴邊裝飾（噴火、蜂蜜棒、吹泡泡、叼紅蘿蔔）。畫法抽成共用：顏色只在 `KIGURUMI`，連身裝由 `onesieArt`、頭套由 `hoodArt` 產生；連身裝另給商店圖示（`ItemArt.icon`） | 主代理（Fable） | 完成（2026-11-18） |
 | W3-alive | 待機（呼吸、耳朵抖）、配件小動作（氣球、小雞、翅膀）、換裝轉圈 | 主代理 | 完成；答對連擊、點不同部位的反應留到下一輪 |
+| T1-tryon | 試衣間多部位試穿：每個部位試一件（`TryOn`，只在畫面、不進存檔）；試穿籤列在小貓下面，點了脫掉；合計價格一鍵全部買下，錢不夠說還差多少；套裝效果標「買下來才有」。判斷都在 `selectors/wardrobe.ts`（`toggleTryOn`、`tryOnBasket`、`tryOnEffects`），驗收 `src/selectors/tryOn.test.ts` | agy Neon medium（派工單 `docs/dispatch/T1-tryon.md`）；試穿籤與買的按鈕的版面主代理重排 | 完成（2026-11-20） |
 
 ## 5. 驗收
 - `npm run lint`、`npm run validate`、`npm test`、`npm run build` 全過；主程式 JS 大小照 §5 的上限。

@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-20-multi-try',
+    date: '2026-11-20',
+    title: '試衣間可以一次試穿好幾件',
+    items: [
+      '在小貓衣櫥可以同時試穿頭頂、身上、嘴邊等不同部位，直接看整套搭起來的樣子與套裝效果',
+      '試衣間會列出正在試穿的每一件和合計小魚乾，點一下就能全部買下來並立刻換上；點單一件的標籤可以單獨脫掉',
+      '小魚乾還不夠時會顯示總共還差多少，先脫掉幾件或再刷幾題就能買',
+    ],
+  },
+  {
     id: '2026-11-19-suit-hints',
     date: '2026-11-19',
     title: '試衣間會告訴你這身有什麼套裝效果',
