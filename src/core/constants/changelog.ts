@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-19-suit-hints',
+    date: '2026-11-19',
+    title: '試衣間會告訴你這身有什麼套裝效果',
+    items: [
+      '小貓衣櫥的試衣間現在會列出這身穿著的套裝效果（例如「一蹦一蹦」「吹泡泡」）和它會做什麼',
+      '只差一件就湊齊時，會提示「再穿上哪一件就有什麼效果」；試穿還沒買的配件時也看得到',
+    ],
+  },
+  {
     id: '2026-11-19-weather-place',
     date: '2026-11-19',
     title: '天氣天空可以自己選縣市',

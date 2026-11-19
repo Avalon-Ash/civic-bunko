@@ -668,3 +668,34 @@
     transform: translateY(3.2px) scale(1);
   }
 }
+
+/* 試衣間：這身穿著的套裝效果（已經有的、只差一件的） */
+.cb-wd-fx {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.cb-wd-fx b {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--butter);
+  font-weight: 800;
+}
+
+.cb-wd-fx-near {
+  color: var(--ink-soft);
+}
+
+.cb-wd-fx-near b {
+  margin: 0 0 0 6px;
+  background: transparent;
+  border-style: dashed;
+}

@@ -9,7 +9,7 @@ import { createWorld, type World } from '../core/world';
 import { createTestWorld } from '../testing/fixture';
 import { attachPersistence, exportProgress, importProgress } from './persistence';
 import { mergeWardrobe, toSyncWardrobe, type SyncWardrobe } from './syncMerge';
-import { applySyncedWardrobe, fishBalance, outfitSpecials, parseScorchSpot, scorchSpotId, scorchedSpots } from './wardrobe';
+import { applySyncedWardrobe, fishBalance, outfitSpecialHints, outfitSpecials, parseScorchSpot, scorchSpotId, scorchedSpots } from './wardrobe';
 
 function richWorld(): World {
   const world = createTestWorld();
@@ -54,6 +54,29 @@ describe('outfit specials', () => {
     assert.deepEqual([...outfitSpecials(set('pajama-hood', 'bear-suit', 'pacifier'))], []);
     // 表裡的每一列至少要有一個部位（空的條件會讓每隻貓都有那個動作）
     for (const special of OUTFIT_SPECIALS) assert.ok(Object.keys(special.wear).length > 0, special.id);
+  });
+});
+
+describe('outfit special hints for the wardrobe', () => {
+  it('lists what is active, and what is one piece away (naming the missing piece)', () => {
+    assert.deepEqual(outfitSpecialHints({}), { active: [], near: [] });
+    const fly = outfitSpecialHints({ back: 'cape' });
+    assert.deepEqual(fly.active.map((fx) => fx.id), ['fly']);
+    assert.deepEqual(fly.near, []);
+    const twoThirds = outfitSpecialHints({ 'head-top': 'dino-hood', body: 'dino-suit' });
+    assert.deepEqual(twoThirds.active, []);
+    assert.deepEqual(twoThirds.near.map((fx) => [fx.id, fx.missing]), [['scorch', ['噴火']]]);
+    const frog = outfitSpecialHints({ 'head-top': 'frog-hood', body: 'frog-suit' });
+    assert.deepEqual(frog.active.map((fx) => fx.id), ['hop']);
+    assert.deepEqual(frog.near.map((fx) => [fx.id, fx.missing]), [['bubbles', ['吹泡泡']]]);
+    // 只戴青蛙頭套：差連身裝就會一蹦一蹦（青蛙裝或兔子裝都行）；差兩件的不提
+    const hood = outfitSpecialHints({ 'head-top': 'frog-hood' });
+    assert.deepEqual(hood.near.map((fx) => [fx.id, fx.missing]), [['hop', ['青蛙裝', '兔子裝']]]);
+    // 單一件就成立的（披風）沒穿時不算「只差一件」
+    assert.ok(!outfitSpecialHints({ 'head-top': 'crown' }).near.some((fx) => fx.id === 'fly'));
+    for (const fx of outfitSpecialHints({ back: 'cape', 'head-top': 'dino-hood', body: 'dino-suit', 'face-low': 'fire-breath' }).active) {
+      assert.ok(fx.name.length > 0 && fx.text.length > 0, fx.id);
+    }
   });
 });
 

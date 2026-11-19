@@ -399,6 +399,35 @@ export function outfitSpecials(outfit: Outfit): Set<OutfitSpecial> {
   return out;
 }
 
+/** 衣櫥要顯示的一個套裝效果 */
+export interface OutfitSpecialView {
+  id: OutfitSpecial;
+  name: string;
+  text: string;
+}
+/**
+ * 這身穿著的套裝效果，給衣櫥顯示：active＝已經有的；near＝只差一個部位就有的（其他部位至少穿對一件），
+ * missing＝那個部位穿哪幾件其中之一就行（配件名稱）。
+ */
+export function outfitSpecialHints(outfit: Outfit): {
+  active: OutfitSpecialView[];
+  near: Array<OutfitSpecialView & { missing: string[] }>;
+} {
+  const active: OutfitSpecialView[] = [];
+  const near: Array<OutfitSpecialView & { missing: string[] }> = [];
+  for (const { id, name, text, wear } of OUTFIT_SPECIALS) {
+    const slots = Object.entries(wear) as Array<[SlotId, readonly ItemId[]]>;
+    const lacking = slots.filter(([slot, items]) => !items.includes(outfit[slot] ?? ''));
+    if (lacking.length === 0) {
+      active.push({ id, name, text });
+    } else if (lacking.length === 1 && slots.length > 1) {
+      const items = lacking[0]?.[1] ?? [];
+      near.push({ id, name, text, missing: items.map((item) => ITEM_BY_ID.get(item)?.name ?? item) });
+    }
+  }
+  return { active, near };
+}
+
 /** 一處燒焦在存檔裡的 ID：卡片 ID＋位置 */
 export function scorchSpotId(card: string, place: ScorchPlace): string {
   return `${card}${SCORCH.sep}${place}`;

@@ -10,6 +10,7 @@ import {
   dailyTierStatus,
   fishBalance,
   itemStatuses,
+  outfitSpecialHints,
   todayQuest,
 } from '../../selectors/wardrobe';
 import { Button } from '../kit/Button';
@@ -118,6 +119,9 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
     if (!tryingStatus) return outfit;
     return { ...outfit, [tryingStatus.item.slot]: tryingStatus.item.id };
   }, [outfit, tryingStatus]);
+
+  /** 現在這身（含試穿中的那件）的套裝效果 */
+  const effects = outfitSpecialHints(preview);
 
   /** 今天特價、還沒買的配件 */
   const onSale = statuses.filter((s) => s.base !== undefined);
@@ -243,9 +247,29 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
             ) : (
               <>
                 <strong>試衣間</strong>
-                <p className="cb-sub cb-m0">點下面的配件，小貓先穿給你看；買過的點一下就換上。</p>
+                {/* 有套裝效果要顯示時，說明換成一句短的（試衣間黏在上方，不能太高） */}
+                <p className="cb-sub cb-m0">
+                  {effects.active.length > 0
+                    ? '這身有套裝效果，把小貓放出來玩就看得到：'
+                    : '點下面的配件，小貓先穿給你看；買過的點一下就換上。'}
+                </p>
               </>
             )}
+            {effects.active.length > 0 || effects.near.length > 0 ? (
+              <ul className="cb-wd-fx" aria-label="套裝效果">
+                {effects.active.map((fx) => (
+                  <li key={fx.id} className="cb-wd-fx-on">
+                    <b>{fx.name}</b>
+                    {fx.text}
+                  </li>
+                ))}
+                {effects.near.map((fx) => (
+                  <li key={fx.id} className="cb-wd-fx-near">
+                    再穿上「{fx.missing.join('」或「')}」就有<b>{fx.name}</b>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </div>
         <div className="cb-wd-filters" role="group" aria-label="部位">

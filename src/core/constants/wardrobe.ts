@@ -25,16 +25,52 @@ export const SLOTS: ReadonlyArray<{ id: SlotId; name: string; layer: boolean; be
 export const SLOTS_BY_DEPTH = [...SLOTS].sort((a, b) => a.z - b.z);
 
 /**
- * 特殊動作對照表：每個部位都穿著列出的其中一件，亂跑的小貓就多這個動作。只在這裡定義，畫面和小貓的行為都讀它。
+ * 特殊動作（套裝效果）對照表：每個部位都穿著列出的其中一件，亂跑的小貓就多這個動作。只在這裡定義，畫面和小貓的行為都讀它。
+ * name、text＝衣櫥試衣間顯示的名稱與說明（都是放出來玩時才看得到的事）。
  */
-export const OUTFIT_SPECIALS: ReadonlyArray<{ id: OutfitSpecial; wear: Partial<Record<SlotId, readonly ItemId[]>> }> = [
-  { id: 'fly', wear: { back: ['cape'] } },
-  { id: 'scorch', wear: { 'head-top': ['dino-hood'], body: ['dino-suit'], 'face-low': ['fire-breath'] } },
-  { id: 'hop', wear: { 'head-top': ['frog-hood', 'bunny-hood'], body: ['frog-suit', 'bunny-suit'] } },
-  { id: 'bubbles', wear: { 'head-top': ['frog-hood'], body: ['frog-suit'], 'face-low': ['frog-bubble'] } },
-  { id: 'binky', wear: { 'head-top': ['bunny-hood'], body: ['bunny-suit'], 'face-low': ['carrot'] } },
-  { id: 'honey', wear: { 'head-top': ['bear-hood'], body: ['bear-suit'], 'face-low': ['honey-dipper'] } },
-  { id: 'dream', wear: { 'head-top': ['pajama-hood'], body: ['pajama-suit'], 'face-low': ['pacifier'] } },
+export const OUTFIT_SPECIALS: ReadonlyArray<{
+  id: OutfitSpecial;
+  name: string;
+  text: string;
+  wear: Partial<Record<SlotId, readonly ItemId[]>>;
+}> = [
+  { id: 'fly', name: '披風飛行', text: '有時會像超人一樣飛過畫面', wear: { back: ['cape'] } },
+  {
+    id: 'scorch',
+    name: '噴火',
+    text: '偶爾對著卡片噴火，把它燒焦',
+    wear: { 'head-top': ['dino-hood'], body: ['dino-suit'], 'face-low': ['fire-breath'] },
+  },
+  {
+    id: 'hop',
+    name: '一蹦一蹦',
+    text: '走路改成用跳的',
+    wear: { 'head-top': ['frog-hood', 'bunny-hood'], body: ['frog-suit', 'bunny-suit'] },
+  },
+  {
+    id: 'bubbles',
+    name: '吹泡泡',
+    text: '坐著時吹出泡泡，可以戳破',
+    wear: { 'head-top': ['frog-hood'], body: ['frog-suit'], 'face-low': ['frog-bubble'] },
+  },
+  {
+    id: 'binky',
+    name: '開心跳',
+    text: '點牠會高高跳起來轉一圈',
+    wear: { 'head-top': ['bunny-hood'], body: ['bunny-suit'], 'face-low': ['carrot'] },
+  },
+  {
+    id: 'honey',
+    name: '蜂蜜腳印',
+    text: '走過的地方留下蜂蜜腳印',
+    wear: { 'head-top': ['bear-hood'], body: ['bear-suit'], 'face-low': ['honey-dipper'] },
+  },
+  {
+    id: 'dream',
+    name: '愛睡覺',
+    text: '特別愛睡，睡著還會說夢話',
+    wear: { 'head-top': ['pajama-hood'], body: ['pajama-suit'], 'face-low': ['pacifier'] },
+  },
 ];
 /**
  * 燒焦：repairFish＝修好一處要幾條小魚乾（公布後不能調高）；max＝同時最多幾處燒焦（滿了小貓就不再噴）；
