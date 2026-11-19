@@ -58,15 +58,20 @@
 
 ## 3. 分工邊界
 
+2026-11-20 依全域憲法「跨模型派工」（2026-11-19 版）更新；模型檔位與換池順序只定義在全域 `agy-call`、`codex-call`，本表只寫本專案怎麼分。
+
 | 工作 | 執行者 |
 | :-- | :-- |
-| 合約、規格、資料 schema、驗收腳本、審查、Git | 主代理（Claude） |
-| 視覺方向、互動手感、核心元件原型、畫面判讀 | 主代理（Claude），不預設外派 |
-| 爬蟲與 PDF 解析實作、資料驗證與測試、機械性元件、內容加工批次 | agy `gemini-4-hydrogen-high`（小而具體的包） |
-| 讀檔摘要、逐檔清冊 | agy `gemini-3.8-flash-medium` |
-| 整包設計＋實作（PWA、複習排程引擎）、看截圖審查 UI、法律解析抽樣第二意見 | Codex Astra（額度恢復後；見底時主代理接手） |
-| 有界的大範圍閱讀（整科考點頻率分析） | agy Argon，timeout 5400 秒（額度恢復後） |
+| 合約、規格、資料 schema、驗收腳本（紅色測試先寫好）、審查、Git | 主代理（Claude） |
+| 定調類：視覺方向、互動手感、核心元件原型、畫面判讀、前後相依的一條鏈 | 主代理（Claude），不預設外派；Fable 有額度時 Fable 自己做（憲法「Fable 預算」） |
+| 規格明確、可拆、有可跑驗收的實作包 | agy `gemini-4-neon-medium`；難或跨檔的用 `gemini-4-neon-high` |
+| 大範圍、多檔、要讀很多再整理的包 | agy `gemini-pro-orchestrator-neon`（不帶 `--effort`） |
+| 雜事：讀檔摘要、機械性改動、補測試、資料驗證、內容加工批次、小而具體的包 | agy `gemini-4-hydrogen-high`（純讀檔摘要可用 `gemini-3.8-flash-medium`） |
+| 整包設計＋實作、邏輯根因第二意見 | Codex `GPT-6.1 Sol` xhigh（見底時主代理接手） |
+| 看截圖審查 UI、美術判讀、法律解析抽樣第二意見 | Codex `GPT-6 Astra`（或主代理自己看） |
+| 有界的只讀長文件分析（整科考點頻率分析） | agy `gemini-4-argon-medium`（`--mode plan`，一定設 timeout） |
 
+- Gemini Models 池偏低或見底時，實作包改派 Sonnet 子代理，再不行主代理自己做；Codex、Gemini 都見底就全部由主代理做（換池順序在 `agy-call`）。
 - 換池依 `~/.claude/QUOTA.md` 與全域 `agy-call`；外派池見底就由 Claude 接手，不停工。
 - 同時最多兩個執行代理，各自在獨立 clone（`C:\Git\_wt_civic_<topic>`），write set 不重疊。
 - 同一包兩次不及格：先查是不是規格或架構造成的，是就改規格；不是才換模型，並寫出新假設。
