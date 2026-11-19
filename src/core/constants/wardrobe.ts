@@ -1,7 +1,7 @@
 // SSOT：小八喵衣櫥（部位、配件、小魚乾、成就、每日小任務）。開案書 docs/plans/cat-wardrobe.md。
 // ID 上線後不改（使用者資料的鍵）。價格不調高、獎勵不調低：餘額是從這些數字算出來的，一改她的餘額就跟著變；
 // 往「她拿到更多」的方向改要使用者同意（2026-11-18 同意過一次：每題、每日關卡、每日任務、成就都加碼）。
-import type { AccessoryId, Achievement, ItemId, OutfitSpecial, Quest, SlotId, WardrobeItem } from '../types';
+import type { AccessoryId, Achievement, ItemId, OutfitSpecial, Quest, ScorchPlace, SlotId, WardrobeItem } from '../types';
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, MISSION_SIZE, STAMPS_PER_REWARD } from './daily';
 
 /** 部位，依疊圖順序由下往上；layer 為 false 的不是圖層（毛色）。behindCat＝畫在貓本體後面。 */
@@ -30,11 +30,23 @@ export const SLOTS_BY_DEPTH = [...SLOTS].sort((a, b) => a.z - b.z);
 export const OUTFIT_SPECIALS: ReadonlyArray<{ id: OutfitSpecial; wear: Partial<Record<SlotId, readonly ItemId[]>> }> = [
   { id: 'fly', wear: { back: ['cape'] } },
   { id: 'scorch', wear: { 'head-top': ['dino-hood'], body: ['dino-suit'], 'face-low': ['fire-breath'] } },
+  { id: 'hop', wear: { 'head-top': ['frog-hood', 'bunny-hood'], body: ['frog-suit', 'bunny-suit'] } },
+  { id: 'bubbles', wear: { 'head-top': ['frog-hood'], body: ['frog-suit'], 'face-low': ['frog-bubble'] } },
+  { id: 'binky', wear: { 'head-top': ['bunny-hood'], body: ['bunny-suit'], 'face-low': ['carrot'] } },
+  { id: 'honey', wear: { 'head-top': ['bear-hood'], body: ['bear-suit'], 'face-low': ['honey-dipper'] } },
+  { id: 'dream', wear: { 'head-top': ['pajama-hood'], body: ['pajama-suit'], 'face-low': ['pacifier'] } },
 ];
 /**
- * 燒焦：repairFish＝修好一處要幾條小魚乾（公布後不能調高）；max＝同時最多幾處燒焦（滿了小貓就不再噴）
+ * 燒焦：repairFish＝修好一處要幾條小魚乾（公布後不能調高）；max＝同時最多幾處燒焦（滿了小貓就不再噴）；
+ * places＝一張卡片上緣可以燒的位置（左、中、右）；sep＝存檔裡「卡片 ID＋位置」中間的分隔字元。
+ * 存檔裡一處燒焦記成「卡片 ID@位置」；2026-11-19 第一版只記卡片 ID（沒有 @），那種視為右邊。
  */
-export const SCORCH = { repairFish: 3, max: 3 } as const;
+export const SCORCH = { repairFish: 3, max: 5, places: ['l', 'm', 'r'], sep: '@' } as const satisfies {
+  repairFish: number;
+  max: number;
+  places: readonly ScorchPlace[];
+  sep: string;
+};
 
 /** 舊的 6 件集章配件各屬哪個部位 */
 const LEGACY_SLOT: Record<AccessoryId, SlotId> = {

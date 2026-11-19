@@ -26,6 +26,7 @@ import type {
   OutfitSpecial,
   Quest,
   QuestId,
+  ScorchPlace,
   SlotId,
   WardrobeItem,
   WardrobeState,
@@ -396,6 +397,18 @@ export function outfitSpecials(outfit: Outfit): Set<OutfitSpecial> {
     if (slots.every(([slot, items]) => items.includes(outfit[slot] ?? ''))) out.add(special.id);
   }
   return out;
+}
+
+/** 一處燒焦在存檔裡的 ID：卡片 ID＋位置 */
+export function scorchSpotId(card: string, place: ScorchPlace): string {
+  return `${card}${SCORCH.sep}${place}`;
+}
+
+/** 讀一處燒焦的 ID：哪張卡片、上緣的哪裡。沒寫位置（第一版的存檔）或位置不認得，視為右邊 */
+export function parseScorchSpot(spot: string): { card: string; place: ScorchPlace } {
+  const at = spot.lastIndexOf(SCORCH.sep);
+  const place = at > 0 ? SCORCH.places.find((p) => p === spot.slice(at + 1)) : undefined;
+  return place ? { card: spot.slice(0, at), place } : { card: spot, place: 'r' };
 }
 
 /** 現在燒焦的地方 */

@@ -320,6 +320,24 @@ export const PET_SCORCH = {
   mark: { w: 58, h: 40, inset: 10, rise: 20 },
 } as const;
 
+/**
+ * 各套娃娃裝的玩法（OUTFIT_SPECIALS）：
+ * hop＝一蹦一蹦地走：每 stride px 跳一下、跳多高（px）；
+ * bubble＝吹泡泡：坐著或站著時每 everyMs 冒一顆、飄 lifeMs 後消失、直徑範圍（px）、往上飄多高、左右飄多遠；
+ * paw＝蜂蜜腳印：每走 stride px 留一個、lifeMs 後淡掉、大小（px）；
+ * binky＝點牠時高高跳起來轉一圈：跳多高、多久；
+ * dream＝愛睡：睡覺的權重乘上 napWeight，睡著時每 everyMs 說一句夢話；
+ * maxBits＝畫面上最多同時幾個泡泡加腳印
+ */
+export const PET_PLAY = {
+  hop: { stride: 44, lift: 16 },
+  bubble: { everyMs: 1_400, lifeMs: 4_500, size: { min: 12, max: 24 }, rise: 170, drift: 30 },
+  paw: { stride: 24, lifeMs: 4_000, size: 14 },
+  binky: { lift: 92, ms: 760 },
+  dream: { napWeight: 4, everyMs: 7_000 },
+  maxBits: 14,
+} as const;
+
 // ── 其他分頁：從頭像鑽出來自由亂跑 ─────────────────────────
 /** 亂跑的小貓寬度（px；高度照 PET_VIEW 比例） */
 export const ROAM_WIDTH = 80;

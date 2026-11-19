@@ -124,7 +124,9 @@
 - **fly（披風）**：要走路或暴衝時有 `PET_FLY.chance` 的機率改用飛的（姿勢 `fly`）；實作是一個又長又高的跳（`jump` 的 `ms`、`lift`），從卡片上起飛時改成滑翔（`flyLift`）。
 - **scorch（小怪獸頭套＋小怪獸裝＋噴火）**：每隔 `PET_SCORCH.everyMs` 跳上一張有 `data-cat-burn` 的卡片，對著右上角噴火（`is-firing`），然後 `dispatch({ type: 'scorch', spot })`。焦痕由 `ScorchLayer` 畫在最上層、跟著卡片走（卡片有的是整張按鈕，裡面不能再放按鈕）。
 - **存檔**：`wardrobe.scorch`（現在燒焦的地方，只存在這台裝置，不同步）、`wardrobe.repairs`（修過幾次，同步取較大值）。都是選填，沒燒過的人存檔不變。花掉的小魚乾＝`repairs × SCORCH.repairFish`（3 條，公布後不能調高）。固定樣本 `save-v6-wardrobe-scorch.json`，測試 `src/systems/wardrobeScorch.test.ts`。
-- **燒焦的地方 ID**（`data-cat-burn` 的值，定了不改）：`today-countdown`、`today-quest`、`stamps-hero`、`cat-today`。刷題與模擬考的畫面沒有標記，所以不會燒。
+- **卡片 ID**（`data-cat-burn` 的值，定了不改）：`today-countdown`、`today-quest`、`stamps-hero`、`cat-today`。刷題與模擬考的畫面沒有標記，所以不會燒。
+- **一處燒焦的 ID**＝`卡片 ID@位置`，位置是卡片上緣的左、中、右（`SCORCH.places`：`l`、`m`、`r`；`scorchSpotId`、`parseScorchSpot`）。第一版（2026-11-19 當天）只記卡片 ID，讀到沒有 `@` 的視為右邊。同時最多 `SCORCH.max`（5）處。左邊那處小貓站在它右邊朝左噴，其餘站在左邊朝右噴。
+- **其他四套的玩法**（都在 `OUTFIT_SPECIALS`，數值在 `PET_PLAY`）：`hop`（青蛙或兔子的頭套＋連身裝：走路改成一蹦一蹦，`walk` 模式的 `hop`）、`bubbles`（青蛙全套＋吹泡泡：醒著待在原地時冒泡泡，可以戳破）、`binky`（兔子全套＋紅蘿蔔：點牠高高跳起來轉一圈）、`honey`（小熊全套＋蜂蜜棒：走過留下蜂蜜腳印）、`dream`（睡衣全套＋奶嘴：睡覺的權重乘 `napWeight`，睡著說夢話 `CAT_DREAM_LINES`）。泡泡和腳印是 `PetLayer` 裡的 `bits`，只在畫面上、不存檔。
 - 兩台裝置各自離線修，合併後次數取較大值，不加總（少扣，不會多扣）。舊版裝置不認得這兩欄：修過的小魚乾在那台不會扣，更新後一致。
 
 ### 7.2 身體與姿勢（RO 的對位點）

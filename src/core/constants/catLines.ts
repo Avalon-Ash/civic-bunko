@@ -260,3 +260,6 @@ export const CAT_HINT_LINES = {
 
 /** 噴火把卡片燒焦之後（PET_SCORCH）說什麼 */
 export const CAT_SCORCH_LINES = ['啊…不小心燒到了喵。', '對不起，火太大了…', '嗝——糟糕，焦了。', '我、我只是打了個嗝…'] as const;
+
+/** 穿睡衣睡著時說的夢話（PET_PLAY.dream） */
+export const CAT_DREAM_LINES = ['呼…小魚乾…好多…', '嗯…再五分鐘…', '喵…上榜了…', '呼嚕…罐罐…', '…不要搶我的被被…'] as const;

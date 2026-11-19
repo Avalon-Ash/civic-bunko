@@ -427,6 +427,81 @@
   cursor: default;
 }
 
+/* 兔子全套被點：跳起來的同時整隻轉一圈 */
+.cb-pet-actor.is-binky .cb-pet-actor-inner {
+  transform-origin: 50% 55%;
+  animation: cb-pet-binky 0.76s ease-in-out;
+}
+
+@keyframes cb-pet-binky {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 小貓身邊冒出來的小東西 */
+.cb-pet-bit {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* 泡泡：往上飄、左右晃、慢慢消失；可以戳破 */
+.cb-pet-bubble {
+  all: unset;
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1.5px solid var(--cat-line);
+  background: radial-gradient(circle at 32% 30%, var(--acc-cream) 0 18%, var(--acc-sky) 46%);
+  opacity: 0.8;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: cb-pet-bubble-rise 4.5s ease-out forwards;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@keyframes cb-pet-bubble-rise {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  12% {
+    transform: translate(6px, -14px) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-12px, -90px) scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(18px, -170px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+/* 蜂蜜腳印：留在地上慢慢淡掉 */
+.cb-pet-paw {
+  fill: var(--acc-gold);
+  stroke: var(--cat-line);
+  stroke-width: 1.2;
+  animation: cb-pet-paw-fade 4s ease-in forwards;
+}
+
+@keyframes cb-pet-paw-fade {
+  0%,
+  55% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 /* 坐在選項上提示時不擋點擊：她要點的就是牠腳下那個選項 */
 .cb-pet-actor.is-hinting {
   pointer-events: none;

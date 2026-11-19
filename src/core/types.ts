@@ -380,9 +380,14 @@ export type Celebration =
   | { kind: 'quest'; id: QuestId };
 /**
  * 穿著特定配件才有的特殊動作（對照表在 constants/wardrobe.ts 的 OUTFIT_SPECIALS）：
- * fly＝披著披風飛；scorch＝小怪獸全套加噴火，會把卡片燒焦
+ * fly＝披著披風飛；scorch＝小怪獸全套加噴火，會把卡片燒焦；
+ * hop＝青蛙或兔子的頭套加連身裝，走路改成一蹦一蹦；bubbles＝青蛙全套加吹泡泡，泡泡會飄出來、可以戳破；
+ * binky＝兔子全套加紅蘿蔔，點牠會高高跳起來轉一圈；honey＝小熊全套加蜂蜜棒，走過的地方留下蜂蜜腳印；
+ * dream＝睡衣全套加奶嘴，特別愛睡、睡著會說夢話
  */
-export type OutfitSpecial = 'fly' | 'scorch';
+export type OutfitSpecial = 'fly' | 'scorch' | 'hop' | 'bubbles' | 'binky' | 'honey' | 'dream';
+/** 焦痕在卡片上緣的哪裡：左、中、右 */
+export type ScorchPlace = 'l' | 'm' | 'r';
 /**
  * 衣櫥狀態（存在 Settings.wardrobe）。owned、achievements、quests 跨裝置同步並取聯集，saved 同步並取每件較大值，
  * repairs 同步並取較大值；outfit、scorch 只存在各裝置。

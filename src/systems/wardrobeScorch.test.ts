@@ -9,7 +9,7 @@ import { createWorld, type World } from '../core/world';
 import { createTestWorld } from '../testing/fixture';
 import { attachPersistence, exportProgress, importProgress } from './persistence';
 import { mergeWardrobe, toSyncWardrobe, type SyncWardrobe } from './syncMerge';
-import { applySyncedWardrobe, fishBalance, outfitSpecials, scorchedSpots } from './wardrobe';
+import { applySyncedWardrobe, fishBalance, outfitSpecials, parseScorchSpot, scorchSpotId, scorchedSpots } from './wardrobe';
 
 function richWorld(): World {
   const world = createTestWorld();
@@ -42,12 +42,32 @@ describe('outfit specials', () => {
     assert.deepEqual([...outfitSpecials({ ...dino, body: 'bear-suit' })], []);
     assert.deepEqual([...outfitSpecials({ 'head-top': 'dino-hood', body: 'dino-suit' })], []);
     assert.deepEqual([...outfitSpecials({ ...dino, back: 'cape' })].sort(), ['fly', 'scorch']);
+    // 其他四套：全套加自己的嘴邊裝飾才有；青蛙、兔子的頭套加連身裝就會一蹦一蹦（可以混搭）
+    const set = (hood: string, suit: string, mouth?: string) => ({ 'head-top': hood, body: suit, ...(mouth ? { 'face-low': mouth } : {}) });
+    assert.deepEqual([...outfitSpecials(set('frog-hood', 'frog-suit', 'frog-bubble'))].sort(), ['bubbles', 'hop']);
+    assert.deepEqual([...outfitSpecials(set('frog-hood', 'frog-suit'))], ['hop']);
+    assert.deepEqual([...outfitSpecials(set('bunny-hood', 'bunny-suit', 'carrot'))].sort(), ['binky', 'hop']);
+    assert.deepEqual([...outfitSpecials(set('frog-hood', 'bunny-suit', 'carrot'))], ['hop']);
+    assert.deepEqual([...outfitSpecials(set('bear-hood', 'bear-suit', 'honey-dipper'))], ['honey']);
+    assert.deepEqual([...outfitSpecials(set('bear-hood', 'bear-suit', 'carrot'))], []);
+    assert.deepEqual([...outfitSpecials(set('pajama-hood', 'pajama-suit', 'pacifier'))], ['dream']);
+    assert.deepEqual([...outfitSpecials(set('pajama-hood', 'bear-suit', 'pacifier'))], []);
     // 表裡的每一列至少要有一個部位（空的條件會讓每隻貓都有那個動作）
     for (const special of OUTFIT_SPECIALS) assert.ok(Object.keys(special.wear).length > 0, special.id);
   });
 });
 
 describe('scorch and repair', () => {
+  it('names a burnt spot by card and place; a spot saved without a place (first version) is the right side', () => {
+    assert.equal(scorchSpotId('today-quest', 'l'), 'today-quest@l');
+    for (const place of SCORCH.places) {
+      assert.deepEqual(parseScorchSpot(scorchSpotId('cat-today', place)), { card: 'cat-today', place });
+    }
+    assert.deepEqual(parseScorchSpot('today-quest'), { card: 'today-quest', place: 'r' });
+    assert.deepEqual(parseScorchSpot('future-spot-v9'), { card: 'future-spot-v9', place: 'r' });
+    assert.deepEqual(parseScorchSpot('card@somewhere-new'), { card: 'card@somewhere-new', place: 'r' });
+  });
+
   it('scorching is cosmetic and capped; repairing costs a few fish and is remembered', () => {
     const world = richWorld();
     const before = fishBalance(world).raw;
@@ -68,10 +88,9 @@ describe('scorch and repair', () => {
     assert.equal(world.settings.wardrobe?.repairs, 1);
     assert.equal(fishBalance(world).raw, before - SCORCH.repairFish);
 
-    dispatch(world, { type: 'repairScorch', spot: 'spot-0' });
-    dispatch(world, { type: 'repairScorch', spot: 'spot-1' });
-    assert.equal(world.settings.wardrobe?.repairs, 3);
-    assert.equal(fishBalance(world).raw, before - SCORCH.repairFish * 3);
+    for (const spot of scorchedSpots(world)) dispatch(world, { type: 'repairScorch', spot });
+    assert.equal(world.settings.wardrobe?.repairs, SCORCH.max);
+    assert.equal(fishBalance(world).raw, before - SCORCH.repairFish * SCORCH.max);
     // 全部修好：scorch 那一欄不留
     assert.equal('scorch' in (world.settings.wardrobe ?? {}), false);
   });

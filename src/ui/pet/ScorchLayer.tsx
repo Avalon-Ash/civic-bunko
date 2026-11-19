@@ -2,29 +2,37 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
 import { PET_SCORCH } from '../../core/constants/pet';
 import { SCORCH } from '../../core/constants/wardrobe';
+import type { ScorchPlace } from '../../core/types';
 import type { World } from '../../core/world';
-import { fishBalance, scorchedSpots } from '../../selectors/wardrobe';
+import { fishBalance, parseScorchSpot, scorchedSpots } from '../../selectors/wardrobe';
 import { useWorld } from '../useWorld';
 
-/** 卡片上的標記：值＝這個地方的 ID（存檔裡 wardrobe.scorch 記的就是它，定了不改） */
+/** 卡片上的標記：值＝這張卡片的 ID（存檔裡 wardrobe.scorch 記的是「卡片 ID@位置」，卡片 ID 定了不改） */
 export const CAT_BURN_ATTR = 'data-cat-burn';
 
 const MARK = PET_SCORCH.mark;
 /** 沒有捲動時多久重新對一次焦痕的位置（毫秒） */
 const SCORCH_RECHECK_MS = 800;
 
+/** 焦痕的左緣離卡片左緣多遠：左、中、右三個位置 */
+export function scorchOffset(width: number, place: ScorchPlace): number {
+  if (place === 'l') return MARK.inset;
+  if (place === 'm') return (width - MARK.w) / 2;
+  return width - MARK.w - MARK.inset;
+}
+
 /** 焦痕要畫在哪（畫面座標）；卡片不在畫面上、或被底部的分頁列蓋住時回 null */
-export function scorchPlace(el: Element): { x: number; y: number } | null {
+export function scorchPlace(el: Element, place: ScorchPlace): { x: number; y: number } | null {
   const r = el.getBoundingClientRect();
   if (r.width === 0) return null;
   const y = r.top - MARK.rise;
   const tabs = document.querySelector('.cb-tabs')?.getBoundingClientRect();
   if (tabs && tabs.top > window.innerHeight / 2 && y + MARK.h > tabs.top) return null;
-  return { x: r.right - MARK.w - MARK.inset, y };
+  return { x: r.left + scorchOffset(r.width, place), y };
 }
 
 /**
- * 燒焦的痕跡：小怪獸全套加噴火的小貓會把卡片的右上角燒焦（只是外觀，不擋卡片本身）。
+ * 燒焦的痕跡：小怪獸全套加噴火的小貓會把卡片上緣的左、中、右燒焦（只是外觀，不擋卡片本身）。
  * 點焦痕會出現「修好」的按鈕，花 SCORCH.repairFish 條小魚乾修好；不修也沒有任何影響。
  * 畫在最上層、跟著卡片的位置走（卡片有的是整張可以按的按鈕，裡面不能再放按鈕）。
  */
@@ -38,8 +46,9 @@ export function ScorchLayer({ world }: { world: World }) {
   /** 把每個焦痕放到它那張卡片的右上角（卡片不在這一頁就藏起來） */
   const place = () => {
     for (const [id, node] of nodes.current) {
-      const el = document.querySelector(`[${CAT_BURN_ATTR}="${id}"]`);
-      const at = el ? scorchPlace(el) : null;
+      const { card, place: where } = parseScorchSpot(id);
+      const el = document.querySelector(`[${CAT_BURN_ATTR}="${card}"]`);
+      const at = el ? scorchPlace(el, where) : null;
       node.style.display = at ? '' : 'none';
       if (at) node.style.transform = `translate3d(${Math.round(at.x)}px, ${Math.round(at.y)}px, 0)`;
     }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   CAT_HINT,
   PET_FLY,
+  PET_PLAY,
   PET_SCORCH,
   PET_VIEW_H,
   PET_VIEW_W,
@@ -28,19 +29,19 @@ import {
   ROAM_WIDTH,
 } from '../../core/constants/pet';
 import { dispatch } from '../../core/commands';
-import { CAT_HINT_LINES, CAT_SCORCH_LINES } from '../../core/constants/catLines';
+import { CAT_DREAM_LINES, CAT_HINT_LINES, CAT_SCORCH_LINES } from '../../core/constants/catLines';
 import { SCORCH } from '../../core/constants/wardrobe';
-import type { CatMood, PetPose, RoamBehavior } from '../../core/types';
+import type { CatMood, PetPose, RoamBehavior, ScorchPlace } from '../../core/types';
 import type { World } from '../../core/world';
 import { soundOn } from '../../selectors/sound';
-import { currentOutfit, outfitSpecials, scorchedSpots } from '../../selectors/wardrobe';
+import { currentOutfit, outfitSpecials, scorchSpotId, scorchedSpots } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
 import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
 import { between, clamp, flyLift, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
 import { getPet, petHome, subscribePet } from './petStore';
-import { CAT_BURN_ATTR } from './ScorchLayer';
+import { CAT_BURN_ATTR, scorchOffset } from './ScorchLayer';
 
 const W = ROAM_WIDTH;
 const H = (ROAM_WIDTH * PET_VIEW_H) / PET_VIEW_W;
@@ -53,7 +54,8 @@ const DEFAULT_ROUTE: Record<RoamBehavior, number> = { walk: 2, sit: 2, groom: 2,
 type Surface = { kind: 'floor' } | { kind: 'perch'; el: Element; dx: number; drop?: number };
 type Mode =
   | { kind: 'idle'; until: number }
-  | { kind: 'walk'; to: number; speed: number }
+  /** hop＝一蹦一蹦地走（青蛙、兔子） */
+  | { kind: 'walk'; to: number; speed: number; hop?: boolean }
   /** ms、lift 不給就是一般的跳（ROAM_JUMP_MS、ROAM_JUMP_LIFT）；披風飛行是一個又長又高的跳 */
   | {
       kind: 'jump';
@@ -84,8 +86,11 @@ interface Engine {
    * stage：wait＝跳過去、坐在選項上等她作答；cheer＝猜對了原地跳；done＝揭曉完，等著離開
    */
   hint: { right: boolean; auto: boolean; answered: boolean; stage: 'wait' | 'cheer' | 'done' } | null;
-  /** 噴火燒卡片進行中：spot＝要燒的地方；go＝正跳過去、blast＝正在噴 */
-  fire: { spot: string; stage: 'go' | 'blast' } | null;
+  /** 噴火燒卡片進行中：spot＝要燒的地方、facing＝朝哪邊噴；go＝正跳過去、blast＝正在噴 */
+  fire: { spot: string; facing: 'left' | 'right'; stage: 'go' | 'blast' } | null;
+  /** 上一次冒泡泡、說夢話的時間；上一個蜂蜜腳印留在哪（x） */
+  lastBitAt: number;
+  lastPawX: number;
   /** 下一次可以噴火的時間 */
   nextFire: number;
   /** 下一個動作開始前把表情改回預設（燒焦後心虛的臉） */
@@ -107,7 +112,18 @@ function newEngine(at: { x: number; y: number }, mode: Mode): Engine {
     fire: null,
     nextFire: performance.now() + between(PET_SCORCH.firstMs, Math.random),
     resetMood: false,
+    lastBitAt: 0,
+    lastPawX: at.x,
   };
+}
+
+/** 小貓身邊冒出來的小東西：泡泡（可以戳破）、蜂蜜腳印 */
+interface Bit {
+  id: number;
+  kind: 'bubble' | 'paw';
+  x: number;
+  y: number;
+  size: number;
 }
 
 function pickLine(lines: readonly string[]): string {
@@ -195,7 +211,16 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   const [out, setOut] = useState(getPet().out);
   const [pose, setPose] = useState<PetPose>('hop');
   const [facing, setFacing] = useState<'left' | 'right'>('right');
-  const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false, firing: false });
+  const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false, firing: false, binky: false });
+  const [bits, setBits] = useState<Bit[]>([]);
+  const bitSeq = useRef(0);
+  /** 冒一個泡泡或腳印，lifeMs 後自己消失；畫面上最多 PET_PLAY.maxBits 個（舊的先擠掉） */
+  const addBit = (kind: Bit['kind'], x: number, y: number, size: number, lifeMs: number) => {
+    bitSeq.current += 1;
+    const id = bitSeq.current;
+    setBits((prev) => [...prev.slice(-(PET_PLAY.maxBits - 1)), { id, kind, x, y, size }]);
+    window.setTimeout(() => setBits((prev) => prev.filter((bit) => bit.id !== id)), lifeMs);
+  };
   /** 提示揭曉時的表情（得意、心虛）；平常照姿勢預設 */
   const [mood, setMood] = useState<CatMood | undefined>(undefined);
   const layerRef = useRef<HTMLDivElement | null>(null);
@@ -337,38 +362,52 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       if (e.surface.kind === 'perch') {
         unavailable.add('zoom');
       }
-      const route = ROAM_ROUTES[tabRef.current] ?? DEFAULT_ROUTE;
+      const baseRoute = ROAM_ROUTES[tabRef.current] ?? DEFAULT_ROUTE;
+      // 睡衣全套：特別愛睡
+      const route = specials.current.has('dream') ? { ...baseRoute, nap: baseRoute.nap * PET_PLAY.dream.napWeight } : baseRoute;
       const calm = now - e.lastInput < ROAM_CALM_AFTER_INPUT_MS;
       const range = xRange();
       const layer = layerRef.current;
 
-      // 特殊動作：小怪獸全套加噴火——時間到了就跳上一張還沒燒焦的卡片，對著右上角噴
+      // 特殊動作：小怪獸全套加噴火——時間到了就跳上一張卡片，挑上緣還沒燒焦的一處（左、中、右）對著它噴
       if (!calm && specials.current.has('scorch') && now >= e.nextFire) {
         e.nextFire = now + PET_SCORCH.retryMs;
         const mark = PET_SCORCH.mark;
-        const targets =
-          burnt.current.length < SCORCH.max
-            ? perches.filter((el) => {
-                const id = el.getAttribute(CAT_BURN_ATTR);
-                const r = rectOf(el);
-                return (
-                  !!id &&
-                  !burnt.current.includes(id) &&
-                  r.width > W + mark.w + mark.inset + ROAM_EDGE * 2 &&
-                  !blockedAt(r.right - mark.inset - mark.w - W, r.top - H + 3, layer)
-                );
-              })
-            : [];
-        const el = targets[Math.floor(Math.random() * targets.length)];
-        const spot = el?.getAttribute(CAT_BURN_ATTR);
-        if (el && spot) {
-          const r = rectOf(el);
-          // 站在焦痕的左邊，面向右噴
-          const tx = r.right - mark.inset - mark.w - W + ROAM_EDGE;
-          e.fire = { spot, stage: 'go' };
+        /** 噴某一處時小貓站哪、朝哪：左邊那處站在它右邊朝左噴，中間和右邊站在它左邊朝右噴 */
+        const stance = (r: DOMRect, place: ScorchPlace) => {
+          const markX = r.left + scorchOffset(r.width, place);
+          return place === 'l'
+            ? { x: markX + mark.w - ROAM_EDGE, facing: 'left' as const }
+            : { x: markX - W + ROAM_EDGE, facing: 'right' as const };
+        };
+        const targets: Array<{ el: Element; spot: string; x: number; facing: 'left' | 'right' }> = [];
+        if (burnt.current.length < SCORCH.max) {
+          for (const el of perches) {
+            const card = el.getAttribute(CAT_BURN_ATTR);
+            const r = rectOf(el);
+            if (!card || r.width < (W + mark.w) * 2) continue;
+            for (const place of SCORCH.places) {
+              const spot = scorchSpotId(card, place);
+              // 第一版的存檔只記卡片 ID，那一處就是右邊
+              if (burnt.current.includes(spot) || (place === 'r' && burnt.current.includes(card))) continue;
+              const at = stance(r, place);
+              if (!blockedAt(at.x, r.top - H + 3, layer)) targets.push({ el, spot, ...at });
+            }
+          }
+        }
+        const target = targets[Math.floor(Math.random() * targets.length)];
+        if (target) {
+          const r = rectOf(target.el);
+          e.fire = { spot: target.spot, facing: target.facing, stage: 'go' };
           e.nextFire = now + between(PET_SCORCH.everyMs, Math.random);
-          e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: tx, y: r.top - H + 3 }, start: now, land: { kind: 'perch', el, dx: tx - r.left } };
-          show('hop', tx > e.x ? 'right' : 'left');
+          e.mode = {
+            kind: 'jump',
+            from: { x: e.x, y: e.y },
+            to: { x: target.x, y: r.top - H + 3 },
+            start: now,
+            land: { kind: 'perch', el: target.el, dx: target.x - r.left },
+          };
+          show('hop', target.x > e.x ? 'right' : 'left');
           return;
         }
       }
@@ -409,8 +448,10 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
               : bounds.min
             : pickWalkTarget(e.x, bounds.min, bounds.max, ROAM_MIN_TRIP, Math.random, (x) => blockedAt(x, e.y, layer));
         if (to !== null) {
-          e.mode = { kind: 'walk', to, speed: b === 'zoom' ? ROAM_RUN_SPEED : ROAM_WALK_SPEED };
-          show(b === 'zoom' ? 'run' : 'walk', to > e.x ? 'right' : 'left');
+          // 青蛙、兔子：不用走的，一蹦一蹦
+          const hop = specials.current.has('hop');
+          e.mode = { kind: 'walk', to, speed: b === 'zoom' ? ROAM_RUN_SPEED : ROAM_WALK_SPEED, ...(hop ? { hop } : {}) };
+          show(hop ? 'hop' : b === 'zoom' ? 'run' : 'walk', to > e.x ? 'right' : 'left');
           return;
         }
       }
@@ -444,10 +485,10 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       }
       const fire = e.fire;
       if (fire?.stage === 'go') {
-        // 落在卡片上了：面向右，對著角落噴一大口
+        // 落在卡片上了：面向那一處，噴一大口
         fire.stage = 'blast';
         e.mode = { kind: 'idle', until: now + PET_SCORCH.blastMs };
-        show('stand', 'right');
+        show('stand', fire.facing);
         setFlags((f) => ({ ...f, firing: true }));
         return;
       }
@@ -597,7 +638,13 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             e.mode = { kind: 'fall', vy: 0 };
             show('fall');
           } else if (e.mode.kind === 'walk') {
-            e.y = y;
+            // 一蹦一蹦：每走 stride 跳一下
+            e.y = m.hop ? y - Math.abs(Math.sin((e.x / PET_PLAY.hop.stride) * Math.PI)) * PET_PLAY.hop.lift : y;
+            // 小熊全套：走過的地方留下蜂蜜腳印
+            if (specials.current.has('honey') && Math.abs(e.x - e.lastPawX) >= PET_PLAY.paw.stride) {
+              e.lastPawX = e.x;
+              addBit('paw', e.x + W / 2 - PET_PLAY.paw.size / 2, y + H - PET_PLAY.paw.size, PET_PLAY.paw.size, PET_PLAY.paw.lifeMs);
+            }
           }
         } else if (m.kind === 'goHome') {
           const h = homeRect();
@@ -629,6 +676,19 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           } else {
             e.y = y;
             if (e.surface.kind === 'perch') e.x = rectOf(e.surface.el).left + e.surface.dx;
+            const asleep = shown.current.pose === 'loaf';
+            // 青蛙全套：醒著待在原地時吹泡泡（從嘴邊冒出來往上飄）
+            if (specials.current.has('bubbles') && !asleep && !e.hint && !e.fire && now - e.lastBitAt > PET_PLAY.bubble.everyMs) {
+              e.lastBitAt = now;
+              const size = between(PET_PLAY.bubble.size, Math.random);
+              const side = shown.current.facing === 'right' ? 0.66 : 0.34;
+              addBit('bubble', e.x + W * side - size / 2, e.y + H * 0.5 - size / 2, size, PET_PLAY.bubble.lifeMs);
+            }
+            // 睡衣全套：睡著時說夢話
+            if (specials.current.has('dream') && asleep && now - e.lastBitAt > PET_PLAY.dream.everyMs) {
+              e.lastBitAt = now;
+              say(pickLine(CAT_DREAM_LINES));
+            }
             if (now >= m.until) {
               proceed(e, now);
             } else if (now - e.lastBlockCheck > ROAM_BLOCK_CHECK_MS) {
@@ -720,8 +780,21 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       if (soundOn(world)) playSound('meow', true);
       const line = voice({ mood: 'idle', place: 'roam' });
       if (line) say(line.text);
-      e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: e.y }, start: performance.now(), land: e.surface };
+      // 兔子全套：高高跳起來轉一圈
+      const binky = specials.current.has('binky');
+      e.mode = {
+        kind: 'jump',
+        from: { x: e.x, y: e.y },
+        to: { x: e.x, y: e.y },
+        start: performance.now(),
+        land: e.surface,
+        ...(binky ? { ms: PET_PLAY.binky.ms, lift: PET_PLAY.binky.lift } : {}),
+      };
       show('hop');
+      if (binky) {
+        setFlags((f) => ({ ...f, binky: true }));
+        window.setTimeout(() => setFlags((f) => ({ ...f, binky: false })), PET_PLAY.binky.ms);
+      }
       return;
     }
     setHomeTarget(false);
@@ -761,12 +834,41 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     flags.emerging ? 'is-emerging' : '',
     flags.hinting ? 'is-hinting' : '',
     flags.firing ? 'is-firing' : '',
+    flags.binky ? 'is-binky' : '',
   ]
     .filter(Boolean)
     .join(' ');
 
   return (
     <div ref={layerRef} className="cb-pet-layer">
+      {bits.map((bit) =>
+        bit.kind === 'bubble' ? (
+          <button
+            key={bit.id}
+            type="button"
+            className="cb-pet-bit cb-pet-bubble"
+            style={{ left: bit.x, top: bit.y, width: bit.size, height: bit.size }}
+            aria-label="戳破泡泡"
+            tabIndex={-1}
+            onPointerDown={() => setBits((prev) => prev.filter((other) => other.id !== bit.id))}
+          />
+        ) : (
+          <svg
+            key={bit.id}
+            className="cb-pet-bit cb-pet-paw"
+            style={{ left: bit.x, top: bit.y }}
+            width={bit.size}
+            height={bit.size}
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <ellipse cx="12" cy="15.5" rx="5" ry="4" />
+            <circle cx="6.5" cy="10" r="2.1" />
+            <circle cx="12" cy="7.5" r="2.2" />
+            <circle cx="17.5" cy="10" r="2.1" />
+          </svg>
+        ),
+      )}
       <div
         ref={actorRef}
         className={cls}
@@ -782,7 +884,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         onKeyDown={onKeyDown}
       >
         {bubble}
-        <div className="cb-pet-actor-inner">
+        <div className="cb-pet-actor-inner" style={flags.binky ? { animationDuration: `${PET_PLAY.binky.ms}ms` } : undefined}>
           <CatBody pose={pose} outfit={outfit} facing={facing} width={W} pivot {...(mood ? { mood } : {})} />
         </div>
       </div>
