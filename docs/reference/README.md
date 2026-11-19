@@ -64,3 +64,4 @@
 
 - `src/ui/sounds/meow-93.mp3`、`meow-91.mp3`、`meow-86.mp3`：Mixkit「Sweet kitty meow」(93)、「Cartoon little cat meow」(91)、「Little cat attention meow」(86)，網址 `https://assets.mixkit.co/active_storage/sfx/<編號>/<編號>-preview.mp3`，下載日 2026-11-18（使用者同意直接抓取套用）。授權：Mixkit Sound Effects Free License（https://mixkit.co/license/#sfxFree）——可商用、不用標示；只能放在比它更大的作品裡使用，不得單獨再散布音檔或宣稱是自己的。音量與裁切數字在 `src/core/constants/sound.ts`。
 - 其他音效（按鈕、答對、答錯、獎勵）是 Web Audio 即時合成，沒有音檔。
+- 天氣天空的資料：Open-Meteo Forecast API（`https://api.open-meteo.com/v1/forecast`，查 `current=weather_code,is_day`），2026-11-19 從瀏覽器實測免金鑰、可跨來源。授權：資料 CC BY 4.0、非商業使用免費（https://open-meteo.com/en/terms），畫面上在今日頁的開關旁標示「天氣資料：Open-Meteo」。送出去的只有四捨五入到小數 1 位的經緯度。

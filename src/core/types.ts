@@ -636,6 +636,15 @@ export interface PetPoseSpec {
 /** 自由亂跑時的一個動作；每個分頁的權重在 constants/pet.ts 的 ROAM_ROUTES */
 export type RoamBehavior = 'walk' | 'sit' | 'groom' | 'nap' | 'perch' | 'zoom';
 
+// ── 天氣天空（規則在 constants/weather.ts）────────────────────
+/** 天空畫哪一種 */
+export type WeatherKind = 'clear' | 'cloudy' | 'rain';
+export interface Weather {
+  kind: WeatherKind;
+  /** 現在是白天（晴天畫太陽）還是晚上（畫月亮） */
+  day: boolean;
+}
+
 // ── 設定 ────────────────────────────────────────────────
 export type ThemeChoice = 'system' | 'light' | 'dark';
 export interface Settings {
@@ -658,6 +667,8 @@ export interface Settings {
   wardrobe?: WardrobeState;
   /** 音效（按鈕、答題、小貓叫）；沒設定視為開啟。各裝置自己的設定，不同步 */
   sound?: boolean;
+  /** 天氣天空（照所在地的天氣畫頁面上方的天空）；沒設定視為關閉——要她自己打開，因為會用到定位。各裝置自己的設定，不同步 */
+  weather?: boolean;
   /** 看過的最新一則更新紀錄 ID；各裝置自己的設定，不同步 */
   changelogSeen?: string;
   /** 使用者幫小貓取的名字（規則在 constants/cat.ts）；沒有這欄＝沒取名。和 catNameAt 一起組成 CatProfile 跨裝置同步 */
@@ -739,6 +750,8 @@ export type UICommand =
   /** 畫面放完慶祝後清掉 */
   | { type: 'dismissCelebrations' }
   | { type: 'setSound'; on: boolean }
+  /** 開關天氣天空 */
+  | { type: 'setWeather'; on: boolean }
   /** 更新紀錄看完了（記下最新一則的 ID） */
   | { type: 'markChangelogSeen'; id: string }
   /** 幫小貓取名；空字串＝改回沒取名 */

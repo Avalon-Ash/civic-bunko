@@ -15,6 +15,9 @@ import { todayProgress, weekStamps } from '../../selectors/daily';
 import { currentOutfit, fishBalance, todayQuest } from '../../selectors/wardrobe';
 import { FishIcon } from './WardrobeScreen';
 import { soundOn } from '../../selectors/sound';
+import { weatherOn } from '../../selectors/weather';
+import { WEATHER_LABEL } from '../../core/constants/weather';
+import type { WeatherView } from '../useWeather';
 import { Switch } from '../kit/Switch';
 import { CatHome } from '../pet/CatHome';
 import { getSyncState } from '../../selectors/sync';
@@ -38,6 +41,15 @@ export interface StampCelebration {
   unlockedName: string | null;
 }
 
+/** 天氣天空開關底下那行說明：關著時講它會做什麼（要定位），開著時講現在的結果 */
+function weatherNote(on: boolean, view: WeatherView | undefined): string {
+  if (!on) return '頁面上方照外面的天氣畫晴天、多雲或下雨；打開時會問你要不要給定位，只送出大概的位置';
+  if (view?.status === 'ok' && view.weather) return `現在外面：${WEATHER_LABEL[view.weather.kind]}（天氣資料：Open-Meteo）`;
+  if (view?.status === 'denied') return '沒有拿到定位，所以不知道外面的天氣；要用的話到瀏覽器設定允許定位';
+  if (view?.status === 'failed') return '現在問不到天氣（可能沒有網路），晚點會再試';
+  return '正在問外面的天氣…';
+}
+
 export interface TodayScreenProps {
   world: World;
   onStartQuiz: () => void;
@@ -50,6 +62,8 @@ export interface TodayScreenProps {
   papersLoading?: boolean;
   loadError?: boolean;
   showInstallHint?: boolean;
+  /** 天氣天空現在的狀態（問到了沒、是什麼天氣） */
+  weather?: WeatherView;
   onOpenInstallHint?: () => void;
   celebration?: StampCelebration | null;
   onCelebrationDone?: () => void;
@@ -72,6 +86,7 @@ export function TodayScreen({
   papersLoading = false,
   loadError = false,
   showInstallHint = false,
+  weather,
   onOpenInstallHint,
   celebration = null,
   onCelebrationDone,
@@ -426,6 +441,18 @@ export function TodayScreen({
               checked={soundOn(world)}
               onChange={(on) => dispatch(world, { type: 'setSound', on })}
               ariaLabel="音效"
+            />
+          </Card>
+
+          <Card className="cb-row cb-switch-card">
+            <div className="cb-grow">
+              <strong className="cb-block">天氣天空</strong>
+              <span className="cb-sub">{weatherNote(weatherOn(world), weather)}</span>
+            </div>
+            <Switch
+              checked={weatherOn(world)}
+              onChange={(on) => dispatch(world, { type: 'setWeather', on })}
+              ariaLabel="天氣天空"
             />
           </Card>
 

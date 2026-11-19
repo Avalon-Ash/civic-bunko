@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-19-weather-sky',
+    date: '2026-11-19',
+    title: '天氣天空',
+    items: [
+      '今日頁最下面多了「天氣天空」開關：打開後，頁面上方會照外面的天氣畫晴天（白天太陽、晚上月亮星星）、多雲或下雨',
+      '打開時手機會問要不要給定位；App 只把大概的位置（約 10 公里的範圍）送去問天氣，不會存下來',
+      '沒給定位或沒有網路時就只是不畫天氣，其他功能照常；刷題和模擬考的畫面不畫',
+    ],
+  },
+  {
     id: '2026-11-19-cat-specials',
     date: '2026-11-19',
     title: '特殊動作：披風會飛、小怪獸會噴火',

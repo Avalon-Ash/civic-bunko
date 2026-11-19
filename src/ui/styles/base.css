@@ -279,3 +279,112 @@ h2 {
   min-width: 0;
   padding: 8px 12px;
 }
+
+
+/* ── 天氣天空（頁面最上面那一段的背景，畫在內容後面）──────── */
+.cb-shell {
+  isolation: isolate;
+}
+
+.cb-sky {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 230px;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 55%, transparent 100%);
+}
+
+.cb-sky-sun {
+  position: absolute;
+  right: -34px;
+  top: -40px;
+  opacity: 0.75;
+}
+
+.cb-sky-rays {
+  transform-origin: 0 0;
+  animation: cb-sky-spin 40s linear infinite;
+}
+
+@keyframes cb-sky-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cb-sky-moon {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  opacity: 0.8;
+}
+
+.cb-sky-star {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--acc-straw);
+  animation: cb-sky-twinkle 3.2s ease-in-out infinite;
+}
+
+@keyframes cb-sky-twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.cb-sky-cloud {
+  position: absolute;
+  fill: var(--surface);
+  opacity: 0.8;
+  animation: cb-sky-drift 50s ease-in-out infinite alternate;
+}
+
+.cb-sky-rain .cb-sky-cloud {
+  fill: var(--acc-silver);
+}
+
+@keyframes cb-sky-drift {
+  from {
+    transform: translateX(-18px);
+  }
+  to {
+    transform: translateX(26px);
+  }
+}
+
+/* 雨：斜斜的細線一直往下掉（兩層錯開） */
+.cb-sky-drops {
+  position: absolute;
+  inset: 30px 0 0 0;
+  opacity: 0.55;
+  background-image:
+    linear-gradient(105deg, transparent 46%, var(--acc-navy) 46%, var(--acc-navy) 54%, transparent 54%),
+    linear-gradient(105deg, transparent 46%, var(--acc-sky) 46%, var(--acc-sky) 54%, transparent 54%);
+  background-size:
+    26px 34px,
+    38px 46px;
+  background-position:
+    0 0,
+    13px 9px;
+  animation: cb-sky-drops 0.7s linear infinite;
+}
+
+.cb-sky-drops {
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 12px, transparent 12px 34px);
+  mask-image: repeating-linear-gradient(180deg, #000 0 12px, transparent 12px 34px);
+}
+
+@keyframes cb-sky-drops {
+  to {
+    background-position:
+      -9px 34px,
+      1px 55px;
+  }
+}

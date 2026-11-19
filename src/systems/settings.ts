@@ -159,6 +159,12 @@ export function setSound(world: World, on: boolean): void {
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }
 
+/** 開關天氣天空，並發出 settingsChanged。 */
+export function setWeather(world: World, on: boolean): void {
+  world.settings = { ...world.settings, weather: on };
+  world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+}
+
 /** 把小貓的個人設定寫進 settings 的兩欄（catName、catNameAt）；沒有名字、不知道時間就不留那一欄 */
 function withCatProfile(settings: Settings, profile: CatProfile): Settings {
   const { catName: _name, catNameAt: _at, ...rest } = settings;

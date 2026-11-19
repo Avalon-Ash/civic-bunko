@@ -20,6 +20,7 @@ import {
   setCatName,
   setShuffleOptions,
   setSound,
+  setWeather,
   setTheme,
 } from '../systems/settings';
 import { disableSync, setSyncCode, syncNow } from '../systems/sync';
@@ -104,6 +105,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'setSound':
       setSound(world, cmd.on);
+      break;
+    case 'setWeather':
+      setWeather(world, cmd.on);
       break;
     case 'markChangelogSeen':
       markChangelogSeen(world, cmd.id);
