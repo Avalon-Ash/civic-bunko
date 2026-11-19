@@ -23,6 +23,7 @@ import { CatHome } from '../pet/CatHome';
 import { getSyncState } from '../../selectors/sync';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
+import { Chip } from '../kit/Chip';
 import { Cat } from '../kit/Cat';
 import { CountUp } from '../kit/CountUp';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
@@ -47,6 +48,7 @@ function weatherNote(on: boolean, view: WeatherView | undefined): string {
   if (view?.status === 'ok' && view.weather) return `現在外面：${WEATHER_LABEL[view.weather.kind]}（天氣資料：Open-Meteo）`;
   if (view?.status === 'denied') return '沒有拿到定位，所以不知道外面的天氣；要用的話到瀏覽器設定允許定位';
   if (view?.status === 'failed') return '現在問不到天氣（可能沒有網路），晚點會再試';
+  if (view?.status === 'waiting') return '點「問天氣」看看外面的天氣（手機會問要不要給定位）';
   return '正在問外面的天氣…';
 }
 
@@ -449,6 +451,11 @@ export function TodayScreen({
               <strong className="cb-block">天氣天空</strong>
               <span className="cb-sub">{weatherNote(weatherOn(world), weather)}</span>
             </div>
+            {weatherOn(world) && weather?.status === 'waiting' ? (
+              <Chip tone="butter" onClick={weather.refresh}>
+                問天氣
+              </Chip>
+            ) : null}
             <Switch
               checked={weatherOn(world)}
               onChange={(on) => dispatch(world, { type: 'setWeather', on })}

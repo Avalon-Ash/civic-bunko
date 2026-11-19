@@ -2,11 +2,11 @@ import type { Weather } from '../../core/types';
 
 /** 雲：一朵的輪廓（寬約 60、高約 26） */
 const CLOUD = 'M10 26 Q0 26 1 17 Q2 9 11 10 Q14 1 25 3 Q33 -2 40 6 Q51 4 53 13 Q61 14 59 21 Q58 26 50 26 Z';
-/** 每朵雲的位置（畫面寬的百分比、離上緣 px）、大小倍數、飄一趟幾秒 */
+/** 每朵雲的位置（畫面寬的百分比、離上緣 px）、大小倍數、飄一趟幾秒。左上角是頁面標題，雲不放在那裡（會讓標題變難讀） */
 const CLOUDS = [
-  { left: 8, top: 18, scale: 1.25, sec: 46 },
-  { left: 52, top: 52, scale: 0.9, sec: 64 },
-  { left: 74, top: 6, scale: 1.05, sec: 55 },
+  { left: 36, top: 2, scale: 1.25, sec: 46 },
+  { left: 4, top: 54, scale: 0.9, sec: 64 },
+  { left: 72, top: 40, scale: 1.05, sec: 55 },
 ] as const;
 /** 星星的位置（百分比、px）與大小 */
 const STARS = [

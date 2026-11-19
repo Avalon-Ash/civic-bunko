@@ -341,13 +341,15 @@ h2 {
 
 .cb-sky-cloud {
   position: absolute;
-  fill: var(--surface);
-  opacity: 0.8;
+  /* 銀灰色：淺色、深色模式的背景上都看得出是雲（用卡片的底色在深色模式會跟背景融在一起） */
+  fill: var(--acc-silver);
+  opacity: 0.5;
   animation: cb-sky-drift 50s ease-in-out infinite alternate;
 }
 
 .cb-sky-rain .cb-sky-cloud {
-  fill: var(--acc-silver);
+  fill: var(--acc-navy);
+  opacity: 0.45;
 }
 
 @keyframes cb-sky-drift {
