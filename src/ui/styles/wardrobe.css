@@ -76,6 +76,14 @@
   box-shadow: 0 4px 0 var(--line);
 }
 
+/* 換裝區左右裁切：下面黏住時蓋縫的 ::before 左右各伸出 50vw，不裁的話捲動區 .cb-main 的內容會比畫面寬，
+   程式捲動（聚焦、捲入畫面）會把整頁往右推。配件格只在這一欄裡捲，縫只要蓋這一欄（多留一點給陰影）；
+   clip 不會變成捲動容器，試衣間照樣黏得住 */
+.cb-wd-dress {
+  overflow-x: clip;
+  overflow-clip-margin: 8px;
+}
+
 /* 矮的畫面（手機橫放）黏住的試衣間會蓋掉幾乎整個配件格：不黏，跟著頁面捲 */
 @media (max-height: 500px) {
   .cb-wd-room {
