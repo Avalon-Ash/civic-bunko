@@ -119,6 +119,14 @@
 - VS Code Pets：陪伴但從不打斷使用者。
 - Zooly、Duolingo 式吉祥物：被拖時有專屬姿勢；動作反映 App 當下的狀態。
 
+### 3.7 特殊動作與燒焦（2026-11-19）
+- **對照表**：`OUTFIT_SPECIALS`（`constants/wardrobe.ts`）列出「每個部位穿著哪幾件其中之一」就有哪個動作；`outfitSpecials(outfit)` 是唯一的判斷處。加新動作＝表裡加一列＋`PetLayer` 的 `next()` 裡加一段行為。
+- **fly（披風）**：要走路或暴衝時有 `PET_FLY.chance` 的機率改用飛的（姿勢 `fly`）；實作是一個又長又高的跳（`jump` 的 `ms`、`lift`），從卡片上起飛時改成滑翔（`flyLift`）。
+- **scorch（小怪獸頭套＋小怪獸裝＋噴火）**：每隔 `PET_SCORCH.everyMs` 跳上一張有 `data-cat-burn` 的卡片，對著右上角噴火（`is-firing`），然後 `dispatch({ type: 'scorch', spot })`。焦痕由 `ScorchLayer` 畫在最上層、跟著卡片走（卡片有的是整張按鈕，裡面不能再放按鈕）。
+- **存檔**：`wardrobe.scorch`（現在燒焦的地方，只存在這台裝置，不同步）、`wardrobe.repairs`（修過幾次，同步取較大值）。都是選填，沒燒過的人存檔不變。花掉的小魚乾＝`repairs × SCORCH.repairFish`（3 條，公布後不能調高）。固定樣本 `save-v6-wardrobe-scorch.json`，測試 `src/systems/wardrobeScorch.test.ts`。
+- **燒焦的地方 ID**（`data-cat-burn` 的值，定了不改）：`today-countdown`、`today-quest`、`stamps-hero`、`cat-today`。刷題與模擬考的畫面沒有標記，所以不會燒。
+- 兩台裝置各自離線修，合併後次數取較大值，不加總（少扣，不會多扣）。舊版裝置不認得這兩欄：修過的小魚乾在那台不會扣，更新後一致。
+
 ### 7.2 身體與姿勢（RO 的對位點）
 - 頭沿用現在的頭（含頭上、臉上、頸部配件），身體是側面的小短腿圓身體。
 - 每個姿勢只是一筆資料（`PetPoseSpec`，型別在 `src/core/types.ts`）：身體（中心、半長、半厚、方向）＋體型 `build`（胸口與屁股的厚度、肚子下垂多少、花色垂到哪）、四條腿、尾巴、**頭的對位點（位置、角度、大小）**、背上配件的對位點、是不是正面坐（`frontal`）。姿勢表只定義在 `src/core/constants/pet.ts`；身體輪廓與背上花色由 `src/ui/kit/petShape.ts` 從這筆資料算出來，`CatBody` 照著畫，頭和頭上的配件跟著對位點走。

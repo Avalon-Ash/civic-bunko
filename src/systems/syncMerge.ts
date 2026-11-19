@@ -8,18 +8,25 @@ import type {
   WardrobeState,
 } from '../core/types';
 
-export type SyncWardrobe = Pick<WardrobeState, 'owned' | 'achievements' | 'quests' | 'saved'>;
+export type SyncWardrobe = Pick<WardrobeState, 'owned' | 'achievements' | 'quests' | 'saved' | 'repairs'>;
 
-/** 衣櫥裡要同步的那幾欄（outfit 不同步）；沒有衣櫥資料就是空的 */
+/** 衣櫥裡要同步的那幾欄（outfit、scorch 不同步）；沒有衣櫥資料就是空的 */
 export function toSyncWardrobe(wardrobe: WardrobeState | undefined): SyncWardrobe {
   if (!wardrobe) return { owned: [], achievements: [], quests: {} };
   const saved = cleanSaved(wardrobe.saved);
+  const repairs = cleanRepairs(wardrobe.repairs);
   return {
     owned: wardrobe.owned,
     achievements: wardrobe.achievements,
     quests: wardrobe.quests,
     ...(saved ? { saved } : {}),
+    ...(repairs ? { repairs } : {}),
   };
+}
+
+/** 修過幾次燒焦：只留正的整數；沒有（或壞資料）回傳 undefined（那一欄就不寫） */
+export function cleanRepairs(repairs: unknown): number | undefined {
+  return typeof repairs === 'number' && Number.isFinite(repairs) && repairs >= 1 ? Math.floor(repairs) : undefined;
 }
 
 /** 特價省下的紀錄：只留正的整數，鍵照字典序；一筆都沒有回傳 undefined（那一欄就不寫） */
@@ -182,6 +189,7 @@ function mergeSortedUnique(a: readonly string[], b: readonly string[]): string[]
 /**
  * 合併兩份衣櫥進度（owned、achievements、quests）：全部取聯集並排序，結果與參數順序無關。
  * saved（特價省下的）每件取兩邊較大值：只會變多，兩台各自記到的都留下。
+ * repairs（修過幾次燒焦）取兩邊較大值：兩台各自離線修的不會加總（花掉的只會少算，不會多扣）。
  * 不含 outfit（目前穿著只存在各裝置）。
  */
 export function mergeWardrobe(
@@ -215,7 +223,9 @@ export function mergeWardrobe(
   }
   const saved = cleanSaved(savedAll);
 
-  return { owned, achievements, quests, ...(saved ? { saved } : {}) };
+  const repairs = cleanRepairs(Math.max(cleanRepairs(local?.repairs) ?? 0, cleanRepairs(remote?.repairs) ?? 0));
+
+  return { owned, achievements, quests, ...(saved ? { saved } : {}), ...(repairs ? { repairs } : {}) };
 }
 
 /**

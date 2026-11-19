@@ -164,6 +164,16 @@
   animation: cb-pet-bob 0.14s ease-in-out infinite;
 }
 
+/* 飛：整隻慢慢上下浮，尾巴和後腿跟著飄 */
+.cb-pet-motion-fly .cb-pet-bob {
+  animation: cb-pet-bob 0.5s ease-in-out infinite;
+}
+
+.cb-pet-motion-fly .cb-pet-leg-0,
+.cb-pet-motion-fly .cb-pet-leg-2 {
+  animation: cb-pet-dangle-leg 0.5s ease-in-out infinite;
+}
+
 /* 理毛：舉起的前腳上下擦臉，頭跟著點 */
 .cb-pet-motion-groom .cb-pet-leg-3 {
   animation: cb-pet-groom-paw 0.6s ease-in-out infinite;
@@ -316,6 +326,105 @@
 .cb-pet-actor.is-shy {
   opacity: 0.3;
   pointer-events: none;
+}
+
+/* 對著卡片噴火：嘴邊的火焰變成一大口 */
+.cb-pet-actor.is-firing .cb-slot-face-low {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: cb-fire-blast 0.2s ease-in-out infinite;
+}
+
+@keyframes cb-fire-blast {
+  0%,
+  100% {
+    transform: scale(1.7, 1.25);
+  }
+  50% {
+    transform: scale(2.2, 1.45);
+  }
+}
+
+/* ── 燒焦的痕跡（蓋在卡片右上角；只有焦痕本身可以點）──────── */
+.cb-scorch-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 14;
+  overflow: hidden;
+}
+
+.cb-scorch {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.cb-scorch-mark {
+  all: unset;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+  animation: cb-scorch-in 0.4s ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cb-scorch-mark:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+@keyframes cb-scorch-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.cb-scorch-smoke {
+  animation: cb-scorch-smoke 2.6s ease-in-out infinite;
+}
+
+@keyframes cb-scorch-smoke {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(-3px);
+    opacity: 0.2;
+  }
+}
+
+.cb-scorch-fix {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  pointer-events: auto;
+  white-space: nowrap;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--butter);
+  border: var(--border-w) solid var(--line);
+  border-radius: 999px;
+  box-shadow: 0 3px 0 var(--line);
+  padding: 8px 14px;
+  min-height: 40px;
+  cursor: pointer;
+}
+
+.cb-scorch-fix:disabled {
+  background: var(--surface);
+  color: var(--ink-soft);
+  cursor: default;
 }
 
 /* 坐在選項上提示時不擋點擊：她要點的就是牠腳下那個選項 */

@@ -23,7 +23,7 @@ import {
   setTheme,
 } from '../systems/settings';
 import { disableSync, setSyncCode, syncNow } from '../systems/sync';
-import { buyItem, dismissCelebrations, wear } from '../systems/wardrobe';
+import { buyItem, dismissCelebrations, repairScorch, scorchSpot, wear } from '../systems/wardrobe';
 import { bumpStore } from './store';
 import type { UICommand } from './types';
 import type { World } from './world';
@@ -141,6 +141,12 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'wear':
       wear(world, cmd.slot, cmd.item);
+      break;
+    case 'scorch':
+      scorchSpot(world, cmd.spot);
+      break;
+    case 'repairScorch':
+      repairScorch(world, cmd.spot);
       break;
     case 'dismissCelebrations':
       dismissCelebrations(world);

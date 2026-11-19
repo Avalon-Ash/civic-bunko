@@ -378,7 +378,15 @@ export interface Quest {
 export type Celebration =
   | { kind: 'achievement'; id: AchievementId }
   | { kind: 'quest'; id: QuestId };
-/** 衣櫥狀態（存在 Settings.wardrobe）。owned、achievements、quests 跨裝置同步並取聯集，saved 同步並取每件較大值；outfit 只存在各裝置。 */
+/**
+ * 穿著特定配件才有的特殊動作（對照表在 constants/wardrobe.ts 的 OUTFIT_SPECIALS）：
+ * fly＝披著披風飛；scorch＝小怪獸全套加噴火，會把卡片燒焦
+ */
+export type OutfitSpecial = 'fly' | 'scorch';
+/**
+ * 衣櫥狀態（存在 Settings.wardrobe）。owned、achievements、quests 跨裝置同步並取聯集，saved 同步並取每件較大值，
+ * repairs 同步並取較大值；outfit、scorch 只存在各裝置。
+ */
 export interface WardrobeState {
   /** 用小魚乾買下的配件（不含集章與成就送的） */
   owned: ItemId[];
@@ -391,6 +399,12 @@ export interface WardrobeState {
    * 存「省了多少」而不是哪天買的：之後商店加了配件，哪天特價哪幾件會變，她已經省下的不能跟著變。
    */
   saved?: Record<ItemId, number>;
+  /**
+   * 花小魚乾修過幾次燒焦（每次 SCORCH.repairFish；沒修過就沒有這欄）。只存次數：花掉的小魚乾＝次數×單價。
+   */
+  repairs?: number;
+  /** 現在燒焦的地方（卡片上 data-cat-burn 的值）；只是這台裝置畫面上的樣子，不同步 */
+  scorch?: string[];
   /** 目前穿著；沒有這欄時沿用舊的 settings.accessory */
   outfit?: Outfit;
 }
@@ -549,9 +563,11 @@ export type PetPose =
   | 'hop'
   | 'stumble'
   | 'dangle'
-  | 'fall';
+  | 'fall'
+  /** 披著披風飛（特殊動作）：身體打橫、一隻手往前伸 */
+  | 'fly';
 /** 姿勢裡會動的部分怎麼動（CSS 動畫在 styles/pet.css 的 cb-pet-motion-*） */
-export type PetMotion = 'still' | 'breathe' | 'walk' | 'run' | 'groom' | 'swing';
+export type PetMotion = 'still' | 'breathe' | 'walk' | 'run' | 'groom' | 'swing' | 'fly';
 /** 一個對位點：把某個零件的原點放到身體座標的 (x, y)，轉 rot 度、縮放 scale */
 export interface PetAnchor {
   x: number;
@@ -716,6 +732,10 @@ export type UICommand =
   | { type: 'buyItem'; id: ItemId }
   /** 穿上（item 為 null＝脫掉）；只接受已擁有、部位相符的配件 */
   | { type: 'wear'; slot: SlotId; item: ItemId | null }
+  /** 小貓把這個地方燒焦了（只是外觀；已經燒焦、或燒焦的地方到上限時不動作） */
+  | { type: 'scorch'; spot: string }
+  /** 花小魚乾把燒焦的地方修好；沒燒焦、餘額不足時不動作 */
+  | { type: 'repairScorch'; spot: string }
   /** 畫面放完慶祝後清掉 */
   | { type: 'dismissCelebrations' }
   | { type: 'setSound'; on: boolean }

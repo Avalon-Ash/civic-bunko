@@ -24,6 +24,7 @@ import { ChangelogSheet } from './components/ChangelogSheet';
 import { useSoundEffects } from './useSoundEffects';
 import { CatVoiceProvider } from './pet/CatVoiceProvider';
 import { PetLayer } from './pet/PetLayer';
+import { ScorchLayer } from './pet/ScorchLayer';
 import { CHANGELOG } from '../core/constants/changelog';
 import { latestChangelog, unseenChangelog } from '../selectors/changelog';
 import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
@@ -261,6 +262,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
       <div className="cb-shell">
         <Toast message={examToast} onDismiss={() => setExamToast(null)} />
         <RewardToast world={world} />
+        <ScorchLayer world={world} />
         <PetLayer world={world} tab={hasActiveRound ? 'round' : tab} allowed={!world.round?.config.exam} />
         <TabBar active={tab} onSelect={handleTabSelect} />
         <main

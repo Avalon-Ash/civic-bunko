@@ -127,3 +127,12 @@ export function pickHint(
   const choice = pool[Math.floor(rng() * pool.length)] ?? pool[0];
   return choice ? { choice, right } : null;
 }
+
+/**
+ * 披風飛行要給 jumpPoint 的 lift：從地面飛到地面是一道高出 lift 的弧線；
+ * 從高處（卡片上）飛下來則是先平飛再滑下去，不往上衝（jumpPoint 的控制點落在起點的高度），免得飛出畫面上緣。
+ */
+export function flyLift(fromY: number, toY: number, lift: number): number {
+  const drop = toY - fromY;
+  return drop > lift ? -drop / 4 : lift;
+}

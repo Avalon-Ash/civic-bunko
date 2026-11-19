@@ -30,7 +30,7 @@ import {
   parseDaysRecord,
 } from './daily';
 import { validateSavedRound } from './round';
-import { cleanSaved } from './syncMerge';
+import { cleanRepairs, cleanSaved } from './syncMerge';
 
 export interface StorageLike {
   getItem(key: string): string | null;
@@ -344,11 +344,17 @@ export function parseWardrobe(value: unknown): WardrobeState | undefined {
       )
     : undefined;
 
+  // 修過幾次燒焦（正整數才留）、現在燒焦的地方（字串、不重複）；沒有就不留這兩欄
+  const repairs = cleanRepairs(value.repairs);
+  const scorch = isStringArray(value.scorch) ? [...new Set(value.scorch)] : [];
+
   return {
     owned,
     achievements,
     quests,
     ...(saved ? { saved } : {}),
+    ...(repairs ? { repairs } : {}),
+    ...(scorch.length > 0 ? { scorch } : {}),
     ...(outfit !== undefined ? { outfit } : {}),
   };
 }

@@ -239,6 +239,28 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     mood: 'oops',
     motion: 'still',
   },
+  /**
+   * 披著披風飛：身體打橫、後腿往後拖、近側的前腳從肩膀往前伸直（超人的姿勢），尾巴往後飄。
+   * 只有穿著披風亂跑時會用到（OUTFIT_SPECIALS 的 fly）。
+   */
+  fly: {
+    torso: { cx: 46, cy: 60, rx: 21, ry: 11.5, rot: -5 },
+    build: STRETCH,
+    legs: [
+      { x: 31, y: 63, len: 11, rot: 72 },
+      { x: 58, y: 66, len: 9, rot: -62 },
+      { x: 34, y: 65, len: 11, rot: 80 },
+      { x: 61, y: 66.5, len: 17, rot: -94, shoulder: true },
+    ],
+    tail: 'M27 59 Q15 60 6 55',
+    head: { x: 70, y: 47, rot: -3, scale: PET_HEAD_SCALE },
+    back: { x: 42, y: 50, rot: -5, scale: BACK },
+    frontal: false,
+    backFront: false,
+    mood: 'yay',
+    quiet: true,
+    motion: 'fly',
+  },
 };
 
 /**
@@ -277,6 +299,26 @@ export const RUNNER_SLEEP_AFTER_MS = 60_000;
  * seat＝牠坐在選項的哪裡：dx＝圖的左緣離選項左緣多遠（負的＝往外凸一點，讓身體正好蓋在代號上）、up＝腳離選項下緣多高
  */
 export const CAT_HINT = { minMs: 5_000, maxMs: 25_000, msPerChar: 120, jitter: 0.15, chance: 0.7, revealMs: 1_800, minTop: 70, seat: { dx: -12, up: 8 } } as const;
+
+/**
+ * 披風飛行（OUTFIT_SPECIALS 的 fly）：要走路或暴衝時有 chance 的機率改用飛的，飛到另一邊。
+ * lift＝弧線最高點比地面高多少（px）、speed＝水平速度（px／秒）、minTrip＝至少要飛這麼遠才飛（太近就用走的）
+ */
+export const PET_FLY = { chance: 0.4, lift: 96, speed: 150, minTrip: 100 } as const;
+/**
+ * 噴火燒卡片（OUTFIT_SPECIALS 的 scorch）：放出來後 firstMs 內噴第一次，之後每隔 everyMs 一次（範圍內隨機）；
+ * retryMs＝時間到了但畫面上沒有可以燒的卡片，多久後再看一次；
+ * blastMs＝對著卡片噴多久、sorryMs＝燒焦後心虛多久；
+ * mark＝焦痕的大小（px）、它離卡片右緣多遠（inset）、比卡片上緣高出多少（rise）——小貓站在它左邊對著它噴
+ */
+export const PET_SCORCH = {
+  firstMs: { min: 8_000, max: 16_000 },
+  everyMs: { min: 45_000, max: 90_000 },
+  retryMs: 4_000,
+  blastMs: 1_500,
+  sorryMs: 1_600,
+  mark: { w: 58, h: 40, inset: 10, rise: 20 },
+} as const;
 
 // ── 其他分頁：從頭像鑽出來自由亂跑 ─────────────────────────
 /** 亂跑的小貓寬度（px；高度照 PET_VIEW 比例） */

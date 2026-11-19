@@ -5,8 +5,10 @@ import {
   DAILY_TIERS,
   FISH_PER_QUESTION,
   ITEMS,
+  OUTFIT_SPECIALS,
   QUESTS,
   QUEST_ROUND_MIN,
+  SCORCH,
   SLOTS,
   SPRINT_DAYS,
   WARDROBE_START_DAY,
@@ -21,6 +23,7 @@ import type {
   DayKey,
   ItemId,
   Outfit,
+  OutfitSpecial,
   Quest,
   QuestId,
   SlotId,
@@ -30,7 +33,7 @@ import type {
 import type { World } from '../core/world';
 import { countTotalStamps, isValidDayKey, toDayKey, unlockedAccessories } from './daily';
 import { addDaysLocal, toLocalDateString } from './date';
-import { cleanSaved, type SyncWardrobe } from './syncMerge';
+import { cleanRepairs, cleanSaved, type SyncWardrobe } from './syncMerge';
 
 const MS_PER_DAY = 86_400_000;
 const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
@@ -292,6 +295,9 @@ export function fishBalance(world: World, _now?: Date): FishBalanceView {
     }
   }
 
+  // 修燒焦花掉的：次數×單價
+  spent += (cleanRepairs(world.settings.wardrobe?.repairs) ?? 0) * SCORCH.repairFish;
+
   const earned = questions + tiers + welcome + achievements + quests;
   const raw = earned - spent;
   return {
@@ -382,10 +388,34 @@ export function todayQuest(world: World, now: Date): TodayQuestView | null {
   return selectTodayQuest(world, now);
 }
 
+/** 這身穿著有哪些特殊動作（照 OUTFIT_SPECIALS：每個部位都要穿著列出的其中一件） */
+export function outfitSpecials(outfit: Outfit): Set<OutfitSpecial> {
+  const out = new Set<OutfitSpecial>();
+  for (const special of OUTFIT_SPECIALS) {
+    const slots = Object.entries(special.wear) as Array<[SlotId, readonly ItemId[]]>;
+    if (slots.every(([slot, items]) => items.includes(outfit[slot] ?? ''))) out.add(special.id);
+  }
+  return out;
+}
+
+/** 現在燒焦的地方 */
+export function scorchedSpots(world: World): string[] {
+  return [...new Set(world.settings.wardrobe?.scorch ?? [])];
+}
+
 /** saved 欄位：有東西才寫（沒趁特價買過的人，存檔長得跟以前一樣） */
 function savedField(saved: Readonly<Record<ItemId, number>> | undefined): { saved?: Record<ItemId, number> } {
   const clean = cleanSaved(saved);
   return clean ? { saved: clean } : {};
+}
+
+/** repairs、scorch 欄位：有東西才寫（沒燒過、沒修過的人，存檔長得跟以前一樣） */
+function repairsField(repairs: number | undefined): { repairs?: number } {
+  const clean = cleanRepairs(repairs);
+  return clean ? { repairs: clean } : {};
+}
+function scorchField(scorch: readonly string[] | undefined): { scorch?: string[] } {
+  return scorch && scorch.length > 0 ? { scorch: [...new Set(scorch)] } : {};
 }
 
 function commitWardrobe(
@@ -396,6 +426,10 @@ function commitWardrobe(
     savedOn?: { id: ItemId; amount: number };
     questCompleted?: { day: DayKey; questId: QuestId };
     outfit?: Outfit;
+    /** 燒焦的地方換成這份清單 */
+    scorch?: string[];
+    /** 修過幾次燒焦（只會變多） */
+    repairs?: number;
   },
 ): boolean {
   const prev = world.settings.wardrobe;
@@ -429,7 +463,9 @@ function commitWardrobe(
     addedAchievements.length > 0 ||
     questAdded ||
     patch?.owned !== undefined ||
-    patch?.outfit !== undefined;
+    patch?.outfit !== undefined ||
+    patch?.scorch !== undefined ||
+    patch?.repairs !== undefined;
 
   if (!changed) {
     return false;
@@ -446,6 +482,8 @@ function commitWardrobe(
       ...prev?.saved,
       ...(patch?.savedOn ? { [patch.savedOn.id]: patch.savedOn.amount } : {}),
     }),
+    ...repairsField(patch?.repairs ?? prev?.repairs),
+    ...scorchField(patch?.scorch ?? prev?.scorch),
     ...(patch?.outfit !== undefined
       ? { outfit: { ...patch.outfit } }
       : prev?.outfit !== undefined
@@ -464,9 +502,10 @@ function commitWardrobe(
   return true;
 }
 
-/** 套用同步合併後的衣櫥資料，保留本機 outfit 並發出 settingsChanged。 */
+/** 套用同步合併後的衣櫥資料，保留本機 outfit、scorch 並發出 settingsChanged。 */
 export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
   const prevOutfit = world.settings.wardrobe?.outfit;
+  const prevScorch = world.settings.wardrobe?.scorch;
   const nextQuests: Record<DayKey, QuestId[]> = {};
   for (const [day, ids] of Object.entries(merged.quests)) {
     nextQuests[day] = [...ids];
@@ -479,6 +518,8 @@ export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
       achievements: [...merged.achievements],
       quests: nextQuests,
       ...savedField(merged.saved),
+      ...repairsField(merged.repairs),
+      ...scorchField(prevScorch),
       ...(prevOutfit !== undefined ? { outfit: { ...prevOutfit } } : {}),
     },
   };
@@ -515,6 +556,26 @@ export function buyItem(
   return commitWardrobe(world, {
     owned: [...prevOwned, id],
     ...(cost.sale ? { savedOn: { id, amount: cost.base - cost.price } } : {}),
+  });
+}
+
+/**
+ * 小貓把一個地方燒焦了（只是外觀，不扣小魚乾）。已經燒焦、或燒焦的地方到 SCORCH.max 時不動作。
+ */
+export function scorchSpot(world: World, spot: string): boolean {
+  const now = scorchedSpots(world);
+  if (!spot || now.includes(spot) || now.length >= SCORCH.max) return false;
+  return commitWardrobe(world, { scorch: [...now, spot] });
+}
+
+/** 花 SCORCH.repairFish 條小魚乾把燒焦的地方修好；沒燒焦、餘額不足時不動作。 */
+export function repairScorch(world: World, spot: string): boolean {
+  const now = scorchedSpots(world);
+  if (!now.includes(spot)) return false;
+  if (fishBalance(world).raw < SCORCH.repairFish) return false;
+  return commitWardrobe(world, {
+    scorch: now.filter((id) => id !== spot),
+    repairs: (cleanRepairs(world.settings.wardrobe?.repairs) ?? 0) + 1,
   });
 }
 

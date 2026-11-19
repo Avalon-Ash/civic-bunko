@@ -257,3 +257,6 @@ export const CAT_HINT_LINES = {
   right: ['我就知道！', '嘿嘿，猜對了喵！', '貓的直覺很準吧！', '看吧看吧！'],
   wrong: ['欸…猜錯了喵。', '對不起，我亂猜的…', '下次不亂指了…', '啊，被騙了喵。'],
 } as const;
+
+/** 噴火把卡片燒焦之後（PET_SCORCH）說什麼 */
+export const CAT_SCORCH_LINES = ['啊…不小心燒到了喵。', '對不起，火太大了…', '嗝——糟糕，焦了。', '我、我只是打了個嗝…'] as const;

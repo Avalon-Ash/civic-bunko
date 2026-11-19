@@ -84,7 +84,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
         {papersLoading && <span className="cb-sub">題庫載入中…</span>}
       </div>
 
-      <Card tone="pink" className="cb-stack-sm cb-stamps-hero" data-cat-perch="">
+      <Card tone="pink" className="cb-stack-sm cb-stamps-hero" data-cat-perch="" data-cat-burn="stamps-hero">
         <div className="cb-row">
           <CatHome size={76}>
             <Cat size={76} mood="yay" outfit={outfit} interactive />

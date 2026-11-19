@@ -168,7 +168,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
         </span>
       </div>
 
-      <Card tone="pink" className="cb-wd-today" data-cat-perch="">
+      <Card tone="pink" className="cb-wd-today" data-cat-perch="" data-cat-burn="cat-today">
         <div className="cb-sub-strong">
           今天刷了 <b className="cb-num-tabular">{tiers.count}</b> 題
         </div>

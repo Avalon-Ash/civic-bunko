@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { RoamBehavior } from '../../core/types';
 import { CAT_HINT, ROAM_ROUTES } from '../../core/constants/pet';
-import { clamp, hintDelay, jumpPoint, perchOffset, pickBehavior, pickHint, pickWalkTarget, stepWalk } from './petLogic';
+import { clamp, flyLift, hintDelay, jumpPoint, perchOffset, pickBehavior, pickHint, pickWalkTarget, stepWalk } from './petLogic';
 
 const seq = (...values: number[]) => {
   let i = 0;
@@ -118,5 +118,20 @@ describe('thinking-too-long hint', () => {
   it('in a round the cat stays on the ground (never perches on the question by itself)', () => {
     assert.equal(ROAM_ROUTES.round?.perch, 0);
     assert.equal(ROAM_ROUTES.round?.zoom, 0);
+  });
+});
+
+describe('cape flight', () => {
+  it('arcs up from the ground, but glides down from a high card without rising above where it started', () => {
+    const lift = 96;
+    const ground = { x: 0, y: 600 };
+    const top = (from: { x: number; y: number }, to: { x: number; y: number }) => {
+      let min = Infinity;
+      for (let i = 0; i <= 20; i += 1) min = Math.min(min, jumpPoint(from, to, flyLift(from.y, to.y, lift), i / 20).y);
+      return min;
+    };
+    assert.ok(Math.abs(top(ground, { x: 300, y: 600 }) - (600 - lift)) < 1);
+    const perch = { x: 0, y: 40 };
+    assert.ok(top(perch, { x: 300, y: 600 }) >= perch.y - 0.5);
   });
 });

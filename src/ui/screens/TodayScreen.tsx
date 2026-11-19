@@ -208,7 +208,7 @@ export function TodayScreen({
 
       {bank ? (
         <>
-          <Card tone="pink" className="cb-countdown" data-cat-perch="">
+          <Card tone="pink" className="cb-countdown" data-cat-perch="" data-cat-burn="today-countdown">
             <CatHome size={76}>
               <Cat
                 size={76}
@@ -271,7 +271,7 @@ export function TodayScreen({
           )}
 
           {onGoCat && !papersLoading ? (
-            <Card tone="butter" className="cb-wd-today-card" onClick={onGoCat} data-cat-perch="">
+            <Card tone="butter" className="cb-wd-today-card" onClick={onGoCat} data-cat-perch="" data-cat-burn="today-quest">
               <span className="cb-wd-quest-tag">今日任務</span>
               <span className="cb-grow cb-wd-today-text">
                 {quest

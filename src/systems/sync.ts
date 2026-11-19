@@ -35,6 +35,7 @@ import {
   mergeProgress,
   mergeWardrobe,
   sameCatProfile,
+  cleanRepairs,
   sameSaved,
   toSyncWardrobe,
   type SyncWardrobe,
@@ -278,6 +279,7 @@ function wardrobeSetDiffers(a: SyncWardrobe, b: SyncWardrobe): boolean {
       return true;
     }
   }
+  if (cleanRepairs(a.repairs) !== cleanRepairs(b.repairs)) return true;
   return !sameSaved(a.saved, b.saved);
 }
 

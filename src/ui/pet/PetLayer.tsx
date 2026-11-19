@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   CAT_HINT,
+  PET_FLY,
+  PET_SCORCH,
   PET_VIEW_H,
   PET_VIEW_W,
   ROAM_BLOCK_CHECK_MS,
@@ -25,17 +27,20 @@ import {
   ROAM_WALK_SPEED,
   ROAM_WIDTH,
 } from '../../core/constants/pet';
-import { CAT_HINT_LINES } from '../../core/constants/catLines';
+import { dispatch } from '../../core/commands';
+import { CAT_HINT_LINES, CAT_SCORCH_LINES } from '../../core/constants/catLines';
+import { SCORCH } from '../../core/constants/wardrobe';
 import type { CatMood, PetPose, RoamBehavior } from '../../core/types';
 import type { World } from '../../core/world';
 import { soundOn } from '../../selectors/sound';
-import { currentOutfit } from '../../selectors/wardrobe';
+import { currentOutfit, outfitSpecials, scorchedSpots } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
 import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
-import { between, clamp, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
+import { between, clamp, flyLift, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
 import { getPet, petHome, subscribePet } from './petStore';
+import { CAT_BURN_ATTR } from './ScorchLayer';
 
 const W = ROAM_WIDTH;
 const H = (ROAM_WIDTH * PET_VIEW_H) / PET_VIEW_W;
@@ -49,7 +54,16 @@ type Surface = { kind: 'floor' } | { kind: 'perch'; el: Element; dx: number; dro
 type Mode =
   | { kind: 'idle'; until: number }
   | { kind: 'walk'; to: number; speed: number }
-  | { kind: 'jump'; from: { x: number; y: number }; to: { x: number; y: number }; start: number; land: Surface | 'home' }
+  /** ms、lift 不給就是一般的跳（ROAM_JUMP_MS、ROAM_JUMP_LIFT）；披風飛行是一個又長又高的跳 */
+  | {
+      kind: 'jump';
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+      start: number;
+      land: Surface | 'home';
+      ms?: number;
+      lift?: number;
+    }
   | { kind: 'fall'; vy: number }
   | { kind: 'land'; until: number }
   | { kind: 'drag' }
@@ -70,6 +84,30 @@ interface Engine {
    * stage：wait＝跳過去、坐在選項上等她作答；cheer＝猜對了原地跳；done＝揭曉完，等著離開
    */
   hint: { right: boolean; auto: boolean; answered: boolean; stage: 'wait' | 'cheer' | 'done' } | null;
+  /** 噴火燒卡片進行中：spot＝要燒的地方；go＝正跳過去、blast＝正在噴 */
+  fire: { spot: string; stage: 'go' | 'blast' } | null;
+  /** 下一次可以噴火的時間 */
+  nextFire: number;
+  /** 下一個動作開始前把表情改回預設（燒焦後心虛的臉） */
+  resetMood: boolean;
+}
+
+/** 剛放出來的小貓 */
+function newEngine(at: { x: number; y: number }, mode: Mode): Engine {
+  return {
+    x: at.x,
+    y: at.y,
+    surface: { kind: 'floor' },
+    mode,
+    lastInput: 0,
+    shyUntil: 0,
+    lastBlockCheck: 0,
+    homeTrip: false,
+    hint: null,
+    fire: null,
+    nextFire: performance.now() + between(PET_SCORCH.firstMs, Math.random),
+    resetMood: false,
+  };
 }
 
 function pickLine(lines: readonly string[]): string {
@@ -149,10 +187,15 @@ export interface PetLayerProps {
 export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   useWorld(world);
   const outfit = currentOutfit(world);
+  /** 這身穿著的特殊動作、現在燒焦的地方：主迴圈每次挑動作時讀最新的 */
+  const specials = useRef(outfitSpecials(outfit));
+  specials.current = outfitSpecials(outfit);
+  const burnt = useRef(scorchedSpots(world));
+  burnt.current = scorchedSpots(world);
   const [out, setOut] = useState(getPet().out);
   const [pose, setPose] = useState<PetPose>('hop');
   const [facing, setFacing] = useState<'left' | 'right'>('right');
-  const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false });
+  const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false, firing: false });
   /** 提示揭曉時的表情（得意、心虛）；平常照姿勢預設 */
   const [mood, setMood] = useState<CatMood | undefined>(undefined);
   const layerRef = useRef<HTMLDivElement | null>(null);
@@ -191,17 +234,13 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           const from = { x: s.request.from.left + s.request.from.width / 2 - W / 2, y: s.request.from.top + s.request.from.height / 2 - H / 2 };
           const range = xRange();
           const toX = clamp(from.x + (from.x < window.innerWidth / 2 ? 40 : -40), range.min, range.max);
-          engine.current = {
-            x: from.x,
-            y: from.y,
-            surface: { kind: 'floor' },
-            mode: { kind: 'jump', from, to: { x: toX, y: floorY() }, start: performance.now(), land: { kind: 'floor' } },
-            lastInput: 0,
-            shyUntil: 0,
-            lastBlockCheck: 0,
-            homeTrip: false,
-            hint: null,
-          };
+          engine.current = newEngine(from, {
+            kind: 'jump',
+            from,
+            to: { x: toX, y: floorY() },
+            start: performance.now(),
+            land: { kind: 'floor' },
+          });
           show('hop');
           setFlags((f) => ({ ...f, emerging: true }));
           window.setTimeout(() => setFlags((f) => ({ ...f, emerging: false })), ROAM_JUMP_MS);
@@ -219,25 +258,22 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           const drop = r.height - CAT_HINT.seat.up;
           const start =
             !auto && e ? { x: e.x, y: e.y } : { x: from.left + from.width / 2 - W / 2, y: from.top + from.height / 2 - H / 2 };
-          engine.current = {
-            x: start.x,
-            y: start.y,
-            surface: !auto && e ? e.surface : { kind: 'floor' },
-            lastInput: !auto && e ? e.lastInput : 0,
-            shyUntil: 0,
-            lastBlockCheck: 0,
-            homeTrip: false,
-            hint: { right, auto, answered: false, stage: 'wait' },
-            mode: {
-              kind: 'jump',
-              from: start,
-              to: { x: tx, y: r.top - H + 3 + drop },
-              start: performance.now(),
-              land: { kind: 'perch', el, dx: tx - r.left, drop },
-            },
+          const en =
+            !auto && e
+              ? e
+              : newEngine(start, { kind: 'idle', until: 0 });
+          en.hint = { right, auto, answered: false, stage: 'wait' };
+          en.fire = null;
+          en.mode = {
+            kind: 'jump',
+            from: start,
+            to: { x: tx, y: r.top - H + 3 + drop },
+            start: performance.now(),
+            land: { kind: 'perch', el, dx: tx - r.left, drop },
           };
+          engine.current = en;
           show('hop', tx > start.x ? 'right' : 'left');
-          setFlags((f) => ({ ...f, hinting: true, landing: false }));
+          setFlags((f) => ({ ...f, hinting: true, landing: false, firing: false }));
         }
       }),
     [],
@@ -303,9 +339,41 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       }
       const route = ROAM_ROUTES[tabRef.current] ?? DEFAULT_ROUTE;
       const calm = now - e.lastInput < ROAM_CALM_AFTER_INPUT_MS;
-      const b = pickBehavior(route, Math.random, { calm, unavailable });
       const range = xRange();
       const layer = layerRef.current;
+
+      // 特殊動作：小怪獸全套加噴火——時間到了就跳上一張還沒燒焦的卡片，對著右上角噴
+      if (!calm && specials.current.has('scorch') && now >= e.nextFire) {
+        e.nextFire = now + PET_SCORCH.retryMs;
+        const mark = PET_SCORCH.mark;
+        const targets =
+          burnt.current.length < SCORCH.max
+            ? perches.filter((el) => {
+                const id = el.getAttribute(CAT_BURN_ATTR);
+                const r = rectOf(el);
+                return (
+                  !!id &&
+                  !burnt.current.includes(id) &&
+                  r.width > W + mark.w + mark.inset + ROAM_EDGE * 2 &&
+                  !blockedAt(r.right - mark.inset - mark.w - W, r.top - H + 3, layer)
+                );
+              })
+            : [];
+        const el = targets[Math.floor(Math.random() * targets.length)];
+        const spot = el?.getAttribute(CAT_BURN_ATTR);
+        if (el && spot) {
+          const r = rectOf(el);
+          // 站在焦痕的左邊，面向右噴
+          const tx = r.right - mark.inset - mark.w - W + ROAM_EDGE;
+          e.fire = { spot, stage: 'go' };
+          e.nextFire = now + between(PET_SCORCH.everyMs, Math.random);
+          e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: tx, y: r.top - H + 3 }, start: now, land: { kind: 'perch', el, dx: tx - r.left } };
+          show('hop', tx > e.x ? 'right' : 'left');
+          return;
+        }
+      }
+
+      const b = pickBehavior(route, Math.random, { calm, unavailable });
       const bounds =
         e.surface.kind === 'perch'
           ? (() => {
@@ -314,6 +382,25 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             })()
           : range;
 
+      // 特殊動作：披著披風——要走路或暴衝時，有時改用飛的飛到另一邊
+      // （在卡片上也可以起飛：飛下來落在地面的另一邊）
+      if ((b === 'walk' || b === 'zoom') && specials.current.has('fly') && Math.random() < PET_FLY.chance) {
+        const to = e.x < (range.min + range.max) / 2 ? range.max : range.min;
+        const trip = Math.abs(to - e.x);
+        if (trip >= PET_FLY.minTrip) {
+          e.mode = {
+            kind: 'jump',
+            from: { x: e.x, y: e.y },
+            to: { x: to, y: floor },
+            start: now,
+            land: { kind: 'floor' },
+            ms: (trip / PET_FLY.speed) * 1000,
+            lift: flyLift(e.y, floor, PET_FLY.lift),
+          };
+          show('fly', to > e.x ? 'right' : 'left');
+          return;
+        }
+      }
       if (b === 'walk' || b === 'zoom') {
         const to =
           b === 'zoom'
@@ -351,6 +438,31 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
 
     /** 一個動作做完了，接下來做什麼：提示進行中照提示的步驟走，不然隨機挑下一個 */
     const proceed = (e: Engine, now: number) => {
+      if (e.resetMood) {
+        e.resetMood = false;
+        setMood(undefined);
+      }
+      const fire = e.fire;
+      if (fire?.stage === 'go') {
+        // 落在卡片上了：面向右，對著角落噴一大口
+        fire.stage = 'blast';
+        e.mode = { kind: 'idle', until: now + PET_SCORCH.blastMs };
+        show('stand', 'right');
+        setFlags((f) => ({ ...f, firing: true }));
+        return;
+      }
+      if (fire) {
+        // 噴完：那個角落焦了，牠心虛一下
+        e.fire = null;
+        setFlags((f) => ({ ...f, firing: false }));
+        dispatch(world, { type: 'scorch', spot: fire.spot });
+        setMood('oops');
+        e.resetMood = true;
+        say(pickLine(CAT_SCORCH_LINES));
+        e.mode = { kind: 'idle', until: now + PET_SCORCH.sorryMs };
+        show('stumble');
+        return;
+      }
       const h = e.hint;
       if (h?.stage === 'wait' && !h.answered) {
         // 坐在選項上等她作答（不會自己走開）
@@ -402,7 +514,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       if (e) {
         const m = e.mode;
         if (m.kind === 'jump') {
-          const t = (now - m.start) / ROAM_JUMP_MS;
+          const t = (now - m.start) / (m.ms ?? ROAM_JUMP_MS);
           // 目標若是卡片，跟著捲動更新落點
           let to = m.to;
           if (m.land !== 'home' && m.land.kind === 'perch') {
@@ -417,7 +529,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             to = { x: m.to.x, y: floorY() };
           }
           if (e.mode === m) {
-            const p = jumpPoint(m.from, to, ROAM_JUMP_LIFT, t);
+            const p = jumpPoint(m.from, to, m.lift ?? ROAM_JUMP_LIFT, t);
             e.x = p.x;
             e.y = p.y;
             if (t >= 1) {
@@ -524,6 +636,11 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
 
         // 提示中牠坐的選項捲出畫面了（掉下去）：這次提示作廢
         if (e.hint && e.mode.kind === 'fall') endHint(e);
+        // 噴火噴到一半掉下去、或被拎起來：這次不燒了
+        if (e.fire && (e.mode.kind === 'fall' || e.mode.kind === 'drag')) {
+          e.fire = null;
+          setFlags((f) => ({ ...f, firing: false }));
+        }
 
         const shy = now < e.shyUntil && e.mode.kind !== 'drag';
         if (shy !== shown.current.shy) {
@@ -537,7 +654,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     };
     raf = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(raf);
-  }, [out]);
+  }, [out, world]);
 
   if (!out || !allowed) return null;
 
@@ -634,6 +751,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     flags.landing ? 'is-landing' : '',
     flags.emerging ? 'is-emerging' : '',
     flags.hinting ? 'is-hinting' : '',
+    flags.firing ? 'is-firing' : '',
   ]
     .filter(Boolean)
     .join(' ');

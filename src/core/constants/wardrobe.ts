@@ -1,7 +1,7 @@
 // SSOT：小八喵衣櫥（部位、配件、小魚乾、成就、每日小任務）。開案書 docs/plans/cat-wardrobe.md。
 // ID 上線後不改（使用者資料的鍵）。價格不調高、獎勵不調低：餘額是從這些數字算出來的，一改她的餘額就跟著變；
 // 往「她拿到更多」的方向改要使用者同意（2026-11-18 同意過一次：每題、每日關卡、每日任務、成就都加碼）。
-import type { AccessoryId, Achievement, Quest, SlotId, WardrobeItem } from '../types';
+import type { AccessoryId, Achievement, ItemId, OutfitSpecial, Quest, SlotId, WardrobeItem } from '../types';
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, MISSION_SIZE, STAMPS_PER_REWARD } from './daily';
 
 /** 部位，依疊圖順序由下往上；layer 為 false 的不是圖層（毛色）。behindCat＝畫在貓本體後面。 */
@@ -23,6 +23,18 @@ export const SLOTS: ReadonlyArray<{ id: SlotId; name: string; layer: boolean; be
  * 嘴邊的東西（噴火、泡泡、叼著的）要畫在帽子、頭套上面才不會被蓋掉。
  */
 export const SLOTS_BY_DEPTH = [...SLOTS].sort((a, b) => a.z - b.z);
+
+/**
+ * 特殊動作對照表：每個部位都穿著列出的其中一件，亂跑的小貓就多這個動作。只在這裡定義，畫面和小貓的行為都讀它。
+ */
+export const OUTFIT_SPECIALS: ReadonlyArray<{ id: OutfitSpecial; wear: Partial<Record<SlotId, readonly ItemId[]>> }> = [
+  { id: 'fly', wear: { back: ['cape'] } },
+  { id: 'scorch', wear: { 'head-top': ['dino-hood'], body: ['dino-suit'], 'face-low': ['fire-breath'] } },
+];
+/**
+ * 燒焦：repairFish＝修好一處要幾條小魚乾（公布後不能調高）；max＝同時最多幾處燒焦（滿了小貓就不再噴）
+ */
+export const SCORCH = { repairFish: 3, max: 3 } as const;
 
 /** 舊的 6 件集章配件各屬哪個部位 */
 const LEGACY_SLOT: Record<AccessoryId, SlotId> = {
