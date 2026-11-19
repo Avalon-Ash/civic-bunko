@@ -173,17 +173,12 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
     setHappy((n) => n + 1);
   };
 
+  /** 只試穿集章、成就送的配件時：一件就說它的條件；好幾件時條件已經寫在每張籤上，只說一句短的（試衣間是黏住的，不能太高） */
   const nonShopHint =
     basket.items.length > 0 && basket.shop.length === 0
       ? basket.items.length === 1
         ? nonShopCondition(basket.items[0]!)
-        : basket.items
-            .map((s) => {
-              const cond = nonShopCondition(s);
-              return cond ? `${s.item.name}：${cond}` : null;
-            })
-            .filter(Boolean)
-            .join('；')
+        : '這幾件是集章、成就送的，不用買；還差什麼寫在下面'
       : null;
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;

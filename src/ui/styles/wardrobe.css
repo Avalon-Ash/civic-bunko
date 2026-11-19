@@ -76,6 +76,13 @@
   box-shadow: 0 4px 0 var(--line);
 }
 
+/* 矮的畫面（手機橫放）黏住的試衣間會蓋掉幾乎整個配件格：不黏，跟著頁面捲 */
+@media (max-height: 500px) {
+  .cb-wd-room {
+    position: relative;
+  }
+}
+
 /* 黏住時，上方內距那條縫用頁面底色蓋住，配件格不會從縫裡露出來 */
 .cb-wd-room.is-stuck::before {
   content: '';
