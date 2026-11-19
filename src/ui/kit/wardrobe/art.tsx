@@ -5,7 +5,7 @@ import { PET_BACK_EASE, PET_HEAD_SCALE, PET_LEG_W } from '../../../core/constant
 import type { ItemId } from '../../../core/types';
 
 /** 配件自己的小動作（動畫在 styles/wardrobe.css 的 cb-motion-*） */
-export type ItemMotion = 'bob' | 'hop' | 'flap' | 'flicker';
+export type ItemMotion = 'bob' | 'hop' | 'flap' | 'flicker' | 'nibble' | 'twitch' | 'puff';
 
 /**
  * 有身體的小貓用的圖（身體座標 100×90，不縮放、只跟著姿勢移動與轉動）。
@@ -38,6 +38,8 @@ export interface BodyArt {
   sleeve?: ReactNode;
   /** 後腿上端的褲管（連身裝）。座標同 sleeve */
   trouser?: ReactNode;
+  /** 整條腿（連腳掌）包成這個顏色：腳也包住的連身睡衣。有給就不必再給 sleeve、trouser */
+  legs?: string;
   /** 成套的尾巴：尾巴換成這個顏色（連身裝把尾巴也包起來）；spots＝尾巴上一排斑點的顏色 */
   tail?: { fill: string; spots?: string };
   /** 畫在身體後面（翅膀、氣球）。原點在姿勢的背對位點 */
@@ -78,6 +80,7 @@ export type ItemArt =
   | { kind: 'fur'; className: string };
 
 const LINE = 'var(--cat-line)';
+const n2 = (v: number) => Math.round(v * 100) / 100;
 /** 配件的線只有三級：外框（與貓本體的 CAT_LINE_W 同級、略細）、小零件的外框、圖案裡的細線 */
 const W = 2.2;
 const WT = 1.8;
@@ -157,6 +160,10 @@ interface KigurumiTheme {
   belly: string;
   spots?: string;
   plates?: string;
+  /** 斑點畫成星星（睡衣的花樣） */
+  stars?: boolean;
+  /** 腳也包住（連身睡衣）：整條腿都是布的顏色，腳掌不露出來 */
+  footed?: boolean;
 }
 /** 每套娃娃裝的顏色只定義在這裡；頭套、連身裝、圖示都讀它 */
 const KIGURUMI = {
@@ -164,9 +171,24 @@ const KIGURUMI = {
   bear: { fill: 'var(--acc-wood)', belly: 'var(--acc-straw)' },
   frog: { fill: 'var(--acc-lime)', belly: 'var(--acc-cream)', spots: 'var(--acc-leaf)' },
   bunny: { fill: 'var(--acc-rose)', belly: 'var(--acc-cream)' },
+  pajama: { fill: 'var(--acc-lav)', belly: 'var(--acc-cream)', spots: 'var(--acc-gold)', stars: true, footed: true },
 } as const satisfies Record<string, KigurumiTheme>;
 /** 頭套上那隻動物自己的眼睛、鼻孔：固定用深色。外框線的顏色在黑貓＋深色模式會換成淺色，畫在布上看不清楚 */
 const HOOD_EYE = 'var(--acc-shade)';
+
+/** 星星的內圈半徑是外圈的幾成；畫成星星時比圓點放大幾倍（同樣半徑的星星看起來比圓點小） */
+const STAR_INNER = 0.5;
+const STAR_GROW = 1.6;
+/** 五角星（中心 x,y、外半徑 r）：睡衣的花樣 */
+function starPath(x: number, y: number, r: number): string {
+  const pts: string[] = [];
+  for (let i = 0; i < 10; i += 1) {
+    const rad = ((i * 36 - 90) * Math.PI) / 180;
+    const k = i % 2 === 0 ? r : r * STAR_INNER;
+    pts.push(`${n2(x + Math.cos(rad) * k)} ${n2(y + Math.sin(rad) * k)}`);
+  }
+  return `M${pts.join('L')}Z`;
+}
 
 /** 套在腿上端的一截布（袖子、褲管）：原點在腿根、+y 往下；cuff＝袖口羅紋的顏色（不給就沒有羅紋） */
 function legCover(fill: string, len: number, cuff?: string): ReactNode {
@@ -217,9 +239,13 @@ function onesieWrap(theme: KigurumiTheme): (body: BodyGeom) => ReactNode {
         )}
         {theme.spots
           ? sides.flatMap((side) =>
-              ONESIE.spots.map(([at, up, r]) => (
-                <circle key={`${side},${at}`} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill={theme.spots} />
-              )),
+              ONESIE.spots.map(([at, up, r]) =>
+                theme.stars ? (
+                  <path key={`${side},${at}`} d={starPath(-body.len * at, side * body.back * up, r * STAR_GROW)} fill={theme.spots} />
+                ) : (
+                  <circle key={`${side},${at}`} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill={theme.spots} />
+                ),
+              ),
             )
           : null}
       </g>
@@ -299,8 +325,10 @@ function onesieArt(theme: KigurumiTheme): ItemArt {
     },
     onBody: {
       wrap: onesieWrap(theme),
-      sleeve: legCover(theme.fill, SLEEVE.len),
-      trouser: legCover(theme.fill, ONESIE.trouser),
+      // 腳也包住的（睡衣）整條腿換成布的顏色；其他的只套袖子和褲管、腳掌露在外面
+      ...(theme.footed
+        ? { legs: theme.fill }
+        : { sleeve: legCover(theme.fill, SLEEVE.len), trouser: legCover(theme.fill, ONESIE.trouser) }),
       tail: { fill: theme.fill, ...(theme.spots ? { spots: theme.spots } : {}) },
       // 側面：背上一排背鰭；直立朝著你的姿勢從正面看不到背鰭（給空的 frontal 就不畫側面那排）
       ...(theme.plates ? { over: onesiePlates(theme.plates), frontal: {} } : {}),
@@ -412,7 +440,6 @@ function sailorWrap(body: BodyGeom): ReactNode {
   );
 }
 
-const n2 = (v: number) => Math.round(v * 100) / 100;
 
 /** 披風（側面）：從後頸沿著背披到屁股後面，尾端飄出去；下擺鋸齒留在背上，不垂到身體側面 */
 function capeOver(body: BodyGeom): ReactNode {
@@ -735,6 +762,20 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   }),
+  'pajama-hood': hoodArt({
+    theme: KIGURUMI.pajama,
+    outline: HOOD_OUTLINE.pointed,
+    box: '0 0 64 54',
+    // 睡衣的帽子：貓耳朵形狀的帽兜，耳朵裡面淺色，額頭上一彎月亮、兩顆星星
+    over: (
+      <g>
+        <path d="M12.3 10 L10.9 19.5 L18.4 14.4 Z M51.7 10 L53.1 19.5 L45.6 14.4 Z" fill={KIGURUMI.pajama.belly} />
+        <path d="M33.6 14.2 A4.6 4.6 0 1 0 36.6 21.6 A3.7 3.7 0 0 1 33.6 14.2 Z" fill={KIGURUMI.pajama.spots} {...thin} strokeWidth={WF} />
+        <path d={starPath(23.4, 20.4, 2.5)} fill={KIGURUMI.pajama.spots} />
+        <path d={starPath(43.4, 21.6, 2)} fill={KIGURUMI.pajama.spots} />
+      </g>
+    ),
+  }),
 
   // ── 頭側 ────────────────────────────────────────────────
   'star-clip': {
@@ -815,6 +856,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   // ── 嘴邊 ────────────────────────────────────────────────
   'fish-snack': {
     kind: 'layer',
+    motion: 'nibble',
     box: '30 36 30 22',
     node: (
       <g transform="translate(34 48) scale(1.25) rotate(-10) translate(-34 -48)">
@@ -827,6 +869,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   mustache: {
     kind: 'layer',
+    motion: 'twitch',
     box: '18 40 28 14',
     // 掛在鼻子下面，蓋住嘴巴
     node: (
@@ -840,6 +883,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   mask: {
     kind: 'layer',
+    motion: 'puff',
     box: '10 38 44 20',
     node: (
       <g>
@@ -869,13 +913,14 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   'honey-dipper': {
     kind: 'layer',
+    motion: 'nibble',
     box: '30 41 28 24',
     // 叼著一根蜂蜜棒：木柄從嘴角伸出去，棒頭沾滿蜂蜜、往下滴
     node: (
       <g>
         <path d="M34 48.4 L46.4 52.6" stroke={LINE} strokeWidth="4.2" strokeLinecap="round" />
         <path d="M34 48.4 L46.4 52.6" stroke="var(--acc-wood)" strokeWidth="2.2" strokeLinecap="round" />
-        <path d="M49.4 58 Q48 61.4 50 63 Q52 61.4 50.8 58 Z" fill="var(--acc-gold)" {...thin} strokeWidth={WF} />
+        <path className="cb-art-drip" d="M49.4 58 Q48 61.4 50 63 Q52 61.4 50.8 58 Z" fill="var(--acc-gold)" {...thin} strokeWidth={WF} />
         <ellipse cx="50" cy="54" rx="4.4" ry="3.9" transform="rotate(20 50 54)" fill="var(--acc-gold)" {...thin} />
         <path d="M47.4 51.6 L46.2 55.6 M50.4 50.4 L49 57.4 M53.2 51.6 L52.2 56.6" stroke={LINE} strokeWidth={WF} strokeLinecap="round" strokeOpacity="0.55" />
       </g>
@@ -883,7 +928,6 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   'frog-bubble': {
     kind: 'layer',
-    motion: 'bob',
     box: '34 40 30 22',
     // 吹泡泡：一串泡泡從嘴邊往右下飄出去（繞過頭套垂到臉頰的那一段，戴著頭套也看得到）
     node: (
@@ -895,8 +939,8 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
             [52, 53, 5.2],
             [60, 57.4, 3.3],
           ] as const
-        ).map(([x, y, r]) => (
-          <g key={x}>
+        ).map(([x, y, r], i) => (
+          <g key={x} className="cb-art-bubble" style={{ animationDelay: `${i * -0.6}s` }}>
             <circle cx={x} cy={y} r={r} fill="var(--acc-sky)" fillOpacity="0.6" stroke={LINE} strokeWidth={WF} />
             <path
               d={`M${x - r * 0.5} ${y - r * 0.1} Q${x - r * 0.45} ${y - r * 0.5} ${x - r * 0.05} ${y - r * 0.55}`}
@@ -912,6 +956,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   },
   carrot: {
     kind: 'layer',
+    motion: 'nibble',
     box: '30 39 34 20',
     // 叼著一根紅蘿蔔：尖的那頭在嘴裡，葉子在外面
     node: (
@@ -919,6 +964,20 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
         <path d="M54 48.4 Q57.6 42.4 60.6 44.6 Q59 47.6 56 48.4 Q60.8 48.6 61.2 52 Q57.4 53.4 54 48.4 Z" fill="var(--acc-leaf)" {...thin} />
         <path d="M34 48.6 L51 43.8 Q55.4 48.6 51 53.4 Z" fill="var(--acc-coral)" {...thin} />
         <path d="M42 46.6 L42.8 49 M46.6 45.4 L47.6 48.6 M44 51 L44.8 53" stroke={LINE} strokeWidth={WF} strokeLinecap="round" strokeOpacity="0.5" />
+      </g>
+    ),
+  },
+  pacifier: {
+    kind: 'layer',
+    motion: 'puff',
+    box: '21 40 22 18',
+    // 奶嘴：含在嘴上的圓片，下面掛一個拉環
+    node: (
+      <g>
+        <circle cx="32" cy="53.2" r="2.9" fill="none" stroke={LINE} strokeWidth="3.4" />
+        <circle cx="32" cy="53.2" r="2.9" fill="none" stroke="var(--acc-gold)" strokeWidth="1.6" />
+        <ellipse cx="32" cy="48" rx="6" ry="3.7" fill="var(--acc-sky)" {...thin} />
+        <circle cx="32" cy="48" r="1.9" fill="var(--acc-cream)" {...thin} strokeWidth={WF} />
       </g>
     ),
   },
@@ -1023,6 +1082,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'bear-suit': onesieArt(KIGURUMI.bear),
   'frog-suit': onesieArt(KIGURUMI.frog),
   'bunny-suit': onesieArt(KIGURUMI.bunny),
+  'pajama-suit': onesieArt(KIGURUMI.pajama),
 
   // ── 背飾（畫在貓後面）────────────────────────────────────
   balloon: {

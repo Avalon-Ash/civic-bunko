@@ -14,7 +14,7 @@ import {
   PET_VIEW_H,
   PET_VIEW_W,
 } from '../../core/constants/pet';
-import { SLOTS } from '../../core/constants/wardrobe';
+import { SLOTS_BY_DEPTH } from '../../core/constants/wardrobe';
 import type { Outfit, PetAnchor, PetLeg, PetPose, PetPoseSpec } from '../../core/types';
 import { CatHead, furClass, type CatMood } from './Cat';
 import { Emote } from './Emote';
@@ -56,7 +56,23 @@ const outline = {
 };
 /** 沿脊椎鏡像（身體座標的 y 反向：背那側 ↔ 肚子那側）。正面坐時身體左右對稱，背那側的花色、布面鏡像到另一側再畫一次 */
 const MIRROR = 'scale(1 -1)';
-function Leg({ leg, index, far, toe, sleeve }: { leg: PetLeg; index: number; far: boolean; toe: number; sleeve: ReactNode }) {
+/** 遠側的腿穿著包腳的衣服時壓暗多少（毛色有自己的遠側色 --cat-fur-far，布沒有） */
+const FAR_CLOTH_DIM = 'brightness(0.9)';
+function Leg({
+  leg,
+  index,
+  far,
+  toe,
+  sleeve,
+  cloth,
+}: {
+  leg: PetLeg;
+  index: number;
+  far: boolean;
+  toe: number;
+  sleeve: ReactNode;
+  cloth?: string;
+}) {
   if (leg.len <= 0) return null;
   /** 腿根要不要封口：遠側的腿（從身體邊緣露出來）、從肩膀舉起來的手臂 */
   const capped = far || leg.shoulder === true;
@@ -64,7 +80,11 @@ function Leg({ leg, index, far, toe, sleeve }: { leg: PetLeg; index: number; far
   return (
     <g transform={`translate(${leg.x} ${leg.y}) rotate(${leg.rot})`}>
       <g className={`cb-pet-leg cb-pet-leg-${index}`}>
-        <path d={capped ? d : `${d}Z`} fill={far ? 'var(--cat-fur-far)' : 'var(--cat-fur)'} />
+        <path
+          d={capped ? d : `${d}Z`}
+          fill={cloth ?? (far ? 'var(--cat-fur-far)' : 'var(--cat-fur)')}
+          style={cloth && far ? { filter: FAR_CLOTH_DIM } : undefined}
+        />
         <path d={d} {...outline} />
         {sleeve}
       </g>
@@ -97,10 +117,10 @@ const TAIL_SPOT = { size: 0.42, gap: 8, dot: 0.01 } as const;
 /** 前腿在 PetPoseSpec.legs 裡的編號（順序：後腿遠、前腿遠、後腿近、前腿近）；袖子只套前腿 */
 const FRONT_LEGS: ReadonlySet<number> = new Set([1, 3]);
 
-/** 穿著裡有「身體版」圖的配件，照 SLOTS 的圖層順序排好 */
+/** 穿著裡有「身體版」圖的配件，照 SLOTS_BY_DEPTH 的疊圖順序排好 */
 function bodyArts(outfit: Outfit): Array<{ slot: string; art: BodyArt; motion?: string }> {
   const list: Array<{ slot: string; art: BodyArt; motion?: string }> = [];
-  for (const slot of SLOTS) {
+  for (const slot of SLOTS_BY_DEPTH) {
     const id = outfit[slot.id];
     const art = id ? ITEM_ART[id] : undefined;
     if (art && art.kind === 'layer' && art.onBody) list.push({ slot: slot.id, art: art.onBody, motion: art.motion });
@@ -201,6 +221,8 @@ export function CatBody({
     x: facing === 'left' ? PET_VIEW_W - emoteX : emoteX,
     y: spec.head.y - HEAD_RADIUS.y * spec.head.scale * EMOTE.corner.y,
   };
+  /** 整條腿包起來的顏色（腳也包住的睡衣） */
+  const cloth = worn.find(({ art }) => art.legs)?.art.legs;
   /** 尾巴的顏色：穿了成套的衣服（連身裝）就照衣服的，不然是毛色 */
   const tailArt = worn.find(({ art }) => art.tail)?.art.tail;
 
@@ -268,8 +290,8 @@ export function CatBody({
           </g>
 
           <g className="cb-pet-bob">
-            <Leg leg={spec.legs[0]} index={0} far toe={toe} sleeve={legWear(0, spec.legs[0])} />
-            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} sleeve={legWear(1, spec.legs[1])} />}
+            <Leg leg={spec.legs[0]} index={0} far toe={toe} cloth={cloth} sleeve={legWear(0, spec.legs[0])} />
+            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} cloth={cloth} sleeve={legWear(1, spec.legs[1])} />}
 
             <g className="cb-pet-torso" transform={torsoFrame}>
               <path className="cb-pet-torso-shape" d={shape.outline} fill="var(--cat-fur)" />
@@ -311,7 +333,7 @@ export function CatBody({
 
             {/* 近側的腿：放下的畫在頭後面；從肩膀舉起來的手臂（shoulder）畫在頭前面，腳掌才碰得到臉頰 */}
             {nearLegs.filter(({ leg }) => !leg.shoulder).map(({ leg, index }) => (
-              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={legWear(index, leg)} />
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} cloth={cloth} sleeve={legWear(index, leg)} />
             ))}
 
             <g transform={place(spec.head, HEAD_ORIGIN.x, HEAD_ORIGIN.y)}>
@@ -321,7 +343,7 @@ export function CatBody({
             </g>
 
             {nearLegs.filter(({ leg }) => leg.shoulder).map(({ leg, index }) => (
-              <Leg key={index} leg={leg} index={index} far={false} toe={toe} sleeve={legWear(index, leg)} />
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} cloth={cloth} sleeve={legWear(index, leg)} />
             ))}
           </g>
         </g>

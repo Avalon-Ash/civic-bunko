@@ -400,6 +400,110 @@
   }
 }
 
+/* 叼著的東西（小魚乾、紅蘿蔔、蜂蜜棒）：以嘴角（左端）為軸上下晃 */
+.cb-motion-nibble {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: cb-motion-nibble 1.6s ease-in-out infinite;
+}
+
+@keyframes cb-motion-nibble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(-5deg);
+  }
+  60% {
+    transform: rotate(3deg);
+  }
+}
+
+/* 鬍子：平常不動，偶爾左右抖兩下 */
+.cb-motion-twitch {
+  transform-box: fill-box;
+  transform-origin: 50% 20%;
+  animation: cb-motion-twitch 4.2s ease-in-out infinite;
+}
+
+@keyframes cb-motion-twitch {
+  0%,
+  78%,
+  100% {
+    transform: rotate(0deg);
+  }
+  83% {
+    transform: rotate(7deg);
+  }
+  89% {
+    transform: rotate(-7deg);
+  }
+  95% {
+    transform: rotate(4deg);
+  }
+}
+
+/* 口罩：跟著呼吸鼓起來 */
+.cb-motion-puff {
+  transform-box: fill-box;
+  transform-origin: 50% 40%;
+  animation: cb-motion-puff 2.6s ease-in-out infinite;
+}
+
+@keyframes cb-motion-puff {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.05, 1.1);
+  }
+}
+
+/* 蜂蜜滴：慢慢拉長、掉下去、再長出來 */
+.cb-art-drip {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: cb-art-drip 2.4s ease-in infinite;
+}
+
+@keyframes cb-art-drip {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1, 1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(5px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 泡泡：一顆一顆輪流變大、往上飄一點 */
+.cb-art-bubble {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: cb-art-bubble 2.4s ease-in-out infinite;
+}
+
+@keyframes cb-art-bubble {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-1.6px) scale(1.14);
+  }
+}
+
 /* 今日頁的任務入口 */
 .cb-wd-today-card {
   display: flex;

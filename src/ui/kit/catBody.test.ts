@@ -30,6 +30,7 @@ const OUTFITS: Array<[string, Outfit]> = [
   ['小熊全套', { 'head-top': 'bear-hood', body: 'bear-suit', 'face-low': 'honey-dipper' }],
   ['青蛙全套', { 'head-top': 'frog-hood', body: 'frog-suit', 'face-low': 'frog-bubble' }],
   ['兔子全套＋翅膀', { 'head-top': 'bunny-hood', body: 'bunny-suit', 'face-low': 'carrot', back: 'wings' }],
+  ['睡衣全套', { 'head-top': 'pajama-hood', body: 'pajama-suit', 'face-low': 'pacifier' }],
 ];
 
 /** 整隻貓畫到哪（身體座標）；被身體輪廓剪掉的布面不算 */
@@ -190,13 +191,17 @@ describe('cat body', () => {
 
   it('every one-piece suit dresses the whole cat the same way: sleeves, trousers, matching tail; only the dino has back plates', () => {
     const suits = ITEMS.filter((it) => it.id.endsWith('-suit'));
-    assert.deepEqual(suits.map((it) => it.id), ['dino-suit', 'bear-suit', 'frog-suit', 'bunny-suit']);
+    assert.deepEqual(suits.map((it) => it.id), ['dino-suit', 'bear-suit', 'frog-suit', 'bunny-suit', 'pajama-suit']);
     for (const { id } of suits) {
       const stand = render('stand', { body: id });
-      assert.equal(count(stand, 'class="cb-pet-sleeve"'), 2, id);
-      assert.equal(count(stand, 'class="cb-pet-trouser"'), 2, id);
+      // 睡衣連腳掌都包住：整條腿是布的顏色，不另外套袖子、褲管
+      const footed = id === 'pajama-suit';
+      assert.equal(count(stand, 'class="cb-pet-sleeve"'), footed ? 0 : 2, id);
+      assert.equal(count(stand, 'class="cb-pet-trouser"'), footed ? 0 : 2, id);
+      assert.equal(/class="cb-pet-leg[^>]*><path[^>]*var\(--cat-fur/.test(stand), !footed, `${id} 的腿`);
       assert.ok(!(/<g class="cb-pet-tail">(.*?)<\/g>/.exec(stand)?.[1] ?? '').includes('var(--cat-patch)'), `${id} 的尾巴`);
-      assert.equal(stand.includes('var(--acc-gold)'), id === 'dino-suit', `${id} 的背鰭`);
+      // 金色：小怪獸的背鰭、睡衣的星星
+      assert.equal(stand.includes('var(--acc-gold)'), id === 'dino-suit' || footed, `${id} 的金色`);
     }
   });
 

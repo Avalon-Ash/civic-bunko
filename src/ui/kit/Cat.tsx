@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CAT_LINE_W, EMOTE, HEAD_ORIGIN, HEAD_RADIUS } from '../../core/constants/pet';
-import { ITEMS, SLOTS } from '../../core/constants/wardrobe';
+import { ITEMS, SLOTS_BY_DEPTH } from '../../core/constants/wardrobe';
 import type { AccessoryId, CatMood, CatScene, ItemId, Outfit, SlotId } from '../../core/types';
 import { useCatBubble, useCatVoice } from './catVoice';
 import { Emote } from './Emote';
@@ -46,13 +46,13 @@ function legacyOutfit(accessory: AccessoryId | null | undefined): Outfit {
 }
 
 /**
- * 依 SLOTS 的順序畫出穿著的圖層；behind＝畫在貓本體後面的那幾層。
+ * 依 SLOTS_BY_DEPTH 的疊圖順序畫出穿著的圖層；behind＝畫在貓本體後面的那幾層。
  * standalone＝只有頭的頭像；接在身體上時，有身體版圖的配件只畫它留在頭上的那一部分（其餘由 CatBody 穿到身體上）。
  */
 function OutfitLayers({ outfit, behind, standalone }: { outfit: Outfit; behind: boolean; standalone: boolean }) {
   return (
     <>
-      {SLOTS.map((slot) => {
+      {SLOTS_BY_DEPTH.map((slot) => {
         if (!slot.layer || slot.behindCat !== behind) return null;
         const id = outfit[slot.id];
         if (!id || ITEM_SLOT.get(id) !== slot.id) return null;

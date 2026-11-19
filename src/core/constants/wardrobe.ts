@@ -5,18 +5,24 @@ import type { AccessoryId, Achievement, Quest, SlotId, WardrobeItem } from '../t
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, MISSION_SIZE, STAMPS_PER_REWARD } from './daily';
 
 /** 部位，依疊圖順序由下往上；layer 為 false 的不是圖層（毛色）。behindCat＝畫在貓本體後面。 */
-export const SLOTS: ReadonlyArray<{ id: SlotId; name: string; layer: boolean; behindCat: boolean }> = [
-  { id: 'bg', name: '背景', layer: true, behindCat: true },
-  { id: 'back', name: '背飾', layer: true, behindCat: true },
-  { id: 'body', name: '身上', layer: true, behindCat: false },
-  { id: 'neck', name: '頸部', layer: true, behindCat: false },
-  { id: 'face-low', name: '嘴邊', layer: true, behindCat: false },
-  { id: 'face-mid', name: '眼睛', layer: true, behindCat: false },
-  { id: 'head-top', name: '頭頂', layer: true, behindCat: false },
+export const SLOTS: ReadonlyArray<{ id: SlotId; name: string; layer: boolean; behindCat: boolean; z: number }> = [
+  { id: 'bg', name: '背景', layer: true, behindCat: true, z: 0 },
+  { id: 'back', name: '背飾', layer: true, behindCat: true, z: 1 },
+  { id: 'body', name: '身上', layer: true, behindCat: false, z: 2 },
+  { id: 'neck', name: '頸部', layer: true, behindCat: false, z: 3 },
+  { id: 'face-low', name: '嘴邊', layer: true, behindCat: false, z: 7 },
+  { id: 'face-mid', name: '眼睛', layer: true, behindCat: false, z: 4 },
+  { id: 'head-top', name: '頭頂', layer: true, behindCat: false, z: 5 },
   // 頭側在帽子上面：花、蝴蝶結、髮夾看起來像別在帽子上，不會被毛線帽、貝雷帽整個蓋掉
-  { id: 'head-side', name: '頭側', layer: true, behindCat: false },
-  { id: 'fur', name: '毛色', layer: false, behindCat: false },
+  { id: 'head-side', name: '頭側', layer: true, behindCat: false, z: 6 },
+  { id: 'fur', name: '毛色', layer: false, behindCat: false, z: 8 },
 ];
+
+/**
+ * 疊圖順序（z 小的先畫、在下面）。和上面的陣列順序分開：陣列順序是衣櫥分頁的順序，
+ * 嘴邊的東西（噴火、泡泡、叼著的）要畫在帽子、頭套上面才不會被蓋掉。
+ */
+export const SLOTS_BY_DEPTH = [...SLOTS].sort((a, b) => a.z - b.z);
 
 /** 舊的 6 件集章配件各屬哪個部位 */
 const LEGACY_SLOT: Record<AccessoryId, SlotId> = {
@@ -57,6 +63,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'bear-hood', slot: 'head-top', name: '小熊頭套', source: shop(PRICE.l) },
   { id: 'frog-hood', slot: 'head-top', name: '青蛙頭套', source: shop(PRICE.l) },
   { id: 'bunny-hood', slot: 'head-top', name: '兔子頭套', source: shop(PRICE.l) },
+  { id: 'pajama-hood', slot: 'head-top', name: '睡衣帽', source: shop(PRICE.l) },
   // 頭側
   { id: 'star-clip', slot: 'head-side', name: '星星髮夾', source: shop(PRICE.s) },
   { id: 'sakura', slot: 'head-side', name: '櫻花', source: shop(PRICE.m) },
@@ -72,6 +79,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'honey-dipper', slot: 'face-low', name: '蜂蜜棒', source: shop(PRICE.m) },
   { id: 'frog-bubble', slot: 'face-low', name: '吹泡泡', source: shop(PRICE.m) },
   { id: 'carrot', slot: 'face-low', name: '叼紅蘿蔔', source: shop(PRICE.m) },
+  { id: 'pacifier', slot: 'face-low', name: '奶嘴', source: shop(PRICE.m) },
   // 頸部
   { id: 'bell', slot: 'neck', name: '鈴鐺項圈', source: shop(PRICE.s) },
   { id: 'bowtie', slot: 'neck', name: '領結', source: shop(PRICE.m) },
@@ -84,6 +92,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'bear-suit', slot: 'body', name: '小熊裝', source: shop(PRICE.xl) },
   { id: 'frog-suit', slot: 'body', name: '青蛙裝', source: shop(PRICE.xl) },
   { id: 'bunny-suit', slot: 'body', name: '兔子裝', source: shop(PRICE.xl) },
+  { id: 'pajama-suit', slot: 'body', name: '連身睡衣', source: shop(PRICE.xl) },
   // 背飾
   { id: 'balloon', slot: 'back', name: '氣球', source: shop(PRICE.xl) },
   { id: 'cape', slot: 'back', name: '小披風', source: shop(PRICE.rare) },
