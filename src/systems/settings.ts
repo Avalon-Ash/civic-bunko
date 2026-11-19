@@ -1,3 +1,4 @@
+import { WEATHER_PLACES } from '../core/constants/weather';
 import { catProfileOf, cleanCatName } from './catBrain';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type { AccessoryId, CatProfile, ExamRecord, Settings, ThemeChoice } from '../core/types';
@@ -162,6 +163,14 @@ export function setSound(world: World, on: boolean): void {
 /** 開關天氣天空，並發出 settingsChanged。 */
 export function setWeather(world: World, on: boolean): void {
   world.settings = { ...world.settings, weather: on };
+  world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+}
+
+/** 天氣天空改看哪個縣市（null 或不認得的 id＝改回用定位，那一欄不留），並發出 settingsChanged。 */
+export function setWeatherPlace(world: World, place: string | null): void {
+  const { weatherPlace: _old, ...rest } = world.settings;
+  const known = place !== null && WEATHER_PLACES.some((p) => p.id === place);
+  world.settings = { ...rest, ...(known ? { weatherPlace: place } : {}) };
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }
 

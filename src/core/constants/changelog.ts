@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-19-weather-place',
+    date: '2026-11-19',
+    title: '天氣天空可以自己選縣市',
+    items: [
+      '今日頁最下面的「天氣天空」打開後，多了「地點」可以選：選了縣市就直接看那裡的天氣，不需要定位',
+      '用定位卻沒有跳出詢問時（通常是手機或電腦的定位服務關著），現在會說明原因，並且有「再試一次」的按鈕',
+    ],
+  },
+  {
     id: '2026-11-19-suit-play',
     date: '2026-11-19',
     title: '每套娃娃裝都有自己的玩法',

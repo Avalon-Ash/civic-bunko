@@ -215,3 +215,25 @@
 .cb-exam-history-row:last-child {
   border-bottom: 0;
 }
+
+/* 天氣天空：選地點那一列 */
+.cb-weather-row {
+  gap: 10px;
+  align-items: center;
+}
+
+.cb-weather-place {
+  gap: 8px;
+  align-items: center;
+}
+
+.cb-select {
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: var(--border-w) solid var(--line);
+  border-radius: 12px;
+  padding: 8px 10px;
+  min-height: 44px;
+}

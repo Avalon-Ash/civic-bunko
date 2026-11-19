@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { WEATHER } from '../core/constants/weather';
 import { createTestWorld } from '../testing/fixture';
 import { dispatch } from '../core/commands';
-import { weatherOn } from '../selectors/weather';
+import { weatherOn, weatherPlace } from '../selectors/weather';
+import { WEATHER_PLACES } from '../core/constants/weather';
 import { importProgress, exportProgress } from './persistence';
 import { createWorld } from '../core/world';
 import { coarseCoord, parseWeather, weatherKind, weatherUrl } from './weather';
@@ -50,5 +51,28 @@ describe('weather sky', () => {
     assert.equal(weatherOn(other), true);
     dispatch(world, { type: 'setWeather', on: false });
     assert.equal(weatherOn(world), false);
+  });
+
+  it('can use a chosen place instead of the device location; unknown ids fall back to location', () => {
+    const world = createTestWorld();
+    assert.equal(weatherPlace(world), null);
+    dispatch(world, { type: 'setWeatherPlace', place: 'taichung' });
+    assert.equal(weatherPlace(world)?.name, '臺中市');
+    const other = createWorld();
+    assert.deepEqual(importProgress(other, exportProgress(world)), { ok: true });
+    assert.equal(weatherPlace(other)?.id, 'taichung');
+    dispatch(world, { type: 'setWeatherPlace', place: 'atlantis' });
+    assert.equal(weatherPlace(world), null);
+    assert.equal('weatherPlace' in world.settings, false);
+    dispatch(world, { type: 'setWeatherPlace', place: 'taipei' });
+    dispatch(world, { type: 'setWeatherPlace', place: null });
+    assert.equal('weatherPlace' in world.settings, false);
+    // 每個地點的座標都已經是粗略值、問得出網址，id 不重複
+    assert.equal(new Set(WEATHER_PLACES.map((p) => p.id)).size, WEATHER_PLACES.length);
+    for (const place of WEATHER_PLACES) {
+      assert.equal(coarseCoord(place.latitude), place.latitude, place.name);
+      assert.equal(coarseCoord(place.longitude), place.longitude, place.name);
+      assert.ok(weatherUrl(place.latitude, place.longitude), place.name);
+    }
   });
 });

@@ -650,6 +650,14 @@ export interface Weather {
   day: boolean;
 }
 
+/** 可以選的地點：名稱與粗略座標（小數 1 位） */
+export interface WeatherPlace {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+}
+
 // ── 設定 ────────────────────────────────────────────────
 export type ThemeChoice = 'system' | 'light' | 'dark';
 export interface Settings {
@@ -674,6 +682,8 @@ export interface Settings {
   sound?: boolean;
   /** 天氣天空（照所在地的天氣畫頁面上方的天空）；沒設定視為關閉——要她自己打開，因為會用到定位。各裝置自己的設定，不同步 */
   weather?: boolean;
+  /** 天氣天空看哪個縣市（WEATHER_PLACES 的 id）；沒有這欄＝用手機定位。各裝置自己的設定，不同步 */
+  weatherPlace?: string;
   /** 看過的最新一則更新紀錄 ID；各裝置自己的設定，不同步 */
   changelogSeen?: string;
   /** 使用者幫小貓取的名字（規則在 constants/cat.ts）；沒有這欄＝沒取名。和 catNameAt 一起組成 CatProfile 跨裝置同步 */
@@ -757,6 +767,8 @@ export type UICommand =
   | { type: 'setSound'; on: boolean }
   /** 開關天氣天空 */
   | { type: 'setWeather'; on: boolean }
+  /** 天氣天空改看哪個縣市（null＝改回用定位；不認得的 id 當作 null） */
+  | { type: 'setWeatherPlace'; place: string | null }
   /** 更新紀錄看完了（記下最新一則的 ID） */
   | { type: 'markChangelogSeen'; id: string }
   /** 幫小貓取名；空字串＝改回沒取名 */

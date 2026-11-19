@@ -75,12 +75,13 @@ interface RawRoundConfig extends Omit<RoundConfig, 'study' | 'ask' | 'passes'> {
 }
 
 interface RawSettings
-  extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe' | 'sound' | 'weather' | 'changelogSeen' | 'catName' | 'catNameAt'> {
+  extends Omit<Settings, 'lastRound' | 'examHistory' | 'bilingual' | 'wardrobe' | 'sound' | 'weather' | 'weatherPlace' | 'changelogSeen' | 'catName' | 'catNameAt'> {
   lastRound: RawRoundConfig | null;
   examHistory?: unknown;
   bilingual?: unknown;
   sound?: unknown;
   weather?: unknown;
+  weatherPlace?: unknown;
   changelogSeen?: unknown;
   wardrobe?: unknown;
   catName?: unknown;
@@ -481,6 +482,7 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       ...(typeof parsed.settings.bilingual === 'boolean' ? { bilingual: parsed.settings.bilingual } : {}),
       ...(typeof parsed.settings.sound === 'boolean' ? { sound: parsed.settings.sound } : {}),
       ...(typeof parsed.settings.weather === 'boolean' ? { weather: parsed.settings.weather } : {}),
+      ...(typeof parsed.settings.weatherPlace === 'string' ? { weatherPlace: parsed.settings.weatherPlace } : {}),
       ...(typeof parsed.settings.changelogSeen === 'string'
         ? { changelogSeen: parsed.settings.changelogSeen }
         : {}),

@@ -15,8 +15,8 @@ import { todayProgress, weekStamps } from '../../selectors/daily';
 import { currentOutfit, fishBalance, todayQuest } from '../../selectors/wardrobe';
 import { FishIcon } from './WardrobeScreen';
 import { soundOn } from '../../selectors/sound';
-import { weatherOn } from '../../selectors/weather';
-import { WEATHER_LABEL } from '../../core/constants/weather';
+import { weatherOn, weatherPlace } from '../../selectors/weather';
+import { WEATHER_LABEL, WEATHER_PLACES } from '../../core/constants/weather';
 import type { WeatherView } from '../useWeather';
 import { Switch } from '../kit/Switch';
 import { CatHome } from '../pet/CatHome';
@@ -42,15 +42,34 @@ export interface StampCelebration {
   unlockedName: string | null;
 }
 
-/** 天氣天空開關底下那行說明：關著時講它會做什麼（要定位），開著時講現在的結果 */
-function weatherNote(on: boolean, view: WeatherView | undefined): string {
-  if (!on) return '頁面上方照外面的天氣畫晴天、多雲或下雨；打開時會問你要不要給定位，只送出大概的位置';
-  if (view?.status === 'ok' && view.weather) return `現在外面：${WEATHER_LABEL[view.weather.kind]}（天氣資料：Open-Meteo）`;
-  if (view?.status === 'denied') return '沒有拿到定位，所以不知道外面的天氣；要用的話到瀏覽器設定允許定位';
-  if (view?.status === 'failed') return '現在問不到天氣（可能沒有網路），晚點會再試';
-  if (view?.status === 'waiting') return '點「問天氣」看看外面的天氣（手機會問要不要給定位）';
-  return '正在問外面的天氣…';
+/** 天氣天空開關底下那行說明：關著時講它會做什麼，開著時講現在的結果或問不到的原因 */
+function weatherNote(on: boolean, view: WeatherView | undefined, placeName: string | null): string {
+  if (!on) return '頁面上方照外面的天氣畫晴天、多雲或下雨；可以用手機定位，也可以自己選縣市';
+  const where = placeName ?? '外面';
+  switch (view?.status) {
+    case 'ok':
+      return view.weather ? `現在${where}：${WEATHER_LABEL[view.weather.kind]}（天氣資料：Open-Meteo）` : '正在問天氣…';
+    case 'denied':
+      return '定位被擋住了（沒有允許，或手機、電腦的定位服務關著），所以沒有跳出詢問。打開定位後按「再試一次」，或直接在下面選縣市';
+    case 'nofix':
+      return '定位開著，但抓不到位置。按「再試一次」，或直接在下面選縣市';
+    case 'unsupported':
+      return '這個瀏覽器沒有定位功能，請在下面選縣市';
+    case 'offline':
+      return '現在問不到天氣（可能沒有網路），按「再試一次」';
+    case 'waiting':
+      return '按「問天氣」看看外面的天氣（會問你要不要給定位），或直接在下面選縣市';
+    default:
+      return '正在問天氣…';
+  }
 }
+/** 這些狀態要給一顆重問的按鈕，和按鈕上的字 */
+const WEATHER_RETRY: Partial<Record<WeatherView['status'], string>> = {
+  waiting: '問天氣',
+  denied: '再試一次',
+  nofix: '再試一次',
+  offline: '再試一次',
+};
 
 export interface TodayScreenProps {
   world: World;
@@ -446,21 +465,42 @@ export function TodayScreen({
             />
           </Card>
 
-          <Card className="cb-row cb-switch-card">
-            <div className="cb-grow">
-              <strong className="cb-block">天氣天空</strong>
-              <span className="cb-sub">{weatherNote(weatherOn(world), weather)}</span>
+          <Card className="cb-stack-sm">
+            <div className="cb-row cb-switch-card">
+              <div className="cb-grow">
+                <strong className="cb-block">天氣天空</strong>
+                <span className="cb-sub">{weatherNote(weatherOn(world), weather, weatherPlace(world)?.name ?? null)}</span>
+              </div>
+              <Switch
+                checked={weatherOn(world)}
+                onChange={(on) => dispatch(world, { type: 'setWeather', on })}
+                ariaLabel="天氣天空"
+              />
             </div>
-            {weatherOn(world) && weather?.status === 'waiting' ? (
-              <Chip tone="butter" onClick={weather.refresh}>
-                問天氣
-              </Chip>
+            {weatherOn(world) ? (
+              <div className="cb-row cb-wrap cb-weather-row">
+                <label className="cb-row cb-weather-place">
+                  <span className="cb-sub">地點</span>
+                  <select
+                    className="cb-select"
+                    value={weatherPlace(world)?.id ?? ''}
+                    onChange={(ev) => dispatch(world, { type: 'setWeatherPlace', place: ev.target.value || null })}
+                  >
+                    <option value="">用定位</option>
+                    {WEATHER_PLACES.map((place) => (
+                      <option key={place.id} value={place.id}>
+                        {place.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {weather && WEATHER_RETRY[weather.status] ? (
+                  <Chip tone="butter" onClick={weather.refresh}>
+                    {WEATHER_RETRY[weather.status]}
+                  </Chip>
+                ) : null}
+              </div>
             ) : null}
-            <Switch
-              checked={weatherOn(world)}
-              onChange={(on) => dispatch(world, { type: 'setWeather', on })}
-              ariaLabel="天氣天空"
-            />
           </Card>
 
           <section className="cb-section cb-update-row">

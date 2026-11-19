@@ -27,7 +27,7 @@ import { PetLayer } from './pet/PetLayer';
 import { ScorchLayer } from './pet/ScorchLayer';
 import { Sky } from './kit/Sky';
 import { useWeather } from './useWeather';
-import { weatherOn } from '../selectors/weather';
+import { weatherOn, weatherPlace } from '../selectors/weather';
 import { CHANGELOG } from '../core/constants/changelog';
 import { latestChangelog, unseenChangelog } from '../selectors/changelog';
 import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
@@ -77,7 +77,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
   const settings = getSettings(world);
   // 天氣天空：她在今日頁打開之後才會問定位
-  const sky = useWeather(weatherOn(world));
+  const sky = useWeather(weatherOn(world), weatherPlace(world));
   const questionView = currentQuestion(world);
   const readQuestion = readView(world);
   const summary = roundSummary(world);
