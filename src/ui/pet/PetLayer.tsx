@@ -504,6 +504,10 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         show('hop');
         return;
       }
+      if (e.homeTrip) {
+        e.mode = { kind: 'goHome' };
+        return;
+      }
       next(e, now);
     };
 
@@ -635,14 +639,19 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         }
 
         // 提示中牠坐的選項捲出畫面了（掉下去）：這次提示作廢
-        if (e.hint && e.mode.kind === 'fall') endHint(e);
+        if (e.hint && e.mode.kind === 'fall') {
+          // 為了提示自己跑出來的：提示作廢就回家，不留在外面
+          if (e.hint.auto) e.homeTrip = true;
+          endHint(e);
+        }
         // 噴火噴到一半掉下去、或被拎起來：這次不燒了
         if (e.fire && (e.mode.kind === 'fall' || e.mode.kind === 'drag')) {
           e.fire = null;
           setFlags((f) => ({ ...f, firing: false }));
         }
 
-        const shy = now < e.shyUntil && e.mode.kind !== 'drag';
+        // 提示中不變淡：作答後畫面會自己捲到解析，牠得意或心虛的樣子要看得到
+        const shy = now < e.shyUntil && e.mode.kind !== 'drag' && !e.hint;
         if (shy !== shown.current.shy) {
           shown.current = { ...shown.current, shy };
           setFlags((f) => ({ ...f, shy }));

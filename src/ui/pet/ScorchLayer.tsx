@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
 import { PET_SCORCH } from '../../core/constants/pet';
 import { SCORCH } from '../../core/constants/wardrobe';
@@ -10,6 +10,8 @@ import { useWorld } from '../useWorld';
 export const CAT_BURN_ATTR = 'data-cat-burn';
 
 const MARK = PET_SCORCH.mark;
+/** 沒有捲動時多久重新對一次焦痕的位置（毫秒） */
+const SCORCH_RECHECK_MS = 800;
 
 /** 焦痕要畫在哪（畫面座標）；卡片不在畫面上、或被底部的分頁列蓋住時回 null */
 export function scorchPlace(el: Element): { x: number; y: number } | null {
@@ -33,23 +35,31 @@ export function ScorchLayer({ world }: { world: World }) {
   const nodes = useRef(new Map<string, HTMLDivElement>());
   const [open, setOpen] = useState<string | null>(null);
 
+  /** 把每個焦痕放到它那張卡片的右上角（卡片不在這一頁就藏起來） */
+  const place = () => {
+    for (const [id, node] of nodes.current) {
+      const el = document.querySelector(`[${CAT_BURN_ATTR}="${id}"]`);
+      const at = el ? scorchPlace(el) : null;
+      node.style.display = at ? '' : 'none';
+      if (at) node.style.transform = `translate3d(${Math.round(at.x)}px, ${Math.round(at.y)}px, 0)`;
+    }
+  };
+
+  // 每次畫面重畫（換分頁、狀態變了）都重放一次
+  useLayoutEffect(place);
+
+  // 捲動、視窗大小變了就重放；版面自己變動（內容載入、卡片收合）沒有事件，所以另外每隔一小段時間對一次
   useEffect(() => {
-    if (spots.length === 0) return undefined;
-    let raf = 0;
-    const tick = () => {
-      for (const id of spots) {
-        const node = nodes.current.get(id);
-        if (!node) continue;
-        const el = document.querySelector(`[${CAT_BURN_ATTR}="${id}"]`);
-        const at = el ? scorchPlace(el) : null;
-        node.style.display = at ? '' : 'none';
-        if (at) node.style.transform = `translate3d(${Math.round(at.x)}px, ${Math.round(at.y)}px, 0)`;
-      }
-      raf = window.requestAnimationFrame(tick);
+    if (key === '') return undefined;
+    document.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
+    const timer = window.setInterval(place, SCORCH_RECHECK_MS);
+    return () => {
+      document.removeEventListener('scroll', place, true);
+      window.removeEventListener('resize', place);
+      window.clearInterval(timer);
     };
-    raf = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(raf);
-    // spots 用字串當依賴：內容一樣就不重開迴圈
+    // place 只讀 ref 和 DOM，不必當依賴
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 

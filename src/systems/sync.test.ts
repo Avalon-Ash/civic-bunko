@@ -76,7 +76,7 @@ function decodePutContent(bodyText: string): {
       achievements: string[];
       quests: Record<string, string[]>;
       outfit?: unknown;
-      saved?: Record<string, number>;
+      saved?: Record<string, number>; repairs?: number;
     };
   };
 } {
@@ -95,7 +95,7 @@ function decodePutContent(bodyText: string): {
         achievements: string[];
         quests: Record<string, string[]>;
         outfit?: unknown;
-        saved?: Record<string, number>;
+        saved?: Record<string, number>; repairs?: number;
       };
     },
   };
@@ -737,5 +737,120 @@ describe('sync system', () => {
     const plain = decodePutContent(putPlain).payload.wardrobe;
     assert.ok(plain);
     assert.equal('saved' in plain, false);
+  });
+  it('syncs how many scorch repairs were paid: larger count wins, uploads when only that differs, never uploads the marks', async () => {
+    const storage = createMemoryStorage({
+      [SYNC_STORAGE_KEY]: JSON.stringify(TEST_CRED),
+    });
+    const world = createWorld();
+    world.settings.wardrobe = {
+      owned: ['beanie'],
+      achievements: [],
+      quests: {},
+      repairs: 2,
+      scorch: ['today-quest'],
+      outfit: { 'head-top': 'beanie' },
+    };
+    let putBodyRaw = '';
+    attachSync(world, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-r1',
+            content: encodeRemoteContent({}, '2026-11-20T00:00:00.000Z', undefined, {
+              wardrobe: { owned: ['beanie'], achievements: [], quests: {}, repairs: 1, scorch: ['other-device-spot'] },
+            }),
+          });
+        }
+        putBodyRaw = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-r2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T10:00:00.000Z'),
+    });
+    await waitForSync(world);
+    assert.equal(world.sync.status, 'idle');
+    // owned 兩邊一樣，只有修復次數不同：本機留較大的、雲端也補上；焦痕是這台自己的，不上傳、也不收別台的
+    assert.deepEqual(world.settings.wardrobe, {
+      owned: ['beanie'],
+      achievements: [],
+      quests: {},
+      repairs: 2,
+      scorch: ['today-quest'],
+      outfit: { 'head-top': 'beanie' },
+    });
+    assert.deepEqual(decodePutContent(putBodyRaw).payload.wardrobe, {
+      owned: ['beanie'],
+      achievements: [],
+      quests: {},
+      repairs: 2,
+    });
+
+    // 雲端的次數比較大：本機跟上（不必再上傳）
+    const worldBehind = createWorld();
+    worldBehind.settings.wardrobe = { owned: ['beanie'], achievements: [], quests: {}, repairs: 1 };
+    let putBehind = '';
+    attachSync(worldBehind, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-b1',
+            content: encodeRemoteContent({}, '2026-11-20T00:00:00.000Z', undefined, {
+              wardrobe: { owned: ['beanie'], achievements: [], quests: {}, repairs: 4 },
+            }),
+          });
+        }
+        putBehind = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-b2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T10:30:00.000Z'),
+    });
+    await waitForSync(worldBehind);
+    assert.equal(worldBehind.settings.wardrobe?.repairs, 4);
+    assert.equal(putBehind, '');
+
+    // 舊版 App 寫回的同步檔沒有 repairs：本機的次數留著，並且補回雲端
+    const worldOldRemote = createWorld();
+    worldOldRemote.settings.wardrobe = { owned: ['beanie'], achievements: [], quests: {}, repairs: 3 };
+    let putOld = '';
+    attachSync(worldOldRemote, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') {
+          return jsonResponse(200, {
+            sha: 'sha-o1',
+            content: encodeRemoteContent({}, '2026-11-20T00:00:00.000Z', undefined, {
+              wardrobe: { owned: ['beanie'], achievements: [], quests: {} },
+            }),
+          });
+        }
+        putOld = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-o2' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T11:00:00.000Z'),
+    });
+    await waitForSync(worldOldRemote);
+    assert.equal(worldOldRemote.settings.wardrobe?.repairs, 3);
+    assert.equal(decodePutContent(putOld).payload.wardrobe?.repairs, 3);
+
+    // 沒修過的人：同步檔不多這一欄
+    const worldPlain = createWorld();
+    worldPlain.settings.wardrobe = { owned: ['beanie'], achievements: [], quests: {}, scorch: ['today-quest'] };
+    let putPlain = '';
+    attachSync(worldPlain, {
+      fetch: async (_input, init) => {
+        if ((init?.method ?? 'GET') === 'GET') return jsonResponse(404, {});
+        putPlain = String(init?.body ?? '');
+        return jsonResponse(200, { content: { sha: 'sha-p1' } });
+      },
+      storage,
+      now: () => new Date('2026-11-20T12:00:00.000Z'),
+    });
+    await waitForSync(worldPlain);
+    const plain = decodePutContent(putPlain).payload.wardrobe;
+    assert.ok(plain);
+    assert.equal('repairs' in plain, false);
+    assert.equal('scorch' in plain, false);
   });
 });
