@@ -270,6 +270,14 @@ export const RUNNER_GROOM_AFTER_MS = 20_000;
 export const RUNNER_GROOM_MS = 3_000;
 export const RUNNER_SLEEP_AFTER_MS = 60_000;
 
+/**
+ * 想太久的提示：一題停太久沒作答，小貓跳到某個選項上猜一個（不保證對）。
+ * 等多久看題目長短：minMs 起跳、每個字加 msPerChar、最多 maxMs，再上下浮動 jitter（比例）；
+ * chance＝牠猜對的機率；revealMs＝作答後牠得意或心虛的樣子維持多久；minTop＝選項離畫面上緣至少多遠才跳（不然牠會頂出畫面）；
+ * seat＝牠坐在選項的哪裡：dx＝圖的左緣離選項左緣多遠（負的＝往外凸一點，讓身體正好蓋在代號上）、up＝腳離選項下緣多高
+ */
+export const CAT_HINT = { minMs: 5_000, maxMs: 25_000, msPerChar: 120, jitter: 0.15, chance: 0.7, revealMs: 1_800, minTop: 70, seat: { dx: -12, up: 8 } } as const;
+
 // ── 其他分頁：從頭像鑽出來自由亂跑 ─────────────────────────
 /** 亂跑的小貓寬度（px；高度照 PET_VIEW 比例） */
 export const ROAM_WIDTH = 80;
@@ -312,6 +320,8 @@ export const ROAM_ROUTES: Readonly<Record<string, Readonly<Record<RoamBehavior, 
   today: { walk: 3, sit: 2, groom: 2, nap: 1, perch: 3, zoom: 1 },
   /** 圖卡：卡片排得很密，坐上去會蓋到上一張，所以只沿地面逛、偶爾暴衝 */
   cards: { walk: 3, sit: 2, groom: 2, nap: 1, perch: 0, zoom: 1 },
+  /** 答題中（刷題、看答案）：只在地面安靜地待著，不跳上題目和選項擋字；跳到選項上只有「想太久的提示」 */
+  round: { walk: 2, sit: 3, groom: 2, nap: 1, perch: 0, zoom: 0 },
   /** 刷題設定：安靜，待在開始鈕上面 */
   quiz: { walk: 2, sit: 3, groom: 2, nap: 1, perch: 0, zoom: 0 },
   /** 小貓衣櫥：理毛、炫耀新衣服 */

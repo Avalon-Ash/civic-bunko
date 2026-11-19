@@ -11,6 +11,8 @@ import {
 import type { Outfit, PetPose } from '../../core/types';
 import type { World } from '../../core/world';
 import { CatBody } from '../kit/CatBody';
+import { useCanRoam } from './CatHome';
+import { recallPet, releasePet, usePet } from './petStore';
 
 export interface PetRunnerProps {
   world: World;
@@ -21,7 +23,8 @@ export interface PetRunnerProps {
 
 /**
  * 答題頁進度條上的小貓：跑到哪＝做到哪。答對跳一下、答錯踉蹌；一陣子沒動靜理毛，更久就睡。
- * 不能點、不能拖（答題要專心）。
+ * 點牠＝放出來在畫面上亂跑（這裡就是牠的家：data-cat-home）；出門時原地留一個肉球，點肉球叫牠回來。
+ * 模擬考沒有進度條，所以沒有這隻。
  */
 export function PetRunner({ world, outfit, value }: PetRunnerProps) {
   const [pose, setPose] = useState<PetPose>('sit');
@@ -30,6 +33,8 @@ export function PetRunner({ world, outfit, value }: PetRunnerProps) {
   const pendingReaction = useRef<PetPose | null>(null);
   const timers = useRef<number[]>([]);
   const hostRef = useRef<HTMLSpanElement | null>(null);
+  const pet = usePet();
+  const canRoam = useCanRoam();
 
   // 進度條的滑動時間＝跑步時間（同一個常數）
   useEffect(() => {
@@ -88,10 +93,45 @@ export function PetRunner({ world, outfit, value }: PetRunnerProps) {
     });
   }, [value]);
 
-  return (
-    <span ref={hostRef} className="cb-pet-runner">
+  const handleTap = () => {
+    if (pet.out) {
+      recallPet();
+      return;
+    }
+    const rect = hostRef.current?.getBoundingClientRect();
+    if (rect) releasePet({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+  };
+
+  const body = (
+    <span className={pet.out ? 'cb-pet-runner-away' : undefined}>
       {/* 模擬考要安靜：不冒表情符號泡泡 */}
       <CatBody pose={pose} outfit={outfit} facing={facing} width={RUNNER_WIDTH} pivot quiet={Boolean(world.round?.config.exam)} />
+    </span>
+  );
+
+  return (
+    <span ref={hostRef} className="cb-pet-runner" data-cat-home="">
+      {canRoam ? (
+        <button
+          type="button"
+          className="cb-pet-runner-btn"
+          onClick={handleTap}
+          aria-label={pet.out ? '叫小貓回來' : '放小貓出來玩'}
+          tabIndex={-1}
+        >
+          {body}
+          {pet.out ? (
+            <svg className="cb-pet-runner-paw" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <ellipse cx="12" cy="15.5" rx="5" ry="4" />
+              <circle cx="6.5" cy="10" r="2.1" />
+              <circle cx="12" cy="7.5" r="2.2" />
+              <circle cx="17.5" cy="10" r="2.1" />
+            </svg>
+          ) : null}
+        </button>
+      ) : (
+        body
+      )}
     </span>
   );
 }

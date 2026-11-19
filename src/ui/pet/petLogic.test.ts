@@ -1,8 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { RoamBehavior } from '../../core/types';
-import { ROAM_ROUTES } from '../../core/constants/pet';
-import { clamp, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
+import { CAT_HINT, ROAM_ROUTES } from '../../core/constants/pet';
+import { clamp, hintDelay, jumpPoint, perchOffset, pickBehavior, pickHint, pickWalkTarget, stepWalk } from './petLogic';
 
 const seq = (...values: number[]) => {
   let i = 0;
@@ -86,5 +86,37 @@ describe('walking on a card', () => {
     assert.equal(perchLeft + dx, 130);
     // 卡片跟著頁面橫移時，小貓跟著卡片
     assert.equal(perchLeft + 12 + dx, 142);
+  });
+});
+
+describe('thinking-too-long hint', () => {
+  it('waits longer for longer questions, always inside the configured range', () => {
+    const mid = () => 0.5;
+    assert.equal(hintDelay(0, mid, CAT_HINT), CAT_HINT.minMs);
+    assert.ok(hintDelay(40, mid, CAT_HINT) > hintDelay(10, mid, CAT_HINT));
+    assert.equal(hintDelay(10_000, mid, CAT_HINT), CAT_HINT.maxMs);
+    for (const roll of [0, 0.5, 0.999]) {
+      for (const chars of [0, 30, 120, 400]) {
+        const ms = hintDelay(chars, () => roll, CAT_HINT);
+        assert.ok(ms >= CAT_HINT.minMs && ms <= CAT_HINT.maxMs, `${chars} 字、${roll}`);
+      }
+    }
+  });
+
+  it('guesses right or wrong by chance, and says which', () => {
+    const order = ['C', 'A', 'D', 'B'] as const;
+    const right = pickHint(order, ['D'], () => 0, CAT_HINT.chance);
+    assert.deepEqual(right, { choice: 'D', right: true });
+    const wrong = pickHint(order, ['D'], () => 0.99, CAT_HINT.chance);
+    assert.equal(wrong?.right, false);
+    assert.notEqual(wrong?.choice, 'D');
+    // 全部都算對（送分題）：只能猜對
+    assert.equal(pickHint(order, ['A', 'B', 'C', 'D'], () => 0.99, CAT_HINT.chance)?.right, true);
+    assert.equal(pickHint([], ['A'], () => 0, CAT_HINT.chance), null);
+  });
+
+  it('in a round the cat stays on the ground (never perches on the question by itself)', () => {
+    assert.equal(ROAM_ROUTES.round?.perch, 0);
+    assert.equal(ROAM_ROUTES.round?.zoom, 0);
   });
 });

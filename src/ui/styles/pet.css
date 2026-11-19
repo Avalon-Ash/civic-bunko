@@ -245,6 +245,33 @@
   top: auto;
 }
 
+/* 進度條上的小貓可以點（放出來）；出門時原地留一個肉球（叫回來） */
+.cb-pet-runner {
+  position: relative;
+  display: inline-block;
+}
+
+.cb-pet-runner-btn {
+  all: unset;
+  display: block;
+  pointer-events: auto;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cb-pet-runner-away {
+  visibility: hidden;
+}
+
+.cb-pet-runner-paw {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  fill: var(--ink-soft);
+  opacity: 0.7;
+}
+
 /* ── 自由亂跑 ───────────────────────────────────────────── */
 
 /* 整層不擋點擊，只有小貓本身可以按；在分頁列之上、抽屜與提示之下 */
@@ -288,6 +315,11 @@
 /* 她在捲動或剛點了畫面：變淡，點擊穿過去 */
 .cb-pet-actor.is-shy {
   opacity: 0.3;
+  pointer-events: none;
+}
+
+/* 坐在選項上提示時不擋點擊：她要點的就是牠腳下那個選項 */
+.cb-pet-actor.is-hinting {
   pointer-events: none;
 }
 

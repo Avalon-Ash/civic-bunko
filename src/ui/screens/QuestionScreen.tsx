@@ -34,6 +34,7 @@ import { Chip } from '../kit/Chip';
 import { Dialog } from '../kit/Dialog';
 import { ProgressBar } from '../kit/ProgressBar';
 import { PetRunner } from '../pet/PetRunner';
+import { CAT_CHOICE_ATTR, useCatHint } from '../pet/useCatHint';
 import { Segmented } from '../kit/Segmented';
 import { Sheet } from '../kit/Sheet';
 import { Toast } from '../kit/Toast';
@@ -90,6 +91,15 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
   const isCorrect = view?.isCorrect ?? null;
   const fast = !isExam && (config?.fast ?? false);
   const combo = view?.combo ?? 0;
+
+  // 想太久的提示：這一題停太久沒作答，小貓跳到某個選項上猜一個（模擬考不提示）
+  useCatHint({
+    enabled: Boolean(view) && !isExam && pick === null,
+    questionId: questionId ?? '',
+    chars: view ? view.question.stem.length + view.question.options.reduce((sum, text) => sum + text.length, 0) : 0,
+    order: view?.optionOrder ?? [],
+    answer: view?.question.answer ?? [],
+  });
 
   useEffect(() => {
     let active = true;
@@ -425,7 +435,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
             const showBurst = !isExam && burstChoice?.choice === choice;
 
             return (
-              <div key={choice} className="cb-opt-wrap">
+              <div key={choice} className="cb-opt-wrap" {...{ [CAT_CHOICE_ATTR]: choice }}>
                 <button
                   type="button"
                   className={`cb-card cb-press cb-opt ${stateClass}`.trim()}

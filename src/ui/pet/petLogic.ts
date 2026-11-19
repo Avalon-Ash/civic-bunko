@@ -1,5 +1,5 @@
 // 自由亂跑的小貓：不碰 DOM 的計算（挑動作、挑落腳處、拋物線）。DOM 與動畫在 PetLayer。
-import type { RoamBehavior } from '../../core/types';
+import type { Choice, RoamBehavior } from '../../core/types';
 
 const BEHAVIORS: readonly RoamBehavior[] = ['walk', 'sit', 'groom', 'nap', 'perch', 'zoom'];
 /** 她正在操作時只做原地的動作 */
@@ -94,4 +94,36 @@ export function perchOffset(x: number, perchLeft: number): number {
 /** 把 v 限制在 [min, max]（max < min 時回 min） */
 export function clamp(v: number, min: number, max: number): number {
   return Math.min(Math.max(v, min), Math.max(min, max));
+}
+
+/**
+ * 想太久的提示要等多久（毫秒）：看題目和選項的字數，字多等久一點，落在 [minMs, maxMs]。
+ */
+export function hintDelay(
+  chars: number,
+  rng: () => number,
+  spec: { minMs: number; maxMs: number; msPerChar: number; jitter: number },
+): number {
+  const base = spec.minMs + Math.max(0, chars) * spec.msPerChar;
+  const wobble = 1 + (rng() * 2 - 1) * spec.jitter;
+  return Math.round(clamp(base * wobble, spec.minMs, spec.maxMs));
+}
+
+/**
+ * 小貓猜哪個選項：chance 的機率猜正確答案，不然從錯的裡面挑一個。
+ * 沒有錯的選項（或沒有對的）時就只能從有的那一邊挑；選項是空的回 null。
+ */
+export function pickHint(
+  order: readonly Choice[],
+  answer: readonly Choice[],
+  rng: () => number,
+  chance: number,
+): { choice: Choice; right: boolean } | null {
+  const rights = order.filter((c) => answer.includes(c));
+  const wrongs = order.filter((c) => !answer.includes(c));
+  const wantRight = rng() < chance;
+  const right = rights.length > 0 && (wantRight || wrongs.length === 0);
+  const pool = right ? rights : wrongs;
+  const choice = pool[Math.floor(rng() * pool.length)] ?? pool[0];
+  return choice ? { choice, right } : null;
 }

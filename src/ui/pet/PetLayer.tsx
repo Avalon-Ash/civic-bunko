@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  CAT_HINT,
   PET_VIEW_H,
   PET_VIEW_W,
   ROAM_BLOCK_CHECK_MS,
@@ -24,7 +25,8 @@ import {
   ROAM_WALK_SPEED,
   ROAM_WIDTH,
 } from '../../core/constants/pet';
-import type { PetPose, RoamBehavior } from '../../core/types';
+import { CAT_HINT_LINES } from '../../core/constants/catLines';
+import type { CatMood, PetPose, RoamBehavior } from '../../core/types';
 import type { World } from '../../core/world';
 import { soundOn } from '../../selectors/sound';
 import { currentOutfit } from '../../selectors/wardrobe';
@@ -42,7 +44,8 @@ const INTERACTIVE = 'button, a[href], input, select, textarea, label, [role="but
 /** 沒有標記動線時的預設 */
 const DEFAULT_ROUTE: Record<RoamBehavior, number> = { walk: 2, sit: 2, groom: 2, nap: 1, perch: 1, zoom: 0.5 };
 
-type Surface = { kind: 'floor' } | { kind: 'perch'; el: Element; dx: number };
+/** perch＝站在某個元素的上緣；drop＝改站在上緣往下這麼多的地方（提示時坐進選項裡面，不擋到上一個選項的字） */
+type Surface = { kind: 'floor' } | { kind: 'perch'; el: Element; dx: number; drop?: number };
 type Mode =
   | { kind: 'idle'; until: number }
   | { kind: 'walk'; to: number; speed: number }
@@ -62,6 +65,15 @@ interface Engine {
   lastBlockCheck: number;
   /** 回家：先走到家底下，再跳進去 */
   homeTrip: boolean;
+  /**
+   * 想太久的提示進行中：right＝牠猜的對不對、auto＝提示完自己回家、answered＝她作答了（該揭曉了）；
+   * stage：wait＝跳過去、坐在選項上等她作答；cheer＝猜對了原地跳；done＝揭曉完，等著離開
+   */
+  hint: { right: boolean; auto: boolean; answered: boolean; stage: 'wait' | 'cheer' | 'done' } | null;
+}
+
+function pickLine(lines: readonly string[]): string {
+  return lines[Math.floor(Math.random() * lines.length)] ?? '';
 }
 
 function rectOf(el: Element): DOMRect {
@@ -127,9 +139,9 @@ function blockedAt(x: number, y: number, layer: Element | null): boolean {
 
 export interface PetLayerProps {
   world: World;
-  /** 目前分頁（決定動線） */
+  /** 動線（ROAM_ROUTES 的 key）：目前分頁，答題中是 round */
   tab: string;
-  /** 答題中為 false：小貓自動回家，讓她專心 */
+  /** 模擬考中為 false：小貓自動回家，讓她專心 */
   allowed: boolean;
 }
 
@@ -140,7 +152,9 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   const [out, setOut] = useState(getPet().out);
   const [pose, setPose] = useState<PetPose>('hop');
   const [facing, setFacing] = useState<'left' | 'right'>('right');
-  const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false });
+  const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false });
+  /** 提示揭曉時的表情（得意、心虛）；平常照姿勢預設 */
+  const [mood, setMood] = useState<CatMood | undefined>(undefined);
   const layerRef = useRef<HTMLDivElement | null>(null);
   const actorRef = useRef<HTMLDivElement | null>(null);
   const engine = useRef<Engine | null>(null);
@@ -150,6 +164,19 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   const drag = useRef<{ id: number; sx: number; sy: number; t0: number; lastX: number; active: boolean } | null>(null);
   const voice = useCatVoice();
   const { bubble, say } = useCatBubble();
+  /** 畫面上現在的樣子（主迴圈、點擊、提示都經過 show 改，才不會各改各的對不起來） */
+  const shown = useRef<{ pose: PetPose; facing: 'left' | 'right'; shy: boolean }>({ pose: 'hop', facing: 'right', shy: false });
+  const show = (p: PetPose, f: 'left' | 'right' = shown.current.facing) => {
+    if (p !== shown.current.pose) setPose(p);
+    if (f !== shown.current.facing) setFacing(f);
+    shown.current = { ...shown.current, pose: p, facing: f };
+  };
+  /** 提示結束（揭曉完、或牠掉下去了）：表情、點擊穿透都復原 */
+  const endHint = (e: Engine) => {
+    e.hint = null;
+    setMood(undefined);
+    setFlags((f) => ({ ...f, hinting: false }));
+  };
 
   // 跟著 store：放出來、叫回家
   useEffect(
@@ -173,22 +200,65 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             shyUntil: 0,
             lastBlockCheck: 0,
             homeTrip: false,
+            hint: null,
           };
-          setPose('hop');
+          show('hop');
           setFlags((f) => ({ ...f, emerging: true }));
           window.setTimeout(() => setFlags((f) => ({ ...f, emerging: false })), ROAM_JUMP_MS);
         } else if (s.request?.kind === 'recall' && e) {
           e.homeTrip = true;
           e.mode = { kind: 'goHome' };
+          if (e.hint) endHint(e);
+        } else if (s.request?.kind === 'hint') {
+          const { el, right, auto, from } = s.request;
+          // 被拎著、正要回家、上一個提示還沒結束：這次不提示
+          if (!auto && e && (e.mode.kind === 'drag' || e.homeTrip || e.hint)) return;
+          const r = rectOf(el);
+          // 坐進選項裡、蓋在左邊的代號（A–D）上：牠自己就是記號，不擋到選項的字，也不擋到上一個選項
+          const tx = r.left + CAT_HINT.seat.dx;
+          const drop = r.height - CAT_HINT.seat.up;
+          const start =
+            !auto && e ? { x: e.x, y: e.y } : { x: from.left + from.width / 2 - W / 2, y: from.top + from.height / 2 - H / 2 };
+          engine.current = {
+            x: start.x,
+            y: start.y,
+            surface: !auto && e ? e.surface : { kind: 'floor' },
+            lastInput: !auto && e ? e.lastInput : 0,
+            shyUntil: 0,
+            lastBlockCheck: 0,
+            homeTrip: false,
+            hint: { right, auto, answered: false, stage: 'wait' },
+            mode: {
+              kind: 'jump',
+              from: start,
+              to: { x: tx, y: r.top - H + 3 + drop },
+              start: performance.now(),
+              land: { kind: 'perch', el, dx: tx - r.left, drop },
+            },
+          };
+          show('hop', tx > start.x ? 'right' : 'left');
+          setFlags((f) => ({ ...f, hinting: true, landing: false }));
         }
       }),
     [],
   );
 
-  // 答題開始：直接回家
+  // 模擬考開始：直接回家
   useEffect(() => {
     if (!allowed && getPet().out) petHome();
   }, [allowed]);
+
+  // 提示中她作答了：記下來，主迴圈在牠坐定後揭曉（還在跳就等落地）
+  useEffect(
+    () =>
+      world.bus.on('answered', () => {
+        const e = engine.current;
+        if (!e?.hint || e.hint.stage !== 'wait') return;
+        e.hint.answered = true;
+        if (e.mode.kind === 'idle') e.mode.until = 0;
+      }),
+    [world],
+  );
 
   // 她捲動或點畫面：小貓變淡讓路，而且一陣子只做原地的動作
   useEffect(() => {
@@ -214,20 +284,13 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     if (!out) return undefined;
     let raf = 0;
     let last = performance.now();
-    let shown: { pose: PetPose; facing: 'left' | 'right'; shy: boolean } = { pose: 'hop', facing: 'right', shy: false };
-
-    const show = (p: PetPose, f: 'left' | 'right' = shown.facing) => {
-      if (p !== shown.pose) setPose(p);
-      if (f !== shown.facing) setFacing(f);
-      shown = { ...shown, pose: p, facing: f };
-    };
 
     const surfaceY = (s: Surface): number | null => {
       if (s.kind === 'floor') return floorY();
       if (!s.el.isConnected) return null;
       const r = rectOf(s.el);
       if (r.top < ROAM_PERCH_MARGIN / 2 || r.top > floorY()) return null;
-      return r.top - H + 3;
+      return r.top - H + 3 + (s.drop ?? 0);
     };
 
     const next = (e: Engine, now: number) => {
@@ -286,6 +349,52 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       show(restPose);
     };
 
+    /** 一個動作做完了，接下來做什麼：提示進行中照提示的步驟走，不然隨機挑下一個 */
+    const proceed = (e: Engine, now: number) => {
+      const h = e.hint;
+      if (h?.stage === 'wait' && !h.answered) {
+        // 坐在選項上等她作答（不會自己走開）
+        e.mode = { kind: 'idle', until: Number.POSITIVE_INFINITY };
+        show('sit');
+        say(pickLine(CAT_HINT_LINES.point));
+        return;
+      }
+      if (h?.stage === 'wait') {
+        // 揭曉：猜對了得意地原地跳，猜錯了心虛
+        setMood(h.right ? 'yay' : 'oops');
+        say(pickLine(h.right ? CAT_HINT_LINES.right : CAT_HINT_LINES.wrong));
+        if (h.right) {
+          h.stage = 'cheer';
+          e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: e.y }, start: now, land: e.surface };
+          show('hop');
+        } else {
+          h.stage = 'done';
+          e.mode = { kind: 'idle', until: now + CAT_HINT.revealMs };
+          show('stumble');
+        }
+        return;
+      }
+      if (h?.stage === 'cheer') {
+        h.stage = 'done';
+        e.mode = { kind: 'idle', until: now + CAT_HINT.revealMs };
+        show('sit');
+        return;
+      }
+      if (h) {
+        endHint(e);
+        if (h.auto) {
+          e.homeTrip = true;
+          e.mode = { kind: 'goHome' };
+          return;
+        }
+        // 本來就在外面玩的：跳回地面，不賴在選項上擋字
+        e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: floorY() }, start: now, land: { kind: 'floor' } };
+        show('hop');
+        return;
+      }
+      next(e, now);
+    };
+
     const tick = (now: number) => {
       const e = engine.current;
       const dt = Math.min(0.05, (now - last) / 1000);
@@ -337,7 +446,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           if (y !== null) e.y = y;
           if (now >= m.until) {
             setFlags((f) => ({ ...f, landing: false }));
-            next(e, now);
+            proceed(e, now);
           }
         } else if (m.kind === 'walk') {
           const step = stepWalk(e.x, m.to, m.speed, dt);
@@ -405,7 +514,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             e.y = y;
             if (e.surface.kind === 'perch') e.x = rectOf(e.surface.el).left + e.surface.dx;
             if (now >= m.until) {
-              next(e, now);
+              proceed(e, now);
             } else if (now - e.lastBlockCheck > ROAM_BLOCK_CHECK_MS) {
               e.lastBlockCheck = now;
               if (e.surface.kind === 'floor' && blockedAt(e.x, e.y, layerRef.current)) next(e, now);
@@ -413,9 +522,12 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           }
         }
 
+        // 提示中牠坐的選項捲出畫面了（掉下去）：這次提示作廢
+        if (e.hint && e.mode.kind === 'fall') endHint(e);
+
         const shy = now < e.shyUntil && e.mode.kind !== 'drag';
-        if (shy !== shown.shy) {
-          shown = { ...shown, shy };
+        if (shy !== shown.current.shy) {
+          shown.current = { ...shown.current, shy };
           setFlags((f) => ({ ...f, shy }));
         }
         const actor = actorRef.current;
@@ -453,7 +565,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     drag.current.active = true;
     e.mode = { kind: 'drag' };
     e.homeTrip = false;
-    setPose('dangle');
+    show('dangle');
     setFlags((f) => ({ ...f, dragging: true, landing: false }));
   };
   const onPointerMove = (ev: React.PointerEvent<HTMLDivElement>) => {
@@ -483,7 +595,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       const line = voice({ mood: 'idle', place: 'roam' });
       if (line) say(line.text);
       e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: e.y }, start: performance.now(), land: e.surface };
-      setPose('hop');
+      show('hop');
       return;
     }
     setHomeTarget(false);
@@ -502,7 +614,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     e.surface = below ? { kind: 'perch', el: below, dx: clamp(e.x - rectOf(below).left, ROAM_EDGE, rectOf(below).width - W - ROAM_EDGE) } : { kind: 'floor' };
     if (e.surface.kind === 'floor') e.x = clamp(e.x, xRange().min, xRange().max);
     e.mode = { kind: 'fall', vy: 0 };
-    setPose('fall');
+    show('fall');
   };
   const onKeyDown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
     if (ev.key === 'Enter' || ev.key === ' ') {
@@ -521,6 +633,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     flags.dragging ? 'is-dragging' : '',
     flags.landing ? 'is-landing' : '',
     flags.emerging ? 'is-emerging' : '',
+    flags.hinting ? 'is-hinting' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -543,7 +656,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       >
         {bubble}
         <div className="cb-pet-actor-inner">
-          <CatBody pose={pose} outfit={outfit} facing={facing} width={W} pivot />
+          <CatBody pose={pose} outfit={outfit} facing={facing} width={W} pivot {...(mood ? { mood } : {})} />
         </div>
       </div>
     </div>

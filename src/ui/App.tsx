@@ -261,7 +261,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
       <div className="cb-shell">
         <Toast message={examToast} onDismiss={() => setExamToast(null)} />
         <RewardToast world={world} />
-        <PetLayer world={world} tab={tab} allowed={!hasActiveRound} />
+        <PetLayer world={world} tab={hasActiveRound ? 'round' : tab} allowed={!world.round?.config.exam} />
         <TabBar active={tab} onSelect={handleTabSelect} />
         <main
           ref={mainRef}
