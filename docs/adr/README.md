@@ -70,4 +70,20 @@
 
 ## 索引
 
-（還沒有 ADR。）
+- [0001 題庫只來自考選部官方 PDF 流水線](0001-official-pdf-pipeline.md)：官方題庫與更正答案只由本機爬蟲與解析腳本產生，不得手改或由模型補寫，並以 manifest 雜湊與驗證腳本守門。
+- [0002 加工層、卡片與中譯與官方層分開存放](0002-derived-layers-separate-from-official.md)：AI 加工、圖卡、申論卡與英文中譯各自獨立存放並以 ID 對應，不寫回官方試卷，字數上限與拼回原文由驗證腳本守門。
+- [0003 解析與卡片引用法條須對應本機法規副本](0003-local-law-copies-for-citations.md)：解析與卡片引用的法規名稱及條號必須能在共用本機法規副本查到，查不到則記為 `lawRef: null`。
+- [0004 題目與各項識別碼產生後不重編、不改名](0004-stable-ids-never-renumbered.md)：題目、試卷、卡片、衣櫥配件、成就、任務、科目、燒焦卡片、縣市與更新紀錄 ID 產生後維持不變，且內容 ID 跨包唯一。
+- [0005 App 採用 ECS 與 SSOT 單向資料流架構](0005-ecs-ssot-architecture.md)：型別、常數與主題樣式集中定義，Component 純資料、System 純函式單一擁有狀態、畫面經 selectors 讀與 commands 寫。
+- [0006 禁用瀏覽器原生彈窗與 as any，介面用自製元件與純 CSS](0006-no-browser-popups-and-minimal-ui-stack.md)：禁用瀏覽器原生彈窗、`target="_blank"` 與 `as any`，執行期只依賴 React，抽屜、提示與動態效果皆自製並以純 CSS 實作。
+- [0007 題庫採扁平資料目錄並由 banks.json 登記](0007-flat-data-dir-and-banks-manifest.md)：（已取代，由 0011）初期將官方與加工等資料依類型扁平置於 `data/` 並由 `data/banks.json` 登記。
+- [0008 跨裝置進度同步採私人 GitHub repo 與同步碼](0008-private-repo-sync-with-sync-code.md)：不建自營後端，透過單一 repo 讀寫權限的 Fine-grained PAT 組裝為 `cb1.` 同步碼，讀寫使用者私人 GitHub repo 的 `progress.json`。
+- [0009 離線快取採自寫 Service Worker 搭配 precache.json 清單](0009-offline-precache-manifest.md)：以自寫 `public/sw.js` 搭配打包產生的 `precache.json`，在版本一致且全部補抓成功後才清除舊版資產快取。
+- [0010 使用者存檔與同步檔只增選填欄位並由固定樣本守門](0010-additive-save-format-and-golden-gate.md)：凍結儲存鍵與版本號，存檔與同步檔只允許往上加選填欄位、壞子欄位單獨丟棄，並以固定樣本與雜湊斷言守門。
+- [0011 題庫拆分為內容包並以引擎邊界腳本守門](0011-content-packs-and-engine-boundary.md)：（取代 0007）將各題庫封裝為 `data/packs/<packId>/`，由 `source.ts` 與 `tools/paths.mjs` 統一取得路徑，並以 lint 腳本禁止引擎出現包字面值。
+- [0012 小魚乾不存餘額，由單調遞增來源即時計算](0012-derived-fish-balance.md)：不儲存小魚乾餘額，一律由只增不減的題數、關卡、成就、任務與扣除特價省下、燒焦修復的支出重算，已發佈價格不調高。
+- [0013 跨裝置同步採可交換合併規則與單一值改動時間戳](0013-commutative-sync-merge-rules.md)：同步合併採取聯集、較大值或確定性時間戳比較而與順序無關，單一值設定連同最後改動時間成包比較。
+- [0014 小貓說話採台詞、判斷與介面三層解耦](0014-cat-voice-three-layer-decoupling.md)：將角色台詞包、處境條件判斷函式與 `CatVoice` 注入介面分離，記憶只存於記憶體且台詞不得含內容包或法條內容。
+- [0015 小貓紙娃娃部位分層、姿勢對位表與幾何測試守門](0015-paper-doll-pose-table-rendering.md)：小貓配件依部位深度疊圖、全身姿勢與頭背對位點集中於純資料表，正面姿勢另有背飾圖並以幾何測試檢查座標與鏡像。
+- [0016 音效採 Web Audio 即時合成並獨立處理系統靜默恢復](0016-web-audio-synthesis-and-ios-recovery.md)：介面回饋音以 Web Audio 即時合成、貓叫採預載音檔並設為 ambient，且將環境喚醒與卡死重建抽離為可測試的純邏輯介面。
+- [0017 天氣天空為同步以外唯一對外連線並限制定位精度與時機](0017-weather-sky-sole-non-sync-external-call.md)：僅對 Open-Meteo 發出非同步對外連線，座標四捨五入至小數一位且不寫入存檔，並限制僅於明確操作或已授權時定位。
