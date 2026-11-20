@@ -290,6 +290,14 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     if (f !== shown.current.facing) setFacing(f);
     shown.current = { ...shown.current, pose: p, facing: f };
   };
+  /** 叫牠回家：噴火、劈斧頭、撲到一半也作罷（還沒劈下去的那幾下不會再落在卡片上） */
+  const goHome = (e: Engine) => {
+    e.homeTrip = true;
+    e.mode = { kind: 'goHome' };
+    e.prank = null;
+    e.pounce = null;
+    setFlags((f) => ({ ...f, firing: false }));
+  };
   /** 提示結束（揭曉完、或牠掉下去了）：表情、點擊穿透都復原 */
   const endHint = (e: Engine) => {
     e.hint = null;
@@ -321,8 +329,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           setFlags((f) => ({ ...f, emerging: true }));
           window.setTimeout(() => setFlags((f) => ({ ...f, emerging: false })), ROAM_JUMP_MS);
         } else if (s.request?.kind === 'recall' && e) {
-          e.homeTrip = true;
-          e.mode = { kind: 'goHome' };
+          goHome(e);
           if (e.hint) endHint(e);
         } else if (s.request?.kind === 'hint') {
           const { el, right, auto, from } = s.request;
@@ -593,11 +600,11 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         } else {
           e.mode = { kind: 'idle', until: now + PET_AXE.swingMs * PET_AXE.swings };
           show('chop', prank.facing);
-          // 每一下劈到底（動畫的 70% 處）時卡片才受力
+          // 每一下劈到底（動畫的 PET_AXE.hitAt 處）時卡片才受力
           for (let i = 0; i < PET_AXE.swings; i += 1) {
             window.setTimeout(() => {
               if (e.prank === prank) chopHit(e, prank, i === 0);
-            }, PET_AXE.swingMs * (i + 0.7));
+            }, PET_AXE.swingMs * (i + PET_AXE.hitAt));
           }
         }
         return;
@@ -990,10 +997,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     if (ev.key === 'Enter' || ev.key === ' ') {
       ev.preventDefault();
       const e = engine.current;
-      if (e) {
-        e.homeTrip = true;
-        e.mode = { kind: 'goHome' };
-      }
+      if (e) goHome(e);
     }
   };
 

@@ -424,6 +424,7 @@ export const PET_PLAY = {
 /**
  * 乳牛全套的大斧頭（OUTFIT_SPECIALS 的 axe）：和噴火一樣定時（第一次也照 PET_SCORCH.firstMs）跳上一張有 data-cat-burn 的卡片（挑上緣還沒燒焦的一處），
  * 舉起斧頭劈 swings 下（每下 swingMs，CSS 的 --pet-chop-ms 讀它），卡片被劈歪 sagMs 後彈回來、裂痕跟著消失。只在畫面上，不存檔。
+ * hitAt＝每一下在動畫的幾成處劈到底（要跟 pet.css 的 cb-pet-chop 關鍵影格 70% 一起改）；
  * reach＝劈到的地方在小貓圖寬的幾成處（面向右；面向左鏡像）；chips＝劈下去時噴出幾片碎屑、飛多久
  */
 export const PET_AXE = {
@@ -431,6 +432,7 @@ export const PET_AXE = {
   retryMs: 4_000,
   swingMs: 520,
   swings: 3,
+  hitAt: 0.7,
   sagMs: 5_000,
   reach: 0.86,
   chips: { count: 4, ms: 700, size: 7 },
