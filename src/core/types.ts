@@ -385,9 +385,24 @@ export type Celebration =
  * fly＝披著披風飛；scorch＝小怪獸全套加噴火，會把卡片燒焦；
  * hop＝青蛙或兔子的頭套加連身裝，走路改成一蹦一蹦；bubbles＝青蛙全套加吹泡泡，泡泡會飄出來、可以戳破；
  * binky＝兔子全套加紅蘿蔔，點牠會高高跳起來轉一圈；honey＝小熊全套加蜂蜜棒，走過的地方留下蜂蜜腳印；
- * dream＝睡衣全套加奶嘴，特別愛睡、睡著會說夢話
+ * dream＝睡衣全套加奶嘴，特別愛睡、睡著會說夢話；
+ * moo＝乳牛的頭套加連身裝，站起來走路、邊走邊哞哞叫；axe＝乳牛全套加牧草，偶爾拿大斧頭把卡片劈歪（只在畫面上，一下子就彈回來）；
+ * pounce＝老虎全套加虎牙，伏低扭屁股、撲到遠處吼一聲；
+ * waddle＝企鵝的頭套加連身裝，站起來搖搖擺擺地走；slide＝企鵝全套加冰棒，暴衝改成趴下用肚子滑
  */
-export type OutfitSpecial = 'fly' | 'scorch' | 'hop' | 'bubbles' | 'binky' | 'honey' | 'dream';
+export type OutfitSpecial =
+  | 'fly'
+  | 'scorch'
+  | 'hop'
+  | 'bubbles'
+  | 'binky'
+  | 'honey'
+  | 'dream'
+  | 'moo'
+  | 'axe'
+  | 'pounce'
+  | 'waddle'
+  | 'slide';
 /** 焦痕在卡片上緣的哪裡：左、中、右 */
 export type ScorchPlace = 'l' | 'm' | 'r';
 /**
@@ -428,7 +443,7 @@ export interface ChangelogEntry {
 }
 
 // ── 音效（Web Audio 即時合成，數值在 constants/sound.ts）──────────
-export type SoundName = 'tap' | 'correct' | 'wrong' | 'reward' | 'meow';
+export type SoundName = 'tap' | 'correct' | 'wrong' | 'reward' | 'meow' | 'moo';
 /** 一個音：從 from 赫茲滑到 to 赫茲（沒有 to 就不滑），在 at 秒開始、持續 dur 秒 */
 export interface ToneSpec {
   wave: 'sine' | 'triangle' | 'square' | 'sawtooth';
@@ -572,9 +587,18 @@ export type PetPose =
   | 'dangle'
   | 'fall'
   /** 披著披風飛（特殊動作）：身體打橫、一隻手往前伸 */
-  | 'fly';
+  | 'fly'
+  /** 用兩隻腳站起來（乳牛、企鵝的特殊動作）：upright＝站著、upwalk＝直立著走、waddle＝搖搖擺擺地走、chop＝舉起大斧頭劈下去 */
+  | 'upright'
+  | 'upwalk'
+  | 'waddle'
+  | 'chop'
+  /** 老虎撲過去之前伏低、扭屁股 */
+  | 'crouch'
+  /** 企鵝趴下來用肚子滑 */
+  | 'slide';
 /** 姿勢裡會動的部分怎麼動（CSS 動畫在 styles/pet.css 的 cb-pet-motion-*） */
-export type PetMotion = 'still' | 'breathe' | 'walk' | 'run' | 'groom' | 'swing' | 'fly';
+export type PetMotion = 'still' | 'breathe' | 'walk' | 'run' | 'groom' | 'swing' | 'fly' | 'waddle' | 'chop' | 'wiggle';
 /** 一個對位點：把某個零件的原點放到身體座標的 (x, y)，轉 rot 度、縮放 scale */
 export interface PetAnchor {
   x: number;
@@ -638,6 +662,18 @@ export interface PetPoseSpec {
   /** 這個姿勢不冒表情符號泡泡（跑步只是路過，每跑一步冒一次太吵） */
   quiet?: boolean;
   motion: PetMotion;
+}
+
+/**
+ * 走路的樣子（套裝效果換掉的步態；對照表在 constants/pet.ts 的 PET_GAITS）：
+ * walk＝走路、zoom＝暴衝、home＝跑回家、rest＝待著不動（本來坐著的時候）時用哪個姿勢；hop＝走路時一蹦一蹦地跳
+ */
+export interface PetGait {
+  walk: PetPose;
+  zoom: PetPose;
+  home: PetPose;
+  rest: PetPose;
+  hop?: boolean;
 }
 
 /** 自由亂跑時的一個動作；每個分頁的權重在 constants/pet.ts 的 ROAM_ROUTES */

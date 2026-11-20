@@ -174,6 +174,77 @@
   animation: cb-pet-dangle-leg 0.5s ease-in-out infinite;
 }
 
+/* 搖搖擺擺（企鵝）：整隻以腳底為支點左右搖，兩隻手跟著拍 */
+.cb-pet-motion-waddle .cb-pet-bob {
+  transform-origin: 50% 100%;
+  animation: cb-pet-waddle 0.56s ease-in-out infinite;
+}
+
+.cb-pet-motion-waddle .cb-pet-leg-1,
+.cb-pet-motion-waddle .cb-pet-leg-3 {
+  animation: cb-pet-dangle-leg 0.28s ease-in-out infinite;
+}
+
+@keyframes cb-pet-waddle {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
+/* 劈（乳牛全套）：舉過頭的手臂連斧頭一起往前劈下去，再慢慢舉回來；劈到底時身體往前壓一下 */
+.cb-pet-motion-chop .cb-pet-leg-3 {
+  animation: cb-pet-chop var(--pet-chop-ms, 0.5s) ease-in infinite;
+}
+
+.cb-pet-motion-chop .cb-pet-bob {
+  transform-origin: 50% 100%;
+  animation: cb-pet-chop-lean var(--pet-chop-ms, 0.5s) ease-in infinite;
+}
+
+@keyframes cb-pet-chop {
+  0%,
+  45% {
+    transform: rotate(-12deg);
+  }
+  70% {
+    transform: rotate(104deg);
+  }
+  100% {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes cb-pet-chop-lean {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+  70% {
+    transform: rotate(5deg);
+  }
+}
+
+/* 伏低扭屁股（老虎撲之前）：以前腳為支點，屁股左右扭 */
+.cb-pet-motion-wiggle .cb-pet-bob {
+  transform-origin: 80% 100%;
+  animation: cb-pet-wiggle 0.22s ease-in-out infinite;
+}
+
+@keyframes cb-pet-wiggle {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+
 /* 理毛：舉起的前腳上下擦臉，頭跟著點 */
 .cb-pet-motion-groom .cb-pet-leg-3 {
   animation: cb-pet-groom-paw 0.6s ease-in-out infinite;
@@ -607,4 +678,125 @@
 .cb-cat-home.is-target {
   border-radius: 50%;
   box-shadow: 0 0 0 4px var(--butter), 0 0 0 7px var(--line);
+}
+
+/* 大斧頭劈到的卡片（乳牛全套）：被劈的那一側往下沉、歪一下，過一陣子（--cat-chop-ms＝PET_AXE.sagMs）彈回來。
+   用個別的 rotate、translate，不蓋掉卡片自己的 transform */
+[data-cat-chopped] {
+  animation: cb-chop-sag var(--cat-chop-ms, 5s) ease-out;
+}
+
+[data-cat-chopped='l'] {
+  transform-origin: 100% 100%;
+  --chop-tilt: -2.4deg;
+  --chop-drop: 2px;
+}
+
+[data-cat-chopped='r'] {
+  transform-origin: 0% 100%;
+  --chop-tilt: 2.4deg;
+  --chop-drop: 2px;
+}
+
+[data-cat-chopped='m'] {
+  --chop-tilt: 0deg;
+  --chop-drop: 5px;
+}
+
+@keyframes cb-chop-sag {
+  0% {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+  5% {
+    rotate: calc(var(--chop-tilt) * 1.6);
+    translate: 0 calc(var(--chop-drop) * 1.6);
+  }
+  12%,
+  88% {
+    rotate: var(--chop-tilt);
+    translate: 0 var(--chop-drop);
+  }
+  94% {
+    rotate: calc(var(--chop-tilt) * -0.4);
+    translate: 0 calc(var(--chop-drop) * -0.4);
+  }
+  100% {
+    rotate: 0deg;
+    translate: 0 0;
+  }
+}
+
+/* 老虎吼一聲：卡片嚇得抖一下 */
+[data-cat-shake] {
+  animation: cb-roar-shake 0.45s ease-in-out;
+}
+
+@keyframes cb-roar-shake {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  20% {
+    translate: -3px 0;
+  }
+  40% {
+    translate: 3px 0;
+  }
+  60% {
+    translate: -2px 0;
+  }
+  80% {
+    translate: 2px 0;
+  }
+}
+
+/* 劈出來的裂痕：從卡片上緣往下裂；圖的上緣中間對準劈到的地方 */
+.cb-pet-crack {
+  pointer-events: none;
+}
+
+.cb-pet-crack svg {
+  display: block;
+  margin-left: -13px;
+  fill: none;
+  stroke: var(--cat-line);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: cb-crack-in 0.18s ease-out;
+}
+
+@keyframes cb-crack-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* 碎屑：從劈到的地方往外噴、往下掉 */
+.cb-pet-chip {
+  box-sizing: border-box;
+  background: var(--surface-raised);
+  border: 1.5px solid var(--cat-line);
+  border-radius: 2px;
+  pointer-events: none;
+  animation: cb-pet-chip 0.7s ease-out forwards;
+}
+
+@keyframes cb-pet-chip {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  55% {
+    transform: translate(var(--chip-dx), var(--chip-dy)) rotate(200deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--chip-dx) * 1.4), calc(var(--chip-dy) * -0.4)) rotate(320deg);
+    opacity: 0;
+  }
 }

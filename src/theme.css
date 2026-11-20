@@ -50,6 +50,7 @@
 
   /* 衣櫥配件（只給小八喵的配件與毛色用，不拿來做介面色） */
   --acc-coral: #f2836f;
+  --acc-orange: #f5a24b;
   --acc-navy: #4f6496;
   --acc-sky: #a8d8f0;
   --acc-lav: #cdb6ee;
@@ -123,6 +124,7 @@
     --cat-line: #3a2d24;
     --cat-line-black: #b3a195;
     --acc-coral: #df7562;
+    --acc-orange: #d98a3e;
     --acc-navy: #7088c2;
     --acc-sky: #8cc0dc;
     --acc-lav: #b39fd8;
@@ -176,6 +178,7 @@
   --cat-line: #3a2d24;
   --cat-line-black: #b3a195;
   --acc-coral: #df7562;
+  --acc-orange: #d98a3e;
   --acc-navy: #7088c2;
   --acc-sky: #8cc0dc;
   --acc-lav: #b39fd8;

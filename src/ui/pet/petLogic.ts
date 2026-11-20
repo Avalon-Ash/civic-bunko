@@ -1,5 +1,6 @@
 // 自由亂跑的小貓：不碰 DOM 的計算（挑動作、挑落腳處、拋物線）。DOM 與動畫在 PetLayer。
-import type { Choice, RoamBehavior } from '../../core/types';
+import { PET_GAITS, PET_GAIT_DEFAULT } from '../../core/constants/pet';
+import type { Choice, OutfitSpecial, PetGait, RoamBehavior } from '../../core/types';
 
 const BEHAVIORS: readonly RoamBehavior[] = ['walk', 'sit', 'groom', 'nap', 'perch', 'zoom'];
 /** 她正在操作時只做原地的動作 */
@@ -25,6 +26,11 @@ export function pickBehavior(
     if (roll < 0) return b;
   }
   return pool[pool.length - 1] ?? 'sit';
+}
+
+/** 這身穿著走路的樣子：PET_GAITS 裡第一個符合的，都不符合就是平常的步態 */
+export function gaitFor(specials: ReadonlySet<OutfitSpecial>): PetGait {
+  return PET_GAITS.find(({ when }) => specials.has(when))?.gait ?? PET_GAIT_DEFAULT;
 }
 
 /** 範圍內隨機（含下限、不含上限） */

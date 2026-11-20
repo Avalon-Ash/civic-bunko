@@ -263,3 +263,15 @@ export const CAT_SCORCH_LINES = ['啊…不小心燒到了喵。', '對不起，
 
 /** 穿睡衣睡著時說的夢話（PET_PLAY.dream） */
 export const CAT_DREAM_LINES = ['呼…小魚乾…好多…', '嗯…再五分鐘…', '喵…上榜了…', '呼嚕…罐罐…', '…不要搶我的被被…'] as const;
+
+/** 穿乳牛裝站起來走路時（PET_MOO） */
+export const CAT_MOO_LINES = ['哞～', '哞哞！', '哞～哞～', '我是乳牛，哞。', '哞（其實是喵）'] as const;
+
+/** 乳牛全套拿大斧頭劈卡片（PET_AXE） */
+export const CAT_AXE_LINES = ['哞哈哈，劈歪了！', '嘿咻——！', '哞！卡片歪掉了～', '這張看起來很好劈。', '等一下就彈回來啦。'] as const;
+
+/** 老虎全套撲到地上吼一聲（PET_POUNCE） */
+export const CAT_ROAR_LINES = ['嗷嗚——！', '吼！嚇到了吧？', '虎撲成功！', '嗷～我是老虎。'] as const;
+
+/** 企鵝全套趴下來用肚子滑（PET_SLIDE） */
+export const CAT_SLIDE_LINES = ['咻——！', '滑滑滑～', '肚子涼涼的！'] as const;

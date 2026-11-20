@@ -71,6 +71,26 @@ export const OUTFIT_SPECIALS: ReadonlyArray<{
     text: '特別愛睡，睡著還會說夢話',
     wear: { 'head-top': ['pajama-hood'], body: ['pajama-suit'], 'face-low': ['pacifier'] },
   },
+  { id: 'moo', name: '站起來走', text: '用兩隻腳走路，邊走邊哞哞叫', wear: { 'head-top': ['cow-hood'], body: ['cow-suit'] } },
+  {
+    id: 'axe',
+    name: '大斧頭',
+    text: '偶爾拿大斧頭把卡片劈歪，一下子就彈回來',
+    wear: { 'head-top': ['cow-hood'], body: ['cow-suit'], 'face-low': ['grass-stalk'] },
+  },
+  {
+    id: 'pounce',
+    name: '虎撲',
+    text: '伏低扭扭屁股，撲到遠處吼一聲',
+    wear: { 'head-top': ['tiger-hood'], body: ['tiger-suit'], 'face-low': ['tiger-fang'] },
+  },
+  { id: 'waddle', name: '搖搖擺擺', text: '站起來搖搖擺擺地走', wear: { 'head-top': ['penguin-hood'], body: ['penguin-suit'] } },
+  {
+    id: 'slide',
+    name: '肚子滑行',
+    text: '跑起來改成趴下用肚子滑',
+    wear: { 'head-top': ['penguin-hood'], body: ['penguin-suit'], 'face-low': ['popsicle'] },
+  },
 ];
 /**
  * 燒焦：repairFish＝修好一處要幾條小魚乾（公布後不能調高）；max＝同時最多幾處燒焦（滿了小貓就不再噴）；
@@ -124,6 +144,9 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'frog-hood', slot: 'head-top', name: '青蛙頭套', source: shop(PRICE.l) },
   { id: 'bunny-hood', slot: 'head-top', name: '兔子頭套', source: shop(PRICE.l) },
   { id: 'pajama-hood', slot: 'head-top', name: '睡衣帽', source: shop(PRICE.l) },
+  { id: 'cow-hood', slot: 'head-top', name: '乳牛頭套', source: shop(PRICE.l) },
+  { id: 'tiger-hood', slot: 'head-top', name: '老虎頭套', source: shop(PRICE.l) },
+  { id: 'penguin-hood', slot: 'head-top', name: '企鵝頭套', source: shop(PRICE.l) },
   // 頭側
   { id: 'star-clip', slot: 'head-side', name: '星星髮夾', source: shop(PRICE.s) },
   { id: 'sakura', slot: 'head-side', name: '櫻花', source: shop(PRICE.m) },
@@ -140,6 +163,9 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'frog-bubble', slot: 'face-low', name: '吹泡泡', source: shop(PRICE.m) },
   { id: 'carrot', slot: 'face-low', name: '叼紅蘿蔔', source: shop(PRICE.m) },
   { id: 'pacifier', slot: 'face-low', name: '奶嘴', source: shop(PRICE.m) },
+  { id: 'grass-stalk', slot: 'face-low', name: '叼牧草', source: shop(PRICE.m) },
+  { id: 'tiger-fang', slot: 'face-low', name: '小虎牙', source: shop(PRICE.m) },
+  { id: 'popsicle', slot: 'face-low', name: '咬冰棒', source: shop(PRICE.m) },
   // 頸部
   { id: 'bell', slot: 'neck', name: '鈴鐺項圈', source: shop(PRICE.s) },
   { id: 'bowtie', slot: 'neck', name: '領結', source: shop(PRICE.m) },
@@ -153,6 +179,9 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'frog-suit', slot: 'body', name: '青蛙裝', source: shop(PRICE.xl) },
   { id: 'bunny-suit', slot: 'body', name: '兔子裝', source: shop(PRICE.xl) },
   { id: 'pajama-suit', slot: 'body', name: '連身睡衣', source: shop(PRICE.xl) },
+  { id: 'cow-suit', slot: 'body', name: '乳牛裝', source: shop(PRICE.xl) },
+  { id: 'tiger-suit', slot: 'body', name: '老虎裝', source: shop(PRICE.xl) },
+  { id: 'penguin-suit', slot: 'body', name: '企鵝裝', source: shop(PRICE.xl) },
   // 背飾
   { id: 'balloon', slot: 'back', name: '氣球', source: shop(PRICE.xl) },
   { id: 'cape', slot: 'back', name: '小披風', source: shop(PRICE.rare) },

@@ -4,11 +4,12 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { createElement as h } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { HEAD_RADIUS, PET_POSES, PET_VIEW_H, PET_VIEW_W } from '../../core/constants/pet';
+import { HEAD_RADIUS, PET_CHOP_ARM, PET_POSES, PET_VIEW_H, PET_VIEW_W } from '../../core/constants/pet';
 import { ITEMS } from '../../core/constants/wardrobe';
 import type { Outfit, PetPose } from '../../core/types';
 import { svgBounds, type Bounds } from '../../testing/svgBounds';
 import { CatBody } from './CatBody';
+import { heldAxe } from './wardrobe/art';
 import { frontalBuild, torsoShape, type Cubic, type Pt } from './petShape';
 
 const POSES = Object.keys(PET_POSES) as PetPose[];
@@ -31,6 +32,9 @@ const OUTFITS: Array<[string, Outfit]> = [
   ['青蛙全套', { 'head-top': 'frog-hood', body: 'frog-suit', 'face-low': 'frog-bubble' }],
   ['兔子全套＋翅膀', { 'head-top': 'bunny-hood', body: 'bunny-suit', 'face-low': 'carrot', back: 'wings' }],
   ['睡衣全套', { 'head-top': 'pajama-hood', body: 'pajama-suit', 'face-low': 'pacifier' }],
+  ['乳牛全套＋披風', { 'head-top': 'cow-hood', body: 'cow-suit', 'face-low': 'grass-stalk', back: 'cape' }],
+  ['老虎全套', { 'head-top': 'tiger-hood', body: 'tiger-suit', 'face-low': 'tiger-fang', fur: 'fur-black' }],
+  ['企鵝全套＋氣球', { 'head-top': 'penguin-hood', body: 'penguin-suit', 'face-low': 'popsicle', back: 'balloon' }],
 ];
 
 /** 整隻貓畫到哪（身體座標）；被身體輪廓剪掉的布面不算 */
@@ -126,7 +130,7 @@ describe('cat body', () => {
     }
     assert.deepEqual(
       POSES.filter((pose) => PET_POSES[pose].backFront),
-      ['sit', 'groom', 'dangle', 'fall'],
+      ['sit', 'groom', 'dangle', 'fall', 'upright', 'upwalk', 'waddle', 'chop'],
     );
     // 披風：正面有脖子前面的扣子（唯一用到金色的地方）；側面沒有
     assert.equal(count(render('sit', { back: 'cape' }), 'var(--acc-gold)'), 1);
@@ -191,16 +195,25 @@ describe('cat body', () => {
 
   it('every one-piece suit dresses the whole cat the same way: sleeves, trousers, matching tail; only the dino has back plates', () => {
     const suits = ITEMS.filter((it) => it.id.endsWith('-suit'));
-    assert.deepEqual(suits.map((it) => it.id), ['dino-suit', 'bear-suit', 'frog-suit', 'bunny-suit', 'pajama-suit']);
+    assert.deepEqual(suits.map((it) => it.id), [
+      'dino-suit',
+      'bear-suit',
+      'frog-suit',
+      'bunny-suit',
+      'pajama-suit',
+      'cow-suit',
+      'tiger-suit',
+      'penguin-suit',
+    ]);
     for (const { id } of suits) {
       const stand = render('stand', { body: id });
-      // 睡衣連腳掌都包住：整條腿是布的顏色，不另外套袖子、褲管
-      const footed = id === 'pajama-suit';
+      // 睡衣、企鵝連腳掌都包住：整條腿換成一個顏色，不另外套袖子、褲管
+      const footed = id === 'pajama-suit' || id === 'penguin-suit';
       assert.equal(count(stand, 'class="cb-pet-sleeve"'), footed ? 0 : 2, id);
       assert.equal(count(stand, 'class="cb-pet-trouser"'), footed ? 0 : 2, id);
       assert.equal(/class="cb-pet-leg[^>]*><path[^>]*var\(--cat-fur/.test(stand), !footed, `${id} 的腿`);
       assert.ok(!(/<g class="cb-pet-tail">(.*?)<\/g>/.exec(stand)?.[1] ?? '').includes('var(--cat-patch)'), `${id} 的尾巴`);
-      // 金色：小怪獸的背鰭、睡衣的星星
+      // 金色：小怪獸的背鰭、睡衣的星星、企鵝的腳
       assert.equal(stand.includes('var(--acc-gold)'), id === 'dino-suit' || footed, `${id} 的金色`);
     }
   });
@@ -267,5 +280,19 @@ describe('cat body', () => {
     assert.match(markup, new RegExp(`<g transform="translate\\(${PET_VIEW_W} 0\\) scale\\(-1 1\\)"><g class="cb-pet `));
     assert.doesNotMatch(markup, /<g[^>]*class="cb-pet [^"]*"[^>]*transform=/);
     assert.doesNotMatch(markup, /<g[^>]*transform=[^>]*class="cb-pet /);
+  });
+
+  it('the big axe is held in the raised arm: drawn inside that arm (so it swings with it), inside the picture, only when the pose has a raised arm', () => {
+    const axe = heldAxe(PET_CHOP_ARM.len);
+    const markup = renderToStaticMarkup(h(CatBody, { pose: 'chop', outfit: {}, held: axe }));
+    const arm = markup.indexOf('cb-pet-leg-3');
+    assert.ok(arm > markup.indexOf('class="cb-pet-head"'), '舉起來的手在頭前面');
+    assert.ok(markup.indexOf('cb-pet-axe') > arm, '斧頭畫在那條手臂裡');
+    for (const facing of ['right', 'left'] as const) {
+      const b = svgBounds(renderToStaticMarkup(h(CatBody, { pose: 'chop', outfit: { 'head-top': 'cow-hood' }, facing, held: axe })), { within: 'cb-pet' });
+      assert.ok(b && b.minX >= -EPS && b.maxX <= PET_VIEW_W + EPS && b.minY >= -EPS && b.maxY <= PET_VIEW_H + EPS, facing);
+    }
+    // 沒有舉起來的手：不畫
+    assert.ok(!renderToStaticMarkup(h(CatBody, { pose: 'upright', outfit: {}, held: axe })).includes('cb-pet-axe'));
   });
 });

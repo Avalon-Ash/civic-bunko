@@ -1,5 +1,5 @@
 // SSOT：有身體的小貓（姿勢表＝對位點、動線、速度與時間）。開案書 docs/plans/cat-wardrobe.md §7。
-import type { CatEmote, CatMood, PetBuild, PetPose, PetPoseSpec, RoamBehavior } from '../types';
+import type { CatEmote, CatMood, OutfitSpecial, PetBuild, PetGait, PetPose, PetPoseSpec, RoamBehavior } from '../types';
 
 /** 身體座標：0..PET_VIEW_W × 0..PET_VIEW_H，面向右；地面在 PET_GROUND */
 export const PET_VIEW_W = 100;
@@ -118,7 +118,48 @@ const sit: PetPoseSpec = {
   motion: 'breathe',
 };
 
-export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
+/** 用兩隻腳站著：身體直立、下面粗一點（屁股坐不下去，肉往下沉），比被拎著的身體寬一點 */
+const UPRIGHT: PetBuild = { chest: 10.5, shoulder: 10, hip: 13, belly: 1.08, flat: 0.1, patch: 0.05 };
+/**
+ * 站起來（乳牛、企鵝的特殊動作）：照被拎著的直立身體，往下放到後腳踩在地上；前腳是垂在兩側的手。
+ * 頭不比被拎著時高（高帽子才不會頂出身體座標）。leg＝後腳從身體哪裡長出來、多長（腳掌踩在 PET_GROUND）
+ */
+const UP_LEG = { y: 74, len: PET_GROUND - 74 } as const;
+const upright: PetPoseSpec = {
+  torso: { cx: 50, cy: 61, rx: 16, ry: 14, rot: -90 },
+  build: UPRIGHT,
+  legs: [
+    { x: 44.5, y: UP_LEG.y, len: UP_LEG.len, rot: 0 },
+    { x: 42.5, y: 55, len: 11, rot: 14 },
+    { x: 55.5, y: UP_LEG.y, len: UP_LEG.len, rot: 0 },
+    { x: 57.5, y: 56, len: 11, rot: -14 },
+  ],
+  tail: 'M43 75 Q31 76 29 64',
+  head: { x: 50, y: 36, rot: 0, scale: PET_HEAD_SCALE },
+  back: { x: 41, y: 57, rot: -22, scale: BACK },
+  frontal: false,
+  backFront: true,
+  mood: 'idle',
+  motion: 'breathe',
+};
+/**
+ * 舉起大斧頭（乳牛全套）：近側的手從肩膀整隻舉過頭，斧頭接在手上（CatBody 的 held）；
+ * 劈下去的動作是 CSS 的 cb-pet-motion-chop（手臂往前轉）。arm＝舉起來的手臂（長度、角度，-180＝筆直朝上）
+ */
+export const PET_CHOP_ARM = { x: 57.5, y: 55, len: 13, rot: -158 } as const;
+/** 整個姿勢往下移 dy（身體座標）：趴在地上滑的姿勢＝飛的姿勢貼到地面 */
+function lowered(spec: PetPoseSpec, dy: number): PetPoseSpec {
+  return {
+    ...spec,
+    torso: { ...spec.torso, cy: spec.torso.cy + dy },
+    legs: spec.legs.map((leg) => ({ ...leg, y: leg.y + dy })) as PetPoseSpec['legs'],
+    tail: spec.tail.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x: string, y: string) => `${x} ${Number(y) + dy}`),
+    head: { ...spec.head, y: spec.head.y + dy },
+    back: { ...spec.back, y: spec.back.y + dy },
+  };
+}
+
+const BASE_POSES = {
   stand,
   walk: { ...stand, motion: 'walk' },
   run: {
@@ -261,6 +302,48 @@ export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
     quiet: true,
     motion: 'fly',
   },
+  upright,
+  /** 直立著走：對角的手腳一起擺（走路的動畫照用），看起來是左腳配右手 */
+  upwalk: { ...upright, motion: 'walk' },
+  /** 搖搖擺擺（企鵝）：兩隻手往外張開，整隻左右搖 */
+  waddle: {
+    ...upright,
+    legs: [upright.legs[0], { ...upright.legs[1], rot: 34 }, upright.legs[2], { ...upright.legs[3], rot: -34 }],
+    motion: 'waddle',
+  },
+  chop: {
+    ...upright,
+    legs: [upright.legs[0], upright.legs[1], upright.legs[2], { ...PET_CHOP_ARM, shoulder: true }],
+    head: { ...upright.head, rot: 4 },
+    mood: 'yay',
+    motion: 'chop',
+  },
+  /** 撲過去之前（老虎全套）：前面壓低、屁股翹高，尾巴豎著，屁股左右扭 */
+  crouch: {
+    torso: { cx: 45, cy: 70, rx: 19, ry: 13, rot: 10 },
+    build: BEAN,
+    legs: [
+      { x: 33, y: 76, len: 10, rot: 0 },
+      { x: 55, y: 80, len: 6, rot: 0 },
+      { x: 38, y: 77, len: 9, rot: 0 },
+      { x: 59, y: 80, len: 6, rot: 0 },
+    ],
+    tail: 'M28 64 Q20 52 26 44',
+    head: { x: 67, y: 58, rot: 6, scale: PET_HEAD_SCALE },
+    back: { x: 40, y: 60, rot: 10, scale: BACK },
+    frontal: false,
+    backFront: false,
+    mood: 'idle',
+    motion: 'wiggle',
+  },
+} satisfies Record<Exclude<PetPose, 'slide'>, PetPoseSpec>;
+
+/** 趴下來用肚子滑的身體離地面多高：飛的姿勢整隻往下放這麼多，肚子剛好貼地 */
+const SLIDE_DROP = 13;
+export const PET_POSES: Readonly<Record<PetPose, PetPoseSpec>> = {
+  ...BASE_POSES,
+  /** 用肚子滑（企鵝全套）：飛的姿勢貼到地上，一隻手往前伸 */
+  slide: { ...lowered(BASE_POSES.fly, SLIDE_DROP), motion: 'still' },
 };
 
 /**
@@ -337,6 +420,42 @@ export const PET_PLAY = {
   dream: { napWeight: 4, everyMs: 7_000 },
   maxBits: 14,
 } as const;
+
+/**
+ * 乳牛全套的大斧頭（OUTFIT_SPECIALS 的 axe）：和噴火一樣定時（第一次也照 PET_SCORCH.firstMs）跳上一張有 data-cat-burn 的卡片（挑上緣還沒燒焦的一處），
+ * 舉起斧頭劈 swings 下（每下 swingMs，CSS 的 --pet-chop-ms 讀它），卡片被劈歪 sagMs 後彈回來、裂痕跟著消失。只在畫面上，不存檔。
+ * reach＝劈到的地方在小貓圖寬的幾成處（面向右；面向左鏡像）；chips＝劈下去時噴出幾片碎屑、飛多久
+ */
+export const PET_AXE = {
+  everyMs: { min: 40_000, max: 80_000 },
+  retryMs: 4_000,
+  swingMs: 520,
+  swings: 3,
+  sagMs: 5_000,
+  reach: 0.86,
+  chips: { count: 4, ms: 700, size: 7 },
+} as const;
+/**
+ * 老虎全套的虎撲（pounce）：要走路或暴衝時有 chance 的機率改成撲過去——先伏低扭屁股 crouchMs，再撲到至少 minTrip 外的地面；
+ * 撲的速度（px／秒）與拋物線多高；落地吼一聲，看得到的卡片抖 shakeMs。答題頁不撲
+ */
+export const PET_POUNCE = { chance: 0.45, crouchMs: 1_100, minTrip: 120, speed: 420, lift: 60, roarMs: 1_400, shakeMs: 450 } as const;
+/** 乳牛裝直立著走：每隔 everyMs 哞一聲（泡泡＋音效）；企鵝暴衝改成用肚子滑時，有 chance 的機率喊一聲 */
+export const PET_MOO = { everyMs: 4_500 } as const;
+export const PET_SLIDE = { cheer: 0.5 } as const;
+
+/** 平常的步態 */
+export const PET_GAIT_DEFAULT: PetGait = { walk: 'walk', zoom: 'run', home: 'run', rest: 'sit' };
+/**
+ * 套裝效果換掉的步態：照順序第一個符合的生效（企鵝全套同時有 slide 和 waddle，slide 在前）。
+ * 站起來的（乳牛、企鵝）本來坐著的時候改成站著
+ */
+export const PET_GAITS: ReadonlyArray<{ when: OutfitSpecial; gait: PetGait }> = [
+  { when: 'hop', gait: { walk: 'hop', zoom: 'hop', home: 'run', rest: 'sit', hop: true } },
+  { when: 'slide', gait: { walk: 'waddle', zoom: 'slide', home: 'slide', rest: 'upright' } },
+  { when: 'waddle', gait: { walk: 'waddle', zoom: 'waddle', home: 'waddle', rest: 'upright' } },
+  { when: 'moo', gait: { walk: 'upwalk', zoom: 'upwalk', home: 'upwalk', rest: 'upright' } },
+];
 
 // ── 其他分頁：從頭像鑽出來自由亂跑 ─────────────────────────
 /** 亂跑的小貓寬度（px；高度照 PET_VIEW 比例） */

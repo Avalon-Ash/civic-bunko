@@ -6,8 +6,9 @@ import { createElement as h, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Cat, ItemIcon } from '../../src/ui/kit/Cat';
 import { CatBody } from '../../src/ui/kit/CatBody';
+import { heldAxe } from '../../src/ui/kit/wardrobe/art';
 import { ITEMS } from '../../src/core/constants/wardrobe';
-import { PET_POSES, PET_VIEW_H, PET_VIEW_W, ROAM_WIDTH, RUNNER_WIDTH } from '../../src/core/constants/pet';
+import { PET_CHOP_ARM, PET_POSES, PET_VIEW_H, PET_VIEW_W, ROAM_WIDTH, RUNNER_WIDTH } from '../../src/core/constants/pet';
 import type { Outfit, PetPose } from '../../src/core/types';
 
 const out = process.argv[2];
@@ -45,6 +46,9 @@ const bodyOutfits: Array<[string, Outfit]> = [
   ['青蛙全套', { 'head-top': 'frog-hood', body: 'frog-suit', 'face-low': 'frog-bubble' }],
   ['兔子全套', { 'head-top': 'bunny-hood', body: 'bunny-suit', 'face-low': 'carrot' }],
   ['睡衣全套', { 'head-top': 'pajama-hood', body: 'pajama-suit', 'face-low': 'pacifier' }],
+  ['乳牛全套', { 'head-top': 'cow-hood', body: 'cow-suit', 'face-low': 'grass-stalk' }],
+  ['老虎全套', { 'head-top': 'tiger-hood', body: 'tiger-suit', 'face-low': 'tiger-fang' }],
+  ['企鵝全套', { 'head-top': 'penguin-hood', body: 'penguin-suit', 'face-low': 'popsicle' }],
   ['小怪獸全套＋披風＋圍巾（灰貓）', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'cape', neck: 'scarf', fur: 'fur-gray' }],
   ['小怪獸全套＋翅膀＋眼鏡＋蝴蝶結（黑貓）', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'wings', 'face-mid': 'glasses', 'head-side': 'bow', fur: 'fur-black' }],
 ];
@@ -53,6 +57,8 @@ const bodies = bodyOutfits
     ([name, outfit]) =>
       `<h4>${name}</h4><div class="row">` +
       poses.map((pose) => cell(pose, h(CatBody, { pose, outfit, width: bodyWidth, backdrop: true }))).join('') +
+      // 舉著大斧頭（乳牛全套的 axe）：斧頭是拿在手上的道具，不是配件
+      cell('chop＋斧頭', h(CatBody, { pose: 'chop', outfit, width: bodyWidth, backdrop: true, held: heldAxe(PET_CHOP_ARM.len) })) +
       '</div>',
   )
   .join('');

@@ -40,8 +40,8 @@ export interface BodyArt {
   trouser?: ReactNode;
   /** 整條腿（連腳掌）包成這個顏色：腳也包住的連身睡衣。有給就不必再給 sleeve、trouser */
   legs?: string;
-  /** 成套的尾巴：尾巴換成這個顏色（連身裝把尾巴也包起來）；spots＝尾巴上一排斑點的顏色 */
-  tail?: { fill: string; spots?: string };
+  /** 成套的尾巴：尾巴換成這個顏色（連身裝把尾巴也包起來）；spots＝尾巴上一排斑點的顏色；stripes＝斑點改成一圈圈的環紋（老虎） */
+  tail?: { fill: string; spots?: string; stripes?: boolean };
   /** 畫在身體後面（翅膀、氣球）。原點在姿勢的背對位點 */
   behind?: ReactNode;
   /** 留在頭上的那一部分（領口、領結）。頭像座標，跟頭一起縮放 */
@@ -126,7 +126,8 @@ const WING_FRONT = { in: 5, down: 4 } as const;
  * collar＝領口往前多出多少；trouser＝褲管從後腿腿根往下蓋多長（後腿的腿根埋在身體裡比前腿深，要蓋到露出身體的那一段）；
  * belly＝側面時肚子那塊從肚子半厚的幾成處開始；bellyLen、bellyHalf＝正面時肚子那塊占身體長度、背半厚的幾成（半徑）、
  * bellyAt＝它的中心在身體長度的幾成處；
- * spots＝斑點（在身體長度的幾成處、背半厚的幾成高、半徑）；
+ * spots＝斑點（在身體長度的幾成處、背半厚的幾成高、半徑）；patches＝乳牛斑（同上）；
+ * stripes＝虎紋排在身體長度的幾成處，stripeHalf＝每根在背線那端的半寬、stripeLean＝尖端往屁股倒多少、stripeTip＝尖端長到背半厚的幾成（0＝身體中線）；
  * plates＝背鰭排在背上的哪裡、各是標準大小的幾倍：位置 0–1 是背線（肩膀到屁股最厚處）、1–2 是屁股那段圓弧（2＝屁股端）。
  * 頭很大、會擋住背的前半，所以背鰭排在後半到屁股；
  * plateHalf、plateH、plateSink、plateLean＝背鰭的半寬、高、底邊埋進身體多深、尖端往後倒多少
@@ -143,6 +144,15 @@ const ONESIE = {
     [0.56, 0.74, 1.7],
     [0.78, 0.5, 2.2],
   ],
+  stripes: [0.12, 0.28, 0.44, 0.6, 0.76, 0.92],
+  stripeHalf: 1.8,
+  stripeLean: 1.4,
+  stripeTip: 0.2,
+  patches: [
+    [0.24, 0.5, 4.4],
+    [0.56, 0.62, 5.2],
+    [0.86, 0.32, 3.6],
+  ],
   plates: [
     [0.35, 0.85],
     [1, 1],
@@ -154,16 +164,18 @@ const ONESIE = {
   plateLean: 1,
 } as const;
 
-/** 一套娃娃裝的顏色：fill＝布、belly＝肚子那塊、spots＝斑點（身上和尾巴；沒有就不畫）、plates＝背鰭（沒有就不畫） */
+/** 娃娃裝布上的花樣：dots＝圓點、stars＝星星（睡衣）、stripes＝從背往下的虎紋、patches＝乳牛的大塊斑 */
+type KigurumiPattern = 'dots' | 'stars' | 'stripes' | 'patches';
+/** 一套娃娃裝的顏色：fill＝布、belly＝肚子那塊、spots＝花樣的顏色（身上和尾巴；沒有就不畫）、plates＝背鰭（沒有就不畫） */
 interface KigurumiTheme {
   fill: string;
   belly: string;
   spots?: string;
+  /** 花樣（有 spots 才畫）；不給是圓點 */
+  pattern?: KigurumiPattern;
   plates?: string;
-  /** 斑點畫成星星（睡衣的花樣） */
-  stars?: boolean;
-  /** 腳也包住（連身睡衣）：整條腿都是布的顏色，腳掌不露出來 */
-  footed?: boolean;
+  /** 腳也包住（連身睡衣、企鵝）：整條腿換成這個顏色，腳掌不露出來 */
+  feet?: string;
 }
 /** 每套娃娃裝的顏色只定義在這裡；頭套、連身裝、圖示都讀它 */
 const KIGURUMI = {
@@ -171,7 +183,10 @@ const KIGURUMI = {
   bear: { fill: 'var(--acc-wood)', belly: 'var(--acc-straw)' },
   frog: { fill: 'var(--acc-lime)', belly: 'var(--acc-cream)', spots: 'var(--acc-leaf)' },
   bunny: { fill: 'var(--acc-rose)', belly: 'var(--acc-cream)' },
-  pajama: { fill: 'var(--acc-lav)', belly: 'var(--acc-cream)', spots: 'var(--acc-gold)', stars: true, footed: true },
+  pajama: { fill: 'var(--acc-lav)', belly: 'var(--acc-cream)', spots: 'var(--acc-gold)', pattern: 'stars', feet: 'var(--acc-lav)' },
+  cow: { fill: 'var(--acc-cream)', belly: 'var(--acc-rose)', spots: 'var(--acc-shade)', pattern: 'patches' },
+  tiger: { fill: 'var(--acc-orange)', belly: 'var(--acc-cream)', spots: 'var(--acc-shade)', pattern: 'stripes' },
+  penguin: { fill: 'var(--acc-night)', belly: 'var(--acc-cream)', feet: 'var(--acc-gold)' },
 } as const satisfies Record<string, KigurumiTheme>;
 /** 頭套上那隻動物自己的眼睛、鼻孔：固定用深色。外框線的顏色在黑貓＋深色模式會換成淺色，畫在布上看不清楚 */
 const HOOD_EYE = 'var(--acc-shade)';
@@ -210,6 +225,45 @@ function legCover(fill: string, len: number, cuff?: string): ReactNode {
   );
 }
 
+/** 一塊不規則的圓斑（乳牛的花色）：中心 x,y、大約的半徑 r */
+function blobPath(x: number, y: number, r: number): string {
+  const p = (dx: number, dy: number) => `${n2(x + dx * r)} ${n2(y + dy * r)}`;
+  return `M${p(1, 0)} Q${p(1.05, 0.85)} ${p(0.05, 0.8)} Q${p(-1.1, 0.75)} ${p(-0.9, -0.05)} Q${p(-0.95, -1)} ${p(0, -0.85)} Q${p(0.95, -1.1)} ${p(1, 0)} Z`;
+}
+
+/**
+ * 連身裝身上的花樣（側面在背那側；正面坐時左右各畫一份，side＝-1 或 1）。座標同 BodyArt.wrap。
+ * 虎紋從背線往肚子那側長成一根根楔形，長到背半厚的 ONESIE.stripeTip 成；乳牛斑是幾塊大圓斑。
+ */
+function onesiePattern(theme: KigurumiTheme, body: BodyGeom, side: number): ReactNode {
+  const fill = theme.spots;
+  if (!fill) return null;
+  if (theme.pattern === 'stripes') {
+    const edge = side * (body.back + CLOTH_MARGIN);
+    const tip = side * body.back * ONESIE.stripeTip;
+    return ONESIE.stripes.map((at) => {
+      const x = -body.len * at;
+      return (
+        <path
+          key={at}
+          d={`M${n2(x + ONESIE.stripeHalf)} ${n2(edge)} Q${n2(x + 0.4)} ${n2((edge + tip) / 2)} ${n2(x - ONESIE.stripeLean)} ${n2(tip)} Q${n2(x - 1.2)} ${n2((edge + tip) / 2)} ${n2(x - ONESIE.stripeHalf)} ${n2(edge)} Z`}
+          fill={fill}
+        />
+      );
+    });
+  }
+  if (theme.pattern === 'patches') {
+    return ONESIE.patches.map(([at, up, r]) => <path key={at} d={blobPath(-body.len * at, side * body.back * up, r)} fill={fill} />);
+  }
+  return ONESIE.spots.map(([at, up, r]) =>
+    theme.pattern === 'stars' ? (
+      <path key={at} d={starPath(-body.len * at, side * body.back * up, r * STAR_GROW)} fill={fill} />
+    ) : (
+      <circle key={at} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill={fill} />
+    ),
+  );
+}
+
 /** 連身裝的布面：整個身體都蓋住。側面時肚子那塊在身體下緣；正面時在中間，斑點左右各一份 */
 function onesieWrap(theme: KigurumiTheme): (body: BodyGeom) => ReactNode {
   return (body) => {
@@ -237,17 +291,7 @@ function onesieWrap(theme: KigurumiTheme): (body: BodyGeom) => ReactNode {
             {...bthin}
           />
         )}
-        {theme.spots
-          ? sides.flatMap((side) =>
-              ONESIE.spots.map(([at, up, r]) =>
-                theme.stars ? (
-                  <path key={`${side},${at}`} d={starPath(-body.len * at, side * body.back * up, r * STAR_GROW)} fill={theme.spots} />
-                ) : (
-                  <circle key={`${side},${at}`} cx={n2(-body.len * at)} cy={n2(side * body.back * up)} r={r} fill={theme.spots} />
-                ),
-              ),
-            )
-          : null}
+        {theme.spots ? sides.map((side) => <g key={side}>{onesiePattern(theme, body, side)}</g>) : null}
       </g>
     );
   };
@@ -313,10 +357,22 @@ function onesieArt(theme: KigurumiTheme): ItemArt {
           <path d="M12.6 5.6 Q16 8.6 19.4 5.6" fill="none" stroke={LINE} strokeWidth="1.1" strokeLinecap="round" />
           {theme.spots ? (
             <g fill={theme.spots}>
-              <circle cx="7.6" cy="12.6" r="1.1" />
-              <circle cx="24.4" cy="12.6" r="1.1" />
-              <circle cx="11.6" cy="26" r="1" />
-              <circle cx="20.4" cy="26" r="1" />
+              {theme.pattern === 'stripes' ? (
+                <path d="M6.4 11.6 L9.6 12.8 L6.9 14.4 Z M25.6 11.6 L22.4 12.8 L25.1 14.4 Z M9.6 20 L12.2 20.8 L9.6 22.2 Z M22.4 20 L19.8 20.8 L22.4 22.2 Z M10.6 4.6 L12.6 7.6 L13.4 5.2 Z M21.4 4.6 L19.4 7.6 L18.6 5.2 Z" />
+              ) : theme.pattern === 'patches' ? (
+                <>
+                  <path d={blobPath(8, 12.4, 2.2)} />
+                  <path d={blobPath(20.6, 25.4, 1.8)} />
+                  <path d={blobPath(13.4, 8.6, 1.6)} />
+                </>
+              ) : (
+                <>
+                  <circle cx="7.6" cy="12.6" r="1.1" />
+                  <circle cx="24.4" cy="12.6" r="1.1" />
+                  <circle cx="11.6" cy="26" r="1" />
+                  <circle cx="20.4" cy="26" r="1" />
+                </>
+              )}
             </g>
           ) : null}
           {theme.plates ? <path d="M14.2 4.6 L16 1.2 L17.8 4.6 Z" fill={theme.plates} stroke={LINE} strokeWidth="1" strokeLinejoin="round" /> : null}
@@ -325,11 +381,11 @@ function onesieArt(theme: KigurumiTheme): ItemArt {
     },
     onBody: {
       wrap: onesieWrap(theme),
-      // 腳也包住的（睡衣）整條腿換成布的顏色；其他的只套袖子和褲管、腳掌露在外面
-      ...(theme.footed
-        ? { legs: theme.fill }
+      // 腳也包住的（睡衣、企鵝）整條腿換成 feet 的顏色；其他的只套袖子和褲管、腳掌露在外面
+      ...(theme.feet
+        ? { legs: theme.feet }
         : { sleeve: legCover(theme.fill, SLEEVE.len), trouser: legCover(theme.fill, ONESIE.trouser) }),
-      tail: { fill: theme.fill, ...(theme.spots ? { spots: theme.spots } : {}) },
+      tail: { fill: theme.fill, ...(theme.spots ? { spots: theme.spots } : {}), ...(theme.pattern === 'stripes' ? { stripes: true } : {}) },
       // 側面：背上一排背鰭；直立朝著你的姿勢從正面看不到背鰭（給空的 frontal 就不畫側面那排）
       ...(theme.plates ? { over: onesiePlates(theme.plates), frontal: {} } : {}),
       // 下巴下面的領口
@@ -341,8 +397,16 @@ function onesieArt(theme: KigurumiTheme): ItemArt {
         <path d="M24.5 61.6 Q32 63.6 39.5 61.6 L40 68.4 Q32 70.8 24 68.4 Z" fill={theme.belly} {...thin} />
         {theme.spots ? (
           <g fill={theme.spots}>
-            <circle cx="16.5" cy="61.4" r="1.8" />
-            <circle cx="47.5" cy="61.4" r="1.8" />
+            {theme.pattern === 'stripes' ? (
+              <path d="M14.6 58.8 L18.6 60.2 L15.2 63.6 Z M49.4 58.8 L45.4 60.2 L48.8 63.6 Z" />
+            ) : theme.pattern === 'patches' ? (
+              <path d={blobPath(16.5, 61.4, 2.6)} />
+            ) : (
+              <>
+                <circle cx="16.5" cy="61.4" r="1.8" />
+                <circle cx="47.5" cy="61.4" r="1.8" />
+              </>
+            )}
           </g>
         ) : null}
       </g>
@@ -353,13 +417,16 @@ function onesieArt(theme: KigurumiTheme): ItemArt {
 /**
  * 頭套的輪廓（頭像座標）：包住頭頂、兩邊蓋到臉頰，不繞到下巴（頸部配件露在外面）；中間的開口露出臉。
  * 貓耳朵豎在頭頂兩側（耳尖約 (14,7)、(50,7)，頭像的耳朵還會抖，最多轉 9 度），每個頭套都要把它們整個包住：
- * pointed＝耳朵的地方鼓成尖耳罩；dome＝圓頂，耳朵那兩塊由各主題自己的圓耳朵、大眼睛、垂耳蓋住（HOOD_EAR 那一圈之內）。
+ * pointed＝耳朵的地方鼓成尖耳罩；dome＝圓頂，耳朵那兩塊由各主題自己的圓耳朵、大眼睛、垂耳蓋住（HOOD_EAR 那一圈之內）；
+ * egg＝蛋形的高圓頂，整個把耳朵包進去（沒有耳朵的動物）。
  */
 const HOOD_SIDES_AND_OPENING =
   'Q61.2 40 59 48.5 Q57.6 52 55 49.5 C55.5 34 46 25.5 32 25.5 C18 25.5 8.5 34 9 49.5 Q6.4 52 5 48.5 Z';
 const HOOD_OUTLINE = {
   pointed: `M5 48.5 Q2.8 40 4.4 32 Q5 28.5 6.4 25.5 L9.2 5.6 Q10.6 2.4 13.6 4.2 L27.5 12.6 Q32 11.2 36.5 12.6 L50.4 4.2 Q53.4 2.4 54.8 5.6 L57.6 25.5 Q59 28.5 59.6 32 ${HOOD_SIDES_AND_OPENING}`,
   dome: `M5 48.5 Q2.8 40 4.4 32 Q5.6 22 14 16.5 Q32 4.5 50 16.5 Q58.4 22 59.6 32 ${HOOD_SIDES_AND_OPENING}`,
+  /** 蛋形：沒有耳朵的動物（企鵝），整個圓頂撐高到把貓耳朵包在裡面 */
+  egg: `M5 48.5 Q2.8 40 4.4 32 Q0 -1 32 -0.4 Q64 -1 59.6 32 ${HOOD_SIDES_AND_OPENING}`,
 } as const;
 /** 圓頂頭套上蓋住貓耳朵的那一圈（左邊那顆；右邊是 x 鏡像）：圓心與半徑。圓耳朵、大眼睛都畫成這麼大 */
 const HOOD_EAR = { x: 13.6, y: 11.4, r: 9.4 } as const;
@@ -409,6 +476,36 @@ function hoodArt(spec: {
       </g>
     ),
   };
+}
+
+/**
+ * 乳牛全套的大斧頭（拿在舉起來的手上，CatBody 的 held）：座標同那條手臂，原點在肩膀、+y 沿著手臂往外。
+ * 握在柄的尾端，柄沿著手臂再往外伸 handle；斧刃在手臂的 -x 那一側（手臂舉過頭時朝前，劈下去時朝下）。
+ * grip＝柄的尾端藏進腳掌多深；half＝柄的半寬；blade、bladeH＝斧刃伸出去多遠、多寬；knob＝柄頂端那顆的半徑
+ */
+const AXE = { handle: 24, grip: 2.4, half: 1.7, blade: 15, bladeH: 18, knob: 2.2 } as const;
+export function heldAxe(armLen: number): ReactNode {
+  const start = armLen - AXE.grip;
+  const end = armLen + AXE.handle;
+  const top = end - AXE.bladeH;
+  return (
+    <g className="cb-pet-axe">
+      <rect x={-AXE.half} y={start} width={AXE.half * 2} height={end - start} rx={AXE.half} fill="var(--acc-wood)" {...bthin} />
+      <path
+        d={`M0 ${n2(end - 1)} L${-AXE.blade + 1.5} ${n2(end + 1.6)} Q${-AXE.blade - 2.4} ${n2(end - AXE.bladeH / 2)} ${-AXE.blade + 1.5} ${n2(top - 1.6)} L0 ${n2(top + 1)} Z`}
+        fill="var(--acc-silver)"
+        {...bstroke}
+      />
+      <path
+        d={`M${-AXE.blade + 0.6} ${n2(end - 0.6)} Q${-AXE.blade - 1.4} ${n2(end - AXE.bladeH / 2)} ${-AXE.blade + 0.6} ${n2(top - 0.6)}`}
+        fill="none"
+        stroke="var(--acc-cream)"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <circle cx="0" cy={end} r={AXE.knob} fill="var(--acc-wood)" {...bthin} />
+    </g>
+  );
 }
 
 /** 毛衣的布面：從領口蓋到下擺，直的織紋，下擺一圈羅紋 */
@@ -777,6 +874,70 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     ),
   }),
 
+  'cow-hood': hoodArt({
+    theme: KIGURUMI.cow,
+    outline: HOOD_OUTLINE.egg,
+    box: '-6 -2 76 56',
+    // 乳牛：蛋形的帽子把貓耳朵整個包住，兩側各一隻往外垂的耳朵（一白一黑），頭頂一對短短的牛角，
+    // 額頭上一塊黑斑、寬寬的粉紅色鼻口和兩個鼻孔
+    under: (
+      <g>
+        <path d="M6.4 17.6 Q-0.4 15.4 -2.2 21.6 Q0.4 27 7 24.4 Z" fill={KIGURUMI.cow.fill} {...stroke} />
+        <path d="M57.6 17.6 Q64.4 15.4 66.2 21.6 Q63.6 27 57 24.4 Z" fill={KIGURUMI.cow.spots} {...stroke} />
+      </g>
+    ),
+    over: (
+      <g>
+        <path d="M5 19.4 Q1.2 18.6 0 21.8 Q1.6 24.4 5.4 23.2 Z" fill={KIGURUMI.cow.belly} />
+        <path d={blobPath(43, 8.4, 5.4)} fill={KIGURUMI.cow.spots} />
+        <path d={blobPath(8.6, 33, 2.6)} fill={KIGURUMI.cow.spots} />
+        {mirrored(<path d="M23.4 6.4 Q20.2 3.4 21 -0.6 Q24.6 1.2 27.2 5.4 Z" fill="var(--acc-straw)" {...thin} />)}
+        <circle cx="24.4" cy="14.6" r="1.6" fill={HOOD_EYE} />
+        <circle cx="39.6" cy="14.6" r="1.6" fill={HOOD_EYE} />
+        <ellipse cx="32" cy="20.6" rx="7.8" ry="3.8" fill={KIGURUMI.cow.belly} {...thin} strokeWidth={WF} />
+        <ellipse cx="28.8" cy="20.6" rx="1.1" ry="1.5" fill={HOOD_EYE} />
+        <ellipse cx="35.2" cy="20.6" rx="1.1" ry="1.5" fill={HOOD_EYE} />
+      </g>
+    ),
+  }),
+  'tiger-hood': hoodArt({
+    theme: KIGURUMI.tiger,
+    outline: HOOD_OUTLINE.dome,
+    box: '0 0 64 54',
+    // 老虎：兩顆圓耳朵（包住貓耳朵），額頭上一個「王」字，兩頰各兩道虎紋
+    under: mirrored(<circle cx={HOOD_EAR.x} cy={HOOD_EAR.y} r={HOOD_EAR.r} fill={KIGURUMI.tiger.fill} {...stroke} />),
+    over: (
+      <g>
+        {mirrored(
+          <g>
+            <circle cx={HOOD_EAR.x} cy={HOOD_EAR.y - 1} r="4.4" fill={KIGURUMI.tiger.belly} />
+            <path d="M4.2 33 L10.2 34.8 L4.4 36.8 Z M4.4 39.6 L9.8 40.8 L4.9 42.6 Z" fill={KIGURUMI.tiger.spots} />
+          </g>,
+        )}
+        <path d="M27.6 12.2 H36.4 M28.4 15.6 H35.6 M27.6 19 H36.4 M32 12.2 V19" fill="none" stroke={KIGURUMI.tiger.spots} strokeWidth="1.7" strokeLinecap="round" />
+        <circle cx="22.8" cy="19.6" r="1.6" fill={HOOD_EYE} />
+        <circle cx="41.2" cy="19.6" r="1.6" fill={HOOD_EYE} />
+      </g>
+    ),
+  }),
+  'penguin-hood': hoodArt({
+    theme: KIGURUMI.penguin,
+    outline: HOOD_OUTLINE.egg,
+    box: '0 -2 64 56',
+    // 企鵝：深色的蛋形帽子（把貓耳朵整個包進去），兩顆白底的圓眼睛，額頭垂下一個黃色的嘴喙。布是深色的，眼睛墊白底才看得到
+    over: (
+      <g>
+        {mirrored(
+          <g>
+            <circle cx="23.4" cy="16.6" r="3.8" fill={KIGURUMI.penguin.belly} {...thin} strokeWidth={WF} />
+            <circle cx="24.4" cy="17.2" r="1.9" fill={HOOD_EYE} />
+            <circle cx="23.8" cy="16.4" r="0.6" fill={KIGURUMI.penguin.belly} />
+          </g>,
+        )}
+        <path d="M28 20.8 Q32 19 36 20.8 L32 26 Z" fill={KIGURUMI.penguin.feet} {...thin} />
+      </g>
+    ),
+  }),
   // ── 頭側 ────────────────────────────────────────────────
   'star-clip': {
     kind: 'layer',
@@ -981,6 +1142,46 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   },
+  'grass-stalk': {
+    kind: 'layer',
+    motion: 'nibble',
+    box: '30 32 30 22',
+    // 叼一根牧草：草莖從嘴角往右上翹，中間兩片葉子，末端一串草穗
+    node: (
+      <g>
+        <path d="M34 48.6 Q44 47 53 40.6" fill="none" stroke={LINE} strokeWidth="3.4" strokeLinecap="round" />
+        <path d="M34 48.6 Q44 47 53 40.6" fill="none" stroke="var(--acc-leaf)" strokeWidth="1.6" strokeLinecap="round" />
+        <path d="M42.6 46.4 Q44.6 41.4 48.4 41.2 Q46.6 45.4 42.6 46.4 Z" fill="var(--acc-leaf)" {...thin} strokeWidth={WF} />
+        <path d="M46.6 45.4 Q51.6 46.6 53.4 50 Q49 49.6 46.6 45.4 Z" fill="var(--acc-leaf)" {...thin} strokeWidth={WF} />
+        <ellipse cx="55" cy="38.6" rx="2.2" ry="4" transform="rotate(48 55 38.6)" fill="var(--acc-straw)" {...thin} strokeWidth={WF} />
+      </g>
+    ),
+  },
+  'tiger-fang': {
+    kind: 'layer',
+    motion: 'twitch',
+    box: '24 42 16 12',
+    // 兩顆小虎牙：從嘴巴兩邊往下露出來
+    node: (
+      <g>
+        <path d="M28.6 47.4 H31.2 L29.9 51.4 Z" fill="var(--acc-cream)" {...thin} strokeWidth={WF} />
+        <path d="M32.8 47.4 H35.4 L34.1 51.4 Z" fill="var(--acc-cream)" {...thin} strokeWidth={WF} />
+      </g>
+    ),
+  },
+  popsicle: {
+    kind: 'layer',
+    motion: 'nibble',
+    box: '30 36 30 20',
+    // 咬著一根冰棒：冰的那頭在嘴裡，木棒往右伸出去
+    node: (
+      <g transform="rotate(-14 34 48.4)">
+        <rect x="46.6" y="47.2" width="8.6" height="2.6" rx="1.3" fill="var(--acc-wood)" {...thin} strokeWidth={WF} />
+        <rect x="33.4" y="44.6" width="14.6" height="7.6" rx="3.6" fill="var(--acc-sky)" {...thin} />
+        <path d="M38.4 44.8 V52 M42.6 44.8 V52" stroke="var(--acc-cream)" strokeWidth="1.2" strokeOpacity="0.8" />
+      </g>
+    ),
+  },
   // ── 頸部 ────────────────────────────────────────────────
   bell: {
     kind: 'layer',
@@ -1083,6 +1284,9 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'frog-suit': onesieArt(KIGURUMI.frog),
   'bunny-suit': onesieArt(KIGURUMI.bunny),
   'pajama-suit': onesieArt(KIGURUMI.pajama),
+  'cow-suit': onesieArt(KIGURUMI.cow),
+  'tiger-suit': onesieArt(KIGURUMI.tiger),
+  'penguin-suit': onesieArt(KIGURUMI.penguin),
 
   // ── 背飾（畫在貓後面）────────────────────────────────────
   balloon: {

@@ -39,6 +39,12 @@ export const TONES: Readonly<Record<Exclude<SoundName, 'meow'>, readonly ToneSpe
     { wave: 'triangle', from: NOTE.D6, at: 0.14, dur: 0.14, gain: 0.06 },
     { wave: 'triangle', from: NOTE.G6, at: 0.21, dur: 0.22, gain: 0.06 },
   ],
+  /** 乳牛裝走路時的「哞～」：低音先往上推再慢慢往下掉，疊一個高八度的泛音才聽得出是「哞」不是嗡嗡聲 */
+  moo: [
+    { wave: 'sawtooth', from: 118, to: 150, at: 0, dur: 0.22, gain: 0.035 },
+    { wave: 'sawtooth', from: 150, to: 112, at: 0.18, dur: 0.62, gain: 0.035 },
+    { wave: 'triangle', from: 300, to: 224, at: 0.18, dur: 0.62, gain: 0.025 },
+  ],
 };
 
 /** 貓叫錄音的目標音量（RMS）：比按鍵聲（約 0.02）稍大 */

@@ -39,6 +39,11 @@ export interface CatBodyProps {
   pivot?: boolean;
   /** 不冒表情符號泡泡（模擬考：要安靜） */
   quiet?: boolean;
+  /**
+   * 拿在近側那隻舉起來的手（PetLeg.shoulder）上的東西，例如乳牛的大斧頭。座標同那條手臂：原點在肩膀、+y 沿著手臂往腳掌。
+   * 畫在手臂的那一層裡，所以跟著手臂的動畫轉、跟著整隻貓翻面；這個姿勢沒有舉起來的手就不畫
+   */
+  held?: ReactNode;
 }
 
 /** 對位點 → SVG transform：把零件的原點 (ox, oy) 放到 anchor 上 */
@@ -65,6 +70,7 @@ function Leg({
   toe,
   sleeve,
   cloth,
+  held,
 }: {
   leg: PetLeg;
   index: number;
@@ -72,6 +78,8 @@ function Leg({
   toe: number;
   sleeve: ReactNode;
   cloth?: string;
+  /** 手上拿的東西（畫在腳掌後面，看起來是握著） */
+  held?: ReactNode;
 }) {
   if (leg.len <= 0) return null;
   /** 腿根要不要封口：遠側的腿（從身體邊緣露出來）、從肩膀舉起來的手臂 */
@@ -80,6 +88,7 @@ function Leg({
   return (
     <g transform={`translate(${leg.x} ${leg.y}) rotate(${leg.rot})`}>
       <g className={`cb-pet-leg cb-pet-leg-${index}`}>
+        {held}
         <path
           d={capped ? d : `${d}Z`}
           fill={cloth ?? (far ? 'var(--cat-fur-far)' : 'var(--cat-fur)')}
@@ -113,9 +122,13 @@ function chinDepth(spec: PetPoseSpec): number {
  * size＝直徑是尾巴粗細的幾成、gap＝每隔多遠一顆、dot＝每一段的長度（不給 0：有些瀏覽器會把長度 0 的虛線整段丟掉）
  */
 const TAIL_SPOT = { size: 0.42, gap: 8, dot: 0.01 } as const;
+/** 尾巴的環紋（老虎）：每一圈沿著尾巴多長、圈與圈的間距；粗細和尾巴一樣，平頭（看起來是一圈環） */
+const TAIL_RING = { len: 1.8, gap: 5 } as const;
 
 /** 前腿在 PetPoseSpec.legs 裡的編號（順序：後腿遠、前腿遠、後腿近、前腿近）；袖子只套前腿 */
 const FRONT_LEGS: ReadonlySet<number> = new Set([1, 3]);
+/** 拿東西的是近側的前腳 */
+const HELD_LEG = 3;
 
 /** 穿著裡有「身體版」圖的配件，照 SLOTS_BY_DEPTH 的疊圖順序排好 */
 function bodyArts(outfit: Outfit): Array<{ slot: string; art: BodyArt; motion?: string }> {
@@ -143,6 +156,7 @@ export function CatBody({
   backdrop = false,
   pivot = false,
   quiet = false,
+  held,
 }: CatBodyProps) {
   const spec = PET_POSES[pose];
   /** 支點對齊：平移量換成圖寬的百分比（translateX 的 % 是元素自己的寬） */
@@ -277,15 +291,27 @@ export function CatBody({
             <path d={spec.tail} {...outline} strokeWidth={PET_TAIL_W + PET_LINE_W * 2} />
             <path d={spec.tail} fill="none" stroke={tailArt?.fill ?? 'var(--cat-patch)'} strokeWidth={PET_TAIL_W} strokeLinecap="round" />
             {tailArt?.spots ? (
-              <path
-                d={spec.tail}
-                fill="none"
-                stroke={tailArt.spots}
-                strokeWidth={PET_TAIL_W * TAIL_SPOT.size}
-                strokeLinecap="round"
-                strokeDasharray={`${TAIL_SPOT.dot} ${TAIL_SPOT.gap}`}
-                strokeDashoffset={-TAIL_SPOT.gap / 2}
-              />
+              tailArt.stripes ? (
+                <path
+                  d={spec.tail}
+                  fill="none"
+                  stroke={tailArt.spots}
+                  strokeWidth={PET_TAIL_W}
+                  strokeLinecap="butt"
+                  strokeDasharray={`${TAIL_RING.len} ${TAIL_RING.gap}`}
+                  strokeDashoffset={-TAIL_RING.gap / 2}
+                />
+              ) : (
+                <path
+                  d={spec.tail}
+                  fill="none"
+                  stroke={tailArt.spots}
+                  strokeWidth={PET_TAIL_W * TAIL_SPOT.size}
+                  strokeLinecap="round"
+                  strokeDasharray={`${TAIL_SPOT.dot} ${TAIL_SPOT.gap}`}
+                  strokeDashoffset={-TAIL_SPOT.gap / 2}
+                />
+              )
             ) : null}
           </g>
 
@@ -343,7 +369,16 @@ export function CatBody({
             </g>
 
             {nearLegs.filter(({ leg }) => leg.shoulder).map(({ leg, index }) => (
-              <Leg key={index} leg={leg} index={index} far={false} toe={toe} cloth={cloth} sleeve={legWear(index, leg)} />
+              <Leg
+                key={index}
+                leg={leg}
+                index={index}
+                far={false}
+                toe={toe}
+                cloth={cloth}
+                sleeve={legWear(index, leg)}
+                held={index === HELD_LEG ? held : undefined}
+              />
             ))}
           </g>
         </g>

@@ -1,8 +1,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import type { RoamBehavior } from '../../core/types';
-import { CAT_HINT, ROAM_ROUTES } from '../../core/constants/pet';
-import { clamp, flyLift, hintDelay, jumpPoint, perchOffset, pickBehavior, pickHint, pickWalkTarget, stepWalk } from './petLogic';
+import { CAT_HINT, PET_GAIT_DEFAULT, PET_POSES, ROAM_ROUTES } from '../../core/constants/pet';
+import { OUTFIT_SPECIALS } from '../../core/constants/wardrobe';
+import { outfitSpecials } from '../../selectors/wardrobe';
+import { clamp, flyLift, gaitFor, hintDelay, jumpPoint, perchOffset, pickBehavior, pickHint, pickWalkTarget, stepWalk } from './petLogic';
 
 const seq = (...values: number[]) => {
   let i = 0;
@@ -133,5 +135,26 @@ describe('cape flight', () => {
     assert.ok(Math.abs(top(ground, { x: 300, y: 600 }) - (600 - lift)) < 1);
     const perch = { x: 0, y: 40 };
     assert.ok(top(perch, { x: 300, y: 600 }) >= perch.y - 0.5);
+  });
+
+  it('gaitFor: the outfit decides how the cat walks; the penguin full set slides instead of waddling when it zooms', () => {
+    const wear = (id: string) => outfitSpecials(Object.fromEntries(Object.entries(OUTFIT_SPECIALS.find((sp) => sp.id === id)?.wear ?? {}).map(([slot, ids]) => [slot, ids?.[0]])));
+    assert.deepEqual(gaitFor(new Set()), PET_GAIT_DEFAULT);
+    assert.equal(gaitFor(wear('hop')).hop, true);
+    assert.deepEqual(gaitFor(wear('moo')), { walk: 'upwalk', zoom: 'upwalk', home: 'upwalk', rest: 'upright' });
+    // 乳牛全套（含大斧頭）也站起來走
+    assert.equal(gaitFor(wear('axe')).walk, 'upwalk');
+    assert.equal(gaitFor(wear('waddle')).zoom, 'waddle');
+    // 企鵝全套：走路搖擺、暴衝和回家用肚子滑
+    const penguin = gaitFor(wear('slide'));
+    assert.equal(penguin.walk, 'waddle');
+    assert.equal(penguin.zoom, 'slide');
+    // 老虎沒有換步態
+    assert.deepEqual(gaitFor(wear('pounce')), PET_GAIT_DEFAULT);
+    // 每個步態用到的姿勢都在姿勢表裡
+    for (const sp of OUTFIT_SPECIALS) {
+      const g = gaitFor(wear(sp.id));
+      for (const pose of [g.walk, g.zoom, g.home, g.rest]) assert.ok(PET_POSES[pose], `${sp.id} ${pose}`);
+    }
   });
 });
