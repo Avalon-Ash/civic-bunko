@@ -56,6 +56,7 @@ import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
 import { between, clamp, flyLift, gaitFor, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
+import { CLAW_MARK, ClawMark, FrostMark } from './petMarks';
 import { getPet, petHome, subscribePet } from './petStore';
 import { CAT_BURN_ATTR, scorchOffset } from './ScorchLayer';
 
@@ -148,7 +149,7 @@ function newEngine(at: { x: number; y: number }, mode: Mode): Engine {
 
 /**
  * 小貓身邊冒出來的小東西：泡泡（可以戳破）、蜂蜜腳印、碎屑（dx、dy＝飛去哪）；
- * 和釘在卡片上、跟著卡片走的痕跡（el；dx、top＝離卡片左緣、上緣多遠）：斧頭的裂痕、老虎的抓痕、企鵝的冰（w、h＝冰蓋多大、radius＝卡片的圓角）
+ * 和釘在卡片上、跟著卡片走的痕跡（el；dx、top＝離卡片左緣、上緣多遠）：斧頭的裂痕、老虎的爪痕、企鵝的冰（w、h、radius＝卡片的大小與圓角）
  */
 interface Bit {
   id: number;
@@ -162,22 +163,7 @@ interface Bit {
   top?: number;
   w?: number;
   h?: number;
-  radius?: string;
-}
-
-/** 老虎的三道爪痕（40×36 的圖，上緣中間對準前腳） */
-const CLAW_PATH = 'M9 3 Q6 16 3 31 M21 2 Q18 18 15 34 M33 3 Q30 16 27 31';
-
-/** 冰柱：照卡片寬度排一排，長短照編號決定（每次畫都一樣，不會閃） */
-function iciclePath(width: number, seed: number): string {
-  const { every, w, min, max } = PET_SLIDE.icicle;
-  const parts: string[] = [];
-  for (let x = every / 2; x + w / 2 < width; x += every) {
-    const k = Math.abs(Math.sin((x + seed) * 12.9898)) % 1;
-    const len = min + k * (max - min);
-    parts.push(`M${Math.round(x - w / 2)} 0 L${Math.round(x)} ${Math.round(len)} L${Math.round(x + w / 2)} 0 Z`);
-  }
-  return parts.join(' ');
+  radius?: number;
 }
 
 function pickLine(lines: readonly string[]): string {
@@ -463,7 +449,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       for (const el of cards) {
         const r = rectOf(el);
         addBit(
-          { kind: 'frost', x: r.left, y: r.top, size: 0, el, dx: 0, top: 0, w: r.width, h: r.height, radius: getComputedStyle(el).borderRadius },
+          { kind: 'frost', x: r.left, y: r.top, size: 0, el, dx: 0, top: 0, w: r.width, h: r.height, radius: Number.parseFloat(getComputedStyle(el).borderRadius) || 0 },
           PET_SLIDE.freezeMs,
         );
       }
@@ -710,7 +696,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           const r = rectOf(clawEl);
           const pawX = e.x + W * (shown.current.facing === 'right' ? 0.72 : 0.28);
           addBit(
-            { kind: 'claw', x: pawX, y: r.top + PET_POUNCE.clawTop, size: 0, el: clawEl, dx: pawX - r.left, top: PET_POUNCE.clawTop },
+            { kind: 'claw', x: pawX, y: r.top - CLAW_MARK.rise, size: 0, el: clawEl, dx: pawX - r.left, top: -CLAW_MARK.rise },
             PET_POUNCE.clawMs,
           );
         }
@@ -1098,13 +1084,14 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             key={bit.id}
             ref={pinRef(bit.id)}
             className="cb-pet-bit cb-pet-claw"
-            style={{ transform: `translate3d(${Math.round(bit.x)}px, ${Math.round(bit.y)}px, 0)`, animationDuration: `${PET_POUNCE.clawMs}ms` }}
+            style={{
+              transform: `translate3d(${Math.round(bit.x)}px, ${Math.round(bit.y)}px, 0)`,
+              marginLeft: -CLAW_MARK.w / 2,
+              animationDuration: `${PET_POUNCE.clawMs}ms`,
+            }}
             aria-hidden="true"
           >
-            <svg width="40" height="36" viewBox="0 0 40 36">
-              <path className="cb-pet-claw-out" d={CLAW_PATH} />
-              <path className="cb-pet-claw-in" d={CLAW_PATH} />
-            </svg>
+            <ClawMark />
           </div>
         ) : bit.kind === 'frost' ? (
           <div
@@ -1113,16 +1100,11 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             className="cb-pet-bit cb-pet-frost"
             style={{
               transform: `translate3d(${Math.round(bit.x)}px, ${Math.round(bit.y)}px, 0)`,
-              width: bit.w,
-              height: bit.h,
-              borderRadius: bit.radius,
               animationDuration: `${PET_SLIDE.freezeMs}ms`,
             }}
             aria-hidden="true"
           >
-            <svg className="cb-pet-icicles" width={bit.w} height={PET_SLIDE.icicle.max} viewBox={`0 0 ${Math.round(bit.w ?? 0)} ${PET_SLIDE.icicle.max}`}>
-              <path d={iciclePath(bit.w ?? 0, bit.id)} />
-            </svg>
+            <FrostMark width={bit.w ?? 0} height={bit.h ?? 0} radius={bit.radius ?? 0} seed={bit.id} />
           </div>
         ) : bit.kind === 'crack' ? (
           <div

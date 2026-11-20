@@ -777,51 +777,71 @@
   }
 }
 
-/* 老虎的抓痕：三道爪痕從卡片上緣往下劃，深色外框、裡面一道淺色（像被抓破），最後淡掉（長度＝PET_POUNCE.clawMs） */
-.cb-pet-claw {
+/* 老虎的爪痕、企鵝的冰（畫法在 ui/pet/petMarks.tsx）：只是裝飾，不擋點擊；長度由元件帶進來（PET_POUNCE.clawMs、PET_SLIDE.freezeMs） */
+.cb-pet-claw,
+.cb-pet-frost {
   pointer-events: none;
   animation: cb-pet-mark-life 6s linear forwards;
 }
 
 .cb-pet-claw svg {
   display: block;
-  margin-left: -20px;
-  fill: none;
-  stroke-linecap: round;
+  transform-origin: 50% 0;
+  animation: cb-claw-in 0.22s ease-out;
+}
+
+/* 爪痕從上往下劃開 */
+@keyframes cb-claw-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.cb-pet-snowcap,
+.cb-pet-icicles {
+  position: absolute;
+  left: 0;
   overflow: visible;
-  animation: cb-crack-in 0.16s ease-out;
 }
 
-.cb-pet-claw-out {
-  stroke: var(--cat-line);
-  stroke-width: 5.5;
-}
-
-.cb-pet-claw-in {
-  stroke: var(--acc-cream);
-  stroke-width: 2.2;
-}
-
-/* 企鵝的冰：整張卡片蓋一層半透明的冰、框變成冰藍色，底下掛一排冰柱；慢慢退冰（長度＝PET_SLIDE.freezeMs） */
-.cb-pet-frost {
-  box-sizing: border-box;
-  pointer-events: none;
-  border: 3px solid var(--acc-sky);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--acc-cream) 55%, transparent) 0 12%, transparent 12% 22%, color-mix(in srgb, var(--acc-cream) 40%, transparent) 22% 26%, transparent 26%),
-    color-mix(in srgb, var(--acc-sky) 38%, transparent);
-  animation: cb-pet-mark-life 6s linear forwards;
+/* 雪堆往上冒出來、冰柱往下長出來 */
+.cb-pet-snowcap {
+  transform-origin: 50% 100%;
+  animation: cb-frost-grow 0.35s ease-out;
 }
 
 .cb-pet-icicles {
-  position: absolute;
-  left: -3px;
-  top: 100%;
-  overflow: visible;
-  fill: var(--acc-sky);
-  stroke: var(--cat-line);
-  stroke-width: 1.2;
-  stroke-linejoin: round;
+  transform-origin: 50% 0;
+  animation: cb-frost-grow 0.45s ease-out;
+}
+
+@keyframes cb-frost-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* 冰柱尖端的水滴：一直滴 */
+.cb-pet-drop {
+  animation: cb-pet-drop 1.6s ease-in infinite;
+}
+
+@keyframes cb-pet-drop {
+  0%,
+  40% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(12px);
+    opacity: 0;
+  }
 }
 
 /* 釘在卡片上的痕跡：很快出現、停一陣子、最後淡掉 */

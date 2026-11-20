@@ -449,18 +449,17 @@ export const PET_POUNCE = {
   lift: 60,
   roarMs: 1_400,
   shakeMs: 450,
-  /** 撲到卡片上（畫面上有卡片可以撲時，有 onCard 的機率撲卡片、不然撲地面）：落地的地方留下抓痕 clawMs 後淡掉；抓痕在卡片上緣往下 clawTop 處 */
+  /** 撲到卡片上（畫面上有卡片可以撲時，有 onCard 的機率撲卡片、不然撲地面）：前腳那裡的卡片上緣留下爪痕，clawMs 後淡掉（畫法在 ui/pet/petMarks.tsx） */
   onCard: 0.7,
   clawMs: 6_000,
-  clawTop: 8,
 } as const;
 /** 乳牛裝直立著走：每隔 everyMs 哞一聲（泡泡＋音效）；企鵝暴衝改成用肚子滑時，有 chance 的機率喊一聲 */
 export const PET_MOO = { everyMs: 4_500 } as const;
 /**
- * 企鵝全套用肚子滑：有 cheer 的機率喊一聲；滑到底時畫面上看得到的卡片結冰 freezeMs（蓋一層冰、底下掛冰柱，只在畫面上，照常可以點）；
- * icicle＝冰柱的間距、寬、最短與最長（px）
+ * 企鵝全套用肚子滑：有 cheer 的機率喊一聲；滑到底時畫面上看得到的卡片結冰 freezeMs：上緣堆雪、下緣掛冰柱，
+ * 都畫在卡片邊緣外面、不蓋內容、不擋點擊（畫法在 ui/pet/petMarks.tsx）
  */
-export const PET_SLIDE = { cheer: 0.5, freezeMs: 6_000, icicle: { every: 20, w: 9, min: 7, max: 16 } } as const;
+export const PET_SLIDE = { cheer: 0.5, freezeMs: 6_000 } as const;
 
 /** 平常的步態 */
 export const PET_GAIT_DEFAULT: PetGait = { walk: 'walk', zoom: 'run', home: 'run', rest: 'sit' };
