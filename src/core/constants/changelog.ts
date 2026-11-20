@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-20-claw-freeze',
+    date: '2026-11-20',
+    title: '乳牛變帥了，老虎會抓、企鵝會結冰',
+    items: [
+      '乳牛頭套換了寬寬的牛鼻子，兩支牛角往外翹，比較顯眼',
+      '老虎全套撲過去時會撲到卡片上，在卡片留下三道抓痕（一陣子後淡掉）',
+      '企鵝全套用肚子滑到底，畫面上的卡片會結一層冰、掛上冰柱，過幾秒就退冰；結冰時照常可以點',
+    ],
+  },
+  {
     id: '2026-11-20-cow-tiger-penguin',
     date: '2026-11-20',
     title: '新娃娃裝：乳牛、老虎、企鵝',

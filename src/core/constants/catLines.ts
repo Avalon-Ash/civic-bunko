@@ -275,3 +275,9 @@ export const CAT_ROAR_LINES = ['嗷嗚——！', '吼！嚇到了吧？', '虎�
 
 /** 企鵝全套趴下來用肚子滑（PET_SLIDE） */
 export const CAT_SLIDE_LINES = ['咻——！', '滑滑滑～', '肚子涼涼的！'] as const;
+
+/** 企鵝全套滑完，卡片都結冰了（PET_SLIDE） */
+export const CAT_FREEZE_LINES = ['全部凍住啦！', '冰冰涼涼～', '等一下就退冰了。'] as const;
+
+/** 老虎全套撲到卡片上抓了幾下（PET_POUNCE） */
+export const CAT_CLAW_LINES = ['抓抓抓！', '嗷嗚，抓花了～', '磨爪子剛剛好。'] as const;

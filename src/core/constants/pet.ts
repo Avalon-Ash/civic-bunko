@@ -441,10 +441,26 @@ export const PET_AXE = {
  * 老虎全套的虎撲（pounce）：要走路或暴衝時有 chance 的機率改成撲過去——先伏低扭屁股 crouchMs，再撲到至少 minTrip 外的地面；
  * 撲的速度（px／秒）與拋物線多高；落地吼一聲，看得到的卡片抖 shakeMs。答題頁不撲
  */
-export const PET_POUNCE = { chance: 0.45, crouchMs: 1_100, minTrip: 120, speed: 420, lift: 60, roarMs: 1_400, shakeMs: 450 } as const;
+export const PET_POUNCE = {
+  chance: 0.45,
+  crouchMs: 1_100,
+  minTrip: 120,
+  speed: 420,
+  lift: 60,
+  roarMs: 1_400,
+  shakeMs: 450,
+  /** 撲到卡片上（畫面上有卡片可以撲時，有 onCard 的機率撲卡片、不然撲地面）：落地的地方留下抓痕 clawMs 後淡掉；抓痕在卡片上緣往下 clawTop 處 */
+  onCard: 0.7,
+  clawMs: 6_000,
+  clawTop: 8,
+} as const;
 /** 乳牛裝直立著走：每隔 everyMs 哞一聲（泡泡＋音效）；企鵝暴衝改成用肚子滑時，有 chance 的機率喊一聲 */
 export const PET_MOO = { everyMs: 4_500 } as const;
-export const PET_SLIDE = { cheer: 0.5 } as const;
+/**
+ * 企鵝全套用肚子滑：有 cheer 的機率喊一聲；滑到底時畫面上看得到的卡片結冰 freezeMs（蓋一層冰、底下掛冰柱，只在畫面上，照常可以點）；
+ * icicle＝冰柱的間距、寬、最短與最長（px）
+ */
+export const PET_SLIDE = { cheer: 0.5, freezeMs: 6_000, icicle: { every: 20, w: 9, min: 7, max: 16 } } as const;
 
 /** 平常的步態 */
 export const PET_GAIT_DEFAULT: PetGait = { walk: 'walk', zoom: 'run', home: 'run', rest: 'sit' };

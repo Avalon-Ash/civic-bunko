@@ -36,7 +36,9 @@ import {
 import { dispatch } from '../../core/commands';
 import {
   CAT_AXE_LINES,
+  CAT_CLAW_LINES,
   CAT_DREAM_LINES,
+  CAT_FREEZE_LINES,
   CAT_HINT_LINES,
   CAT_MOO_LINES,
   CAT_ROAR_LINES,
@@ -110,8 +112,8 @@ interface Engine {
    * go＝正跳過去、act＝正在噴或劈
    */
   prank: { kind: 'fire' | 'axe'; el: Element; place: ScorchPlace; spot: string; facing: 'left' | 'right'; stage: 'go' | 'act' } | null;
-  /** 老虎撲過去：to＝落點（地面的 x）；crouch＝伏低扭屁股、air＝撲在空中 */
-  pounce: { to: number; stage: 'crouch' | 'air' } | null;
+  /** 老虎撲過去：to＝落點的 x、el＝撲到哪張卡片上（沒有就是地面）；crouch＝伏低扭屁股、air＝撲在空中 */
+  pounce: { to: number; el?: Element; stage: 'crouch' | 'air' } | null;
   /** 上一次冒泡泡、說夢話的時間；上一次哞；上一個蜂蜜腳印留在哪（x） */
   lastBitAt: number;
   lastMooAt: number;
@@ -145,17 +147,37 @@ function newEngine(at: { x: number; y: number }, mode: Mode): Engine {
 }
 
 /**
- * 小貓身邊冒出來的小東西：泡泡（可以戳破）、蜂蜜腳印、斧頭劈出來的裂痕（跟著卡片走：el、dx＝離卡片左緣多遠）與碎屑（dx、dy＝飛去哪）
+ * 小貓身邊冒出來的小東西：泡泡（可以戳破）、蜂蜜腳印、碎屑（dx、dy＝飛去哪）；
+ * 和釘在卡片上、跟著卡片走的痕跡（el；dx、top＝離卡片左緣、上緣多遠）：斧頭的裂痕、老虎的抓痕、企鵝的冰（w、h＝冰蓋多大、radius＝卡片的圓角）
  */
 interface Bit {
   id: number;
-  kind: 'bubble' | 'paw' | 'crack' | 'chip';
+  kind: 'bubble' | 'paw' | 'chip' | 'crack' | 'claw' | 'frost';
   x: number;
   y: number;
   size: number;
   el?: Element;
   dx?: number;
   dy?: number;
+  top?: number;
+  w?: number;
+  h?: number;
+  radius?: string;
+}
+
+/** 老虎的三道爪痕（40×36 的圖，上緣中間對準前腳） */
+const CLAW_PATH = 'M9 3 Q6 16 3 31 M21 2 Q18 18 15 34 M33 3 Q30 16 27 31';
+
+/** 冰柱：照卡片寬度排一排，長短照編號決定（每次畫都一樣，不會閃） */
+function iciclePath(width: number, seed: number): string {
+  const { every, w, min, max } = PET_SLIDE.icicle;
+  const parts: string[] = [];
+  for (let x = every / 2; x + w / 2 < width; x += every) {
+    const k = Math.abs(Math.sin((x + seed) * 12.9898)) % 1;
+    const len = min + k * (max - min);
+    parts.push(`M${Math.round(x - w / 2)} 0 L${Math.round(x)} ${Math.round(len)} L${Math.round(x + w / 2)} 0 Z`);
+  }
+  return parts.join(' ');
 }
 
 function pickLine(lines: readonly string[]): string {
@@ -254,7 +276,12 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     window.setTimeout(() => setBits((prev) => prev.filter((other) => other.id !== id)), lifeMs);
   };
   /** 裂痕跟著卡片走：主迴圈每一格照卡片的位置重放 */
-  const cracks = useRef(new Map<number, HTMLDivElement>());
+  /** 釘在卡片上的痕跡（裂痕、抓痕、冰）：主迴圈每一格照卡片的位置重放 */
+  const pins = useRef(new Map<number, HTMLDivElement>());
+  const pinRef = (id: number) => (node: HTMLDivElement | null) => {
+    if (node) pins.current.set(id, node);
+    else pins.current.delete(id);
+  };
   const bitsRef = useRef(bits);
   bitsRef.current = bits;
   /** 卡片上的標記（劈歪、抖一下）lifeMs 後拿掉；同一張卡片再被標一次就重新計時、動畫重播 */
@@ -418,7 +445,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         // 歪多久給 CSS 讀（cb-chop-sag 的長度）
         if (el instanceof HTMLElement) el.style.setProperty('--cat-chop-ms', `${PET_AXE.sagMs}ms`);
         markCard(el, CHOP_ATTR, prank.place, PET_AXE.sagMs);
-        addBit({ kind: 'crack', x: hitX, y: r.top, size: 0, el, dx: hitX - r.left }, PET_AXE.sagMs);
+        addBit({ kind: 'crack', x: hitX, y: r.top, size: 0, el, dx: hitX - r.left, top: 0 }, PET_AXE.sagMs);
       }
       const chips = PET_AXE.chips;
       for (let i = 0; i < chips.count; i += 1) {
@@ -430,6 +457,19 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
       }
     };
 
+    /** 企鵝滑完：看得到的卡片結冰（蓋一層冰、底下掛冰柱），freezeMs 後退冰 */
+    const freezeCards = () => {
+      const cards = visiblePerches(floorY());
+      for (const el of cards) {
+        const r = rectOf(el);
+        addBit(
+          { kind: 'frost', x: r.left, y: r.top, size: 0, el, dx: 0, top: 0, w: r.width, h: r.height, radius: getComputedStyle(el).borderRadius },
+          PET_SLIDE.freezeMs,
+        );
+      }
+      if (cards.length > 0) say(pickLine(CAT_FREEZE_LINES));
+    };
+
     const surfaceY = (s: Surface): number | null => {
       if (s.kind === 'floor') return floorY();
       if (!s.el.isConnected) return null;
@@ -439,6 +479,8 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     };
 
     const next = (e: Engine, now: number) => {
+      // 重新挑動作＝之前排好的撲擊作罷（例如伏低到一半發現腳下有按鈕，被叫去換位置）
+      e.pounce = null;
       const floor = floorY();
       const perches = visiblePerches(floor);
       const unavailable = new Set<RoamBehavior>();
@@ -516,9 +558,18 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         tabRef.current !== 'round' &&
         Math.random() < PET_POUNCE.chance
       ) {
-        const to = pickWalkTarget(e.x, range.min, range.max, PET_POUNCE.minTrip, Math.random, (x) => blockedAt(x, floor, layer));
+        // 優先撲到一張卡片上（抓花它），沒有卡片可以撲就撲到地面
+        const cards = perches.filter((el) => el !== (e.surface.kind === 'perch' ? e.surface.el : null));
+        const card = Math.random() < PET_POUNCE.onCard ? cards[Math.floor(Math.random() * cards.length)] : undefined;
+        const cr = card ? rectOf(card) : null;
+        const onCard =
+          card && cr
+            ? pickWalkTarget(Number.NaN, cr.left + ROAM_EDGE, cr.right - W - ROAM_EDGE, 0, Math.random, (x) => blockedAt(x, cr.top - H + 3, layer))
+            : null;
+        const to =
+          onCard ?? pickWalkTarget(e.x, range.min, range.max, PET_POUNCE.minTrip, Math.random, (x) => blockedAt(x, floor, layer));
         if (to !== null) {
-          e.pounce = { to, stage: 'crouch' };
+          e.pounce = { to, stage: 'crouch', ...(onCard !== null && card ? { el: card } : {}) };
           e.mode = { kind: 'idle', until: now + PET_POUNCE.crouchMs };
           show('crouch', to > e.x ? 'right' : 'left');
           return;
@@ -636,12 +687,13 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         // 扭完屁股：撲出去
         pounce.stage = 'air';
         const trip = Math.abs(pounce.to - e.x);
+        const card = pounce.el?.isConnected ? rectOf(pounce.el) : null;
         e.mode = {
           kind: 'jump',
           from: { x: e.x, y: e.y },
-          to: { x: pounce.to, y: floorY() },
+          to: { x: pounce.to, y: card ? card.top - H + 3 : floorY() },
           start: now,
-          land: { kind: 'floor' },
+          land: pounce.el && card ? { kind: 'perch', el: pounce.el, dx: pounce.to - card.left } : { kind: 'floor' },
           ms: Math.max(ROAM_JUMP_MS, (trip / PET_POUNCE.speed) * 1000),
           lift: PET_POUNCE.lift,
         };
@@ -649,11 +701,20 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
         return;
       }
       if (pounce) {
-        // 落地：吼一聲，看得到的卡片嚇得抖一下
+        // 落地：吼一聲，看得到的卡片嚇得抖一下；撲在卡片上的話，前腳那裡留下抓痕
         e.pounce = null;
         setMood('yay');
         e.resetMood = true;
-        say(pickLine(CAT_ROAR_LINES));
+        const clawEl = pounce.el && e.surface.kind === 'perch' && e.surface.el === pounce.el && pounce.el.isConnected ? pounce.el : null;
+        if (clawEl) {
+          const r = rectOf(clawEl);
+          const pawX = e.x + W * (shown.current.facing === 'right' ? 0.72 : 0.28);
+          addBit(
+            { kind: 'claw', x: pawX, y: r.top + PET_POUNCE.clawTop, size: 0, el: clawEl, dx: pawX - r.left, top: PET_POUNCE.clawTop },
+            PET_POUNCE.clawMs,
+          );
+        }
+        say(pickLine(clawEl ? CAT_CLAW_LINES : CAT_ROAR_LINES));
         for (const el of visiblePerches(floorY())) markCard(el, SHAKE_ATTR, '', PET_POUNCE.shakeMs);
         e.mode = { kind: 'idle', until: now + PET_POUNCE.roarMs };
         show('stand');
@@ -768,6 +829,8 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             e.surface.dx = perchOffset(e.x, rectOf(e.surface.el).left);
           }
           if (step.arrived) {
+            // 企鵝用肚子滑到底：卡片都結冰
+            if (shown.current.pose === 'slide' && !e.homeTrip && specials.current.has('slide')) freezeCards();
             if (e.homeTrip) {
               const h = homeRect();
               if (h) {
@@ -862,7 +925,8 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
               proceed(e, now);
             } else if (now - e.lastBlockCheck > ROAM_BLOCK_CHECK_MS) {
               e.lastBlockCheck = now;
-              if (e.surface.kind === 'floor' && blockedAt(e.x, e.y, layerRef.current)) next(e, now);
+              // 伏低準備撲的那一秒不換位置（撲出去就離開了）
+              if (e.surface.kind === 'floor' && !e.pounce && blockedAt(e.x, e.y, layerRef.current)) next(e, now);
             }
           }
         }
@@ -880,12 +944,14 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           setFlags((f) => ({ ...f, firing: false }));
         }
 
-        // 裂痕跟著被劈的那張卡片走
-        for (const [id, node] of cracks.current) {
+        // 裂痕、抓痕、冰跟著自己的卡片走（卡片不在了就藏起來）
+        for (const [id, node] of pins.current) {
           const bit = bitsRef.current.find((other) => other.id === id);
-          if (!bit?.el?.isConnected) continue;
+          const alive = Boolean(bit?.el?.isConnected);
+          node.style.visibility = alive ? '' : 'hidden';
+          if (!bit?.el || !alive) continue;
           const r = rectOf(bit.el);
-          node.style.transform = `translate3d(${Math.round(r.left + (bit.dx ?? 0))}px, ${Math.round(r.top)}px, 0)`;
+          node.style.transform = `translate3d(${Math.round(r.left + (bit.dx ?? 0))}px, ${Math.round(r.top + (bit.top ?? 0))}px, 0)`;
         }
 
         // 提示中不變淡：作答後畫面會自己捲到解析，牠得意或心虛的樣子要看得到
@@ -1027,13 +1093,41 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             tabIndex={-1}
             onPointerDown={() => setBits((prev) => prev.filter((other) => other.id !== bit.id))}
           />
+        ) : bit.kind === 'claw' ? (
+          <div
+            key={bit.id}
+            ref={pinRef(bit.id)}
+            className="cb-pet-bit cb-pet-claw"
+            style={{ transform: `translate3d(${Math.round(bit.x)}px, ${Math.round(bit.y)}px, 0)`, animationDuration: `${PET_POUNCE.clawMs}ms` }}
+            aria-hidden="true"
+          >
+            <svg width="40" height="36" viewBox="0 0 40 36">
+              <path className="cb-pet-claw-out" d={CLAW_PATH} />
+              <path className="cb-pet-claw-in" d={CLAW_PATH} />
+            </svg>
+          </div>
+        ) : bit.kind === 'frost' ? (
+          <div
+            key={bit.id}
+            ref={pinRef(bit.id)}
+            className="cb-pet-bit cb-pet-frost"
+            style={{
+              transform: `translate3d(${Math.round(bit.x)}px, ${Math.round(bit.y)}px, 0)`,
+              width: bit.w,
+              height: bit.h,
+              borderRadius: bit.radius,
+              animationDuration: `${PET_SLIDE.freezeMs}ms`,
+            }}
+            aria-hidden="true"
+          >
+            <svg className="cb-pet-icicles" width={bit.w} height={PET_SLIDE.icicle.max} viewBox={`0 0 ${Math.round(bit.w ?? 0)} ${PET_SLIDE.icicle.max}`}>
+              <path d={iciclePath(bit.w ?? 0, bit.id)} />
+            </svg>
+          </div>
         ) : bit.kind === 'crack' ? (
           <div
             key={bit.id}
-            ref={(node) => {
-              if (node) cracks.current.set(bit.id, node);
-              else cracks.current.delete(bit.id);
-            }}
+            ref={pinRef(bit.id)}
             className="cb-pet-bit cb-pet-crack"
             style={{ transform: `translate3d(${Math.round(bit.x)}px, ${Math.round(bit.y)}px, 0)` }}
             aria-hidden="true"

@@ -81,14 +81,14 @@ export const OUTFIT_SPECIALS: ReadonlyArray<{
   {
     id: 'pounce',
     name: '虎撲',
-    text: '伏低扭扭屁股，撲到遠處吼一聲',
+    text: '伏低扭扭屁股撲到卡片上，把它抓花',
     wear: { 'head-top': ['tiger-hood'], body: ['tiger-suit'], 'face-low': ['tiger-fang'] },
   },
   { id: 'waddle', name: '搖搖擺擺', text: '站起來搖搖擺擺地走', wear: { 'head-top': ['penguin-hood'], body: ['penguin-suit'] } },
   {
     id: 'slide',
     name: '肚子滑行',
-    text: '跑起來改成趴下用肚子滑',
+    text: '跑起來改成趴下用肚子滑，滑完卡片都結冰',
     wear: { 'head-top': ['penguin-hood'], body: ['penguin-suit'], 'face-low': ['popsicle'] },
   },
 ];

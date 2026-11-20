@@ -878,8 +878,8 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     theme: KIGURUMI.cow,
     outline: HOOD_OUTLINE.egg,
     box: '-6 -2 76 56',
-    // 乳牛：蛋形的帽子把貓耳朵整個包住，兩側各一隻往外垂的耳朵（一白一黑），頭頂一對短短的牛角，
-    // 額頭上一塊黑斑、寬寬的粉紅色鼻口和兩個鼻孔
+    // 乳牛：蛋形的帽子把貓耳朵整個包住，兩側各一隻往外垂的耳朵（一白一黑），頭頂兩側一對往外彎的大牛角；
+    // 鼻口是橫跨額頭的寬扁橢圓、鼻孔在兩端斜斜的（圓的小鼻子加中間兩個點會像豬）
     under: (
       <g>
         <path d="M6.4 17.6 Q-0.4 15.4 -2.2 21.6 Q0.4 27 7 24.4 Z" fill={KIGURUMI.cow.fill} {...stroke} />
@@ -889,14 +889,19 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     over: (
       <g>
         <path d="M5 19.4 Q1.2 18.6 0 21.8 Q1.6 24.4 5.4 23.2 Z" fill={KIGURUMI.cow.belly} />
-        <path d={blobPath(43, 8.4, 5.4)} fill={KIGURUMI.cow.spots} />
+        <path d={blobPath(47.6, 11.6, 4.2)} fill={KIGURUMI.cow.spots} />
         <path d={blobPath(8.6, 33, 2.6)} fill={KIGURUMI.cow.spots} />
-        {mirrored(<path d="M23.4 6.4 Q20.2 3.4 21 -0.6 Q24.6 1.2 27.2 5.4 Z" fill="var(--acc-straw)" {...thin} />)}
-        <circle cx="24.4" cy="14.6" r="1.6" fill={HOOD_EYE} />
-        <circle cx="39.6" cy="14.6" r="1.6" fill={HOOD_EYE} />
-        <ellipse cx="32" cy="20.6" rx="7.8" ry="3.8" fill={KIGURUMI.cow.belly} {...thin} strokeWidth={WF} />
-        <ellipse cx="28.8" cy="20.6" rx="1.1" ry="1.5" fill={HOOD_EYE} />
-        <ellipse cx="35.2" cy="20.6" rx="1.1" ry="1.5" fill={HOOD_EYE} />
+        {mirrored(
+          <g>
+            <path d="M11.4 7.6 Q3.2 7 1.4 -0.6 Q7.6 2.6 17.6 3.6 Q16.4 6.6 11.4 7.6 Z" fill="var(--acc-straw)" {...thin} />
+            <path d="M4.6 3.4 Q8 4.8 12 5" fill="none" stroke={LINE} strokeWidth={WF} strokeLinecap="round" strokeOpacity="0.5" />
+          </g>,
+        )}
+        <circle cx="23.8" cy="12.8" r="1.6" fill={HOOD_EYE} />
+        <circle cx="40.2" cy="12.8" r="1.6" fill={HOOD_EYE} />
+        <ellipse cx="32" cy="20.6" rx="13.8" ry="4.6" fill={KIGURUMI.cow.belly} {...thin} strokeWidth={WF} />
+        <ellipse cx="23.6" cy="20.8" rx="1.3" ry="2.3" transform="rotate(-28 23.6 20.8)" fill={HOOD_EYE} />
+        <ellipse cx="40.4" cy="20.8" rx="1.3" ry="2.3" transform="rotate(28 40.4 20.8)" fill={HOOD_EYE} />
       </g>
     ),
   }),
