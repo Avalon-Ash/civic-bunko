@@ -427,8 +427,44 @@ export interface WardrobeState {
   repairs?: number;
   /** 現在燒焦的地方（卡片上 data-cat-burn 的值）；只是這台裝置畫面上的樣子，不同步 */
   scorch?: string[];
-  /** 目前穿著；沒有這欄時沿用舊的 settings.accessory */
+  /** 目前穿著；沒有這欄時沿用舊的 settings.accessory。這是原本那隻（HOUSE_FIRST_CAT）的穿著 */
   outfit?: Outfit;
+  /** 原本那隻的穿著最後一次被使用者改動的時間（ISO）；沒有這欄＝不知道（加這欄之前換的）。和 outfit 一起組成 CatLook 跨裝置同步 */
+  outfitAt?: string;
+  /** 領養的小貓（鍵是 CatId；原本那隻不在這裡，牠的資料在舊欄位）。規則在 docs/plans/cat-house.md §3 */
+  cats?: Record<CatId, HouseCatSave>;
+  /** 帶出門的小貓；沒有這欄＝照小屋順序的前 HOUSE.maxOut 隻。各裝置自己的設定，不同步 */
+  outing?: CatId[];
+  /** 陪我刷題的那隻（答題頁、頭像）；沒有這欄或不在家裡＝原本那隻。各裝置自己的設定，不同步 */
+  leader?: CatId;
+}
+
+// ── 小貓之家（多隻小貓；數字在 constants/house.ts）────────────
+/**
+ * 小貓 ID：原本那隻固定是 HOUSE_FIRST_CAT（'cat-1'，資料在舊欄位，不寫進 wardrobe.cats）；
+ * 領養的是 HOUSE_ADOPT 列的 ID（'cat-2'…）。是使用者資料的鍵，產生後不改名、不重編。
+ * 格式是 HOUSE_CAT_ID（cat-數字）：不認得的編號（較新版本領養的）照樣保留、同步，只是不顯示。
+ */
+export type CatId = string;
+/** 領養的小貓存在 wardrobe.cats 的資料；每欄選填，壞掉的欄位只丟那一欄 */
+export interface HouseCatSave {
+  /** 名字（規則同 settings.catName）；沒有＝沒取名 */
+  name?: string;
+  /** 名字最後一次被改動（含清掉）的時間（ISO） */
+  nameAt?: string;
+  /** 穿著（含毛色） */
+  outfit?: Outfit;
+  /** 穿著最後一次被改動的時間（ISO） */
+  outfitAt?: string;
+}
+/**
+ * 一隻小貓的長相（穿著含毛色）＋最後一次被使用者改動的時間。整包跨裝置同步：比 at，較新的整包留下
+ * （systems/syncMerge.ts 的 mergeCatLook）。at 是空字串（不知道）的長相不上傳，各裝置維持自己的。
+ */
+export interface CatLook {
+  outfit: Outfit;
+  /** ISO；空字串＝不知道 */
+  at: string;
 }
 
 // ── 更新紀錄 ────────────────────────────────────────────
@@ -794,8 +830,8 @@ export type UICommand =
   | { type: 'disableSync' }
   /** 用小魚乾買一件 shop 配件；餘額不足、不在架上、已擁有時不動作 */
   | { type: 'buyItem'; id: ItemId }
-  /** 穿上（item 為 null＝脫掉）；只接受已擁有、部位相符的配件 */
-  | { type: 'wear'; slot: SlotId; item: ItemId | null }
+  /** 穿上（item 為 null＝脫掉）；只接受已擁有、部位相符的配件。cat 沒寫＝原本那隻；同一件可以好幾隻同時穿 */
+  | { type: 'wear'; slot: SlotId; item: ItemId | null; cat?: CatId }
   /** 小貓把這個地方燒焦了（只是外觀；已經燒焦、或燒焦的地方到上限時不動作） */
   | { type: 'scorch'; spot: string }
   /** 花小魚乾把燒焦的地方修好；沒燒焦、餘額不足時不動作 */
@@ -809,5 +845,11 @@ export type UICommand =
   | { type: 'setWeatherPlace'; place: string | null }
   /** 更新紀錄看完了（記下最新一則的 ID） */
   | { type: 'markChangelogSeen'; id: string }
-  /** 幫小貓取名；空字串＝改回沒取名 */
-  | { type: 'setCatName'; name: string };
+  /** 幫小貓取名；空字串＝改回沒取名。cat 沒寫＝原本那隻 */
+  | { type: 'setCatName'; name: string; cat?: CatId }
+  /** 領養下一隻（HOUSE_ADOPT 裡第一個還沒領養的）；滿了、錢不夠時不動作。可以順便取名、穿上一件已經有的毛色 */
+  | { type: 'adoptCat'; name?: string; fur?: ItemId }
+  /** 帶不帶這隻出門；已經帶了 HOUSE.maxOut 隻時再加不動作 */
+  | { type: 'setCatOuting'; cat: CatId; on: boolean }
+  /** 換成這隻陪我刷題（全家只有一隻）；不在家裡的 ID 不動作 */
+  | { type: 'setLeader'; cat: CatId };

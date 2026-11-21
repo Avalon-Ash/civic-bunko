@@ -1,0 +1,116 @@
+{
+  "version": 1,
+  "progress": {
+    "115-general-admin-law-q08": {
+      "seen": 3,
+      "correct": 2,
+      "views": 1,
+      "streak": 2,
+      "lastPick": "B",
+      "lastAt": "2026-11-16T12:30:00.000Z",
+      "due": "2026-11-20"
+    }
+  },
+  "settings": {
+    "theme": "light",
+    "lastRound": {
+      "bankId": "local4-civil",
+      "subjectKeys": [
+        "admin-law",
+        "law-english"
+      ],
+      "count": 10,
+      "mode": "mixed",
+      "fast": false,
+      "study": "quiz",
+      "ask": "positive",
+      "passes": 1
+    },
+    "installHintDismissed": true,
+    "accessory": "bow",
+    "shuffleOptions": true,
+    "cardsSeen": [
+      "concept-law-rank",
+      "newlaw-lga-55-city"
+    ],
+    "bilingual": false,
+    "examHistory": [
+      {
+        "paperId": "115-general-admin-law",
+        "at": "2026-11-16T14:00:00.000Z",
+        "total": 50,
+        "answered": 48,
+        "correct": 31,
+        "score": 62
+      }
+    ],
+    "wardrobe": {
+      "owned": [
+        "adopt-cat-2",
+        "adopt-cat-3",
+        "adopt-cat-9",
+        "beanie",
+        "fur-orange",
+        "future-item-v9",
+        "star-clip"
+      ],
+      "achievements": [
+        "exam-1",
+        "exam-60",
+        "future-ach-v9"
+      ],
+      "quests": {
+        "2026-11-17": [
+          "quiz-round",
+          "future-quest-v9"
+        ]
+      },
+      "outfit": {
+        "head-top": "beanie",
+        "head-side": "bow"
+      },
+      "saved": {
+        "beanie": 24,
+        "future-item-v9": 7
+      },
+      "repairs": 2,
+      "scorch": [
+        "today-quest",
+        "future-spot-v9"
+      ],
+      "outfitAt": "2026-11-22T01:00:00.000Z",
+      "cats": {
+        "cat-2": {
+          "name": "麻糬",
+          "nameAt": "2026-11-22T01:05:00.000Z",
+          "outfit": {
+            "fur": "fur-orange",
+            "head-top": "beanie"
+          },
+          "outfitAt": "2026-11-22T01:06:00.000Z"
+        },
+        "cat-3": {},
+        "cat-9": {
+          "name": "未來貓",
+          "nameAt": "2026-12-20T00:00:00.000Z",
+          "outfit": {
+            "fur": "fur-future-v9"
+          },
+          "outfitAt": "2026-12-20T00:00:00.000Z"
+        }
+      },
+      "outing": [
+        "cat-1",
+        "cat-3"
+      ],
+      "leader": "cat-2"
+    },
+    "catName": "阿福",
+    "catNameAt": "2026-11-18T03:00:00.000Z"
+  },
+  "days": {
+    "2026-11-15": 15,
+    "2026-11-16": 22,
+    "2026-11-17": 10
+  }
+}

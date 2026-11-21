@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-22T02:00:00.000Z",
+  "progress": {
+    "115-general-admin-law-q08": {
+      "seen": 4,
+      "correct": 3,
+      "views": 1,
+      "streak": 3,
+      "lastPick": "B",
+      "lastAt": "2026-11-17T02:50:00.000Z",
+      "due": "2026-11-24"
+    },
+    "115-general-public-admin-q21": {
+      "seen": 1,
+      "correct": 1,
+      "views": 0,
+      "streak": 1,
+      "lastPick": "A",
+      "lastAt": "2026-11-17T02:55:00.000Z",
+      "due": "2026-11-18"
+    }
+  },
+  "days": {
+    "2026-11-16": 30,
+    "2026-11-17": 9
+  },
+  "cardsSeen": [
+    "concept-admin-act"
+  ],
+  "examHistory": [
+    {
+      "paperId": "113-local4-local-gov",
+      "at": "2026-11-17T02:40:00.000Z",
+      "total": 25,
+      "answered": 25,
+      "correct": 20,
+      "score": 80
+    }
+  ],
+  "wardrobe": {
+    "owned": [
+      "adopt-cat-2",
+      "adopt-cat-9",
+      "fur-orange"
+    ],
+    "achievements": [],
+    "quests": {}
+  },
+  "cat": {
+    "name": "阿福",
+    "at": "2026-11-18T03:00:00.000Z"
+  },
+  "cats": {
+    "cat-2": {
+      "name": "麻糬",
+      "at": "2026-11-22T01:05:00.000Z"
+    },
+    "cat-9": {
+      "name": "未來貓",
+      "at": "2026-12-20T00:00:00.000Z"
+    }
+  },
+  "looks": {
+    "cat-1": {
+      "outfit": {
+        "fur": "fur-orange"
+      },
+      "at": "2026-11-22T01:00:00.000Z"
+    },
+    "cat-2": {
+      "outfit": {
+        "fur": "fur-orange",
+        "head-top": "beanie"
+      },
+      "at": "2026-11-22T01:06:00.000Z"
+    },
+    "cat-9": {
+      "outfit": {
+        "fur": "fur-future-v9"
+      },
+      "at": "2026-12-20T00:00:00.000Z"
+    }
+  }
+}
