@@ -194,14 +194,30 @@
   box-shadow: 0 3px 0 var(--line);
 }
 
+.cb-house-chip-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  max-width: 84px;
+}
+
 .cb-house-chip-name {
   font-size: 0.75rem;
   font-weight: 800;
   line-height: 1.2;
   white-space: nowrap;
+  min-width: 0;
   max-width: 78px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.cb-house-chip-paw {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  fill: var(--pink-deep);
 }
 
 .cb-house-adopt-btn {
@@ -248,10 +264,38 @@
 
 .cb-house-selected {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cb-house-selected-head {
+  display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px 12px;
+}
+
+.cb-house-outing-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 2px dashed var(--hair);
+}
+
+.cb-house-switch-field {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+  display: inline-flex;
+}
+
+.cb-house-switch-field:disabled .cb-switch-hit {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .cb-house-leader-btn {

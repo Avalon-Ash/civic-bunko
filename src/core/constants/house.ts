@@ -79,3 +79,13 @@ export const HOUSE_SCENE = {
   doorInset: 14,
   enterTargetRatio: { min: 0.52, max: 0.78 },
 } as const;
+
+/**
+ * 一起放多隻小貓出門的節奏（ui/pet/CatHome.tsx、PetLayer.tsx 讀它）。
+ * staggerMs＝每隻依序從頭像跳出來的間隔（毫秒）；
+ * jumpOffset＝跳出來時往畫面內側落下的水平距離範圍（px），多隻一起跳出時自然散開。
+ */
+export const HOUSE_OUTING = {
+  staggerMs: 260,
+  jumpOffset: { min: 28, max: 84 },
+} as const;

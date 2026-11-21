@@ -45,6 +45,7 @@ import {
   CAT_SCORCH_LINES,
   CAT_SLIDE_LINES,
 } from '../../core/constants/catLines';
+import { HOUSE_OUTING } from '../../core/constants/house';
 import { SCORCH } from '../../core/constants/wardrobe';
 import type { CatId, CatMood, PetPose, RoamBehavior, ScorchPlace } from '../../core/types';
 import type { World } from '../../core/world';
@@ -56,6 +57,7 @@ import { heldAxe } from '../kit/wardrobe/art';
 import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
+import { canStartCardEffect, clearCatEffects, endCardEffect, tryCardEffect, tryVoice } from './petGate';
 import { between, clamp, flyLift, gaitFor, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
 import { CLAW_MARK, ClawMark, FrostMark } from './petMarks';
 import { getPet, petHome, subscribePet } from './petStore';
@@ -111,9 +113,9 @@ interface Engine {
   hint: { right: boolean; auto: boolean; answered: boolean; stage: 'wait' | 'cheer' | 'done' } | null;
   /**
    * 搗蛋進行中（小怪獸噴火、乳牛劈斧頭）：el、place、spot＝要對付的卡片和它上緣的哪一處、facing＝朝哪邊；
-   * go＝正跳過去、act＝正在噴或劈
+   * go＝正跳過去、act＝正在噴或劈；hit＝斧頭第一下已經落到卡片上（由 sagMs 計時器解鎖）
    */
-  prank: { kind: 'fire' | 'axe'; el: Element; place: ScorchPlace; spot: string; facing: 'left' | 'right'; stage: 'go' | 'act' } | null;
+  prank: { kind: 'fire' | 'axe'; el: Element; place: ScorchPlace; spot: string; facing: 'left' | 'right'; stage: 'go' | 'act'; hit?: boolean } | null;
   /** 老虎撲過去：to＝落點的 x、el＝撲到哪張卡片上（沒有就是地面）；crouch＝伏低扭屁股、air＝撲在空中 */
   pounce: { to: number; el?: Element; stage: 'crouch' | 'air' } | null;
   /** 上一次冒泡泡、說夢話的時間；上一次哞；上一個蜂蜜腳印留在哪（x） */
@@ -218,15 +220,15 @@ function homeRect(): DOMRect | null {
   return null;
 }
 
-/** 這個位置的小貓腳下或身上有沒有按鈕之類可以點的東西 */
-function blockedAt(x: number, y: number, layer: Element | null): boolean {
+/** 這個位置的小貓腳下或身上有沒有按鈕之類可以點的東西（忽略所有小貓層本身與泡泡） */
+function blockedAt(x: number, y: number): boolean {
   const points: Array<[number, number]> = [
     [x + W * 0.25, y + H * 0.55],
     [x + W * 0.75, y + H * 0.55],
     [x + W * 0.5, y + H * 0.9],
   ];
   for (const [px, py] of points) {
-    const hit = document.elementsFromPoint(px, py).find((el) => !layer?.contains(el));
+    const hit = document.elementsFromPoint(px, py).find((el) => !el.closest('.cb-pet-layer'));
     if (hit?.closest(INTERACTIVE)) return true;
   }
   return false;
@@ -290,7 +292,6 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
   };
   /** 提示揭曉時的表情（得意、心虛）；平常照姿勢預設 */
   const [mood, setMood] = useState<CatMood | undefined>(undefined);
-  const layerRef = useRef<HTMLDivElement | null>(null);
   const actorRef = useRef<HTMLDivElement | null>(null);
   const engine = useRef<Engine | null>(null);
   const tabRef = useRef(tab);
@@ -299,6 +300,30 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
   const drag = useRef<{ id: number; sx: number; sy: number; t0: number; lastX: number; active: boolean } | null>(null);
   const voice = useCatVoice();
   const { bubble, say } = useCatBubble();
+  /** 自動出聲走共用節流（點擊小貓不走這裡） */
+  const autoSay = (text: string, now: number) => {
+    if (tryVoice(cat, now)) say(text);
+  };
+  /** 卡片效果鎖的釋放計時器（劈歪、抓痕、結冰結束時解鎖；卸載時全部清掉） */
+  const effectTimers = useRef(new Map<Element, number>());
+  const releaseCardNow = (el: Element) => {
+    window.clearTimeout(effectTimers.current.get(el));
+    effectTimers.current.delete(el);
+    endCardEffect(cat, el);
+  };
+  const releaseCardLater = (el: Element, ms: number) => {
+    window.clearTimeout(effectTimers.current.get(el));
+    const id = window.setTimeout(() => {
+      effectTimers.current.delete(el);
+      endCardEffect(cat, el);
+    }, ms);
+    effectTimers.current.set(el, id);
+  };
+  const releaseAllEffects = () => {
+    for (const id of effectTimers.current.values()) window.clearTimeout(id);
+    effectTimers.current.clear();
+    clearCatEffects(cat);
+  };
   /** 畫面上現在的樣子（主迴圈、點擊、提示都經過 show 改，才不會各改各的對不起來） */
   const shown = useRef<{ pose: PetPose; facing: 'left' | 'right'; shy: boolean }>({ pose: 'hop', facing: 'right', shy: false });
   const show = (p: PetPose, f: 'left' | 'right' = shown.current.facing) => {
@@ -306,13 +331,19 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
     if (f !== shown.current.facing) setFacing(f);
     shown.current = { ...shown.current, pose: p, facing: f };
   };
+  /** 中止進行中的搗蛋或虎撲並釋放尚未落地的卡片鎖 */
+  const abortActions = (e: Engine) => {
+    if (e.prank && !e.prank.hit) releaseCardNow(e.prank.el);
+    if (e.pounce?.el) releaseCardNow(e.pounce.el);
+    e.prank = null;
+    e.pounce = null;
+    setFlags((f) => ({ ...f, firing: false }));
+  };
   /** 叫牠回家：噴火、劈斧頭、撲到一半也作罷（還沒劈下去的那幾下不會再落在卡片上） */
   const goHome = (e: Engine) => {
     e.homeTrip = true;
     e.mode = { kind: 'goHome' };
-    e.prank = null;
-    e.pounce = null;
-    setFlags((f) => ({ ...f, firing: false }));
+    abortActions(e);
   };
   /** 提示結束（揭曉完、或牠掉下去了）：表情、點擊穿透都復原 */
   const endHint = (e: Engine) => {
@@ -335,7 +366,8 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       if (s.request?.kind === 'release') {
         const from = { x: s.request.from.left + s.request.from.width / 2 - W / 2, y: s.request.from.top + s.request.from.height / 2 - H / 2 };
         const range = xRange();
-        const toX = clamp(from.x + (from.x < window.innerWidth / 2 ? 40 : -40), range.min, range.max);
+        const spread = between(HOUSE_OUTING.jumpOffset, Math.random);
+        const toX = clamp(from.x + (from.x < window.innerWidth / 2 ? spread : -spread), range.min, range.max);
         engine.current = newEngine(from, {
           kind: 'jump',
           from,
@@ -363,9 +395,8 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           !auto && e
             ? e
             : newEngine(start, { kind: 'idle', until: 0 });
+        abortActions(en);
         en.hint = { right, auto, answered: false, stage: 'wait' };
-        en.prank = null;
-        en.pounce = null;
         en.mode = {
           kind: 'jump',
           from: start,
@@ -380,13 +411,17 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
     });
     return () => {
       off();
+      releaseAllEffects();
       petHome(cat);
     };
   }, [cat]);
 
   // 模擬考開始：直接回家
   useEffect(() => {
-    if (!allowed && getPet(cat).out) petHome(cat);
+    if (!allowed && getPet(cat).out) {
+      releaseAllEffects();
+      petHome(cat);
+    }
   }, [allowed, cat]);
 
   // 提示中她作答了：記下來，主迴圈在牠坐定後揭曉（還在跳就等落地）
@@ -436,10 +471,12 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       const r = rectOf(el);
       const hitX = clamp(e.x + W * (prank.facing === 'right' ? PET_AXE.reach : 1 - PET_AXE.reach), r.left, r.right);
       if (first) {
+        prank.hit = true;
         // 歪多久給 CSS 讀（cb-chop-sag 的長度）
         if (el instanceof HTMLElement) el.style.setProperty('--cat-chop-ms', `${PET_AXE.sagMs}ms`);
         markCard(el, CHOP_ATTR, prank.place, PET_AXE.sagMs);
         addBit({ kind: 'crack', x: hitX, y: r.top, size: 0, el, dx: hitX - r.left, top: 0 }, PET_AXE.sagMs);
+        releaseCardLater(el, PET_AXE.sagMs);
       }
       const chips = PET_AXE.chips;
       for (let i = 0; i < chips.count; i += 1) {
@@ -452,16 +489,20 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
     };
 
     /** 企鵝滑完：看得到的卡片結冰（蓋一層冰、底下掛冰柱），freezeMs 後退冰 */
-    const freezeCards = () => {
+    const freezeCards = (now: number) => {
       const cards = visiblePerches(floorY());
+      let frozen = 0;
       for (const el of cards) {
+        if (!tryCardEffect(cat, el)) continue;
+        frozen += 1;
         const r = rectOf(el);
         addBit(
           { kind: 'frost', x: r.left, y: r.top, size: 0, el, dx: 0, top: 0, w: r.width, h: r.height, radius: Number.parseFloat(getComputedStyle(el).borderRadius) || 0 },
           PET_SLIDE.freezeMs,
         );
+        releaseCardLater(el, PET_SLIDE.freezeMs);
       }
-      if (cards.length > 0) say(pickLine(CAT_FREEZE_LINES));
+      if (frozen > 0) autoSay(pickLine(CAT_FREEZE_LINES), now);
     };
 
     const surfaceY = (s: Surface): number | null => {
@@ -474,6 +515,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
 
     const next = (e: Engine, now: number) => {
       // 重新挑動作＝之前排好的撲擊作罷（例如伏低到一半發現腳下有按鈕，被叫去換位置）
+      if (e.pounce?.el) releaseCardNow(e.pounce.el);
       e.pounce = null;
       const floor = floorY();
       const perches = visiblePerches(floor);
@@ -487,7 +529,6 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       const route = specials.current.has('dream') ? { ...baseRoute, nap: baseRoute.nap * PET_PLAY.dream.napWeight } : baseRoute;
       const calm = now - e.lastInput < ROAM_CALM_AFTER_INPUT_MS;
       const range = xRange();
-      const layer = layerRef.current;
 
       // 特殊動作：搗蛋——小怪獸全套加噴火、乳牛全套加牧草（大斧頭）。時間到了就跳上一張卡片，
       // 挑上緣還沒燒焦的一處（左、中、右）對著它噴火或劈下去
@@ -505,22 +546,22 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         };
         const targets: Array<{ el: Element; place: ScorchPlace; spot: string; x: number; facing: 'left' | 'right' }> = [];
         // 噴火會留下焦痕，滿了就不噴；劈歪的卡片一下子就彈回來，不受焦痕的數量限制，但不劈正歪著的卡片
-        if (prankKind === 'axe' || burnt.current.length < SCORCH.max) {
+        if ((prankKind === 'axe' || burnt.current.length < SCORCH.max) && canStartCardEffect(cat)) {
           for (const el of perches) {
             const card = el.getAttribute(CAT_BURN_ATTR);
             const r = rectOf(el);
-            if (!card || r.width < (W + mark.w) * 2 || el.hasAttribute(CHOP_ATTR)) continue;
+            if (!card || r.width < (W + mark.w) * 2 || el.hasAttribute(CHOP_ATTR) || !canStartCardEffect(cat, el)) continue;
             for (const place of SCORCH.places) {
               const spot = scorchSpotId(card, place);
               // 不疊在焦痕上（第一版的存檔只記卡片 ID，那一處就是右邊）
               if (burnt.current.includes(spot) || (place === 'r' && burnt.current.includes(card))) continue;
               const at = stance(r, place);
-              if (!blockedAt(at.x, r.top - H + 3, layer)) targets.push({ el, place, spot, ...at });
+              if (!blockedAt(at.x, r.top - H + 3)) targets.push({ el, place, spot, ...at });
             }
           }
         }
         const target = targets[Math.floor(Math.random() * targets.length)];
-        if (target) {
+        if (target && tryCardEffect(cat, target.el)) {
           const r = rectOf(target.el);
           e.prank = { kind: prankKind, el: target.el, place: target.place, spot: target.spot, facing: target.facing, stage: 'go' };
           e.nextPrank = now + between(prankTiming.everyMs, Math.random);
@@ -552,22 +593,27 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         tabRef.current !== 'round' &&
         Math.random() < PET_POUNCE.chance
       ) {
-        // 優先撲到一張卡片上（抓花它），沒有卡片可以撲就撲到地面
-        const cards = perches.filter((el) => el !== (e.surface.kind === 'perch' ? e.surface.el : null));
+        // 優先撲到一張卡片上（抓花它），沒有卡片可以撲或已有別隻在改卡片時就撲到地面
+        const cards = perches.filter(
+          (el) => el !== (e.surface.kind === 'perch' ? e.surface.el : null) && canStartCardEffect(cat, el),
+        );
         const card = Math.random() < PET_POUNCE.onCard ? cards[Math.floor(Math.random() * cards.length)] : undefined;
         const cr = card ? rectOf(card) : null;
         const onCard =
           card && cr
-            ? pickWalkTarget(Number.NaN, cr.left + ROAM_EDGE, cr.right - W - ROAM_EDGE, 0, Math.random, (x) => blockedAt(x, cr.top - H + 3, layer))
+            ? pickWalkTarget(Number.NaN, cr.left + ROAM_EDGE, cr.right - W - ROAM_EDGE, 0, Math.random, (x) => blockedAt(x, cr.top - H + 3))
             : null;
-        const to =
-          onCard ?? pickWalkTarget(e.x, range.min, range.max, PET_POUNCE.minTrip, Math.random, (x) => blockedAt(x, floor, layer));
+        const cardLocked = onCard !== null && card !== undefined && tryCardEffect(cat, card);
+        const to = cardLocked
+          ? onCard
+          : pickWalkTarget(e.x, range.min, range.max, PET_POUNCE.minTrip, Math.random, (x) => blockedAt(x, floor));
         if (to !== null) {
-          e.pounce = { to, stage: 'crouch', ...(onCard !== null && card ? { el: card } : {}) };
+          e.pounce = { to, stage: 'crouch', ...(cardLocked && card ? { el: card } : {}) };
           e.mode = { kind: 'idle', until: now + PET_POUNCE.crouchMs };
           show('crouch', to > e.x ? 'right' : 'left');
           return;
         }
+        if (cardLocked && card) releaseCardNow(card);
       }
 
       // 特殊動作：披著披風——要走路或暴衝時，有時改用飛的飛到另一邊
@@ -595,14 +641,14 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
             ? e.x < (bounds.min + bounds.max) / 2
               ? bounds.max
               : bounds.min
-            : pickWalkTarget(e.x, bounds.min, bounds.max, ROAM_MIN_TRIP, Math.random, (x) => blockedAt(x, e.y, layer));
+            : pickWalkTarget(e.x, bounds.min, bounds.max, ROAM_MIN_TRIP, Math.random, (x) => blockedAt(x, e.y));
         if (to !== null) {
           // 步態看穿著：青蛙、兔子一蹦一蹦；乳牛站起來走；企鵝搖搖擺擺、暴衝改成用肚子滑
           const gait = gaitFor(specials.current);
           const walkPose = b === 'zoom' ? gait.zoom : gait.walk;
           e.mode = { kind: 'walk', to, speed: b === 'zoom' ? ROAM_RUN_SPEED : ROAM_WALK_SPEED, ...(gait.hop ? { hop: true } : {}) };
           show(walkPose, to > e.x ? 'right' : 'left');
-          if (walkPose === 'slide' && Math.random() < PET_SLIDE.cheer) say(pickLine(CAT_SLIDE_LINES));
+          if (walkPose === 'slide' && Math.random() < PET_SLIDE.cheer) autoSay(pickLine(CAT_SLIDE_LINES), now);
           return;
         }
       }
@@ -613,7 +659,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         const tx =
           el && r
             ? pickWalkTarget(Number.NaN, r.left + ROAM_EDGE, r.right - W - ROAM_EDGE, 0, Math.random, (x) =>
-                blockedAt(x, r.top - H + 3, layer),
+                blockedAt(x, r.top - H + 3),
               )
             : null;
         if (el && r && tx !== null) {
@@ -657,21 +703,23 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       if (prank?.kind === 'fire') {
         // 噴完：那個角落焦了，牠心虛一下
         e.prank = null;
+        releaseCardNow(prank.el);
         setFlags((f) => ({ ...f, firing: false }));
         dispatch(world, { type: 'scorch', spot: prank.spot });
         setMood('oops');
         e.resetMood = true;
-        say(pickLine(CAT_SCORCH_LINES));
+        autoSay(pickLine(CAT_SCORCH_LINES), now);
         e.mode = { kind: 'idle', until: now + PET_SCORCH.sorryMs };
         show('stumble');
         return;
       }
       if (prank) {
-        // 劈完：得意地站著
+        // 劈完：得意地站著（若第一下沒命中才立刻解鎖；命中則由 sagMs 計時器解鎖）
         e.prank = null;
+        if (!prank.hit) releaseCardNow(prank.el);
         setMood('yay');
         e.resetMood = true;
-        say(pickLine(CAT_AXE_LINES));
+        autoSay(pickLine(CAT_AXE_LINES), now);
         e.mode = { kind: 'idle', until: now + PET_SCORCH.sorryMs };
         show(gaitFor(specials.current).rest);
         return;
@@ -707,9 +755,14 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
             { kind: 'claw', x: pawX, y: r.top - CLAW_MARK.rise, size: 0, el: clawEl, dx: pawX - r.left, top: -CLAW_MARK.rise },
             PET_POUNCE.clawMs,
           );
+          releaseCardLater(clawEl, PET_POUNCE.clawMs);
+        } else if (pounce.el) {
+          releaseCardNow(pounce.el);
         }
-        say(pickLine(clawEl ? CAT_CLAW_LINES : CAT_ROAR_LINES));
-        for (const el of visiblePerches(floorY())) markCard(el, SHAKE_ATTR, '', PET_POUNCE.shakeMs);
+        autoSay(pickLine(clawEl ? CAT_CLAW_LINES : CAT_ROAR_LINES), now);
+        if (canStartCardEffect(cat)) {
+          for (const el of visiblePerches(floorY())) markCard(el, SHAKE_ATTR, '', PET_POUNCE.shakeMs);
+        }
         e.mode = { kind: 'idle', until: now + PET_POUNCE.roarMs };
         show('stand');
         return;
@@ -824,7 +877,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           }
           if (step.arrived) {
             // 企鵝用肚子滑到底：卡片都結冰
-            if (shown.current.pose === 'slide' && !e.homeTrip && specials.current.has('slide')) freezeCards();
+            if (shown.current.pose === 'slide' && !e.homeTrip && specials.current.has('slide')) freezeCards(now);
             if (e.homeTrip) {
               const h = homeRect();
               if (h) {
@@ -868,8 +921,10 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               now - e.lastMooAt > PET_MOO.everyMs
             ) {
               e.lastMooAt = now;
-              say(pickLine(CAT_MOO_LINES));
-              if (soundOn(world)) playSound('moo', false);
+              if (tryVoice(cat, now)) {
+                say(pickLine(CAT_MOO_LINES));
+                if (soundOn(world)) playSound('moo', false);
+              }
             }
           }
         } else if (m.kind === 'goHome') {
@@ -913,14 +968,14 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
             // 睡衣全套：睡著時說夢話
             if (specials.current.has('dream') && asleep && now - e.lastBitAt > PET_PLAY.dream.everyMs) {
               e.lastBitAt = now;
-              say(pickLine(CAT_DREAM_LINES));
+              autoSay(pickLine(CAT_DREAM_LINES), now);
             }
             if (now >= m.until) {
               proceed(e, now);
             } else if (now - e.lastBlockCheck > ROAM_BLOCK_CHECK_MS) {
               e.lastBlockCheck = now;
               // 伏低準備撲的那一秒不換位置（撲出去就離開了）
-              if (e.surface.kind === 'floor' && !e.pounce && blockedAt(e.x, e.y, layerRef.current)) next(e, now);
+              if (e.surface.kind === 'floor' && !e.pounce && blockedAt(e.x, e.y)) next(e, now);
             }
           }
         }
@@ -933,9 +988,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         }
         // 噴火、劈斧頭、撲到一半掉下去或被拎起來：這次作罷
         if ((e.prank || e.pounce) && (e.mode.kind === 'fall' || e.mode.kind === 'drag')) {
-          e.prank = null;
-          e.pounce = null;
-          setFlags((f) => ({ ...f, firing: false }));
+          abortActions(e);
         }
 
         // 裂痕、抓痕、冰跟著自己的卡片走（卡片不在了就藏起來）
@@ -989,6 +1042,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
     drag.current.active = true;
     e.mode = { kind: 'drag' };
     e.homeTrip = false;
+    abortActions(e);
     show('dangle');
     setFlags((f) => ({ ...f, dragging: true, landing: false }));
   };
@@ -1075,7 +1129,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
     .join(' ');
 
   return (
-    <div ref={layerRef} className="cb-pet-layer">
+    <div className="cb-pet-layer">
       {bits.map((bit) =>
         bit.kind === 'bubble' ? (
           <button

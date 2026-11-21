@@ -1,8 +1,9 @@
-import { useRef, useSyncExternalStore, type ReactNode } from 'react';
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
+import { HOUSE_OUTING } from '../../core/constants/house';
 import type { World } from '../../core/world';
-import { leaderCat } from '../../selectors/house';
+import { outingCats } from '../../selectors/house';
 import { useWorld } from '../useWorld';
-import { recallPet, releasePet, usePet } from './petStore';
+import { getPet, recallPet, releasePet, subscribePet } from './petStore';
 
 /** 減少動態設定開著時，小貓不出來亂跑 */
 function subscribeMotion(fn: () => void): () => void {
@@ -33,26 +34,63 @@ export interface CatHomeProps {
  */
 export function CatHome({ world, size, children }: CatHomeProps) {
   useWorld(world);
-  const cat = leaderCat(world);
-  const pet = usePet(cat);
+  const cats = outingCats(world);
+  const anyOut = useSyncExternalStore(
+    subscribePet,
+    () => cats.some((id) => getPet(id).out),
+    () => false,
+  );
   const canRoam = useCanRoam();
   const ref = useRef<HTMLSpanElement | null>(null);
+  const timersRef = useRef<number[]>([]);
+
+  const clearTimers = () => {
+    for (const id of timersRef.current) window.clearTimeout(id);
+    timersRef.current = [];
+  };
+
+  useEffect(() => clearTimers, []);
 
   const handleRelease = () => {
+    if (cats.length === 0) return;
     const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
-    releasePet(cat, { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+    const from = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    clearTimers();
+    cats.forEach((id, index) => {
+      if (index === 0) {
+        releasePet(id, from);
+      } else {
+        const timer = window.setTimeout(() => {
+          const cur = ref.current?.getBoundingClientRect();
+          releasePet(
+            id,
+            cur ? { left: cur.left, top: cur.top, width: cur.width, height: cur.height } : from,
+          );
+        }, index * HOUSE_OUTING.staggerMs);
+        timersRef.current.push(timer);
+      }
+    });
   };
+
+  const handleRecall = () => {
+    clearTimers();
+    for (const id of cats) {
+      if (getPet(id).out) recallPet(id);
+    }
+  };
+
+  const empty = cats.length === 0;
 
   return (
     <span
       ref={ref}
-      className={`cb-cat-home ${pet.out ? 'is-empty' : ''}`.trim()}
+      className={`cb-cat-home ${anyOut ? 'is-empty' : ''}`.trim()}
       style={{ width: size, height: size }}
       data-cat-home=""
     >
-      {pet.out ? (
-        <button type="button" className="cb-cat-home-empty" onClick={() => recallPet(cat)} aria-label="叫小貓回家">
+      {anyOut ? (
+        <button type="button" className="cb-cat-home-empty" onClick={handleRecall} aria-label="叫小貓回家">
           <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden="true">
             <ellipse cx="32" cy="46" rx="25" ry="10" fill="var(--pink)" stroke="var(--line)" strokeWidth="2.5" />
             <path d="M14 46 Q32 54 50 46" fill="none" stroke="var(--pink-deep)" strokeWidth="1.6" strokeLinecap="round" />
@@ -68,8 +106,14 @@ export function CatHome({ world, size, children }: CatHomeProps) {
       ) : (
         children
       )}
-      {!pet.out && canRoam ? (
-        <button type="button" className="cb-cat-home-paw" onClick={handleRelease} aria-label="放小貓出來玩">
+      {!anyOut && canRoam ? (
+        <button
+          type="button"
+          className="cb-cat-home-paw"
+          onClick={handleRelease}
+          aria-disabled={empty || undefined}
+          aria-label={empty ? '先在小貓之家選要帶出門的小貓' : '放小貓出來玩'}
+        >
           <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
             <ellipse cx="12" cy="15.5" rx="5" ry="4" />
             <circle cx="6.5" cy="10" r="2.1" />

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
+import { HOUSE } from '../../core/constants/house';
 import { ACHIEVEMENTS, DAILY_SALE, SLOTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
 import { RUNNER_HOP_MS } from '../../core/constants/pet';
 import type { CatId, ItemId, Outfit, SlotId, TryOn } from '../../core/types';
 import type { World } from '../../core/world';
-import { catOutfit, houseCats, leaderCat, nextAdoption } from '../../selectors/house';
+import { catOutfit, houseCats, leaderCat, nextAdoption, outingCats } from '../../selectors/house';
 import {
   achievementStatuses,
   dailyTierStatus,
@@ -26,6 +27,7 @@ import { CatBody } from '../kit/CatBody';
 import { Chip } from '../kit/Chip';
 import { CountUp } from '../kit/CountUp';
 import { ProgressBar } from '../kit/ProgressBar';
+import { Switch } from '../kit/Switch';
 import { CatNameEditor } from '../pet/CatNameEditor';
 import { useWorld } from '../useWorld';
 
@@ -116,6 +118,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   useWorld(world);
   const now = new Date();
   const cats = houseCats(world);
+  const outing = outingCats(world);
   const leader = leaderCat(world);
   const adoption = nextAdoption(world, now);
   const fish = fishBalance(world, now);
@@ -140,6 +143,8 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
     cats.find((c) => c.id === leader) ??
     cats[0]!;
   const selected = selectedCat.id;
+  /** 已經帶滿 HOUSE.maxOut 隻、這隻沒帶：開關停用（system 那邊也會擋，這裡只是畫面） */
+  const outingFull = !selectedCat.out && outing.length >= HOUSE.maxOut;
 
   // 選中的那隻如果不在家裡，回到陪我刷題那隻並清試穿籃
   useEffect(() => {
@@ -255,7 +260,19 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
               onClick={() => selectCat(cat.id)}
             >
               <Cat size={38} interactive={false} outfit={catOutfit(world, cat.id)} />
-              <span className="cb-house-chip-name">{cat.name}</span>
+              <span className="cb-house-chip-label">
+                <span className="cb-house-chip-name">{cat.name}</span>
+                {cat.out ? (
+                  <span className="cb-house-chip-paw" role="img" aria-label="會一起出門">
+                    <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true">
+                      <ellipse cx="12" cy="15.5" rx="5" ry="4" />
+                      <circle cx="6.5" cy="10" r="2.1" />
+                      <circle cx="12" cy="7.5" r="2.2" />
+                      <circle cx="17.5" cy="10" r="2.1" />
+                    </svg>
+                  </span>
+                ) : null}
+              </span>
             </button>
           );
         })}
@@ -283,18 +300,40 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
       <div className="cb-house-columns">
         <div className="cb-house-side">
           <Card className="cb-house-selected">
-            <CatNameEditor world={world} cat={selected} />
-            {selectedCat.leader ? (
-              <Chip tone="mint">現在陪你刷題</Chip>
-            ) : (
-              <Button
-                variant="butter"
-                className="cb-house-leader-btn"
-                onClick={() => dispatch(world, { type: 'setLeader', cat: selected })}
+            <div className="cb-house-selected-head">
+              <CatNameEditor world={world} cat={selected} />
+              {selectedCat.leader ? (
+                <Chip tone="mint">現在陪你刷題</Chip>
+              ) : (
+                <Button
+                  variant="butter"
+                  className="cb-house-leader-btn"
+                  onClick={() => dispatch(world, { type: 'setLeader', cat: selected })}
+                >
+                  換牠陪我刷題
+                </Button>
+              )}
+            </div>
+            <div className="cb-house-outing-row">
+              <div className="cb-grow">
+                <strong className="cb-block">帶出門</strong>
+                {outingFull ? (
+                  <span className="cb-sub">最多帶 {HOUSE.maxOut} 隻出門</span>
+                ) : null}
+              </div>
+              <fieldset
+                className="cb-house-switch-field"
+                disabled={outingFull}
               >
-                換牠陪我刷題
-              </Button>
-            )}
+                <Switch
+                  checked={selectedCat.out}
+                  onChange={(on) => {
+                    dispatch(world, { type: 'setCatOuting', cat: selected, on });
+                  }}
+                  ariaLabel={`帶${selectedCat.name}出門`}
+                />
+              </fieldset>
+            </div>
           </Card>
 
           <Card tone="pink" className="cb-wd-today" data-cat-perch="" data-cat-burn="cat-today">

@@ -6,7 +6,7 @@ import type { World } from '../core/world';
 import { currentQuestion, getSettings, readView, roundSummary, type RoundSummaryView } from '../selectors';
 import { isInstallHintDismissed } from '../selectors/backup';
 import { stampTotals, todayProgress } from '../selectors/daily';
-import { leaderCat } from '../selectors/house';
+import { leaderCat, outingCats } from '../selectors/house';
 import { toLocalDateString } from '../systems/date';
 import { InstallHintSheet } from './components/InstallHintSheet';
 import { UpdateBanner } from './components/UpdateBanner';
@@ -263,7 +263,8 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   };
 
   const isWideContent = tab === 'quiz' && hasActiveRound;
-  const leader = leaderCat(world);
+  const petTab = hasActiveRound ? 'round' : tab;
+  const activePets = petTab === 'round' ? [leaderCat(world)] : outingCats(world);
 
   return (
     <CatVoiceProvider world={world}>
@@ -273,7 +274,9 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
         {/* 答題中不畫：讓她專心 */}
         <Sky weather={hasActiveRound ? null : sky.weather} />
         <ScorchLayer world={world} />
-        <PetLayer key={leader} world={world} cat={leader} tab={hasActiveRound ? 'round' : tab} allowed={!world.round?.config.exam} />
+        {activePets.map((cat) => (
+          <PetLayer key={cat} world={world} cat={cat} tab={petTab} allowed={!world.round?.config.exam} />
+        ))}
         <TabBar active={tab} onSelect={handleTabSelect} />
         <main
           ref={mainRef}
