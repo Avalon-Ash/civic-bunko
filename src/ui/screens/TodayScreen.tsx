@@ -12,7 +12,8 @@ import {
   savedRoundInfo,
 } from '../../selectors';
 import { todayProgress, weekStamps } from '../../selectors/daily';
-import { currentOutfit, fishBalance, todayQuest } from '../../selectors/wardrobe';
+import { catOutfit, leaderCat } from '../../selectors/house';
+import { fishBalance, todayQuest } from '../../selectors/wardrobe';
 import { FishIcon } from './WardrobeScreen';
 import { soundOn } from '../../selectors/sound';
 import { weatherOn, weatherPlace } from '../../selectors/weather';
@@ -144,7 +145,7 @@ export function TodayScreen({
   const missions = bank ? dailyMissions(world, bank.id, now) : [];
   const today = todayProgress(world, now);
   const week = weekStamps(world, now);
-  const outfit = currentOutfit(world);
+  const outfit = catOutfit(world, leaderCat(world));
   const quest = todayQuest(world, now);
   const fish = fishBalance(world, now);
 
@@ -245,7 +246,7 @@ export function TodayScreen({
       {bank ? (
         <>
           <Card tone="pink" className="cb-countdown" data-cat-perch="" data-cat-burn="today-countdown">
-            <CatHome size={76}>
+            <CatHome world={world} size={76}>
               <Cat
                 size={76}
                 mood={papersLoading ? 'sleepy' : 'idle'}

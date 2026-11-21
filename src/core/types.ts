@@ -516,6 +516,8 @@ export interface CatTap {
   mood: CatMood;
   place: CatPlace;
   scene?: CatScene;
+  /** 點到哪一隻小貓；沒給＝陪我刷題那隻（leaderCat） */
+  cat?: CatId;
 }
 /** 小貓看得到的處境：selectors/cat.ts 從 world 整理出來，大腦只讀這個、不碰 world */
 export interface CatSituation extends CatTap {

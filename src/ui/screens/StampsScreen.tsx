@@ -4,7 +4,7 @@ import { WEAK_MIN_ANSWERED, WEAK_ROUND_COUNT } from '../../core/constants/weak';
 import type { World } from '../../core/world';
 import { activeBank, availableCount, subjectStats } from '../../selectors';
 import { stampTotals } from '../../selectors/daily';
-import { currentOutfit } from '../../selectors/wardrobe';
+import { catOutfit, leaderCat } from '../../selectors/house';
 import { frequentRoundConfig, frequentTopics } from '../../selectors/frequent';
 import { topicStats, weakRoundConfig, weakSummary, weakTopics } from '../../selectors/weak';
 import { Button } from '../kit/Button';
@@ -32,7 +32,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
   const bank = activeBank(world);
   const stats = bank ? subjectStats(world, bank.id) : [];
   const totals = stampTotals(world);
-  const outfit = currentOutfit(world);
+  const outfit = catOutfit(world, leaderCat(world));
 
   const now = new Date();
   const weakList = bank ? weakTopics(world, bank.id) : [];
@@ -86,7 +86,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
 
       <Card tone="pink" className="cb-stack-sm cb-stamps-hero" data-cat-perch="" data-cat-burn="stamps-hero">
         <div className="cb-row">
-          <CatHome size={76}>
+          <CatHome world={world} size={76}>
             <Cat size={76} mood="yay" outfit={outfit} interactive />
           </CatHome>
           <div className="cb-grow">

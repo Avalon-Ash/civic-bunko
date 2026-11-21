@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { CAT_HINT } from '../../core/constants/pet';
 import type { Choice } from '../../core/types';
+import type { World } from '../../core/world';
+import { leaderCat } from '../../selectors/house';
 import { useCanRoam } from './CatHome';
 import { hintDelay, pickHint } from './petLogic';
 import { hintPet } from './petStore';
@@ -9,6 +11,7 @@ import { hintPet } from './petStore';
 export const CAT_CHOICE_ATTR = 'data-cat-choice';
 
 export interface CatHintInput {
+  world: World;
   /** 這一題可以提示（還沒作答、不是模擬考） */
   enabled: boolean;
   /** 題目換了就重新計時 */
@@ -24,7 +27,7 @@ export interface CatHintInput {
  * 想太久的提示：這一題停太久沒作答，小貓跳到某個選項上猜一個（CAT_HINT；不保證對，作答後才知道牠猜得對不對）。
  * 一題只提示一次；選項不在畫面上或被抽屜蓋住、找不到小貓的家、開著「減少動態」時不提示。
  */
-export function useCatHint({ enabled, questionId, chars, order, answer }: CatHintInput): void {
+export function useCatHint({ world, enabled, questionId, chars, order, answer }: CatHintInput): void {
   const canRoam = useCanRoam();
   const orderKey = order.join('');
   const answerKey = answer.join('');
@@ -43,10 +46,10 @@ export function useCatHint({ enabled, questionId, chars, order, answer }: CatHin
       const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
       if (!top || !el.contains(top)) return;
       const h = home.getBoundingClientRect();
-      hintPet(el, guess.right, { left: h.left, top: h.top, width: h.width, height: h.height });
+      hintPet(leaderCat(world), el, guess.right, { left: h.left, top: h.top, width: h.width, height: h.height });
     }, hintDelay(chars, Math.random, CAT_HINT));
     return () => window.clearTimeout(id);
     // order、answer 用字串當依賴：內容一樣就不重新計時
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, canRoam, questionId, chars, orderKey, answerKey]);
+  }, [world, enabled, canRoam, questionId, chars, orderKey, answerKey]);
 }

@@ -46,10 +46,11 @@ import {
   CAT_SLIDE_LINES,
 } from '../../core/constants/catLines';
 import { SCORCH } from '../../core/constants/wardrobe';
-import type { CatMood, PetPose, RoamBehavior, ScorchPlace } from '../../core/types';
+import type { CatId, CatMood, PetPose, RoamBehavior, ScorchPlace } from '../../core/types';
 import type { World } from '../../core/world';
+import { catOutfit } from '../../selectors/house';
 import { soundOn } from '../../selectors/sound';
-import { currentOutfit, outfitSpecials, scorchSpotId, scorchedSpots } from '../../selectors/wardrobe';
+import { outfitSpecials, scorchSpotId, scorchedSpots } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
 import { heldAxe } from '../kit/wardrobe/art';
 import { useCatBubble, useCatVoice } from '../kit/catVoice';
@@ -233,6 +234,8 @@ function blockedAt(x: number, y: number, layer: Element | null): boolean {
 
 export interface PetLayerProps {
   world: World;
+  /** 這一層控制哪一隻小貓 */
+  cat: CatId;
   /** 動線（ROAM_ROUTES 的 key）：目前分頁，答題中是 round */
   tab: string;
   /** 模擬考中為 false：小貓自動回家，讓她專心 */
@@ -240,15 +243,15 @@ export interface PetLayerProps {
 }
 
 /** 自由亂跑的小貓：從頭像鑽出來、沿地面逛、跳上卡片、可以拎起來放回家。 */
-export function PetLayer({ world, tab, allowed }: PetLayerProps) {
+export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
   useWorld(world);
-  const outfit = currentOutfit(world);
+  const outfit = catOutfit(world, cat);
   /** 這身穿著的特殊動作、現在燒焦的地方：主迴圈每次挑動作時讀最新的 */
   const specials = useRef(outfitSpecials(outfit));
   specials.current = outfitSpecials(outfit);
   const burnt = useRef(scorchedSpots(world));
   burnt.current = scorchedSpots(world);
-  const [out, setOut] = useState(getPet().out);
+  const [out, setOut] = useState(getPet(cat).out);
   const [pose, setPose] = useState<PetPose>('hop');
   const [facing, setFacing] = useState<'left' | 'right'>('right');
   const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false, firing: false, binky: false });
@@ -292,7 +295,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   const engine = useRef<Engine | null>(null);
   const tabRef = useRef(tab);
   tabRef.current = tab;
-  const seqRef = useRef(getPet().seq);
+  const seqRef = useRef(getPet(cat).seq);
   const drag = useRef<{ id: number; sx: number; sy: number; t0: number; lastX: number; active: boolean } | null>(null);
   const voice = useCatVoice();
   const { bubble, say } = useCatBubble();
@@ -319,67 +322,72 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
   };
 
   // 跟著 store：放出來、叫回家
-  useEffect(
-    () =>
-      subscribePet(() => {
-        const s = getPet();
-        setOut(s.out);
-        if (s.seq === seqRef.current) return;
-        seqRef.current = s.seq;
-        const e = engine.current;
-        if (s.request?.kind === 'release') {
-          const from = { x: s.request.from.left + s.request.from.width / 2 - W / 2, y: s.request.from.top + s.request.from.height / 2 - H / 2 };
-          const range = xRange();
-          const toX = clamp(from.x + (from.x < window.innerWidth / 2 ? 40 : -40), range.min, range.max);
-          engine.current = newEngine(from, {
-            kind: 'jump',
-            from,
-            to: { x: toX, y: floorY() },
-            start: performance.now(),
-            land: { kind: 'floor' },
-          });
-          show('hop');
-          setFlags((f) => ({ ...f, emerging: true }));
-          window.setTimeout(() => setFlags((f) => ({ ...f, emerging: false })), ROAM_JUMP_MS);
-        } else if (s.request?.kind === 'recall' && e) {
-          goHome(e);
-          if (e.hint) endHint(e);
-        } else if (s.request?.kind === 'hint') {
-          const { el, right, auto, from } = s.request;
-          // 被拎著、正要回家、上一個提示還沒結束：這次不提示
-          if (!auto && e && (e.mode.kind === 'drag' || e.homeTrip || e.hint)) return;
-          const r = rectOf(el);
-          // 坐進選項裡、蓋在左邊的代號（A–D）上：牠自己就是記號，不擋到選項的字，也不擋到上一個選項
-          const tx = r.left + CAT_HINT.seat.dx;
-          const drop = r.height - CAT_HINT.seat.up;
-          const start =
-            !auto && e ? { x: e.x, y: e.y } : { x: from.left + from.width / 2 - W / 2, y: from.top + from.height / 2 - H / 2 };
-          const en =
-            !auto && e
-              ? e
-              : newEngine(start, { kind: 'idle', until: 0 });
-          en.hint = { right, auto, answered: false, stage: 'wait' };
-          en.prank = null;
-          en.pounce = null;
-          en.mode = {
-            kind: 'jump',
-            from: start,
-            to: { x: tx, y: r.top - H + 3 + drop },
-            start: performance.now(),
-            land: { kind: 'perch', el, dx: tx - r.left, drop },
-          };
-          engine.current = en;
-          show('hop', tx > start.x ? 'right' : 'left');
-          setFlags((f) => ({ ...f, hinting: true, landing: false, firing: false }));
-        }
-      }),
-    [],
-  );
+  useEffect(() => {
+    const init = getPet(cat);
+    setOut(init.out);
+    seqRef.current = init.seq;
+    const off = subscribePet(() => {
+      const s = getPet(cat);
+      setOut(s.out);
+      if (s.seq === seqRef.current) return;
+      seqRef.current = s.seq;
+      const e = engine.current;
+      if (s.request?.kind === 'release') {
+        const from = { x: s.request.from.left + s.request.from.width / 2 - W / 2, y: s.request.from.top + s.request.from.height / 2 - H / 2 };
+        const range = xRange();
+        const toX = clamp(from.x + (from.x < window.innerWidth / 2 ? 40 : -40), range.min, range.max);
+        engine.current = newEngine(from, {
+          kind: 'jump',
+          from,
+          to: { x: toX, y: floorY() },
+          start: performance.now(),
+          land: { kind: 'floor' },
+        });
+        show('hop');
+        setFlags((f) => ({ ...f, emerging: true }));
+        window.setTimeout(() => setFlags((f) => ({ ...f, emerging: false })), ROAM_JUMP_MS);
+      } else if (s.request?.kind === 'recall' && e) {
+        goHome(e);
+        if (e.hint) endHint(e);
+      } else if (s.request?.kind === 'hint') {
+        const { el, right, auto, from } = s.request;
+        // 被拎著、正要回家、上一個提示還沒結束：這次不提示
+        if (!auto && e && (e.mode.kind === 'drag' || e.homeTrip || e.hint)) return;
+        const r = rectOf(el);
+        // 坐進選項裡、蓋在左邊的代號（A–D）上：牠自己就是記號，不擋到選項的字，也不擋到上一個選項
+        const tx = r.left + CAT_HINT.seat.dx;
+        const drop = r.height - CAT_HINT.seat.up;
+        const start =
+          !auto && e ? { x: e.x, y: e.y } : { x: from.left + from.width / 2 - W / 2, y: from.top + from.height / 2 - H / 2 };
+        const en =
+          !auto && e
+            ? e
+            : newEngine(start, { kind: 'idle', until: 0 });
+        en.hint = { right, auto, answered: false, stage: 'wait' };
+        en.prank = null;
+        en.pounce = null;
+        en.mode = {
+          kind: 'jump',
+          from: start,
+          to: { x: tx, y: r.top - H + 3 + drop },
+          start: performance.now(),
+          land: { kind: 'perch', el, dx: tx - r.left, drop },
+        };
+        engine.current = en;
+        show('hop', tx > start.x ? 'right' : 'left');
+        setFlags((f) => ({ ...f, hinting: true, landing: false, firing: false }));
+      }
+    });
+    return () => {
+      off();
+      petHome(cat);
+    };
+  }, [cat]);
 
   // 模擬考開始：直接回家
   useEffect(() => {
-    if (!allowed && getPet().out) petHome();
-  }, [allowed]);
+    if (!allowed && getPet(cat).out) petHome(cat);
+  }, [allowed, cat]);
 
   // 提示中她作答了：記下來，主迴圈在牠坐定後揭曉（還在跳就等落地）
   useEffect(
@@ -781,7 +789,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
             e.y = p.y;
             if (t >= 1) {
               if (m.land === 'home') {
-                petHome();
+                petHome(cat);
                 return;
               }
               e.surface = m.land;
@@ -829,7 +837,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
                 };
                 show('hop');
               } else {
-                petHome();
+                petHome(cat);
                 return;
               }
             } else {
@@ -868,7 +876,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
           const h = homeRect();
           const range = xRange();
           if (!h) {
-            petHome();
+            petHome(cat);
             return;
           }
           const to = clamp(h.left + h.width / 2 - W / 2, range.min, range.max);
@@ -953,7 +961,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     };
     raf = window.requestAnimationFrame(tick);
     return () => window.cancelAnimationFrame(raf);
-  }, [out, world]);
+  }, [out, world, cat]);
 
   if (!out || !allowed) return null;
 
@@ -1008,7 +1016,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     if (!d.active) {
       // 點一下：喵一聲、說句話、原地跳一下
       if (soundOn(world)) playSound('meow', true);
-      const line = voice({ mood: 'idle', place: 'roam' });
+      const line = voice({ mood: 'idle', place: 'roam', cat });
       if (line) say(line.text);
       // 兔子全套：高高跳起來轉一圈
       const binky = specials.current.has('binky');
@@ -1031,7 +1039,7 @@ export function PetLayer({ world, tab, allowed }: PetLayerProps) {
     actorRef.current?.style.setProperty('--pet-swing', '0deg');
     setFlags((f) => ({ ...f, dragging: false }));
     if (nearHome(ev.clientX, ev.clientY)) {
-      petHome();
+      petHome(cat);
       return;
     }
     // 放開：掉到下面的卡片上，沒有就掉到地上

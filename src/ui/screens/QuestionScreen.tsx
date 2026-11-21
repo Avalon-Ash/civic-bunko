@@ -7,7 +7,7 @@ import { formatLawRef } from '../../data/laws';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { bilingualOn, currentQuestion, currentRoundConfig, paperSubjectName, questionPaper } from '../../selectors';
-import { currentOutfit } from '../../selectors/wardrobe';
+import { catOutfit, leaderCat } from '../../selectors/house';
 import { examClock, examSheet } from '../../selectors/exam';
 import {
   BilingualToggle,
@@ -94,6 +94,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
 
   // 想太久的提示：這一題停太久沒作答，小貓跳到某個選項上猜一個（模擬考不提示）
   useCatHint({
+    world,
     enabled: Boolean(view) && !isExam && pick === null,
     questionId: questionId ?? '',
     chars: view ? view.question.stem.length + view.question.options.reduce((sum, text) => sum + text.length, 0) : 0,
@@ -196,7 +197,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
 
   const { question, group, enrich, zh, groupZh, index, total, optionOrder } = view;
   const paper = questionPaper(world, question.paperId);
-  const outfit = currentOutfit(world);
+  const outfit = catOutfit(world, leaderCat(world));
   const isAnswered = pick !== null;
   const bilingualEnabled = bilingualOn(world);
   const hasZh = Boolean(zh || groupZh);

@@ -10,6 +10,7 @@ import {
 } from '../../core/constants/pet';
 import type { Outfit, PetPose } from '../../core/types';
 import type { World } from '../../core/world';
+import { leaderCat } from '../../selectors/house';
 import { CatBody } from '../kit/CatBody';
 import { useCanRoam } from './CatHome';
 import { recallPet, releasePet, usePet } from './petStore';
@@ -33,7 +34,8 @@ export function PetRunner({ world, outfit, value }: PetRunnerProps) {
   const pendingReaction = useRef<PetPose | null>(null);
   const timers = useRef<number[]>([]);
   const hostRef = useRef<HTMLSpanElement | null>(null);
-  const pet = usePet();
+  const cat = leaderCat(world);
+  const pet = usePet(cat);
   const canRoam = useCanRoam();
 
   // 進度條的滑動時間＝跑步時間（同一個常數）
@@ -95,11 +97,11 @@ export function PetRunner({ world, outfit, value }: PetRunnerProps) {
 
   const handleTap = () => {
     if (pet.out) {
-      recallPet();
+      recallPet(cat);
       return;
     }
     const rect = hostRef.current?.getBoundingClientRect();
-    if (rect) releasePet({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+    if (rect) releasePet(cat, { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
   };
 
   const body = (

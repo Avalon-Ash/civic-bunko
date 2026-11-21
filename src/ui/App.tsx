@@ -6,6 +6,7 @@ import type { World } from '../core/world';
 import { currentQuestion, getSettings, readView, roundSummary, type RoundSummaryView } from '../selectors';
 import { isInstallHintDismissed } from '../selectors/backup';
 import { stampTotals, todayProgress } from '../selectors/daily';
+import { leaderCat } from '../selectors/house';
 import { toLocalDateString } from '../systems/date';
 import { InstallHintSheet } from './components/InstallHintSheet';
 import { UpdateBanner } from './components/UpdateBanner';
@@ -262,6 +263,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   };
 
   const isWideContent = tab === 'quiz' && hasActiveRound;
+  const leader = leaderCat(world);
 
   return (
     <CatVoiceProvider world={world}>
@@ -271,7 +273,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
         {/* 答題中不畫：讓她專心 */}
         <Sky weather={hasActiveRound ? null : sky.weather} />
         <ScorchLayer world={world} />
-        <PetLayer world={world} tab={hasActiveRound ? 'round' : tab} allowed={!world.round?.config.exam} />
+        <PetLayer key={leader} world={world} cat={leader} tab={hasActiveRound ? 'round' : tab} allowed={!world.round?.config.exam} />
         <TabBar active={tab} onSelect={handleTabSelect} />
         <main
           ref={mainRef}

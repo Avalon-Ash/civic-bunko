@@ -3,6 +3,7 @@ import { describe, it } from 'node:test';
 import { dispatch } from '../core/commands';
 import { CAT_CHARACTER } from '../core/constants/catLines';
 import { DAILY_GOAL_QUESTIONS } from '../core/constants/daily';
+import { HOUSE_ADOPT, HOUSE_FIRST_CAT } from '../core/constants/house';
 import type { CatTap } from '../core/types';
 import { createTestWorld, testBank } from '../testing/fixture';
 import { EMPTY_CAT_MEMORY, catDisplayName, catName, catSays, catSituation } from './cat';
@@ -82,5 +83,45 @@ describe('cat selectors', () => {
     const pack = { id: 'other', defaultName: '阿橘', topics: [{ id: 'only', when: [], weight: 1, lines: ['{NAME}來了'] }] };
     const result = catSays(world, TAP, EMPTY_CAT_MEMORY, daysBeforeExam(10), () => 0, pack);
     assert.deepEqual(result.line, { text: '阿橘來了', topic: 'only' });
+  });
+
+  it('uses the leader cat name and outfit by default, or the cat specified in CatTap', () => {
+    const world = createTestWorld();
+    world.settings.wardrobe = {
+      owned: ['beanie', 'scarf', 'glasses', 'fur-orange'],
+      achievements: [],
+      quests: {},
+    };
+    dispatch(world, { type: 'setCatName', name: '阿福' });
+    dispatch(world, { type: 'wear', slot: 'head-top', item: 'beanie' });
+
+    dispatch(world, { type: 'adoptCat', name: '麻糬', fur: 'fur-orange' });
+    dispatch(world, { type: 'wear', slot: 'neck', item: 'scarf', cat: 'cat-2' });
+    dispatch(world, { type: 'wear', slot: 'face-mid', item: 'glasses', cat: 'cat-2' });
+    dispatch(world, { type: 'setLeader', cat: 'cat-2' });
+
+    assert.equal(catName(world), '麻糬');
+    assert.equal(catDisplayName(world), '麻糬');
+    assert.equal(catName(world, HOUSE_FIRST_CAT), '阿福');
+    assert.equal(catDisplayName(world, CAT_CHARACTER, HOUSE_FIRST_CAT), '阿福');
+
+    const now = daysBeforeExam(10);
+    const leaderSit = catSituation(world, TAP, 1, now);
+    assert.equal(leaderSit.name, '麻糬');
+    assert.equal(leaderSit.wearing, 2);
+
+    const firstSit = catSituation(world, { ...TAP, cat: HOUSE_FIRST_CAT }, 1, now);
+    assert.equal(firstSit.name, '阿福');
+    assert.equal(firstSit.wearing, 1);
+  });
+
+  it('uses the adopted cat default name when unnamed and chosen as leader', () => {
+    const world = createTestWorld();
+    dispatch(world, { type: 'adoptCat' });
+    dispatch(world, { type: 'setLeader', cat: 'cat-2' });
+
+    assert.equal(catName(world), null);
+    assert.equal(catDisplayName(world), HOUSE_ADOPT[0]?.defaultName);
+    assert.equal(catSituation(world, TAP, 1, daysBeforeExam(10)).name, null);
   });
 });

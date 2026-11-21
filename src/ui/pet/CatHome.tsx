@@ -1,4 +1,7 @@
 import { useRef, useSyncExternalStore, type ReactNode } from 'react';
+import type { World } from '../../core/world';
+import { leaderCat } from '../../selectors/house';
+import { useWorld } from '../useWorld';
 import { recallPet, releasePet, usePet } from './petStore';
 
 /** 減少動態設定開著時，小貓不出來亂跑 */
@@ -17,6 +20,7 @@ export function useCanRoam(): boolean {
 }
 
 export interface CatHomeProps {
+  world: World;
   /** 頭像的大小（px）：小貓出門時，空的家維持一樣大，版面不跳 */
   size: number;
   /** 在家時顯示的頭像（Cat） */
@@ -27,15 +31,17 @@ export interface CatHomeProps {
  * 小貓的家：頭像加一個「放出來玩」的肉球按鈕。小貓出門時變成空的坐墊，點它＝叫牠回來。
  * PetLayer 用 data-cat-home 找家在哪（跳出來、跳回去、拎回家都看這個位置）。
  */
-export function CatHome({ size, children }: CatHomeProps) {
-  const pet = usePet();
+export function CatHome({ world, size, children }: CatHomeProps) {
+  useWorld(world);
+  const cat = leaderCat(world);
+  const pet = usePet(cat);
   const canRoam = useCanRoam();
   const ref = useRef<HTMLSpanElement | null>(null);
 
   const handleRelease = () => {
     const rect = ref.current?.getBoundingClientRect();
     if (!rect) return;
-    releasePet({ left: rect.left, top: rect.top, width: rect.width, height: rect.height });
+    releasePet(cat, { left: rect.left, top: rect.top, width: rect.width, height: rect.height });
   };
 
   return (
@@ -46,7 +52,7 @@ export function CatHome({ size, children }: CatHomeProps) {
       data-cat-home=""
     >
       {pet.out ? (
-        <button type="button" className="cb-cat-home-empty" onClick={recallPet} aria-label="叫小貓回家">
+        <button type="button" className="cb-cat-home-empty" onClick={() => recallPet(cat)} aria-label="叫小貓回家">
           <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden="true">
             <ellipse cx="32" cy="46" rx="25" ry="10" fill="var(--pink)" stroke="var(--line)" strokeWidth="2.5" />
             <path d="M14 46 Q32 54 50 46" fill="none" stroke="var(--pink-deep)" strokeWidth="1.6" strokeLinecap="round" />

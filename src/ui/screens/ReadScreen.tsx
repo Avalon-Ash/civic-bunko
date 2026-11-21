@@ -5,7 +5,7 @@ import type { World } from '../../core/world';
 import { loadTopics } from '../../data/source';
 import { resolveTopicLabel } from '../../data/sourceLoader';
 import { bilingualOn, paperSubjectName, questionPaper, readView } from '../../selectors';
-import { currentOutfit } from '../../selectors/wardrobe';
+import { catOutfit, leaderCat } from '../../selectors/house';
 import {
   BilingualToggle,
   OptionTextWithZh,
@@ -86,7 +86,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
 
   const { question, group, enrich, zh, groupZh, askType, pass, totalPasses, index, total, views } = view;
   const paper = questionPaper(world, question.paperId);
-  const outfit = currentOutfit(world);
+  const outfit = catOutfit(world, leaderCat(world));
   const subjectName = paperSubjectName(world, paper);
   const sourceLabel = formatQuestionSource(world, paper, question.no, subjectName);
   const firstTopic = enrich?.topic[0];

@@ -1,19 +1,24 @@
 // 小貓的名字與「牠現在看到什麼」：把 world 整理成大腦讀的 CatSituation，再請大腦挑一句話。畫面只從這裡讀。
 import { CAT_CHARACTER } from '../core/constants/catLines';
 import { DAILY_GOAL_QUESTIONS } from '../core/constants/daily';
-import type { CatCharacter, CatLine, CatMemory, CatSituation, CatTap } from '../core/types';
+import type { CatCharacter, CatId, CatLine, CatMemory, CatSituation, CatTap } from '../core/types';
 import type { World } from '../core/world';
 import { EMPTY_CAT_MEMORY, cleanCatName, countTaps, speak } from '../systems/catBrain';
 import { addDaysLocal, localDaysUntil, toLocalDateString } from '../systems/date';
-import { currentOutfit } from '../systems/wardrobe';
+import { catOutfit, houseCats, leaderCat, type HouseCatView } from './house';
 import { activeBank } from './index';
 
 /** 還沒點過牠時的記憶（給保管記憶的呼叫端當起點） */
 export { EMPTY_CAT_MEMORY };
 
-/** 使用者取的名字；沒取（或存檔裡的值不合規則）是 null */
-export function catName(world: World): string | null {
-  return cleanCatName(world.settings.catName);
+function catView(world: World, cat?: CatId): HouseCatView | undefined {
+  const id = cat ?? leaderCat(world);
+  return houseCats(world).find((c) => c.id === id);
+}
+
+/** 使用者取的名字；沒取（或存檔裡的值不合規則）是 null。未指定 cat 時讀「陪我刷題」那隻。 */
+export function catName(world: World, cat?: CatId): string | null {
+  return catView(world, cat)?.named ?? null;
 }
 
 /** 輸入框裡打的字存起來會變成什麼（清理、截短之後）；null＝等於沒取名 */
@@ -21,9 +26,12 @@ export function cleanCatNameInput(text: string): string | null {
   return cleanCatName(text);
 }
 
-/** 畫面上怎麼稱呼牠：取了名字用名字，沒取用角色包的預設稱呼 */
-export function catDisplayName(world: World, character: CatCharacter = CAT_CHARACTER): string {
-  return catName(world) ?? character.defaultName;
+/** 畫面上怎麼稱呼牠：取了名字用名字，沒取用預設稱呼（或角色包的預設稱呼）。未指定 cat 時讀「陪我刷題」那隻。 */
+export function catDisplayName(world: World, character: CatCharacter = CAT_CHARACTER, cat?: CatId): string {
+  const view = catView(world, cat);
+  if (view?.named) return view.named;
+  if (character !== CAT_CHARACTER) return character.defaultName;
+  return view?.name ?? character.defaultName;
 }
 
 /** 連續幾天蓋章：從今天往回數；今天還沒蓋就從昨天數起 */
@@ -47,7 +55,8 @@ function daysToExam(world: World, now: Date): number | null {
 
 /** 小貓現在看到的處境；taps＝這一下是連續點的第幾下 */
 export function catSituation(world: World, tap: CatTap, taps: number, now: Date): CatSituation {
-  const outfit = currentOutfit(world);
+  const target = tap.cat ?? leaderCat(world);
+  const outfit = catOutfit(world, target);
   return {
     ...tap,
     hour: now.getHours(),
@@ -56,7 +65,7 @@ export function catSituation(world: World, tap: CatTap, taps: number, now: Date)
     dailyGoal: DAILY_GOAL_QUESTIONS,
     streak: stampStreak(world, now),
     wearing: Object.keys(outfit).filter((slot) => slot !== 'fur').length,
-    name: catName(world),
+    name: catName(world, target),
     taps,
   };
 }
@@ -75,5 +84,9 @@ export function catSays(
 ): { line: CatLine | null; memory: CatMemory } {
   const nowMs = now.getTime();
   const situation = catSituation(world, tap, countTaps(memory, nowMs), now);
-  return speak(character, situation, memory, nowMs, rng);
+  const activeCharacter =
+    character === CAT_CHARACTER
+      ? { ...character, defaultName: catDisplayName(world, character, tap.cat ?? leaderCat(world)) }
+      : character;
+  return speak(activeCharacter, situation, memory, nowMs, rng);
 }

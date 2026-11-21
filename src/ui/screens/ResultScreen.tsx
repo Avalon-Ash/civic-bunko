@@ -5,7 +5,7 @@ import type { LawRef, QuestionId } from '../../core/types';
 import type { World } from '../../core/world';
 import { formatLawRef } from '../../data/laws';
 import { bilingualOn, paperSubjectName, questionPaper, roundSummary } from '../../selectors';
-import { currentOutfit } from '../../selectors/wardrobe';
+import { catOutfit, leaderCat } from '../../selectors/house';
 import { examHistory, examQuestionDetail, examResult } from '../../selectors/exam';
 import {
   BilingualToggle,
@@ -54,7 +54,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
   useWorld(world);
   const summary = roundSummary(world);
   const exam = examResult(world);
-  const outfit = currentOutfit(world);
+  const outfit = catOutfit(world, leaderCat(world));
 
   const [inspectId, setInspectId] = useState<QuestionId | null>(null);
   const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
