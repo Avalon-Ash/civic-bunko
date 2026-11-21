@@ -433,7 +433,7 @@ export interface WardrobeState {
   outfitAt?: string;
   /** 領養的小貓（鍵是 CatId；原本那隻不在這裡，牠的資料在舊欄位）。規則在 docs/plans/cat-house.md §3 */
   cats?: Record<CatId, HouseCatSave>;
-  /** 帶出門的小貓；沒有這欄＝照小屋順序的前 HOUSE.maxOut 隻。各裝置自己的設定，不同步 */
+  /** 帶出門的小貓；沒有這欄＝全家都帶。各裝置自己的設定，不同步 */
   outing?: CatId[];
   /** 陪我刷題的那隻（答題頁、頭像）；沒有這欄或不在家裡＝原本那隻。各裝置自己的設定，不同步 */
   leader?: CatId;
@@ -851,7 +851,7 @@ export type UICommand =
   | { type: 'setCatName'; name: string; cat?: CatId }
   /** 領養下一隻（HOUSE_ADOPT 裡第一個還沒領養的）；滿了、錢不夠時不動作。可以順便取名、穿上一件已經有的毛色 */
   | { type: 'adoptCat'; name?: string; fur?: ItemId }
-  /** 帶不帶這隻出門；已經帶了 HOUSE.maxOut 隻時再加不動作 */
+  /** 帶不帶這隻出門（沒有隻數上限） */
   | { type: 'setCatOuting'; cat: CatId; on: boolean }
   /** 換成這隻陪我刷題（全家只有一隻）；不在家裡的 ID 不動作 */
   | { type: 'setLeader'; cat: CatId };

@@ -4,7 +4,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { dispatch } from '../core/commands';
 import { CAT_CHARACTER } from '../core/constants/catLines';
-import { HOUSE, HOUSE_ADOPT, HOUSE_FIRST_CAT, HOUSE_MAX_CATS } from '../core/constants/house';
+import { HOUSE_ADOPT, HOUSE_FIRST_CAT, HOUSE_MAX_CATS } from '../core/constants/house';
 import { WARDROBE_START_DAY } from '../core/constants/wardrobe';
 import type { UICommand } from '../core/types';
 import { createWorld, type World } from '../core/world';
@@ -166,21 +166,30 @@ describe('cat house', () => {
     assert.equal(world.settings.wardrobe?.cats?.['cat-4'], undefined);
   });
 
-  it('takes the first few cats out by default, and never more than HOUSE.maxOut', () => {
+  it('takes the whole family out by default; the switch only says whether this cat goes, with no limit', () => {
     const world = rich(createWorld());
     adoptAll(world);
     const ids = houseCats(world).map((c) => c.id);
-    assert.deepEqual(outingCats(world), ids.slice(0, HOUSE.maxOut));
+    assert.deepEqual(outingCats(world), ids);
 
-    run(world, { type: 'setCatOuting', cat: 'cat-4', on: true });
-    assert.deepEqual(outingCats(world), ids.slice(0, HOUSE.maxOut));
     run(world, { type: 'setCatOuting', cat: 'cat-2', on: false });
+    run(world, { type: 'setCatOuting', cat: 'cat-4', on: false });
+    assert.deepEqual(outingCats(world), [HOUSE_FIRST_CAT, 'cat-3', 'cat-5']);
     run(world, { type: 'setCatOuting', cat: 'cat-4', on: true });
-    assert.deepEqual(outingCats(world), [HOUSE_FIRST_CAT, 'cat-3', 'cat-4']);
+    run(world, { type: 'setCatOuting', cat: 'cat-2', on: true });
+    assert.deepEqual(outingCats(world), ids);
     assert.deepEqual(
       houseCats(world).filter((c) => c.out).map((c) => c.id),
-      [HOUSE_FIRST_CAT, 'cat-3', 'cat-4'],
+      ids,
     );
+    // 新領養的那隻：還沒動過開關時跟著全家出門
+    const fresh = rich(createWorld());
+    run(fresh, { type: 'adoptCat' });
+    assert.deepEqual(outingCats(fresh), [HOUSE_FIRST_CAT, 'cat-2']);
+    // 動過開關之後才領養的：也跟著出門（不會因為存了名單就被漏掉）
+    run(fresh, { type: 'setCatOuting', cat: HOUSE_FIRST_CAT, on: false });
+    run(fresh, { type: 'adoptCat' });
+    assert.deepEqual(outingCats(fresh), ['cat-2', 'cat-3']);
     // 可以一隻都不帶
     for (const id of outingCats(world)) run(world, { type: 'setCatOuting', cat: id, on: false });
     assert.deepEqual(outingCats(world), []);

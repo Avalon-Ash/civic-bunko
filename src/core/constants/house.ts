@@ -29,13 +29,6 @@ export const HOUSE_ADOPT: readonly HouseAdoption[] = [
 /** 小屋最多住幾隻（導出值：原本那隻＋領養表） */
 export const HOUSE_MAX_CATS = 1 + HOUSE_ADOPT.length;
 
-export const HOUSE = {
-  /** 今日、集章頁按肉球時，最多幾隻一起出門（手機效能與畫面擁擠） */
-  maxOut: 3,
-  /** 多隻出門時，發出聲音的（哞、說話泡泡、夢話）兩次至少隔多久（毫秒）；同一時間只有一隻出聲 */
-  voiceGapMs: 6_000,
-} as const;
-
 /**
  * 小屋場景的尺寸與動作參數（ui/house/houseLogic.ts、HouseScene.tsx、house.css 讀它）。
  * height／shortHeight＝房間高度（px；shortHeight 用於手機橫放，高 ≤ 500px）；
