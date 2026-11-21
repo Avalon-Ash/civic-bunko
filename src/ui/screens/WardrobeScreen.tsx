@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
-import { HOUSE } from '../../core/constants/house';
 import { ACHIEVEMENTS, DAILY_SALE, SLOTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
 import { RUNNER_HOP_MS } from '../../core/constants/pet';
 import type { CatId, ItemId, Outfit, SlotId, TryOn } from '../../core/types';
 import type { World } from '../../core/world';
-import { catOutfit, houseCats, leaderCat, nextAdoption, outingCats } from '../../selectors/house';
+import { catOutfit, houseCats, leaderCat, nextAdoption } from '../../selectors/house';
 import {
   achievementStatuses,
   dailyTierStatus,
@@ -118,7 +117,6 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   useWorld(world);
   const now = new Date();
   const cats = houseCats(world);
-  const outing = outingCats(world);
   const leader = leaderCat(world);
   const adoption = nextAdoption(world, now);
   const fish = fishBalance(world, now);
@@ -143,8 +141,6 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
     cats.find((c) => c.id === leader) ??
     cats[0]!;
   const selected = selectedCat.id;
-  /** 已經帶滿 HOUSE.maxOut 隻、這隻沒帶：開關停用（system 那邊也會擋，這裡只是畫面） */
-  const outingFull = !selectedCat.out && outing.length >= HOUSE.maxOut;
 
   // 選中的那隻如果不在家裡，回到陪我刷題那隻並清試穿籃
   useEffect(() => {
@@ -317,22 +313,14 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
             <div className="cb-house-outing-row">
               <div className="cb-grow">
                 <strong className="cb-block">帶出門</strong>
-                {outingFull ? (
-                  <span className="cb-sub">最多帶 {HOUSE.maxOut} 隻出門</span>
-                ) : null}
               </div>
-              <fieldset
-                className="cb-house-switch-field"
-                disabled={outingFull}
-              >
-                <Switch
-                  checked={selectedCat.out}
-                  onChange={(on) => {
-                    dispatch(world, { type: 'setCatOuting', cat: selected, on });
-                  }}
-                  ariaLabel={`帶${selectedCat.name}出門`}
-                />
-              </fieldset>
+              <Switch
+                checked={selectedCat.out}
+                onChange={(on) => {
+                  dispatch(world, { type: 'setCatOuting', cat: selected, on });
+                }}
+                ariaLabel={`帶${selectedCat.name}出門`}
+              />
             </div>
           </Card>
 

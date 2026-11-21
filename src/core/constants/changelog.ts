@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-cat-outing-all',
+    date: '2026-11-22',
+    title: '全家都可以一起出門了',
+    items: [
+      '帶出門不限隻數，開關只管這隻要不要帶，新領養的也會跟著出門',
+      '每隻小貓各玩各的，叫聲、噴火、劈卡片都照自己的節奏',
+    ],
+  },
+  {
     id: '2026-11-22-cat-outing',
     date: '2026-11-22',
     title: '小貓們可以一起出門了',

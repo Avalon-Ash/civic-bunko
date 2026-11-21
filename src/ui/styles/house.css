@@ -285,19 +285,6 @@
   border-top: 2px dashed var(--hair);
 }
 
-.cb-house-switch-field {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  min-inline-size: 0;
-  display: inline-flex;
-}
-
-.cb-house-switch-field:disabled .cb-switch-hit {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
 .cb-house-leader-btn {
   width: auto;
   min-height: var(--tap-min);

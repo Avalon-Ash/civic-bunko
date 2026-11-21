@@ -3,7 +3,6 @@
 // 原本那隻沿用舊欄位（settings.catName／catNameAt、wardrobe.outfit＋outfitAt），其餘讀寫 wardrobe.cats[id]。
 import { CAT_CHARACTER } from '../core/constants/catLines';
 import {
-  HOUSE,
   HOUSE_ADOPT,
   HOUSE_CAT_ID,
   HOUSE_FIRST_CAT,
@@ -115,15 +114,15 @@ export function leaderCat(world: World): CatId {
   return saved && ids.includes(saved) ? saved : HOUSE_FIRST_CAT;
 }
 
-/** 讀取帶出門的小貓 ID 清單（只列在家裡的、照家裡順序）；未設定時為前 HOUSE.maxOut 隻。 */
+/** 讀取帶出門的小貓 ID 清單（只列在家裡的、照家裡順序）；未設定時為全家。 */
 export function outingCats(world: World): CatId[] {
   const ids = houseCatIds(world);
   const saved = world.settings.wardrobe?.outing;
   if (saved === undefined) {
-    return ids.slice(0, HOUSE.maxOut);
+    return ids;
   }
   const savedSet = new Set(saved);
-  return ids.filter((id) => savedSet.has(id)).slice(0, HOUSE.maxOut);
+  return ids.filter((id) => savedSet.has(id));
 }
 
 /** 讀取全家小貓的目前資料（照家裡順序）。 */
@@ -191,9 +190,18 @@ export function adoptCat(
     nextCats = { ...prevCats, [next.cat]: updated };
   }
 
+  const prevOuting = world.settings.wardrobe?.outing;
+  const nextOuting =
+    prevOuting !== undefined
+      ? prevOuting.includes(next.cat)
+        ? prevOuting
+        : [...prevOuting, next.cat]
+      : undefined;
+
   return commitWardrobe(world, {
     owned: [...prevOwned, next.owned],
     ...(nextCats !== undefined ? { cats: nextCats } : {}),
+    ...(nextOuting !== undefined ? { outing: nextOuting } : {}),
   });
 }
 
@@ -295,7 +303,7 @@ export function setHouseCatName(
   commitWardrobe(world, { cats: { ...prevCats, [cat]: updated } });
 }
 
-/** 設定是否帶這隻小貓出門（最多 HOUSE.maxOut 隻，可以一隻都不帶）；不碰 settings.accessory。 */
+/** 設定是否帶這隻小貓出門（不限隻數，可以一隻都不帶）；不碰 settings.accessory。 */
 export function setCatOuting(world: World, cat: CatId, on: boolean): boolean {
   const ids = houseCatIds(world);
   if (!ids.includes(cat)) {
@@ -304,7 +312,7 @@ export function setCatOuting(world: World, cat: CatId, on: boolean): boolean {
   const current = outingCats(world);
   const isOut = current.includes(cat);
   if (on) {
-    if (isOut || current.length >= HOUSE.maxOut) {
+    if (isOut) {
       return false;
     }
     const nextSet = new Set([...current, cat]);
