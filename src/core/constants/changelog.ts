@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-cat-house',
+    date: '2026-11-22',
+    title: '小貓之家：可以養好幾隻了',
+    items: [
+      '「小貓」分頁變成小貓之家，最多可以養 5 隻小貓；第 2 隻現在就能免費領養，之後的用小魚乾帶回家',
+      '點房間裡的小貓或名牌列就能選牠，每隻都可以各自取名字、換衣服和毛色，也能換誰陪你刷題',
+      '全家都會在房間裡走來走去、坐著、理毛、打盹，靠在一起時還會蹭蹭冒愛心，窗外也會跟著早晚變化',
+    ],
+  },
+  {
     id: '2026-11-22-new-furs',
     date: '2026-11-22',
     title: '六種新毛色',

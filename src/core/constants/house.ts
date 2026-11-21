@@ -35,3 +35,47 @@ export const HOUSE = {
   /** 多隻出門時，發出聲音的（哞、說話泡泡、夢話）兩次至少隔多久（毫秒）；同一時間只有一隻出聲 */
   voiceGapMs: 6_000,
 } as const;
+
+/**
+ * 小屋場景的尺寸與動作參數（ui/house/houseLogic.ts、HouseScene.tsx、house.css 讀它）。
+ * height／shortHeight＝房間高度（px；shortHeight 用於手機橫放，高 ≤ 500px）；
+ * floorRatio＝地板佔房間高度的比例；floorInsetY＝地板可用區域的上下比例；
+ * catWidth＝房間裡每隻小貓的圖寬（px）；edgeX＝小貓中心離左右牆至少留幾 px；
+ * walkSpeed＝走路速度（px／秒）；minTrip＝走路目標至少離現在多遠（px）；walkTries＝挑目標最多試幾次；
+ * hopMs＝點小貓時跳一下的時間（毫秒）；maxDtMs＝單幀推進步長上限（毫秒，避免切回前景跳躍）；
+ * dur＝各動作持續多久（毫秒，範圍內隨機）；weights＝動作權重；
+ * nuzzle＝兩隻距離小於 dist（px）時，有 chance 的機率一起坐下互看冒 ♥，同時最多一對；
+ * doorInset＝新領養的小貓從右邊門口走進來時的起點（離右緣幾 px）；enterTargetRatio＝走進房內落點的水平比例範圍。
+ */
+export const HOUSE_SCENE = {
+  height: 186,
+  shortHeight: 132,
+  floorRatio: 0.42,
+  floorInsetY: { min: 0.24, max: 0.88 },
+  catWidth: 64,
+  edgeX: 42,
+  defaultWidth: 360,
+  walkSpeed: 42,
+  minTrip: 36,
+  walkTries: 8,
+  hopMs: 520,
+  maxDtMs: 60,
+  dur: {
+    sit: { min: 3_000, max: 6_500 },
+    groom: { min: 2_800, max: 5_000 },
+    loaf: { min: 6_000, max: 11_000 },
+    nuzzle: { min: 3_600, max: 5_400 },
+  },
+  weights: {
+    walk: 3,
+    sit: 2,
+    groom: 2,
+    loaf: 1,
+  },
+  nuzzle: {
+    dist: 88,
+    chance: 0.45,
+  },
+  doorInset: 14,
+  enterTargetRatio: { min: 0.52, max: 0.78 },
+} as const;

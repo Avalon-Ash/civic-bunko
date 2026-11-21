@@ -15,4 +15,5 @@
 @import './styles/exam.css'; /* 模擬考與選項打亂 */
 @import './styles/topics.css'; /* 弱點與高頻考點、刷題頁快速回合與開始鈕 */
 @import './styles/wardrobe.css'; /* 小貓衣櫥 */
+@import './styles/house.css'; /* 小貓之家 */
 @import './styles/pet.css'; /* 有身體的小貓：進度條跑者、自由亂跑 */
