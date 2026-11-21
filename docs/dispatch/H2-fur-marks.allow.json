@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "command(npm run lint)",
+      "command(npm test)",
+      "command(npm run build)",
+      "command(npx tsx tools/gallery/cat-gallery.mts .gallery/fur-light.html light)",
+      "command(npx tsx tools/gallery/cat-gallery.mts .gallery/fur-dark.html dark)",
+      "command(npx tsx tools/economy/fish-economy.mts)"
+    ]
+  }
+}
