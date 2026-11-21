@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import { CAT_LINE_W, EMOTE, HEAD_ORIGIN, HEAD_RADIUS } from '../../core/constants/pet';
 import { ITEMS, SLOTS_BY_DEPTH } from '../../core/constants/wardrobe';
 import type { AccessoryId, CatMood, CatScene, ItemId, Outfit, SlotId } from '../../core/types';
 import { useCatBubble, useCatVoice } from './catVoice';
 import { Emote } from './Emote';
-import { ITEM_ART } from './wardrobe/art';
+import { ITEM_ART, type FurMarks } from './wardrobe/art';
 
 export type { CatMood };
 
@@ -78,6 +78,14 @@ export function furClass(outfit: Outfit): string {
   return art && art.kind === 'fur' ? art.className : '';
 }
 
+/** 穿著的毛色花紋（素色或沒穿就是 undefined） */
+export function furMarks(outfit: Outfit): FurMarks | undefined {
+  const id = outfit.fur;
+  if (!id) return undefined;
+  const art = ITEM_ART[id];
+  return art && art.kind === 'fur' ? art.marks : undefined;
+}
+
 /** 單獨顯示一件配件的圖示；毛色顯示成那個毛色的小貓。 */
 export function ItemIcon({ id, size = 36 }: { id: ItemId; size?: number }) {
   const art = ITEM_ART[id];
@@ -102,6 +110,8 @@ export function AccessoryIcon({ id, size = 36 }: { id: AccessoryId; size?: numbe
  * 頭像用的 Cat 與有身體的 CatBody 共用它；standalone＝只有頭的頭像（要畫背景與背飾；身體版由 CatBody 畫在身體後面）。
  */
 export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: Outfit; standalone: boolean }) {
+  const marks = furMarks(outfit);
+  const headClip = `${useId()}cb-head`;
   const feature = {
     fill: 'none',
     stroke: 'var(--cat-feature)',
@@ -109,12 +119,19 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
   };
+  const mouth = { ...feature, stroke: 'var(--cat-mouth)' };
   return (
     <>
     {standalone ? <OutfitLayers outfit={outfit} behind standalone /> : null}
-    {EARS.map((ear) => (
+    {EARS.map((ear, i) => (
       <g key={ear.side} className={`cb-cat-ear cb-cat-ear-${ear.side}`}>
-        <path d={ear.outer} fill="var(--cat-patch)" stroke="var(--cat-line)" strokeWidth={CAT_LINE_W} strokeLinejoin="round" />
+        <path
+          d={ear.outer}
+          fill={marks?.ears?.[i] ?? 'var(--cat-patch)'}
+          stroke="var(--cat-line)"
+          strokeWidth={CAT_LINE_W}
+          strokeLinejoin="round"
+        />
         <path d={ear.inner} fill="var(--cat-ear)" stroke="var(--cat-ear)" strokeWidth="1.2" strokeLinejoin="round" />
       </g>
     ))}
@@ -123,6 +140,16 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
       d="M6 40Q6 19 30 18l-5 12q-9 3-13 14zM58 40Q58 19 34 18l5 12q9 3 13 14z"
       fill="var(--cat-patch)"
     />
+    {marks?.head ? (
+      <>
+        <clipPath id={headClip}>
+          <ellipse cx={HEAD_ORIGIN.x} cy={HEAD_ORIGIN.y} rx={HEAD_RADIUS.x} ry={HEAD_RADIUS.y} />
+        </clipPath>
+        <g clipPath={`url(#${headClip})`} className="cb-fur-marks cb-fur-head">
+          {marks.head}
+        </g>
+      </>
+    ) : null}
     <ellipse
       cx={HEAD_ORIGIN.x}
       cy={HEAD_ORIGIN.y}
@@ -152,9 +179,9 @@ export function CatHead({ mood, outfit, standalone }: { mood: CatMood; outfit: O
 
     <path d="M30.3 43.7Q32 43 33.7 43.7Q33.4 45.5 32 46.1Q30.6 45.5 30.3 43.7Z" fill="var(--cat-nose)" />
     {mood === 'oops' ? (
-      <path d="M29 48.4h6" {...feature} />
+      <path d="M29 48.4h6" {...mouth} />
     ) : (
-      <path d="M27 46.4q2.5 3.5 5 0q2.5 3.5 5 0" {...feature} />
+      <path d="M27 46.4q2.5 3.5 5 0q2.5 3.5 5 0" {...mouth} />
     )}
     <OutfitLayers outfit={outfit} behind={false} standalone={standalone} />
     </>

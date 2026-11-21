@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-new-furs',
+    date: '2026-11-22',
+    title: '六種新毛色',
+    items: [
+      '衣櫥多了奶茶貓、虎斑貓、銀虎斑、賓士貓、三花貓、暹羅貓',
+      '虎斑有額頭的 M 字和背上的條紋，賓士有白手套，三花左右兩邊的斑不一樣，暹羅的臉、耳朵、腳和尾巴是深色的',
+    ],
+  },
+  {
     id: '2026-11-20-claw-freeze',
     date: '2026-11-20',
     title: '乳牛變帥了，老虎會抓、企鵝會結冰',

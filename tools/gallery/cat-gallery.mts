@@ -1,7 +1,8 @@
 // 小八喵看圖用：把每件配件穿在頭像、每種姿勢（含背飾、背景）畫成一張靜態 HTML，給人或代理在瀏覽器裡比對。
 // 用法：npx tsx tools/gallery/cat-gallery.mts <輸出.html> [light|dark] [身體姿勢區每格的寬度，預設 150]
 // 不進 App、不進測試；輸出放 .gallery/（已列入 .gitignore）。
-import { readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { createElement as h, type ReactElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { Cat, ItemIcon } from '../../src/ui/kit/Cat';
@@ -62,6 +63,19 @@ const bodies = bodyOutfits
       '</div>',
   )
   .join('');
+
+/** 新毛色 × 每種姿勢（獨立列出方便對照花紋；放在 #bodies 裡讓頁尾檢查一起掃） */
+const NEW_FUR_IDS = new Set(['fur-milktea', 'fur-tabby', 'fur-silver', 'fur-tuxedo', 'fur-calico', 'fur-siamese']);
+const newFurBodies =
+  '<h3>新毛色 × 每種姿勢</h3>' +
+  ITEMS.filter((it) => NEW_FUR_IDS.has(it.id))
+    .map(
+      (it) =>
+        `<h4>${it.name}</h4><div class="row">` +
+        poses.map((pose) => cell(pose, h(CatBody, { pose, outfit: { fur: it.id }, width: bodyWidth }))).join('') +
+        '</div>',
+    )
+    .join('');
 
 /** 實際大小：她在 App 裡看到的尺寸（進度條跑者、跑出來玩、試衣間、頭像），線寬與小配件在這裡才看得出問題 */
 const ROOM_WIDTH = 140; // 試衣間（WardrobeScreen 的 ROOM_CAT_WIDTH）
@@ -188,6 +202,7 @@ addEventListener('load', () => {
 });
 </script>`;
 
+mkdirSync(dirname(out), { recursive: true });
 writeFileSync(
   out,
   `<!doctype html><html data-theme="${mode}"><meta charset="utf-8"><title>小八喵看圖 ${mode}</title><style>${css}
@@ -200,7 +215,7 @@ figure{margin:0;text-align:center;font-size:12px}.stage{background:var(--surface
 <h3>頭像（每件單穿）</h3><div class="grid">${heads}</div>
 <h3>圖示</h3><div class="grid icons">${icons}</div>
 <h3>實際大小</h3>${real}${realHeads}
-<h3>身體姿勢（含背景，試衣間的畫法）</h3><div id="bodies">${bodies}</div>
+<h3>身體姿勢（含背景，試衣間的畫法）</h3><div id="bodies">${bodies}${newFurBodies}</div>
 <h3>超出身體座標 ${PET_VIEW_W}×${PET_VIEW_H} 的組合（單位：身體座標）</h3><pre id="overflow"></pre>
 <h3>花紋與剪裁有沒有貼在身體上</h3><pre id="attach"></pre>
 <h3>面向左是不是面向右的鏡像</h3>${mirror}<pre id="mirror"></pre>${checkScript}`,

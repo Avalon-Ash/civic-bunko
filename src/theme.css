@@ -47,6 +47,10 @@
   /* 黑貓毛色的外框：淺色模式跟一般外框一樣；深色模式改淺（下面兩段），不然深色的毛和外框會融進深色背景 */
   --cat-line-black: var(--cat-line);
   --cat-feature: var(--cat-line); /* 眼睛、嘴巴；黑貓毛色會改成淺色 */
+  --cat-mouth: var(--cat-feature); /* 嘴巴；賓士、暹羅的臉和口鼻底色不同，可分開定色 */
+  --cat-mark: var(--cat-patch); /* 毛色花紋主色（條紋、斑塊、重點色） */
+  --cat-mark-2: var(--cat-line); /* 毛色花紋第二色（三花的黑斑） */
+  --cat-white: #fffdf9; /* 毛色花紋的白色（賓士的口鼻、胸口、腳尖） */
 
   /* 衣櫥配件（只給小八喵的配件與毛色用，不拿來做介面色） */
   --acc-coral: #f2836f;
@@ -223,6 +227,52 @@
   --cat-fur: #ffe993;
   --cat-fur-far: #f2d672;
   --cat-patch: #f0b93c;
+}
+.cb-fur-milktea {
+  --cat-fur: #ebd7c1;
+  --cat-fur-far: #d8c0a6;
+  --cat-patch: #bc926b;
+}
+.cb-fur-tabby {
+  --cat-fur: #dfa973;
+  --cat-fur-far: #ca915b;
+  --cat-patch: var(--cat-fur);
+  --cat-mark: #7d4c28;
+}
+.cb-fur-silver {
+  --cat-fur: #d7dde3;
+  --cat-fur-far: #bcc4cc;
+  --cat-patch: var(--cat-fur);
+  --cat-mark: #555f6b;
+}
+.cb-fur-tuxedo {
+  --cat-line: var(--cat-line-black);
+  --cat-fur: #4b4249;
+  --cat-fur-far: #3b3339;
+  --cat-patch: #2e282d;
+  --cat-blush: #d98296;
+  --cat-ear: #a96a7b;
+  --cat-nose: #ea8c9d;
+  --cat-feature: #fff1d2;
+  --cat-shine: var(--cat-feature);
+  --cat-mouth: #5a4636;
+  --cat-white: #fffdf9;
+}
+.cb-fur-calico {
+  --cat-fur: #fffdf9;
+  --cat-fur-far: #ebe1d5;
+  --cat-patch: var(--cat-fur);
+  --cat-mark: #ef9f55;
+  --cat-mark-2: #4b4249;
+}
+.cb-fur-siamese {
+  --cat-fur: #f7ebd7;
+  --cat-fur-far: #e5d5bc;
+  --cat-patch: var(--cat-fur);
+  --cat-mark: #6b4b3a;
+  --cat-mark-2: #b98f6f; /* 臉上的面罩：比腳、耳朵淺一階，深色的五官才看得到 */
+  --cat-ear: #c8968f;
+  --cat-nose: #e58f9f;
 }
 
 *,

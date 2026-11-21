@@ -196,6 +196,12 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'fur-gray', slot: 'fur', name: '灰貓', source: shop(PRICE.xl) },
   { id: 'fur-black', slot: 'fur', name: '黑貓', source: shop(PRICE.rare) },
   { id: 'fur-gold', slot: 'fur', name: '金貓', source: byAchievement('answered-1000') },
+  { id: 'fur-milktea', slot: 'fur', name: '奶茶貓', source: shop(PRICE.m) },
+  { id: 'fur-tabby', slot: 'fur', name: '虎斑貓', source: shop(PRICE.xl) },
+  { id: 'fur-silver', slot: 'fur', name: '銀虎斑', source: shop(PRICE.xl) },
+  { id: 'fur-tuxedo', slot: 'fur', name: '賓士貓', source: shop(PRICE.xl) },
+  { id: 'fur-calico', slot: 'fur', name: '三花貓', source: shop(PRICE.rare) },
+  { id: 'fur-siamese', slot: 'fur', name: '暹羅貓', source: shop(PRICE.rare) },
 ];
 
 // ── 小魚乾 ────────────────────────────────────────────────

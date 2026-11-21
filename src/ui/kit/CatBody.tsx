@@ -6,7 +6,9 @@ import {
   HEAD_RADIUS,
   PET_BACKDROP,
   PET_HEAD_SCALE,
+  PET_LEG_W,
   PET_LINE_W,
+  PET_PAW_H,
   PET_PAW_TOE,
   PET_PIVOT_SHIFT,
   PET_POSES,
@@ -16,10 +18,10 @@ import {
 } from '../../core/constants/pet';
 import { SLOTS_BY_DEPTH } from '../../core/constants/wardrobe';
 import type { Outfit, PetAnchor, PetLeg, PetPose, PetPoseSpec } from '../../core/types';
-import { CatHead, furClass, type CatMood } from './Cat';
+import { CatHead, furClass, furMarks, type CatMood } from './Cat';
 import { Emote } from './Emote';
 import { frontalBuild, legPath, r2, torsoShape } from './petShape';
-import { ITEM_ART, type BodyArt, type BodyGeom } from './wardrobe/art';
+import { ITEM_ART, type BodyArt, type BodyGeom, type FurMarks } from './wardrobe/art';
 
 export interface CatBodyProps {
   pose: PetPose;
@@ -63,6 +65,23 @@ const outline = {
 const MIRROR = 'scale(1 -1)';
 /** 遠側的腿穿著包腳的衣服時壓暗多少（毛色有自己的遠側色 --cat-fur-far，布沒有） */
 const FAR_CLOTH_DIM = 'brightness(0.9)';
+/** 腿底部的腳尖形狀（賓士貓白手套）：沿用 legPath 下緣的同一條輪廓，從 pawTop 往下包到腳底，不超出腿的輪廓 */
+function pawTipPath(len: number, toe: number): string {
+  const w = PET_LEG_W / 2;
+  const pawTop = Math.max(0, len - PET_LEG_W * PET_PAW_H);
+  const heel = Math.max(0, len - w);
+  const front = w + toe;
+  return [
+    `M${-w} ${r2(pawTop)}`,
+    `L${-w} ${r2(heel)}`,
+    `Q${-w} ${len} 0 ${len}`,
+    `L${toe} ${len}`,
+    `Q${r2(front)} ${len} ${r2(front)} ${r2((len + pawTop) / 2)}`,
+    `Q${r2(front)} ${r2(pawTop)} ${w} ${r2(pawTop)}`,
+    'Z',
+  ].join('');
+}
+
 function Leg({
   leg,
   index,
@@ -70,6 +89,7 @@ function Leg({
   toe,
   sleeve,
   cloth,
+  furLeg,
   held,
 }: {
   leg: PetLeg;
@@ -78,6 +98,7 @@ function Leg({
   toe: number;
   sleeve: ReactNode;
   cloth?: string;
+  furLeg?: FurMarks['legs'];
   /** 手上拿的東西（畫在腳掌後面，看起來是握著） */
   held?: ReactNode;
 }) {
@@ -85,15 +106,24 @@ function Leg({
   /** 腿根要不要封口：遠側的腿（從身體邊緣露出來）、從肩膀舉起來的手臂 */
   const capped = far || leg.shoulder === true;
   const d = legPath(leg.len, capped, toe);
+  const fullFill = cloth ?? (furLeg?.kind === 'full' ? furLeg.fill : undefined);
   return (
     <g transform={`translate(${leg.x} ${leg.y}) rotate(${leg.rot})`}>
       <g className={`cb-pet-leg cb-pet-leg-${index}`}>
         {held}
         <path
           d={capped ? d : `${d}Z`}
-          fill={cloth ?? (far ? 'var(--cat-fur-far)' : 'var(--cat-fur)')}
-          style={cloth && far ? { filter: FAR_CLOTH_DIM } : undefined}
+          fill={fullFill ?? (far ? 'var(--cat-fur-far)' : 'var(--cat-fur)')}
+          style={fullFill && far ? { filter: FAR_CLOTH_DIM } : undefined}
         />
+        {!cloth && furLeg?.kind === 'paw' ? (
+          <path
+            className="cb-fur-paw"
+            d={pawTipPath(leg.len, toe)}
+            fill={furLeg.fill}
+            style={far ? { filter: FAR_CLOTH_DIM } : undefined}
+          />
+        ) : null}
         <path d={d} {...outline} />
         {sleeve}
       </g>
@@ -235,10 +265,11 @@ export function CatBody({
     x: facing === 'left' ? PET_VIEW_W - emoteX : emoteX,
     y: spec.head.y - HEAD_RADIUS.y * spec.head.scale * EMOTE.corner.y,
   };
+  const marks = furMarks(outfit);
   /** 整條腿包起來的顏色（腳也包住的睡衣） */
   const cloth = worn.find(({ art }) => art.legs)?.art.legs;
-  /** 尾巴的顏色：穿了成套的衣服（連身裝）就照衣服的，不然是毛色 */
-  const tailArt = worn.find(({ art }) => art.tail)?.art.tail;
+  /** 尾巴的顏色：穿了成套的衣服（連身裝）就照衣服的，不然照毛色花紋或預設毛色 */
+  const tailArt = worn.find(({ art }) => art.tail)?.art.tail ?? marks?.tail;
 
   return (
     <svg
@@ -316,19 +347,26 @@ export function CatBody({
           </g>
 
           <g className="cb-pet-bob">
-            <Leg leg={spec.legs[0]} index={0} far toe={toe} cloth={cloth} sleeve={legWear(0, spec.legs[0])} />
-            {spec.frontal ? null : <Leg leg={spec.legs[1]} index={1} far toe={toe} cloth={cloth} sleeve={legWear(1, spec.legs[1])} />}
+            <Leg leg={spec.legs[0]} index={0} far toe={toe} cloth={cloth} furLeg={marks?.legs} sleeve={legWear(0, spec.legs[0])} />
+            {spec.frontal ? null : (
+              <Leg leg={spec.legs[1]} index={1} far toe={toe} cloth={cloth} furLeg={marks?.legs} sleeve={legWear(1, spec.legs[1])} />
+            )}
 
             <g className="cb-pet-torso" transform={torsoFrame}>
               <path className="cb-pet-torso-shape" d={shape.outline} fill="var(--cat-fur)" />
               <path className="cb-pet-saddle" d={shape.saddle} fill="var(--cat-patch)" />
               {spec.frontal ? <path className="cb-pet-saddle" d={shape.saddle} transform={MIRROR} fill="var(--cat-patch)" /> : null}
-              {worn.some(({ art }) => art.wrap) ? (
+              {marks?.body || worn.some(({ art }) => art.wrap) ? (
                 <>
                   <clipPath id={clip}>
                     <path d={shape.outline} />
                   </clipPath>
                   <g clipPath={`url(#${clip})`} className="cb-pet-wrap">
+                    {marks?.body ? (
+                      <g className="cb-fur-marks cb-fur-body" transform={neckFrame}>
+                        {marks.body(geom)}
+                      </g>
+                    ) : null}
                     {worn.map(({ slot, art }) =>
                       art.wrap ? (
                         <g key={slot}>
@@ -359,7 +397,7 @@ export function CatBody({
 
             {/* 近側的腿：放下的畫在頭後面；從肩膀舉起來的手臂（shoulder）畫在頭前面，腳掌才碰得到臉頰 */}
             {nearLegs.filter(({ leg }) => !leg.shoulder).map(({ leg, index }) => (
-              <Leg key={index} leg={leg} index={index} far={false} toe={toe} cloth={cloth} sleeve={legWear(index, leg)} />
+              <Leg key={index} leg={leg} index={index} far={false} toe={toe} cloth={cloth} furLeg={marks?.legs} sleeve={legWear(index, leg)} />
             ))}
 
             <g transform={place(spec.head, HEAD_ORIGIN.x, HEAD_ORIGIN.y)}>
@@ -376,6 +414,7 @@ export function CatBody({
                 far={false}
                 toe={toe}
                 cloth={cloth}
+                furLeg={marks?.legs}
                 sleeve={legWear(index, leg)}
                 held={index === HELD_LEG ? held : undefined}
               />

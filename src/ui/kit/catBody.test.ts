@@ -9,7 +9,7 @@ import { ITEMS } from '../../core/constants/wardrobe';
 import type { Outfit, PetPose } from '../../core/types';
 import { svgBounds, type Bounds } from '../../testing/svgBounds';
 import { CatBody } from './CatBody';
-import { heldAxe } from './wardrobe/art';
+import { heldAxe, ITEM_ART } from './wardrobe/art';
 import { frontalBuild, torsoShape, type Cubic, type Pt } from './petShape';
 
 const POSES = Object.keys(PET_POSES) as PetPose[];
@@ -294,5 +294,91 @@ describe('cat body', () => {
     }
     // 沒有舉起來的手：不畫
     assert.ok(!renderToStaticMarkup(h(CatBody, { pose: 'upright', outfit: {}, held: axe })).includes('cb-pet-axe'));
+  });
+
+  it('patterned furs draw clipped marks with CSS-variable colors in every pose, while plain and default furs draw none', () => {
+    const furEntries = Object.entries(ITEM_ART).filter(([, art]) => art.kind === 'fur');
+    const patterned = furEntries.filter(([, art]) => art.kind === 'fur' && Boolean(art.marks));
+    const plain = furEntries.filter(([, art]) => art.kind === 'fur' && !art.marks);
+    assert.deepEqual(
+      patterned.map(([id]) => id),
+      ['fur-tabby', 'fur-silver', 'fur-tuxedo', 'fur-calico', 'fur-siamese'],
+    );
+    assert.deepEqual(
+      plain.map(([id]) => id),
+      ['fur-orange', 'fur-gray', 'fur-black', 'fur-gold', 'fur-milktea'],
+    );
+
+    /** 掃整段 SVG：驗證每個 cb-fur-marks 都在有效的 clipPath 裡、且裡面的 fill／stroke 都只用 var(--…) 或 none */
+    const inspectMarks = (markup: string, label: string) => {
+      const clipIds = new Set([...markup.matchAll(/<clipPath id="([^"]+)">/g)].map((m) => m[1]));
+      const stack: Array<{ clip: string | null; inMarks: boolean }> = [{ clip: null, inMarks: false }];
+      let markGroups = 0;
+      const badPaints: string[] = [];
+      for (const [, closing, tag, rest, selfClosing] of markup.matchAll(/<(\/)?([a-zA-Z][\w:-]*)((?:[^>"]|"[^"]*")*?)(\/)?>/g)) {
+        if (!tag) continue;
+        if (closing) {
+          if (stack.length > 1) stack.pop();
+          continue;
+        }
+        const top = stack[stack.length - 1] as { clip: string | null; inMarks: boolean };
+        const attrs = rest ?? '';
+        const classes = (/class="([^"]*)"/.exec(attrs)?.[1] ?? '').split(/\s+/);
+        const ownClip = /clip-path="url\(#([^)]+)\)"/.exec(attrs)?.[1] ?? null;
+        const clip = ownClip ?? top.clip;
+        const isMarkGroup = classes.includes('cb-fur-marks');
+        const isPaw = classes.includes('cb-fur-paw');
+        const inMarks = top.inMarks || isMarkGroup || isPaw;
+        if (isMarkGroup) {
+          markGroups += 1;
+          assert.ok(clip && clipIds.has(clip), `${label} 的花紋不在 clipPath 裡`);
+        }
+        if (inMarks) {
+          for (const [, attr, val] of attrs.matchAll(/\b(fill|stroke)="([^"]+)"/g)) {
+            if (val && val !== 'none' && !/^var\(--[\w-]+\)$/.test(val)) badPaints.push(`${attr}="${val}"`);
+          }
+        }
+        if (!selfClosing) stack.push({ clip, inMarks });
+      }
+      assert.deepEqual(badPaints, [], `${label} 花紋用了色碼`);
+      return markGroups;
+    };
+
+    for (const [id, art] of patterned) {
+      if (art.kind !== 'fur' || !art.marks) throw new Error(`${id} 缺少花紋`);
+      const { marks } = art;
+      for (const pose of POSES) {
+        const markup = render(pose, { fur: id });
+        const groups = inspectMarks(markup, `${id} × ${pose}`);
+        const expected = (marks.head ? 1 : 0) + (marks.body ? 1 : 0);
+        assert.equal(groups, expected, `${id} × ${pose} 花紋群組數`);
+        if (marks.legs?.kind === 'paw') {
+          const activeLegs = PET_POSES[pose].legs.filter((l) => l.len > 0).length;
+          assert.equal(count(markup, 'class="cb-fur-paw"'), activeLegs, `${id} × ${pose} 白腳尖數`);
+        }
+      }
+      // 面向左也是面向右的鏡像
+      const right = reach('stand', { fur: id }, 'right');
+      const left = reach('stand', { fur: id }, 'left');
+      assert.ok(Math.abs(left.minX - (PET_VIEW_W - right.maxX)) <= EPS, `${id} 左緣鏡像`);
+      assert.ok(Math.abs(left.maxX - (PET_VIEW_W - right.minX)) <= EPS, `${id} 右緣鏡像`);
+    }
+
+    // 沒穿毛色與素色毛色：完全不畫花紋元素
+    for (const outfit of [{}, ...plain.map(([fur]): Outfit => ({ fur }))]) {
+      for (const pose of POSES) {
+        const markup = render(pose, outfit);
+        assert.ok(!markup.includes('cb-fur-marks'), `${outfit.fur ?? '預設'} × ${pose} 不該有花紋`);
+        assert.ok(!markup.includes('cb-fur-paw'), `${outfit.fur ?? '預設'} × ${pose} 不該有腳尖花紋`);
+      }
+    }
+
+    // 穿連身裝時：成套尾巴照舊換成衣服色，包腳睡衣蓋住賓士的白腳尖，頭上花紋照畫
+    const tabbyDino = render('stand', { fur: 'fur-tabby', body: 'dino-suit' });
+    const tailHtml = /<g class="cb-pet-tail">(.*?)<\/g>/.exec(tabbyDino)?.[1] ?? '';
+    assert.ok(tailHtml.includes('var(--acc-leaf)'), '連身裝尾巴蓋過毛色尾巴');
+    assert.ok(tabbyDino.includes('cb-fur-head'), '穿連身裝時臉上花紋仍在');
+    const tuxPajama = render('stand', { fur: 'fur-tuxedo', body: 'pajama-suit' });
+    assert.equal(count(tuxPajama, 'class="cb-fur-paw"'), 0, '包腳睡衣蓋住白腳尖');
   });
 });

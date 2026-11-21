@@ -63,6 +63,20 @@ export interface BodyArt {
   };
 }
 
+/** 毛色的花紋層（畫面的東西，不進 core/types.ts）。每種毛色畫哪些部位只定義在 ITEM_ART，Cat／CatBody 只讀表。 */
+export interface FurMarks {
+  /** 左右耳外框的顏色（[左耳, 右耳]）；沒給就沿用原本的 var(--cat-patch) */
+  ears?: readonly [string, string];
+  /** 畫在臉底色之上、五官之下，用頭的橢圓裁切（頭像 64×64 座標） */
+  head?: ReactNode;
+  /** 畫在軀幹底色與背花之上、衣服之下，用軀幹輪廓裁切（座標同 BodyArt.wrap） */
+  body?: (body: BodyGeom) => ReactNode;
+  /** 腿上的花紋（沒穿包腳連身裝時畫）：full＝整條腿換色（暹羅）、paw＝腳尖白色（賓士） */
+  legs?: { kind: 'full' | 'paw'; fill: string };
+  /** 尾巴顏色與環紋（沒穿成套連身裝時用；格式同 BodyArt.tail） */
+  tail?: BodyArt['tail'];
+}
+
 export type ItemArt =
   /** 圖層：node 畫在貓的座標裡；box 是單獨顯示圖示時的 viewBox */
   | {
@@ -76,8 +90,8 @@ export type ItemArt =
       /** 背景配件的全身版（身體座標，地面在 PET_GROUND）：畫在整隻貓後面。沒有就把頭像的圖放大墊在後面 */
       stage?: ReactNode;
     }
-  /** 毛色：套在貓外層的 class（色票在 theme.css） */
-  | { kind: 'fur'; className: string };
+  /** 毛色：套在貓外層的 class（色票在 theme.css），選填的花紋畫在頭、身體、腿、尾巴 */
+  | { kind: 'fur'; className: string; marks?: FurMarks };
 
 const LINE = 'var(--cat-line)';
 const n2 = (v: number) => Math.round(v * 100) / 100;
@@ -225,10 +239,16 @@ function legCover(fill: string, len: number, cuff?: string): ReactNode {
   );
 }
 
-/** 一塊不規則的圓斑（乳牛的花色）：中心 x,y、大約的半徑 r */
+/** 一塊不規則的圓斑（乳牛裝、三花貓共用）：中心 x,y、大約的半徑 r */
 function blobPath(x: number, y: number, r: number): string {
   const p = (dx: number, dy: number) => `${n2(x + dx * r)} ${n2(y + dy * r)}`;
   return `M${p(1, 0)} Q${p(1.05, 0.85)} ${p(0.05, 0.8)} Q${p(-1.1, 0.75)} ${p(-0.9, -0.05)} Q${p(-0.95, -1)} ${p(0, -0.85)} Q${p(0.95, -1.1)} ${p(1, 0)} Z`;
+}
+
+/** 從背線往身體裡面彎進去的楔形條紋（老虎裝、虎斑貓共用） */
+function stripeWedgePath(x: number, edge: number, tip: number, half: number, lean: number): string {
+  const mid = (edge + tip) / 2;
+  return `M${n2(x + half)} ${n2(edge)} Q${n2(x + 0.4)} ${n2(mid)} ${n2(x - lean)} ${n2(tip)} Q${n2(x - 1.2)} ${n2(mid)} ${n2(x - half)} ${n2(edge)} Z`;
 }
 
 /**
@@ -241,16 +261,9 @@ function onesiePattern(theme: KigurumiTheme, body: BodyGeom, side: number): Reac
   if (theme.pattern === 'stripes') {
     const edge = side * (body.back + CLOTH_MARGIN);
     const tip = side * body.back * ONESIE.stripeTip;
-    return ONESIE.stripes.map((at) => {
-      const x = -body.len * at;
-      return (
-        <path
-          key={at}
-          d={`M${n2(x + ONESIE.stripeHalf)} ${n2(edge)} Q${n2(x + 0.4)} ${n2((edge + tip) / 2)} ${n2(x - ONESIE.stripeLean)} ${n2(tip)} Q${n2(x - 1.2)} ${n2((edge + tip) / 2)} ${n2(x - ONESIE.stripeHalf)} ${n2(edge)} Z`}
-          fill={fill}
-        />
-      );
-    });
+    return ONESIE.stripes.map((at) => (
+      <path key={at} d={stripeWedgePath(-body.len * at, edge, tip, ONESIE.stripeHalf, ONESIE.stripeLean)} fill={fill} />
+    ));
   }
   if (theme.pattern === 'patches') {
     return ONESIE.patches.map(([at, up, r]) => <path key={at} d={blobPath(-body.len * at, side * body.back * up, r)} fill={fill} />);
@@ -628,6 +641,105 @@ function wingsFrontBehind(body: BodyGeom): ReactNode {
     </g>
   );
 }
+
+/** 虎斑貓背上三條弧形紋的比例（位置、半寬、尖端往後倒多少、尖端長到背半厚的幾成） */
+const FUR_TABBY = { stripes: [0.28, 0.5, 0.72], half: 2.2, lean: 2, tip: 0.12 } as const;
+
+/** 虎斑／銀虎斑共用的花紋：額頭三條 M 字紋、兩頰各兩條細紋、背上三條弧形紋、尾巴環紋（顏色由 theme.css 換） */
+const TABBY_MARKS: FurMarks = {
+  ears: ['var(--cat-fur-far)', 'var(--cat-fur-far)'],
+  head: (
+    <g fill="none" stroke="var(--cat-mark)" strokeLinecap="round">
+      <path d="M25.8 19.2 Q27 23.8 27.6 27.6 M32 18.2 V28 M38.2 19.2 Q37 23.8 36.4 27.6" strokeWidth="2.6" />
+      <path d="M6.5 36.5 Q10.5 37.5 14 39 M6.5 41.8 Q10.5 42.2 13.8 43" strokeWidth="2" />
+      <path d="M57.5 36.5 Q53.5 37.5 50 39 M57.5 41.8 Q53.5 42.2 50.2 43" strokeWidth="2" />
+    </g>
+  ),
+  body: (body) => {
+    const sides = body.frontal ? [-1, 1] : [-1];
+    return (
+      <g>
+        {sides.map((side) => {
+          const edge = side * (body.back + CLOTH_MARGIN);
+          const tip = side * body.back * FUR_TABBY.tip;
+          return (
+            <g key={side}>
+              {FUR_TABBY.stripes.map((at) => (
+                <path
+                  key={at}
+                  d={stripeWedgePath(-body.len * at, edge, tip, FUR_TABBY.half, FUR_TABBY.lean)}
+                  fill="var(--cat-mark)"
+                />
+              ))}
+            </g>
+          );
+        })}
+      </g>
+    );
+  },
+  tail: { fill: 'var(--cat-fur-far)', spots: 'var(--cat-mark)', stripes: true },
+};
+
+/** 賓士貓花紋：白色口鼻與下巴、白胸口、四隻腳尖白色 */
+const TUXEDO_MARKS: FurMarks = {
+  head: (
+    <path
+      d="M32 35.5 Q29.5 43.5 20 46 Q13 48.5 11.5 55 L14 60 H50 L52.5 55 Q51 48.5 44 46 Q34.5 43.5 32 35.5 Z"
+      fill="var(--cat-white)"
+    />
+  ),
+  body: (body) =>
+    body.frontal ? (
+      <ellipse cx={n2(-body.len * 0.28)} cy="0" rx={n2(body.len * 0.36)} ry={n2(body.back * 0.44)} fill="var(--cat-white)" />
+    ) : (
+      <ellipse
+        cx={n2(-body.len * 0.24)}
+        cy={n2(body.belly * 0.76)}
+        rx={n2(body.len * 0.34)}
+        ry={n2(body.belly * 0.58)}
+        fill="var(--cat-white)"
+      />
+    ),
+  legs: { kind: 'paw', fill: 'var(--cat-white)' },
+};
+
+/** 三花貓花紋：左耳與左頭側橘斑、右耳與右頭側黑斑、背上一塊橘一塊黑、橘色尾巴 */
+const CALICO_MARKS: FurMarks = {
+  ears: ['var(--cat-mark)', 'var(--cat-mark-2)'],
+  head: (
+    <g>
+      <path d="M6 42 Q6 18 31 18 Q28 29 21 33 Q13 36 10 46 Q7 45 6 42 Z" fill="var(--cat-mark)" />
+      <path d="M58 40 Q58 18 35 18 Q39 27 45 31 Q52 34 55 43 Q57 42 58 40 Z" fill="var(--cat-mark-2)" />
+    </g>
+  ),
+  body: (body) =>
+    body.frontal ? (
+      <g>
+        <path d={blobPath(-body.len * 0.54, -body.back * 0.68, body.back * 0.42)} fill="var(--cat-mark)" />
+        <path d={blobPath(-body.len * 0.54, -body.back * 0.68, body.back * 0.42)} transform="scale(1 -1)" fill="var(--cat-mark-2)" />
+      </g>
+    ) : (
+      <g>
+        <path d={blobPath(-body.len * 0.34, -body.back * 0.58, body.back * 0.52)} fill="var(--cat-mark)" />
+        <path d={blobPath(-body.len * 0.74, -body.back * 0.44, body.back * 0.52)} fill="var(--cat-mark-2)" />
+      </g>
+    ),
+  tail: { fill: 'var(--cat-mark)' },
+};
+
+/** 暹羅貓花紋：深咖啡色耳朵、臉中央（鼻子周圍的橢圓，不蓋住眼睛）、四隻腳、尾巴 */
+const SIAMESE_MARKS: FurMarks = {
+  ears: ['var(--cat-mark)', 'var(--cat-mark)'],
+  // 臉中央的面罩：外圈淡淡地暈到兩眼之間，內圈包住鼻子與嘴；用中間色，五官照舊是深色、看得清楚
+  head: (
+    <g>
+      <ellipse cx="32" cy="44" rx="13" ry="11" fill="var(--cat-mark-2)" opacity="0.5" />
+      <ellipse cx="32" cy="46" rx="8.5" ry="6.5" fill="var(--cat-mark-2)" />
+    </g>
+  ),
+  legs: { kind: 'full', fill: 'var(--cat-mark)' },
+  tail: { fill: 'var(--cat-mark)' },
+};
 
 export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   // ── 舊集章配件（沿用原本的造型）──────────────────────────
@@ -1479,4 +1591,10 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'fur-gray': { kind: 'fur', className: 'cb-fur-gray' },
   'fur-black': { kind: 'fur', className: 'cb-fur-black' },
   'fur-gold': { kind: 'fur', className: 'cb-fur-gold' },
+  'fur-milktea': { kind: 'fur', className: 'cb-fur-milktea' },
+  'fur-tabby': { kind: 'fur', className: 'cb-fur-tabby', marks: TABBY_MARKS },
+  'fur-silver': { kind: 'fur', className: 'cb-fur-silver', marks: TABBY_MARKS },
+  'fur-tuxedo': { kind: 'fur', className: 'cb-fur-tuxedo', marks: TUXEDO_MARKS },
+  'fur-calico': { kind: 'fur', className: 'cb-fur-calico', marks: CALICO_MARKS },
+  'fur-siamese': { kind: 'fur', className: 'cb-fur-siamese', marks: SIAMESE_MARKS },
 };
