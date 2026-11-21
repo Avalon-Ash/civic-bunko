@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "command(npm run lint)",
+      "command(npm test)",
+      "command(npm run build)",
+      "command(git show d51b852:src/ui/pet/PetLayer.tsx)"
+    ]
+  }
+}
