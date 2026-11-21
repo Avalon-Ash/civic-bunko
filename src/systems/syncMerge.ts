@@ -1,7 +1,10 @@
 import type {
+  CatId,
+  CatLook,
   CatProfile,
   DayKey,
   ExamRecord,
+  Outfit,
   Progress,
   QuestId,
   QuestionId,
@@ -244,4 +247,90 @@ export function mergeCatProfile(a: CatProfile | null, b: CatProfile | null): Cat
 export function sameCatProfile(a: CatProfile | null, b: CatProfile | null): boolean {
   if (a === null || b === null) return a === b;
   return a.name === b.name && a.at === b.at;
+}
+
+/** 新的改動時間至少比目前記錄的晚這麼多毫秒 */
+const CHANGE_TIME_STEP_MS = 1;
+
+/**
+ * 計算新的改動時間：取「現在」與「前一次記錄時間 + 1ms」較晚的那個。
+ * 另一台時鐘跑得比較快時，同步拉下來後在這台再改，時間一定比拉下來的晚，不會下次同步又被蓋回去。
+ */
+export function nextChangeTime(previous: string | undefined, now: () => Date): string {
+  const prevMs = previous ? Date.parse(previous) : Number.NaN;
+  const after = Number.isNaN(prevMs) ? 0 : prevMs + CHANGE_TIME_STEP_MS;
+  return new Date(Math.max(now().getTime(), after)).toISOString();
+}
+
+function outfitKey(outfit: Outfit): string {
+  const entries = Object.entries(outfit)
+    .filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+    .sort(([a], [b]) => compareText(a, b));
+  return JSON.stringify(entries);
+}
+
+/**
+ * 合併兩台裝置的小貓長相：改動時間較新的那一包整包留下（含全部脫掉的空穿著）。
+ * 時間相同時依部位排序後的穿著字串與時間字串裁決，保證交換律與結合律。
+ */
+export function mergeCatLook(a: CatLook | null, b: CatLook | null): CatLook | null {
+  if (a === null) return b;
+  if (b === null) return a;
+  const byTime = compareTimestamp(a.at, b.at);
+  if (byTime !== 0) return byTime > 0 ? a : b;
+  const byOutfit = compareText(outfitKey(a.outfit), outfitKey(b.outfit));
+  if (byOutfit !== 0) return byOutfit > 0 ? a : b;
+  return compareText(a.at, b.at) >= 0 ? a : b;
+}
+
+export function sameCatLook(a: CatLook | null, b: CatLook | null): boolean {
+  if (a === null || b === null) return a === b;
+  return a.at === b.at && outfitKey(a.outfit) === outfitKey(b.outfit);
+}
+
+function mergeCatRecord<T>(
+  a: Readonly<Record<CatId, T>> | undefined,
+  b: Readonly<Record<CatId, T>> | undefined,
+  mergeOne: (left: T | null, right: T | null) => T | null,
+): Record<CatId, T> {
+  const ids = mergeSortedUnique(Object.keys(a ?? {}), Object.keys(b ?? {}));
+  const out: Record<CatId, T> = {};
+  for (const id of ids) {
+    const merged = mergeOne(a?.[id] ?? null, b?.[id] ?? null);
+    if (merged !== null) {
+      out[id] = merged;
+    }
+  }
+  return out;
+}
+
+/** 逐隻合併小貓名字（鍵依字典序排序），每隻規則同 mergeCatProfile。 */
+export function mergeCatProfiles(
+  local: Readonly<Record<CatId, CatProfile>> | undefined,
+  remote: Readonly<Record<CatId, CatProfile>> | undefined,
+): Record<CatId, CatProfile> {
+  return mergeCatRecord(local, remote, mergeCatProfile);
+}
+
+/** 逐隻合併小貓長相（鍵依字典序排序），每隻規則同 mergeCatLook。 */
+export function mergeCatLooks(
+  local: Readonly<Record<CatId, CatLook>> | undefined,
+  remote: Readonly<Record<CatId, CatLook>> | undefined,
+): Record<CatId, CatLook> {
+  return mergeCatRecord(local, remote, mergeCatLook);
+}
+
+/** 兩份逐隻小貓資料表內容是否相同（忽略鍵順序）。 */
+export function sameCatRecord<T>(
+  a: Readonly<Record<CatId, T>> | undefined,
+  b: Readonly<Record<CatId, T>> | undefined,
+  sameOne: (left: T | null, right: T | null) => boolean,
+): boolean {
+  const keysA = Object.keys(a ?? {});
+  const keysB = Object.keys(b ?? {});
+  if (keysA.length !== keysB.length) return false;
+  for (const id of keysA) {
+    if (!sameOne(a?.[id] ?? null, b?.[id] ?? null)) return false;
+  }
+  return true;
 }

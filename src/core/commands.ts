@@ -1,3 +1,4 @@
+import { adoptCat, setCatOuting, setHouseCatName, setLeader } from '../systems/house';
 import { importProgress, resetProgress } from '../systems/persistence';
 import {
   answerQuestion,
@@ -17,7 +18,6 @@ import {
   markChangelogSeen,
   setAccessory,
   setBilingual,
-  setCatName,
   setShuffleOptions,
   setSound,
   setWeather,
@@ -117,7 +117,16 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       markChangelogSeen(world, cmd.id);
       break;
     case 'setCatName':
-      setCatName(world, cmd.name, now);
+      setHouseCatName(world, cmd.name, cmd.cat, now);
+      break;
+    case 'adoptCat':
+      adoptCat(world, { name: cmd.name, fur: cmd.fur }, now);
+      break;
+    case 'setCatOuting':
+      setCatOuting(world, cmd.cat, cmd.on);
+      break;
+    case 'setLeader':
+      setLeader(world, cmd.cat);
       break;
     case 'setBilingual':
       setBilingual(world, cmd.on);
@@ -148,7 +157,7 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       buyItem(world, cmd.id, now);
       break;
     case 'wear':
-      wear(world, cmd.slot, cmd.item);
+      wear(world, cmd.slot, cmd.item, cmd.cat, now);
       break;
     case 'scorch':
       scorchSpot(world, cmd.spot);

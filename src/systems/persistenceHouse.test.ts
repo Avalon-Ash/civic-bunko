@@ -34,9 +34,7 @@ type RawSave = { settings: { wardrobe: Record<string, unknown> } };
 
 describe('persistence: cat house (save-v7-house.json)', () => {
   it('house golden samples are unchanged', () => {
-    const hash = (name: string) => createHash('sha256').update(golden(name).replace(/
-/g, '
-')).digest('hex');
+    const hash = (name: string) => createHash('sha256').update(golden(name).replace(/\r\n/g, '\n')).digest('hex');
     assert.equal(hash('save-v7-house.json'), 'fdc8abc7988212cb12f10bc4a5c16a2eb4d755cec3d0187fd6c780fbf9afd32f');
     assert.equal(hash('sync-v1-house.json'), '85c910bcfb8d1ed17753b34af7312da3a33cf42db84f5925e66e9f8755d65979');
   });

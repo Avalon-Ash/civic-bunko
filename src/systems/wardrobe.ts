@@ -1,4 +1,5 @@
 import { DAILY_GOAL_QUESTIONS } from '../core/constants/daily';
+import { HOUSE_ADOPT } from '../core/constants/house';
 import {
   ACHIEVEMENTS,
   DAILY_SALE,
@@ -9,7 +10,6 @@ import {
   QUESTS,
   QUEST_ROUND_MIN,
   SCORCH,
-  SLOTS,
   SPRINT_DAYS,
   WARDROBE_START_DAY,
   WELCOME_FISH,
@@ -19,8 +19,10 @@ import type {
   Achievement,
   AchievementId,
   AchievementMetric,
+  CatId,
   Celebration,
   DayKey,
+  HouseCatSave,
   ItemId,
   Outfit,
   OutfitSpecial,
@@ -34,13 +36,16 @@ import type {
 import type { World } from '../core/world';
 import { countTotalStamps, isValidDayKey, toDayKey, unlockedAccessories } from './daily';
 import { addDaysLocal, toLocalDateString } from './date';
+import { wearCat } from './house';
 import { cleanRepairs, cleanSaved, type SyncWardrobe } from './syncMerge';
 
 const MS_PER_DAY = 86_400_000;
 const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
-const SLOT_ID_SET = new Set<string>(SLOTS.map((s) => s.id));
 const ITEM_BY_ID = new Map<ItemId, WardrobeItem>(ITEMS.map((item) => [item.id, item]));
+const ADOPT_PRICE_BY_OWNED = new Map<ItemId, number>(
+  HOUSE_ADOPT.map((entry) => [entry.owned, entry.price]),
+);
 const ACHIEVEMENT_BY_ID = new Map<AchievementId, Achievement>(
   ACHIEVEMENTS.map((ach) => [ach.id, ach]),
 );
@@ -293,6 +298,11 @@ export function fishBalance(world: World, _now?: Date): FishBalanceView {
     const item = ITEM_BY_ID.get(id);
     if (item) {
       spent += paidFor(item, world.settings.wardrobe?.saved);
+      continue;
+    }
+    const adoptPrice = ADOPT_PRICE_BY_OWNED.get(id);
+    if (adoptPrice !== undefined) {
+      spent += adoptPrice;
     }
   }
 
@@ -316,22 +326,27 @@ export function fishBalance(world: World, _now?: Date): FishBalanceView {
   };
 }
 
+/** 過濾原始穿著：只留部位相符且已擁有的配件（每隻小貓共用這套過濾規則）。 */
+export function filterOutfit(world: World, raw: Outfit): Outfit {
+  const owned = ownedItems(world);
+  const out: Outfit = {};
+  for (const [slot, itemId] of Object.entries(raw) as Array<
+    [SlotId, ItemId | undefined]
+  >) {
+    if (!itemId) continue;
+    const item = ITEM_BY_ID.get(itemId);
+    if (!item || item.slot !== slot) continue;
+    if (!owned.has(itemId)) continue;
+    out[slot] = itemId;
+  }
+  return out;
+}
+
 /** 讀取貓咪目前各部位穿著；有 wardrobe.outfit 就依它過濾，否則沿用已解鎖的 settings.accessory。 */
 export function currentOutfit(world: World): Outfit {
   const savedOutfit = world.settings.wardrobe?.outfit;
   if (savedOutfit !== undefined) {
-    const owned = ownedItems(world);
-    const out: Outfit = {};
-    for (const [slot, itemId] of Object.entries(savedOutfit) as Array<
-      [SlotId, ItemId | undefined]
-    >) {
-      if (!itemId) continue;
-      const item = ITEM_BY_ID.get(itemId);
-      if (!item || item.slot !== slot) continue;
-      if (!owned.has(itemId)) continue;
-      out[slot] = itemId;
-    }
-    return out;
+    return filterOutfit(world, savedOutfit);
   }
 
   const legacy = world.settings.accessory ?? null;
@@ -460,19 +475,47 @@ function scorchField(scorch: readonly string[] | undefined): { scorch?: string[]
   return scorch && scorch.length > 0 ? { scorch: [...new Set(scorch)] } : {};
 }
 
-function commitWardrobe(
+function catsField(
+  cats: Readonly<Record<CatId, HouseCatSave>> | undefined,
+): { cats?: Record<CatId, HouseCatSave> } {
+  if (!cats) return {};
+  const entries = Object.entries(cats);
+  if (entries.length === 0) return {};
+  const out: Record<CatId, HouseCatSave> = {};
+  for (const [id, entry] of entries) {
+    out[id] = {
+      ...(entry.name !== undefined ? { name: entry.name } : {}),
+      ...(entry.nameAt !== undefined ? { nameAt: entry.nameAt } : {}),
+      ...(entry.outfit !== undefined ? { outfit: { ...entry.outfit } } : {}),
+      ...(entry.outfitAt !== undefined ? { outfitAt: entry.outfitAt } : {}),
+    };
+  }
+  return { cats: out };
+}
+
+export interface WardrobePatch {
+  owned?: ItemId[];
+  /** 這次特價買的那一件省了多少 */
+  savedOn?: { id: ItemId; amount: number };
+  questCompleted?: { day: DayKey; questId: QuestId };
+  outfit?: Outfit;
+  /** 原本那隻的穿著改動時間（ISO） */
+  outfitAt?: string;
+  /** 領養的小貓資料表 */
+  cats?: Record<CatId, HouseCatSave>;
+  /** 帶出門的小貓清單 */
+  outing?: CatId[];
+  /** 陪我刷題的小貓 ID */
+  leader?: CatId;
+  /** 燒焦的地方換成這份清單 */
+  scorch?: string[];
+  /** 修過幾次燒焦（只會變多） */
+  repairs?: number;
+}
+
+export function commitWardrobe(
   world: World,
-  patch?: {
-    owned?: ItemId[];
-    /** 這次特價買的那一件省了多少 */
-    savedOn?: { id: ItemId; amount: number };
-    questCompleted?: { day: DayKey; questId: QuestId };
-    outfit?: Outfit;
-    /** 燒焦的地方換成這份清單 */
-    scorch?: string[];
-    /** 修過幾次燒焦（只會變多） */
-    repairs?: number;
-  },
+  patch?: WardrobePatch,
 ): boolean {
   const prev = world.settings.wardrobe;
   const prevAchievements = prev?.achievements ?? [];
@@ -506,12 +549,25 @@ function commitWardrobe(
     questAdded ||
     patch?.owned !== undefined ||
     patch?.outfit !== undefined ||
+    patch?.outfitAt !== undefined ||
+    patch?.cats !== undefined ||
+    patch?.outing !== undefined ||
+    patch?.leader !== undefined ||
     patch?.scorch !== undefined ||
     patch?.repairs !== undefined;
 
   if (!changed) {
     return false;
   }
+
+  const nextOutfitAt = patch?.outfitAt !== undefined ? patch.outfitAt : prev?.outfitAt;
+  const nextOuting =
+    patch?.outing !== undefined
+      ? [...patch.outing]
+      : prev?.outing !== undefined
+        ? [...prev.outing]
+        : undefined;
+  const nextLeader = patch?.leader !== undefined ? patch.leader : prev?.leader;
 
   const nextWardrobe: WardrobeState = {
     owned: patch?.owned ? [...patch.owned] : [...(prev?.owned ?? [])],
@@ -531,6 +587,10 @@ function commitWardrobe(
       : prev?.outfit !== undefined
         ? { outfit: { ...prev.outfit } }
         : {}),
+    ...(nextOutfitAt !== undefined ? { outfitAt: nextOutfitAt } : {}),
+    ...catsField(patch?.cats !== undefined ? patch.cats : prev?.cats),
+    ...(nextOuting !== undefined ? { outing: nextOuting } : {}),
+    ...(nextLeader !== undefined ? { leader: nextLeader } : {}),
   };
 
   world.settings = {
@@ -544,10 +604,9 @@ function commitWardrobe(
   return true;
 }
 
-/** 套用同步合併後的衣櫥資料，保留本機 outfit、scorch 並發出 settingsChanged。 */
+/** 套用同步合併後的衣櫥資料，保留本機 outfit、outfitAt、cats、outing、leader、scorch 並發出 settingsChanged。 */
 export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
-  const prevOutfit = world.settings.wardrobe?.outfit;
-  const prevScorch = world.settings.wardrobe?.scorch;
+  const prev = world.settings.wardrobe;
   const nextQuests: Record<DayKey, QuestId[]> = {};
   for (const [day, ids] of Object.entries(merged.quests)) {
     nextQuests[day] = [...ids];
@@ -561,8 +620,12 @@ export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
       quests: nextQuests,
       ...savedField(merged.saved),
       ...repairsField(merged.repairs),
-      ...scorchField(prevScorch),
-      ...(prevOutfit !== undefined ? { outfit: { ...prevOutfit } } : {}),
+      ...scorchField(prev?.scorch),
+      ...(prev?.outfit !== undefined ? { outfit: { ...prev.outfit } } : {}),
+      ...(prev?.outfitAt !== undefined ? { outfitAt: prev.outfitAt } : {}),
+      ...catsField(prev?.cats),
+      ...(prev?.outing !== undefined ? { outing: [...prev.outing] } : {}),
+      ...(prev?.leader !== undefined ? { leader: prev.leader } : {}),
     },
   };
   world.bus.emit({
@@ -621,39 +684,15 @@ export function repairScorch(world: World, spot: string): boolean {
   });
 }
 
-/** 穿脫指定部位的配件；不改動舊的 settings.accessory。 */
-export function wear(world: World, slot: SlotId, item: ItemId | null): boolean {
-  if (!SLOT_ID_SET.has(slot)) {
-    return false;
-  }
-  if (item !== null) {
-    const def = ITEM_BY_ID.get(item);
-    if (!def || def.slot !== slot) {
-      return false;
-    }
-    if (!ownedItems(world).has(item)) {
-      return false;
-    }
-  }
-
-  const hasSavedOutfit = world.settings.wardrobe?.outfit !== undefined;
-  const baseOutfit: Outfit = hasSavedOutfit
-    ? { ...world.settings.wardrobe?.outfit }
-    : currentOutfit(world);
-
-  if (item === null) {
-    if (!(slot in baseOutfit)) {
-      return false;
-    }
-    delete baseOutfit[slot];
-  } else {
-    if (hasSavedOutfit && baseOutfit[slot] === item) {
-      return false;
-    }
-    baseOutfit[slot] = item;
-  }
-
-  return commitWardrobe(world, { outfit: baseOutfit });
+/** 穿脫指定部位的配件（cat 未指定＝原本那隻）；不改動舊的 settings.accessory。 */
+export function wear(
+  world: World,
+  slot: SlotId,
+  item: ItemId | null,
+  cat?: CatId,
+  now: () => Date = defaultNow,
+): boolean {
+  return wearCat(world, slot, item, cat, now);
 }
 
 /** 清空畫面待顯示的慶祝清單。 */

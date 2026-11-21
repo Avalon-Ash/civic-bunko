@@ -4,6 +4,7 @@ import { EXAM_HISTORY_MAX } from '../core/constants/exam';
 import type { AccessoryId, CatProfile, ExamRecord, Settings, ThemeChoice } from '../core/types';
 import type { World } from '../core/world';
 import { unlockedAccessories } from './daily';
+import { nextChangeTime } from './syncMerge';
 
 /** 更新佈景主題設定並發出 settingsChanged。 */
 export function setTheme(world: World, theme: ThemeChoice): void {
@@ -184,9 +185,6 @@ function withCatProfile(settings: Settings, profile: CatProfile): Settings {
   };
 }
 
-/** 新的改動時間至少比目前記錄的晚這麼多毫秒 */
-const CAT_PROFILE_STEP_MS = 1;
-
 /**
  * 幫小貓取名：清理後存起來，並記下改動時間（同步時用它判斷哪一台的比較新）。
  * 清完是空的＝改回沒取名（也算一次改動）。跟現在一樣就不動作、時間也不更新。
@@ -196,9 +194,7 @@ const CAT_PROFILE_STEP_MS = 1;
 export function setCatName(world: World, name: string, now: () => Date): void {
   const next = cleanCatName(name);
   if (next === cleanCatName(world.settings.catName)) return;
-  const previous = catProfileOf(world.settings)?.at ?? '';
-  const after = previous === '' ? 0 : Date.parse(previous) + CAT_PROFILE_STEP_MS;
-  const at = new Date(Math.max(now().getTime(), after)).toISOString();
+  const at = nextChangeTime(catProfileOf(world.settings)?.at, now);
   world.settings = withCatProfile(world.settings, { name: next, at });
   world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
 }

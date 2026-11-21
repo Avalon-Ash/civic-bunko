@@ -1,15 +1,19 @@
 import { ACCESSORIES } from '../core/constants/daily';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
+import { HOUSE_CAT_ID } from '../core/constants/house';
 import { STORAGE_KEY } from '../core/constants/round';
 import { READ_PASSES_DEFAULT } from '../core/constants/study';
 import { SLOTS } from '../core/constants/wardrobe';
 import { catProfileOf } from './catBrain';
+import { isAdoptedCatId } from './house';
 import { bumpStore, subscribe } from '../core/store';
 import type {
   AskFilter,
+  CatId,
   Choice,
   DayKey,
   ExamRecord,
+  HouseCatSave,
   Outfit,
   Progress,
   QuestId,
@@ -310,6 +314,18 @@ export function parseExamHistory(value: unknown): ExamRecord[] | undefined {
   return valid;
 }
 
+/** 解析並清理穿著物件：不是物件回傳 undefined；只留部位認得且值為字串的項目。 */
+export function parseOutfit(value: unknown): Outfit | undefined {
+  if (!isRecord(value)) return undefined;
+  const cleanOutfit: Outfit = {};
+  for (const [slot, itemId] of Object.entries(value)) {
+    if (SLOT_ID_SET.has(slot) && typeof itemId === 'string') {
+      cleanOutfit[slot as SlotId] = itemId;
+    }
+  }
+  return cleanOutfit;
+}
+
 /** 解析並正規化衣櫥狀態；不是物件回傳 undefined，壞掉的子欄位只丟那一小項。 */
 export function parseWardrobe(value: unknown): WardrobeState | undefined {
   if (!isRecord(value)) return undefined;
@@ -326,16 +342,50 @@ export function parseWardrobe(value: unknown): WardrobeState | undefined {
     }
   }
 
-  let outfit: Outfit | undefined;
-  if (isRecord(value.outfit)) {
-    const cleanOutfit: Outfit = {};
-    for (const [slot, itemId] of Object.entries(value.outfit)) {
-      if (SLOT_ID_SET.has(slot) && typeof itemId === 'string') {
-        cleanOutfit[slot as SlotId] = itemId;
+  const outfit = parseOutfit(value.outfit);
+  const outfitAt = typeof value.outfitAt === 'string' ? value.outfitAt : undefined;
+
+  let cats: Record<CatId, HouseCatSave> | undefined;
+  if (isRecord(value.cats)) {
+    const cleanCats: Record<CatId, HouseCatSave> = {};
+    for (const [id, entry] of Object.entries(value.cats)) {
+      if (!isAdoptedCatId(id) || !isRecord(entry)) continue;
+      const cleanEntry: HouseCatSave = {};
+      if (typeof entry.name === 'string') {
+        cleanEntry.name = entry.name;
+      }
+      if (typeof entry.nameAt === 'string') {
+        cleanEntry.nameAt = entry.nameAt;
+      }
+      const entryOutfit = parseOutfit(entry.outfit);
+      if (entryOutfit !== undefined) {
+        cleanEntry.outfit = entryOutfit;
+      }
+      if (typeof entry.outfitAt === 'string') {
+        cleanEntry.outfitAt = entry.outfitAt;
+      }
+      cleanCats[id] = cleanEntry;
+    }
+    if (Object.keys(cleanCats).length > 0) {
+      cats = cleanCats;
+    }
+  }
+
+  let outing: CatId[] | undefined;
+  if (Array.isArray(value.outing)) {
+    const seen = new Set<CatId>();
+    const cleanOuting: CatId[] = [];
+    for (const item of value.outing) {
+      if (typeof item === 'string' && HOUSE_CAT_ID.test(item) && !seen.has(item)) {
+        seen.add(item);
+        cleanOuting.push(item);
       }
     }
-    outfit = cleanOutfit;
+    outing = cleanOuting;
   }
+
+  const leader =
+    typeof value.leader === 'string' && HOUSE_CAT_ID.test(value.leader) ? value.leader : undefined;
 
   // 特價省下的：只收「配件 ID → 正數」，其他丟掉；一筆都沒有就不留這欄
   const saved = isRecord(value.saved)
@@ -358,6 +408,10 @@ export function parseWardrobe(value: unknown): WardrobeState | undefined {
     ...(repairs ? { repairs } : {}),
     ...(scorch.length > 0 ? { scorch } : {}),
     ...(outfit !== undefined ? { outfit } : {}),
+    ...(outfitAt !== undefined ? { outfitAt } : {}),
+    ...(cats !== undefined ? { cats } : {}),
+    ...(outing !== undefined ? { outing } : {}),
+    ...(leader !== undefined ? { leader } : {}),
   };
 }
 

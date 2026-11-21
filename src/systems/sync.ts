@@ -7,7 +7,10 @@ import {
   SYNC_VISIBILITY_MIN_INTERVAL_MS,
 } from '../core/constants/sync';
 import { EXAM_HISTORY_MAX } from '../core/constants/exam';
+import { HOUSE_CAT_ID } from '../core/constants/house';
 import type {
+  CatId,
+  CatLook,
   CatProfile,
   DayKey,
   ExamRecord,
@@ -19,7 +22,14 @@ import type {
 import type { World } from '../core/world';
 import { parseDaysRecord } from './daily';
 import {
+  applySyncedHouse,
+  isAdoptedCatId,
+  localHouseCatLooks,
+  localHouseCatProfiles,
+} from './house';
+import {
   parseExamHistory,
+  parseOutfit,
   parseProgressEntry,
   parseWardrobe,
   type StorageLike,
@@ -28,13 +38,17 @@ import { catProfileOf, parseCatProfile } from './catBrain';
 import { applySyncedCatProfile, applySyncedSettings } from './settings';
 import { base64ToUtf8, decodeSyncCode, utf8ToBase64, validateSyncCredentials } from './syncCode';
 import {
+  mergeCatLooks,
   mergeCatProfile,
+  mergeCatProfiles,
   mergeCardsSeen,
   mergeDays,
   mergeExamHistory,
   mergeProgress,
   mergeWardrobe,
+  sameCatLook,
   sameCatProfile,
+  sameCatRecord,
   cleanRepairs,
   sameSaved,
   toSyncWardrobe,
@@ -77,6 +91,10 @@ interface RemoteContent {
   wardrobe: SyncWardrobe;
   /** 小貓的個人設定（名字＋改動時間）；舊版同步檔沒有這欄，或格式不對，都是 null */
   cat: CatProfile | null;
+  /** 領養貓的名字（逐隻 CatProfile；不含原本那隻）；舊版同步檔沒有這欄視為空 */
+  cats: Record<CatId, CatProfile>;
+  /** 全部小貓的長相（逐隻 CatLook，含原本那隻）；沒有有效改動時間的不收 */
+  looks: Record<CatId, CatLook>;
 }
 
 type RemoteFetchResult =
@@ -301,6 +319,40 @@ function sameExamHistory(a: readonly ExamRecord[], b: readonly ExamRecord[]): bo
   );
 }
 
+function parseRemoteCats(value: unknown): Record<CatId, CatProfile> {
+  if (!isRecord(value)) return {};
+  const out: Record<CatId, CatProfile> = {};
+  for (const [id, raw] of Object.entries(value)) {
+    if (!isAdoptedCatId(id)) continue;
+    const profile = parseCatProfile(raw);
+    if (profile !== null) {
+      out[id] = profile;
+    }
+  }
+  return out;
+}
+
+function parseRemoteCatLook(value: unknown): CatLook | null {
+  if (!isRecord(value)) return null;
+  if (typeof value.at !== 'string' || Number.isNaN(Date.parse(value.at))) return null;
+  const outfit = parseOutfit(value.outfit);
+  if (outfit === undefined) return null;
+  return { outfit, at: value.at };
+}
+
+function parseRemoteLooks(value: unknown): Record<CatId, CatLook> {
+  if (!isRecord(value)) return {};
+  const out: Record<CatId, CatLook> = {};
+  for (const [id, raw] of Object.entries(value)) {
+    if (!HOUSE_CAT_ID.test(id)) continue;
+    const look = parseRemoteCatLook(raw);
+    if (look !== null) {
+      out[id] = look;
+    }
+  }
+  return out;
+}
+
 function parseRemoteContent(base64Content: string): RemoteContent | null {
   try {
     const jsonText = base64ToUtf8(base64Content);
@@ -332,7 +384,16 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
     const parsedWardrobe = parseWardrobe(parsed.wardrobe);
     const wardrobe: SyncWardrobe = toSyncWardrobe(parsedWardrobe);
 
-    return { progress, days, cardsSeen, examHistory, wardrobe, cat: parseCatProfile(parsed.cat) };
+    return {
+      progress,
+      days,
+      cardsSeen,
+      examHistory,
+      wardrobe,
+      cat: parseCatProfile(parsed.cat),
+      cats: parseRemoteCats(parsed.cats),
+      looks: parseRemoteLooks(parsed.looks),
+    };
   } catch {
     return null;
   }
@@ -477,6 +538,23 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     }
     const catDiffers = !sameCatProfile(remoteCat, mergedCat);
 
+    // 小貓之家：領養貓的名字（cats）與全家小貓的長相（looks）逐隻比改動時間
+    const remoteCats = remote.kind === 'ok' ? remote.cats : {};
+    const remoteLooks = remote.kind === 'ok' ? remote.looks : {};
+    const localCats = localHouseCatProfiles(world);
+    const localLooks = localHouseCatLooks(world);
+    const mergedCats = mergeCatProfiles(localCats, remoteCats);
+    const mergedLooks = mergeCatLooks(localLooks, remoteLooks);
+    if (
+      !sameCatRecord(localCats, mergedCats, sameCatProfile) ||
+      !sameCatRecord(localLooks, mergedLooks, sameCatLook)
+    ) {
+      applySyncedHouse(world, mergedCats, mergedLooks);
+      if (isStale(controller, gen)) return;
+    }
+    const catsDiffer = !sameCatRecord(remoteCats, mergedCats, sameCatProfile);
+    const looksDiffer = !sameCatRecord(remoteLooks, mergedLooks, sameCatLook);
+
     // 卡片已看、模擬考成績與衣櫥只比內容：遠端順序不同不必寫回
     const remoteCardSet = new Set(remoteCards);
     const cardsDiffer =
@@ -494,7 +572,9 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       cardsDiffer ||
       examsDiffer ||
       wardrobeDiffers ||
-      catDiffers;
+      catDiffers ||
+      catsDiffer ||
+      looksDiffer;
     if (!shouldPut) {
       setSyncState(world, {
         status: 'idle',
@@ -514,6 +594,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       wardrobe: mergedWardrobe,
       // 沒取過名字就不寫這一欄：沒用到這個功能的人，同步檔長得跟以前一樣
       ...(mergedCat !== null ? { cat: mergedCat } : {}),
+      ...(Object.keys(mergedCats).length > 0 ? { cats: mergedCats } : {}),
+      ...(Object.keys(mergedLooks).length > 0 ? { looks: mergedLooks } : {}),
     });
     const putBody: Record<string, unknown> = {
       message: 'chore: sync progress',
