@@ -67,8 +67,9 @@
 | 規格明確、可拆、有可跑驗收的實作包 | agy `gemini-4-neon-medium`；難或跨檔的用 `gemini-4-neon-high` |
 | 大範圍、多檔、要讀很多再整理的包 | agy `gemini-pro-orchestrator-neon`（不帶 `--effort`） |
 | 雜事：讀檔摘要、機械性改動、補測試、資料驗證、內容加工批次、小而具體的包 | agy `gemini-4-hydrogen-high`（純讀檔摘要可用 `gemini-3.8-flash-medium`） |
-| 整包設計＋實作、邏輯根因第二意見 | Codex `GPT-6.1 Sol` xhigh（見底時主代理接手） |
-| 看截圖審查 UI、美術判讀、法律解析抽樣第二意見 | Codex `GPT-6 Astra`（或主代理自己看） |
+| 整包設計＋實作 | Codex `GPT-6.2 Sol` xhigh（見底時主代理接手；派工單要求把碰到的阻礙寫進報告） |
+| 邏輯根因、讀碼第二意見 | Codex `GPT-6.1 Sol`（6.2 Sol 讀碼庫答題退步，先不換） |
+| 看截圖審查 UI、美術判讀、法律解析抽樣第二意見 | Codex `GPT-6.2 Astra`（或主代理自己看） |
 | 有界的只讀長文件分析（整科考點頻率分析） | agy `gemini-4-argon-medium`（`--mode plan`，一定設 timeout） |
 
 - Gemini Models 池偏低或見底時，實作包改派 Sonnet 子代理，再不行主代理自己做；Codex、Gemini 都見底就全部由主代理做（換池順序在 `agy-call`）。
