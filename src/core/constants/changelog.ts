@@ -3,6 +3,12 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-house-trails',
+    date: '2026-11-22',
+    title: '小屋裡的蝸牛和火箭',
+    items: ['小屋裡背蝸牛殼的小貓走過也會留下亮晶晶的線，背小火箭的跑起來會冒煙圈'],
+  },
+  {
     id: '2026-11-22-duck-back-room',
     date: '2026-11-22',
     title: '小鴨裝、背飾特效、小屋擺設',

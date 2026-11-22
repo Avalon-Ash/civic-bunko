@@ -2,7 +2,7 @@
 // 數字只讀 constants/house.ts 的 HOUSE_SCENE、constants/cat.ts 的 CAT_DAY_PARTS 與 constants/pet.ts 的 PET_GAIT_DEFAULT／PET_PLAY。
 import { CAT_DAY_PARTS } from '../../core/constants/cat';
 import { HOUSE_SCENE } from '../../core/constants/house';
-import { PET_FLOAT, PET_GAIT_DEFAULT, PET_PLAY } from '../../core/constants/pet';
+import { PET_FLOAT, PET_GAIT_DEFAULT, PET_PLAY, PET_ROCKET, PET_SLIME } from '../../core/constants/pet';
 import { speedFactor } from '../pet/petLogic';
 import type { CatId, CatMood, OutfitSpecial, PetGait, PetPose } from '../../core/types';
 
@@ -612,4 +612,34 @@ export function nextTickDelayMs(actors: readonly HouseActor[]): number | null {
     if (a.remainMs < soonest) soonest = a.remainMs;
   }
   return Number.isFinite(soonest) ? Math.max(50, Math.round(soonest)) : null;
+}
+
+/** 小屋地板上留下的痕跡：蝸牛殼走過的亮晶晶的線、小火箭暴衝的煙圈（x、y＝房間地板座標，y 是小貓腳底那一排） */
+export interface HouseMark {
+  kind: 'trail' | 'puff';
+  x: number;
+  y: number;
+}
+
+/**
+ * 這隻小貓現在要不要留一個痕跡（跟亂跑的小貓同一套數字：PET_SLIME.stride、PET_ROCKET.stride）：
+ * 蝸牛殼走路時、小火箭暴衝時，離上一個痕跡（last）夠遠就留一個；煙圈留在屁股後面（behind＝離中心多遠）。
+ */
+export function houseMark(
+  actor: HouseActor,
+  specials: ReadonlySet<OutfitSpecial> | undefined,
+  last: { x: number; y: number } | undefined,
+  behind: number,
+): HouseMark | null {
+  const kind =
+    actor.action === 'walk' && specials?.has('slime')
+      ? 'trail'
+      : actor.action === 'zoom' && specials?.has('rocket')
+        ? 'puff'
+        : null;
+  if (!kind) return null;
+  const stride = kind === 'trail' ? PET_SLIME.stride : PET_ROCKET.stride;
+  if (last && Math.hypot(actor.x - last.x, actor.y - last.y) < stride) return null;
+  const back = kind === 'puff' ? (actor.facing === 'right' ? -behind : behind) : 0;
+  return { kind, x: actor.x + back, y: actor.y };
 }

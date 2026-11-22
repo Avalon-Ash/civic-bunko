@@ -5,7 +5,7 @@ import { HOUSE_SCENE } from '../../core/constants/house';
 import { PET_DUCK, PET_FLOAT, PET_GLIDE, PET_ROCKET, PET_SLIME } from '../../core/constants/pet';
 import type { OutfitSpecial } from '../../core/types';
 import { outfitSpecials } from '../../selectors/wardrobe';
-import { actorLift, stepDucks, stepHouse, type HouseActor } from '../house/houseLogic';
+import { actorLift, houseMark, stepDucks, stepHouse, type HouseActor } from '../house/houseLogic';
 import { ducklingTargets, fallCap, floatHeight, gaitFor, landsSoftly, pushTrail, speedFactor } from './petLogic';
 
 const set = (...ids: OutfitSpecial[]) => new Set<OutfitSpecial>(ids);
@@ -99,5 +99,21 @@ describe('house: ducklings, wings and balloon', () => {
     assert.equal(actorLift(walk), 0);
     assert.equal(actorLift({ ...walk, x: 100 }, undefined, balloon), 0, 'starts on the ground');
     assert.equal(actorLift({ ...base }, undefined, balloon), 0, 'sitting is on the ground');
+  });
+
+  it('the snail leaves a trail while walking, the rocket puffs behind it while zooming, stride apart', () => {
+    const snail = outfitSpecials({ back: 'snail-shell' });
+    const rocket = outfitSpecials({ back: 'rocket-pack' });
+    const walk: HouseActor = { ...base, action: 'walk', target: { x: 300, y: 40 }, origin: { x: 100, y: 40 } };
+    assert.deepEqual(houseMark(walk, snail, undefined, 20), { kind: 'trail', x: 200, y: 40 });
+    assert.equal(houseMark(walk, snail, { x: 200 - PET_SLIME.stride / 2, y: 40 }, 20), null, 'too close to the last one');
+    assert.ok(houseMark(walk, snail, { x: 200 - PET_SLIME.stride, y: 40 }, 20));
+    assert.equal(houseMark({ ...walk, action: 'sit' }, snail, undefined, 20), null);
+    assert.equal(houseMark(walk, rocket, undefined, 20), null, 'rocket only puffs on a zoom');
+    const zoom: HouseActor = { ...walk, action: 'zoom' };
+    assert.deepEqual(houseMark(zoom, rocket, undefined, 20), { kind: 'puff', x: 180, y: 40 }, 'facing right → puff on the left');
+    assert.deepEqual(houseMark({ ...zoom, facing: 'left' }, rocket, undefined, 20), { kind: 'puff', x: 220, y: 40 });
+    assert.equal(houseMark(zoom, rocket, { x: 200 - PET_ROCKET.stride / 2, y: 40 }, 20), null);
+    assert.equal(houseMark(zoom, undefined, undefined, 20), null);
   });
 });

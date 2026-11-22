@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { HOUSE_SCENE } from '../../core/constants/house';
+import { PET_PLAY, PET_ROCKET, PET_SLIME } from '../../core/constants/pet';
 import type { CatId, ItemId, OutfitSpecial } from '../../core/types';
 import type { HouseCatView } from '../../selectors/house';
 import { outfitSpecials } from '../../selectors/wardrobe';
@@ -15,6 +16,7 @@ import {
   createInitialActors,
   dayPartOfHour,
   hopActor,
+  houseMark,
   nextTickDelayMs,
   roomBounds,
   stepDucks,
@@ -22,6 +24,7 @@ import {
   syncActorsWithCats,
   type HouseActor,
   type HouseDayPart,
+  type HouseMark,
   type RoomBounds,
 } from './houseLogic';
 
@@ -399,6 +402,30 @@ export function HouseScene({ cats, selected, onSelect, entering = null, decor = 
     return () => window.clearTimeout(t);
   }, [quack]);
 
+  // 蝸牛殼走過留下亮晶晶的線、小火箭暴衝冒煙圈：每一格看每隻要不要留一個，lifeMs 後自己消失；畫面上最多 PET_PLAY.maxBits 個
+  const [marks, setMarks] = useState<Array<HouseMark & { id: number }>>([]);
+  const lastMark = useRef(new Map<CatId, { x: number; y: number }>());
+  const markSeq = useRef(0);
+  useEffect(() => {
+    if (reducedMotion) return;
+    const added: Array<HouseMark & { id: number }> = [];
+    for (const actor of actors) {
+      const mark = houseMark(actor, specialsRef.current.get(actor.id), lastMark.current.get(actor.id), HOUSE_SCENE.catWidth * 0.4);
+      if (!mark) continue;
+      lastMark.current.set(actor.id, { x: actor.x, y: actor.y });
+      markSeq.current += 1;
+      added.push({ ...mark, id: markSeq.current });
+    }
+    if (added.length === 0) return;
+    setMarks((prev) => [...prev, ...added].slice(-PET_PLAY.maxBits));
+    for (const m of added) {
+      window.setTimeout(
+        () => setMarks((prev) => prev.filter((other) => other.id !== m.id)),
+        m.kind === 'trail' ? PET_SLIME.lifeMs : PET_ROCKET.lifeMs,
+      );
+    }
+  }, [actors, reducedMotion]);
+
   // 動作計時器：只有房間看得到且在前景才跑；有人在移動或跳用 rAF，全部靜止用單一 setTimeout
   const delayMs = nextTickDelayMs(actors);
   const running = inView && docVisible && delayMs !== null;
@@ -505,6 +532,28 @@ export function HouseScene({ cats, selected, onSelect, entering = null, decor = 
               quiet={actor.action === 'nuzzle'}
             />
           </button>
+        );
+      })}
+
+      {marks.map((m) => {
+        const w = m.kind === 'trail' ? PET_SLIME.stride + 2 : PET_ROCKET.size;
+        const h = m.kind === 'trail' ? 4 : PET_ROCKET.size;
+        // 線貼在腳底那一排；煙圈在屁股的高度
+        const top = wallHeight + m.y - (m.kind === 'trail' ? h / 2 : HOUSE_SCENE.catWidth * 0.4);
+        return (
+          <span
+            key={m.id}
+            className={`cb-pet-bit cb-pet-${m.kind}`}
+            aria-hidden="true"
+            style={{
+              left: Math.round(m.x - w / 2),
+              top: Math.round(top),
+              width: w,
+              height: h,
+              zIndex: Math.round(m.y) + (m.kind === 'trail' ? 0 : 5),
+              animationDuration: `${m.kind === 'trail' ? PET_SLIME.lifeMs : PET_ROCKET.lifeMs}ms`,
+            }}
+          />
         );
       })}
 

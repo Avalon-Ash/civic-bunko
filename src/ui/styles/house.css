@@ -498,3 +498,8 @@
   font-size: 13px;
   color: var(--ink-soft);
 }
+
+/* 小屋地板上的痕跡（蝸牛的線、火箭的煙圈）：樣子跟亂跑的一樣（pet.css），點擊穿過去 */
+.cb-house-scene .cb-pet-bit {
+  pointer-events: none;
+}
