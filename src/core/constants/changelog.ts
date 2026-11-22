@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-house-specials',
+    date: '2026-11-22',
+    title: '小屋裡也看得到套裝效果',
+    items: [
+      '小屋裡的小貓也照穿著動：企鵝站著搖擺、偶爾用肚子滑過房間，青蛙和兔子一蹦一蹦，乳牛站起來走',
+      '穿披風的會飛過房間，穿睡衣全套的特別愛睡；大家偶爾也會在房間裡暴衝',
+    ],
+  },
+  {
     id: '2026-11-22-perch-down',
     date: '2026-11-22',
     title: '小貓跳上卡片後會自己跳下來',

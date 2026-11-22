@@ -1,10 +1,11 @@
-// 小屋房間動作邏輯（純函式，不碰 DOM）：位置範圍、走進門、下一個動作、蹭蹭配對、時段判斷。
-// 數字只讀 constants/house.ts 的 HOUSE_SCENE 與 constants/cat.ts 的 CAT_DAY_PARTS。
+// 小屋房間動作邏輯（純函式，不碰 DOM）：位置範圍、走進門、下一個動作、蹭蹭配對、時段判斷、套裝步態與飛行／蹦跳高度。
+// 數字只讀 constants/house.ts 的 HOUSE_SCENE、constants/cat.ts 的 CAT_DAY_PARTS 與 constants/pet.ts 的 PET_GAIT_DEFAULT／PET_PLAY。
 import { CAT_DAY_PARTS } from '../../core/constants/cat';
 import { HOUSE_SCENE } from '../../core/constants/house';
-import type { CatId, CatMood, PetPose } from '../../core/types';
+import { PET_GAIT_DEFAULT, PET_PLAY } from '../../core/constants/pet';
+import type { CatId, CatMood, OutfitSpecial, PetGait, PetPose } from '../../core/types';
 
-export type HouseAction = 'walk' | 'sit' | 'groom' | 'loaf' | 'nuzzle';
+export type HouseAction = 'walk' | 'zoom' | 'fly' | 'sit' | 'groom' | 'loaf' | 'nuzzle';
 export type HouseDayPart = 'day' | 'dusk' | 'night';
 
 export interface RoomBounds {
@@ -24,8 +25,10 @@ export interface HouseActor {
   y: number;
   facing: 'left' | 'right';
   action: HouseAction;
-  /** 走路目標；只有 action === 'walk' 時有值 */
+  /** 移動目標；只有 action 為 walk／zoom／fly 時有值 */
   target?: { x: number; y: number };
+  /** 移動起點；用於計算飛行拋物線與蹦跳步距 */
+  origin?: { x: number; y: number };
   /** 靜止動作的剩餘時間（毫秒） */
   remainMs: number;
   /** 蹭蹭對象；只有 action === 'nuzzle' 時有值 */
@@ -36,6 +39,7 @@ export interface HouseActor {
 
 export interface HouseOptions {
   reducedMotion?: boolean;
+  specials?: ReadonlyMap<CatId, ReadonlySet<OutfitSpecial>>;
 }
 
 export interface NuzzlePair {
@@ -46,10 +50,23 @@ export interface NuzzlePair {
 }
 
 type StationaryAction = 'sit' | 'groom' | 'loaf';
-type PickableAction = 'walk' | StationaryAction;
+type MovingAction = 'walk' | 'zoom' | 'fly';
+type PickableAction = 'walk' | StationaryAction | 'zoom';
 
 const STATIONARY_ACTIONS: readonly StationaryAction[] = ['sit', 'groom', 'loaf'];
-const ALL_ACTIONS: readonly PickableAction[] = ['walk', 'sit', 'groom', 'loaf'];
+const ALL_ACTIONS: readonly PickableAction[] = ['walk', 'sit', 'groom', 'loaf', 'zoom'];
+
+function isMovingAction(action: HouseAction): action is MovingAction {
+  return action === 'walk' || action === 'zoom' || action === 'fly';
+}
+
+function actionWeight(action: PickableAction, specials?: ReadonlySet<OutfitSpecial>): number {
+  const base = HOUSE_SCENE.weights[action];
+  if (action === 'loaf' && specials?.has('dream')) {
+    return base * HOUSE_SCENE.napBoost;
+  }
+  return base;
+}
 
 function clamp(v: number, min: number, max: number): number {
   return Math.min(Math.max(v, min), Math.max(min, max));
@@ -88,12 +105,16 @@ export function doorPosition(bounds: RoomBounds): { x: number; y: number } {
   return { x, y };
 }
 
-function pickWeighted<T extends PickableAction>(pool: readonly T[], rng: () => number): T {
-  const total = pool.reduce((sum, a) => sum + HOUSE_SCENE.weights[a], 0);
+function pickWeighted<T extends PickableAction>(
+  pool: readonly T[],
+  rng: () => number,
+  specials?: ReadonlySet<OutfitSpecial>,
+): T {
+  const total = pool.reduce((sum, a) => sum + actionWeight(a, specials), 0);
   if (total <= 0) return pool[0]!;
   let roll = clamp(rng(), 0, 0.999999) * total;
   for (const action of pool) {
-    roll -= HOUSE_SCENE.weights[action];
+    roll -= actionWeight(action, specials);
     if (roll < 0) return action;
   }
   return pool[pool.length - 1]!;
@@ -122,6 +143,32 @@ export function pickFloorTarget(
   return fallback;
 }
 
+/** 暴衝、飛行的落點：房間另一側靠牆的這一段（佔地板寬度的比例） */
+const FAR_SIDE_BAND = 0.2;
+
+/** 挑房間另一側（離現在較遠的那一邊，地板範圍內）的目標；供暴衝與飛行使用。 */
+function pickFarTarget(
+  from: { x: number; y: number },
+  bounds: RoomBounds,
+  rng: () => number,
+): { x: number; y: number } | null {
+  const spanX = bounds.maxX - bounds.minX;
+  const spanY = bounds.maxY - bounds.minY;
+  if (spanX <= 0 && spanY <= 0) return null;
+  const midX = (bounds.minX + bounds.maxX) / 2;
+  const band = spanX * FAR_SIDE_BAND;
+  const goRight = from.x <= midX;
+  const lowX = goRight
+    ? Math.min(bounds.maxX, Math.max(bounds.maxX - band, from.x + spanX / 2))
+    : bounds.minX;
+  const highX = goRight
+    ? bounds.maxX
+    : Math.max(bounds.minX, Math.min(bounds.minX + band, from.x - spanX / 2));
+  const x = clamp(lowX + clamp(rng(), 0, 0.999999) * Math.max(0, highX - lowX), bounds.minX, bounds.maxX);
+  const y = clamp(bounds.minY + clamp(rng(), 0, 0.999999) * spanY, bounds.minY, bounds.maxY);
+  return { x, y };
+}
+
 /** 畫面上是否已經有一對在蹭蹭。 */
 export function hasActiveNuzzle(actors: readonly HouseActor[]): boolean {
   return actors.some((a) => a.action === 'nuzzle');
@@ -137,7 +184,7 @@ export function findNuzzlePartner(
   let bestDist: number = HOUSE_SCENE.nuzzle.dist;
   for (const other of actors) {
     if (other.id === actor.id) continue;
-    if (other.action === 'walk' || other.action === 'nuzzle') continue;
+    if (isMovingAction(other.action) || other.action === 'nuzzle') continue;
     const dist = Math.hypot(actor.x - other.x, actor.y - other.y);
     if (dist < bestDist) {
       bestDist = dist;
@@ -175,7 +222,7 @@ export function createInitialActors(
     const jitter = count <= 1 ? (clamp(rng(), 0, 1) - 0.5) * 0.2 : (clamp(rng(), 0, 1) - 0.5) * (0.5 / count);
     const x = clamp(bounds.minX + (slotCenter + jitter) * spanX, bounds.minX, bounds.maxX);
     const y = clamp(bounds.minY + clamp(rng(), 0, 0.999999) * spanY, bounds.minY, bounds.maxY);
-    const action = pickWeighted(STATIONARY_ACTIONS, rng);
+    const action = pickWeighted(STATIONARY_ACTIONS, rng, options.specials?.get(id));
     const facing: 'left' | 'right' = rng() < 0.5 ? 'left' : 'right';
     const fullDur = between(HOUSE_SCENE.dur[action], rng);
     // 初次進房間錯開換動作的節奏，避免全部同時動
@@ -217,6 +264,7 @@ export function createEnteringActor(
     facing: 'left',
     action: 'walk',
     target: { x: tx, y: ty },
+    origin: { x: door.x, y: door.y },
     remainMs: 0,
     hopMs: 0,
   };
@@ -234,6 +282,7 @@ export function decideNextAction(
   const idx = next.findIndex((a) => a.id === id);
   if (idx === -1) return next;
   const me = next[idx]!;
+  const mySpecials = options.specials?.get(id);
 
   // 結束蹭蹭時，把對象也一起帶回一般靜止動作，避免單獨蹭蹭
   if (me.action === 'nuzzle' && me.partnerId) {
@@ -244,6 +293,7 @@ export function decideNextAction(
         action: 'sit',
         partnerId: undefined,
         target: undefined,
+        origin: undefined,
         remainMs: between(HOUSE_SCENE.dur.sit, rng),
       };
     }
@@ -251,13 +301,14 @@ export function decideNextAction(
     me.action = 'sit';
   }
 
-  // 減少動態：不走動、只坐／理毛／睡
+  // 減少動態：不走動、不暴衝、不飛，只坐／理毛／睡
   if (options.reducedMotion) {
-    const picked = pickWeighted(STATIONARY_ACTIONS, rng);
+    const picked = pickWeighted(STATIONARY_ACTIONS, rng, mySpecials);
     next[idx] = {
       ...me,
       action: picked,
       target: undefined,
+      origin: undefined,
       partnerId: undefined,
       remainMs: between(HOUSE_SCENE.dur[picked], rng),
     };
@@ -276,6 +327,7 @@ export function decideNextAction(
         action: 'nuzzle',
         facing: meLeft ? 'right' : 'left',
         target: undefined,
+        origin: undefined,
         partnerId: partner.id,
         remainMs: dur,
       };
@@ -284,6 +336,7 @@ export function decideNextAction(
         action: 'nuzzle',
         facing: meLeft ? 'left' : 'right',
         target: undefined,
+        origin: undefined,
         partnerId: me.id,
         remainMs: dur,
       };
@@ -291,14 +344,17 @@ export function decideNextAction(
     }
   }
 
-  const picked = pickWeighted(ALL_ACTIONS, rng);
-  if (picked === 'walk') {
-    const target = pickFloorTarget(me, bounds, rng);
+  const picked = pickWeighted(ALL_ACTIONS, rng, mySpecials);
+  if (picked === 'walk' || picked === 'zoom') {
+    const flying = mySpecials?.has('fly') && rng() < HOUSE_SCENE.flyChance;
+    const action: MovingAction = flying ? 'fly' : picked;
+    const target = action === 'walk' ? pickFloorTarget(me, bounds, rng) : pickFarTarget(me, bounds, rng);
     if (target) {
       next[idx] = {
         ...me,
-        action: 'walk',
+        action,
         target,
+        origin: { x: me.x, y: me.y },
         partnerId: undefined,
         remainMs: 0,
         facing: target.x === me.x ? me.facing : target.x < me.x ? 'left' : 'right',
@@ -310,6 +366,7 @@ export function decideNextAction(
       ...me,
       action: 'sit',
       target: undefined,
+      origin: undefined,
       partnerId: undefined,
       remainMs: between(HOUSE_SCENE.dur.sit, rng),
     };
@@ -320,6 +377,7 @@ export function decideNextAction(
     ...me,
     action: picked,
     target: undefined,
+    origin: undefined,
     partnerId: undefined,
     remainMs: between(HOUSE_SCENE.dur[picked], rng),
   };
@@ -335,16 +393,22 @@ export function stepHouse(
   options: HouseOptions = {},
 ): HouseActor[] {
   const dt = Math.max(0, dtMs);
-  const step = HOUSE_SCENE.walkSpeed * (dt / 1000);
   const finished: CatId[] = [];
 
   let next: HouseActor[] = actors.map((actor) => {
     const hopMs = Math.max(0, actor.hopMs - dt);
-    if (actor.action === 'walk') {
+    if (isMovingAction(actor.action)) {
       if (options.reducedMotion || !actor.target) {
         finished.push(actor.id);
-        return { ...actor, hopMs, target: undefined, remainMs: 0 };
+        return { ...actor, hopMs, target: undefined, origin: undefined, remainMs: 0 };
       }
+      const speed =
+        actor.action === 'zoom'
+          ? HOUSE_SCENE.zoomSpeed
+          : actor.action === 'fly'
+            ? HOUSE_SCENE.flySpeed
+            : HOUSE_SCENE.walkSpeed;
+      const step = speed * (dt / 1000);
       const dx = actor.target.x - actor.x;
       const dy = actor.target.y - actor.y;
       const dist = Math.hypot(dx, dy);
@@ -356,6 +420,7 @@ export function stepHouse(
           x: clamp(actor.target.x, bounds.minX, bounds.maxX),
           y: clamp(actor.target.y, bounds.minY, bounds.maxY),
           target: undefined,
+          origin: undefined,
           remainMs: 0,
         };
       }
@@ -379,7 +444,7 @@ export function stepHouse(
     const cur = next.find((a) => a.id === id);
     if (!cur) continue;
     // 如果剛才跟著蹭蹭對象一起換掉動作了，就不重複換
-    if (cur.action !== 'walk' && cur.remainMs > 0) continue;
+    if (!isMovingAction(cur.action) && cur.remainMs > 0) continue;
     next = decideNextAction(id, next, bounds, rng, options);
   }
 
@@ -435,13 +500,35 @@ export function hopActor(actors: readonly HouseActor[], id: CatId): HouseActor[]
   return actors.map((a) => (a.id === id ? { ...a, hopMs: HOUSE_SCENE.hopMs } : a));
 }
 
-/** 對應到 CatBody 的姿勢。 */
-export function actorPose(actor: HouseActor): PetPose {
+/** 對應到 CatBody 的姿勢（步態由 petLogic 的 gaitFor 決定）。 */
+export function actorPose(actor: HouseActor, gait: PetGait = PET_GAIT_DEFAULT): PetPose {
   if (actor.hopMs > 0) return 'hop';
-  if (actor.action === 'walk') return 'walk';
+  if (actor.action === 'walk') return gait.walk;
+  if (actor.action === 'zoom') return gait.zoom;
+  if (actor.action === 'fly') return 'fly';
   if (actor.action === 'groom') return 'groom';
   if (actor.action === 'loaf') return 'loaf';
-  return 'sit';
+  return gait.rest;
+}
+
+/** 計算小貓離地高度（px）：飛行時走拋物線（最高 HOUSE_SCENE.flyLift），蹦跳步態走路／暴衝時一蹦一蹦。 */
+export function actorLift(actor: HouseActor, gait: PetGait = PET_GAIT_DEFAULT): number {
+  if (actor.action === 'fly') {
+    if (!actor.origin || !actor.target) return 0;
+    const total = Math.hypot(actor.target.x - actor.origin.x, actor.target.y - actor.origin.y);
+    if (total <= 0) return 0;
+    const traveled = Math.hypot(actor.x - actor.origin.x, actor.y - actor.origin.y);
+    const t = clamp(traveled / total, 0, 1);
+    return 4 * t * (1 - t) * HOUSE_SCENE.flyLift;
+  }
+  if (gait.hop && (actor.action === 'walk' || actor.action === 'zoom')) {
+    const dist = actor.origin
+      ? Math.hypot(actor.x - actor.origin.x, actor.y - actor.origin.y)
+      : Math.abs(actor.x);
+    const phase = (dist % PET_PLAY.hop.stride) / PET_PLAY.hop.stride;
+    return Math.sin(phase * Math.PI) * PET_PLAY.hop.lift;
+  }
+  return 0;
 }
 
 /** 對應到 CatBody 的表情（未指定時照姿勢預設）。 */
@@ -450,10 +537,10 @@ export function actorMood(actor: HouseActor): CatMood | undefined {
   return undefined;
 }
 
-/** 下一次畫面需要更新的方式：有貓在走或跳時用連續影格，全部靜止時等到最近一個動作結束。 */
+/** 下一次畫面需要更新的方式：有貓在移動（走／暴衝／飛）或跳時用連續影格，全部靜止時等到最近一個動作結束。 */
 export function nextTickDelayMs(actors: readonly HouseActor[]): number | null {
   if (actors.length === 0) return null;
-  if (actors.some((a) => a.action === 'walk' || a.hopMs > 0)) return 0;
+  if (actors.some((a) => isMovingAction(a.action) || a.hopMs > 0)) return 0;
   let soonest = Infinity;
   for (const a of actors) {
     if (a.remainMs < soonest) soonest = a.remainMs;

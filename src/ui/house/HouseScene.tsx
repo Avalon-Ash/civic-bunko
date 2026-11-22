@@ -1,10 +1,13 @@
-import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { HOUSE_SCENE } from '../../core/constants/house';
-import type { CatId } from '../../core/types';
+import type { CatId, OutfitSpecial } from '../../core/types';
 import type { HouseCatView } from '../../selectors/house';
+import { outfitSpecials } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
+import { gaitFor } from '../pet/petLogic';
 import {
   activeNuzzlePair,
+  actorLift,
   actorMood,
   actorPose,
   createInitialActors,
@@ -248,12 +251,19 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
   const boundsRef = useRef<RoomBounds>(bounds);
   boundsRef.current = bounds;
 
+  const specialsById = useMemo(
+    () => new Map<CatId, ReadonlySet<OutfitSpecial>>(cats.map((c) => [c.id, outfitSpecials(c.outfit)])),
+    [cats],
+  );
+  const specialsRef = useRef<ReadonlyMap<CatId, ReadonlySet<OutfitSpecial>>>(specialsById);
+  specialsRef.current = specialsById;
+
   const [actors, setActors] = useState<HouseActor[]>(() =>
     createInitialActors(
       cats.map((c) => c.id),
       roomBounds(HOUSE_SCENE.defaultWidth, HOUSE_SCENE.height),
       Math.random,
-      { reducedMotion },
+      { reducedMotion, specials: specialsById },
     ),
   );
   const lastEnteringTick = useRef<number | null>(null);
@@ -316,12 +326,13 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
     setActors((prev) =>
       syncActorsWithCats(prev, ids, boundsRef.current, Math.random, {
         reducedMotion,
+        specials: specialsRef.current,
         enteringId: isFreshEntering ? entering.id : null,
       }),
     );
   }, [catIdsKey, size.width, size.height, reducedMotion, entering]);
 
-  // 動作計時器：只有房間看得到且在前景才跑；有人在走或跳用 rAF，全部靜止用單一 setTimeout
+  // 動作計時器：只有房間看得到且在前景才跑；有人在移動或跳用 rAF，全部靜止用單一 setTimeout
   const delayMs = nextTickDelayMs(actors);
   const running = inView && docVisible && delayMs !== null;
   const animating = running && delayMs === 0;
@@ -334,7 +345,12 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
     const tick = (now: number) => {
       const dt = Math.min(HOUSE_SCENE.maxDtMs, Math.max(0, now - lastTime));
       lastTime = now;
-      setActors((prev) => stepHouse(prev, dt, boundsRef.current, Math.random, { reducedMotion }));
+      setActors((prev) =>
+        stepHouse(prev, dt, boundsRef.current, Math.random, {
+          reducedMotion,
+          specials: specialsRef.current,
+        }),
+      );
       rafId = window.requestAnimationFrame(tick);
     };
     rafId = window.requestAnimationFrame(tick);
@@ -344,7 +360,12 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
   useEffect(() => {
     if (!idleWaiting || delayMs === null || delayMs <= 0) return;
     const timer = window.setTimeout(() => {
-      setActors((prev) => stepHouse(prev, delayMs, boundsRef.current, Math.random, { reducedMotion }));
+      setActors((prev) =>
+        stepHouse(prev, delayMs, boundsRef.current, Math.random, {
+          reducedMotion,
+          specials: specialsRef.current,
+        }),
+      );
     }, delayMs);
     return () => window.clearTimeout(timer);
   }, [idleWaiting, delayMs, actors, reducedMotion]);
@@ -382,9 +403,12 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
         const cat = catsById.get(actor.id);
         if (!cat) return null;
         const isSelected = cat.id === selected;
-        const pose = actorPose(actor);
+        const specials = specialsById.get(cat.id);
+        const gait = specials ? gaitFor(specials) : undefined;
+        const pose = actorPose(actor, gait);
         const mood = actorMood(actor);
-        const feetY = wallHeight + actor.y;
+        const lift = actorLift(actor, gait);
+        const feetY = wallHeight + actor.y - lift;
         const zIndex = Math.round(actor.y) + (isSelected ? 100 : 10);
 
         return (
