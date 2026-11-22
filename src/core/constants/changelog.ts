@@ -3,6 +3,12 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-house-seats',
+    date: '2026-11-22',
+    title: '小貓會坐上坐墊和書堆',
+    items: ['小屋裡擺了坐墊或書堆，小貓偶爾會走過去跳上去：在坐墊上睡覺、在書堆上坐著，一次一隻'],
+  },
+  {
     id: '2026-11-22-wings-release',
     date: '2026-11-22',
     title: '天使翅膀從頭像飄下來',

@@ -38,6 +38,25 @@ export interface HouseActor {
   hopMs: number;
   /** 小鴨跟班（穿小鴨裝才有）：一隻跟著一隻排隊，位置是房間地板座標 */
   ducks?: HouseDuck[];
+  /** 要去坐、或正坐著的擺設（HouseSeat.id）；走過去的路上也算占位，別隻不會搶 */
+  seat?: string;
+  /**
+   * 坐在擺設上（on）或剛跳下來（!on）：lift＝擺設的坐面離地多高；jump＝正在跳上或跳下（照 hopMs 升降），
+   * 點牠時的原地跳不算（坐在上面原地跳，不會掉回地板）。跳下來落地後拿掉
+   */
+  perch?: { lift: number; on: boolean; jump: boolean };
+}
+
+/**
+ * 小屋擺設上可以坐的地方（HouseScene 從畫面上量出來）：x、y＝小貓要站的地板座標（擺設底部那一排），
+ * lift＝坐面比那一排地板高多少（px），pose＝坐上去做什麼（坐墊上睡、書堆上坐）
+ */
+export interface HouseSeat {
+  id: string;
+  x: number;
+  y: number;
+  lift: number;
+  pose: 'sit' | 'loaf';
 }
 
 export interface HouseDuck {
@@ -50,6 +69,8 @@ export interface HouseDuck {
 export interface HouseOptions {
   reducedMotion?: boolean;
   specials?: ReadonlyMap<CatId, ReadonlySet<OutfitSpecial>>;
+  /** 擺設上可以坐的地方（沒有擺坐墊、書堆就是空的） */
+  seats?: readonly HouseSeat[];
 }
 
 export interface NuzzlePair {
@@ -194,7 +215,7 @@ export function findNuzzlePartner(
   let bestDist: number = HOUSE_SCENE.nuzzle.dist;
   for (const other of actors) {
     if (other.id === actor.id) continue;
-    if (isMovingAction(other.action) || other.action === 'nuzzle') continue;
+    if (isMovingAction(other.action) || other.action === 'nuzzle' || other.perch?.on) continue;
     const dist = Math.hypot(actor.x - other.x, actor.y - other.y);
     if (dist < bestDist) {
       bestDist = dist;
@@ -294,6 +315,27 @@ export function decideNextAction(
   const me = next[idx]!;
   const mySpecials = options.specials?.get(id);
 
+  // 走到要坐的擺設了：跳上去，坐墊上睡、書堆上坐
+  const seatHere = me.seat && !me.perch?.on ? options.seats?.find((s) => s.id === me.seat) : undefined;
+  if (seatHere && Math.hypot(me.x - seatHere.x, me.y - seatHere.y) < 1) {
+    next[idx] = {
+      ...me,
+      action: seatHere.pose,
+      target: undefined,
+      origin: undefined,
+      perch: { lift: seatHere.lift, on: true, jump: true },
+      hopMs: HOUSE_SCENE.hopMs,
+      remainMs: between(HOUSE_SCENE.dur[seatHere.pose], rng),
+    };
+    return next;
+  }
+  // 坐夠了（或要去的擺設被收起來了）：先跳下來，再照常挑下一個動作
+  if (me.perch?.on) {
+    me.perch = { lift: me.perch.lift, on: false, jump: true };
+    me.hopMs = HOUSE_SCENE.hopMs;
+  }
+  me.seat = undefined;
+
   // 結束蹭蹭時，把對象也一起帶回一般靜止動作，避免單獨蹭蹭
   if (me.action === 'nuzzle' && me.partnerId) {
     const pIdx = next.findIndex((a) => a.id === me.partnerId);
@@ -349,6 +391,27 @@ export function decideNextAction(
         origin: undefined,
         partnerId: me.id,
         remainMs: dur,
+      };
+      return next;
+    }
+  }
+
+  // 去擺設上坐：有空的位子（沒有別隻正坐著或正走過去）才會挑，機率照 HOUSE_SCENE.weights.seat 跟其他動作比
+  const freeSeats = (options.seats ?? []).filter((s) => !next.some((a) => a.id !== id && a.seat === s.id));
+  if (freeSeats.length > 0) {
+    const total = ALL_ACTIONS.reduce((sum, a) => sum + actionWeight(a, mySpecials), 0) + HOUSE_SCENE.weights.seat;
+    if (clamp(rng(), 0, 0.999999) * total < HOUSE_SCENE.weights.seat) {
+      const seat = freeSeats[Math.floor(clamp(rng(), 0, 0.999999) * freeSeats.length)]!;
+      const target = { x: seat.x, y: seat.y };
+      next[idx] = {
+        ...me,
+        action: 'walk',
+        target,
+        origin: { x: me.x, y: me.y },
+        seat: seat.id,
+        partnerId: undefined,
+        remainMs: 0,
+        facing: target.x === me.x ? me.facing : target.x < me.x ? 'left' : 'right',
       };
       return next;
     }
@@ -465,7 +528,30 @@ export function stepHouse(
     next = decideNextAction(id, next, bounds, rng, options);
   }
 
-  return next.map((actor) => stepDucks(actor, Boolean(options.specials?.get(actor.id)?.has('ducklings')), dt));
+  return next.map((actor) => stepDucks(dropPerch(actor, options.seats), Boolean(options.specials?.get(actor.id)?.has('ducklings')), dt));
+}
+
+/** 跳下來落地了就拿掉 perch；坐著的擺設被收起來了就跳下來 */
+function dropPerch(actor: HouseActor, seats: readonly HouseSeat[] | undefined): HouseActor {
+  if (actor.perch && !actor.perch.on && actor.hopMs <= 0) return { ...actor, perch: undefined };
+  if (actor.perch?.jump && actor.hopMs <= 0) return { ...actor, perch: { ...actor.perch, jump: false } };
+  if (actor.seat && !seats?.some((s) => s.id === actor.seat)) {
+    return {
+      ...actor,
+      seat: undefined,
+      ...(actor.perch?.on ? { perch: { lift: actor.perch.lift, on: false, jump: true }, hopMs: HOUSE_SCENE.hopMs } : {}),
+    };
+  }
+  return actor;
+}
+
+/** 跳上、跳下擺設，或坐在擺設上時，比地板高多少（px）：跳的那一下照 hopMs 升降，再加一個小弧線 */
+export function perchLift(actor: HouseActor): number {
+  if (!actor.perch) return 0;
+  const f = clamp(actor.hopMs / HOUSE_SCENE.hopMs, 0, 1);
+  if (!actor.perch.jump) return actor.perch.on ? actor.perch.lift : 0;
+  const level = actor.perch.on ? actor.perch.lift * (1 - f) : actor.perch.lift * f;
+  return level + 4 * f * (1 - f) * HOUSE_SCENE.seatArc;
 }
 
 /**
@@ -567,6 +653,11 @@ export function actorLift(
   gait: PetGait = PET_GAIT_DEFAULT,
   specials?: ReadonlySet<OutfitSpecial>,
 ): number {
+  return moveLift(actor, gait, specials) + perchLift(actor);
+}
+
+/** 移動中離地多高（飛、緩降、飄著走、一蹦一蹦）；坐在擺設上的高度另外加（perchLift） */
+function moveLift(actor: HouseActor, gait: PetGait, specials?: ReadonlySet<OutfitSpecial>): number {
   const traveled = actor.origin ? Math.hypot(actor.x - actor.origin.x, actor.y - actor.origin.y) : 0;
   const total = actor.origin && actor.target ? Math.hypot(actor.target.x - actor.origin.x, actor.target.y - actor.origin.y) : 0;
   if (actor.action === 'fly') {

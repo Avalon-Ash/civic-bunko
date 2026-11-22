@@ -40,7 +40,8 @@ export const HOUSE_MAX_CATS = 1 + HOUSE_ADOPT.length;
  * hoverSpeed、hoverRise＝天使翅膀飛起來的速度、在路程的前幾成就飛到最高（剩下的路慢慢降落）；
  * floatEase、floatStride＝氣球飄著走：起步、停下時升降要走多遠（px）、每走多遠上下晃一次；
  * duck＝小鴨跟班（隻數與多久呱一次跟亂跑的小貓同一處 PET_DUCK）：每隻跟前面那隻保持 gap（px）、追的速度 speed（px／秒）、圖寬 size（px）；napBoost＝睡衣全套挑睡覺的權重倍數；minTrip＝走路目標至少離現在多遠（px）；walkTries＝挑目標最多試幾次；
- * hopMs＝點小貓時跳一下的時間（毫秒）；maxDtMs＝單幀推進步長上限（毫秒，避免切回前景跳躍）；
+ * hopMs＝點小貓時跳一下的時間（毫秒；跳上、跳下擺設也是這麼久）；seatArc＝跳上跳下擺設時多跳高多少（px）；
+ * weights.seat＝去坐墊、書堆上坐的權重（有空位才會挑，跟其他動作的權重比）；maxDtMs＝單幀推進步長上限（毫秒，避免切回前景跳躍）；
  * dur＝各動作持續多久（毫秒，範圍內隨機）；weights＝動作權重；
  * nuzzle＝兩隻距離小於 dist（px）時，有 chance 的機率一起坐下互看冒 ♥，同時最多一對；
  * doorInset＝新領養的小貓從右邊門口走進來時的起點（離右緣幾 px）；enterTargetRatio＝走進房內落點的水平比例範圍。
@@ -80,7 +81,9 @@ export const HOUSE_SCENE = {
     groom: 2,
     loaf: 1,
     zoom: 1,
+    seat: 1.5,
   },
+  seatArc: 10,
   nuzzle: {
     dist: 88,
     chance: 0.45,

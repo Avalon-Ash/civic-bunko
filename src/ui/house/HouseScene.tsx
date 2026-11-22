@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { HOUSE_SCENE } from '../../core/constants/house';
 import { PET_PLAY, PET_ROCKET, PET_SLIME } from '../../core/constants/pet';
 import type { CatId, ItemId, OutfitSpecial } from '../../core/types';
@@ -25,6 +25,7 @@ import {
   type HouseActor,
   type HouseDayPart,
   type HouseMark,
+  type HouseSeat,
   type RoomBounds,
 } from './houseLogic';
 
@@ -57,6 +58,7 @@ function RoomDecor({ ids, wall }: { ids: readonly ItemId[]; wall: boolean }) {
           viewBox={room.box}
           aria-hidden="true"
           style={{ ...room.at }}
+          data-seat={room.seat ? id : undefined}
         >
           {room.node}
         </svg>
@@ -292,6 +294,30 @@ export function HouseScene({ cats, selected, onSelect, entering = null, decor = 
   );
   const specialsRef = useRef<ReadonlyMap<CatId, ReadonlySet<OutfitSpecial>>>(specialsById);
   specialsRef.current = specialsById;
+
+  // 擺設上可以坐的地方：照畫面上的位置量（擺設的位置是 CSS 長度，房間大小一變就重量）
+  const seatsRef = useRef<HouseSeat[]>([]);
+  const decorKey = decor.join(',');
+  useLayoutEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+    const sr = scene.getBoundingClientRect();
+    const b = roomBounds(size.width, size.height);
+    const wall = size.height - b.floorHeight;
+    const seats: HouseSeat[] = [];
+    for (const el of scene.querySelectorAll('[data-seat]')) {
+      const id = el.getAttribute('data-seat') ?? '';
+      const art = ITEM_ART[id];
+      const seat = art && art.kind === 'layer' ? art.room?.seat : undefined;
+      if (!seat) continue;
+      const r = el.getBoundingClientRect();
+      const x = Math.min(Math.max(r.left - sr.left + r.width / 2, b.minX), b.maxX);
+      const y = Math.min(Math.max(r.bottom - sr.top - wall, b.minY), b.maxY);
+      const top = r.top - sr.top + seat.top * r.height;
+      seats.push({ id, x, y, lift: Math.max(0, wall + y - top), pose: seat.pose });
+    }
+    seatsRef.current = seats;
+  }, [decorKey, size.width, size.height]);
   // 換上或脫掉小鴨裝：小鴨馬上出現或消失（不等那隻小貓換下一個動作）
   const duckKey = cats.map((c) => (specialsById.get(c.id)?.has('ducklings') ? 1 : 0)).join('');
   useEffect(() => {
@@ -443,6 +469,7 @@ export function HouseScene({ cats, selected, onSelect, entering = null, decor = 
         stepHouse(prev, dt, boundsRef.current, Math.random, {
           reducedMotion,
           specials: specialsRef.current,
+          seats: seatsRef.current,
         }),
       );
       rafId = window.requestAnimationFrame(tick);
@@ -458,6 +485,7 @@ export function HouseScene({ cats, selected, onSelect, entering = null, decor = 
         stepHouse(prev, delayMs, boundsRef.current, Math.random, {
           reducedMotion,
           specials: specialsRef.current,
+          seats: seatsRef.current,
         }),
       );
     }, delayMs);

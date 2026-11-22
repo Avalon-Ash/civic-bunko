@@ -86,6 +86,8 @@ export interface RoomArt {
   box: string;
   wall: boolean;
   at: { left?: string; right?: string; top?: string; bottom?: string; width: number; height: number };
+  /** 小貓可以坐上去（地上的才有）：top＝坐面在圖的幾成高（從上往下量）、pose＝坐上去睡覺還是坐著 */
+  seat?: { top: number; pose: 'sit' | 'loaf' };
 }
 
 export type ItemArt =
@@ -1670,6 +1672,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       wall: false,
       box: '0 0 84 32',
       at: { right: '16%', bottom: '6px', width: 80, height: 30 },
+      seat: { top: 0.3, pose: 'loaf' },
       node: (
         <g>
           <path d="M5 9 L1.5 6 M79 9 L82.5 6 M5 25 L1.5 28 M79 25 L82.5 28" stroke="var(--acc-gold)" strokeWidth="1.8" strokeLinecap="round" />
@@ -1703,6 +1706,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       wall: false,
       box: '0 0 40 38',
       at: { right: '54px', bottom: 'calc(var(--house-floor-pct) - 22px)', width: 38, height: 36 },
+      seat: { top: 0.22, pose: 'sit' },
       node: (
         <g>
           <rect x="3" y="27" width="32" height="9" rx="2" fill="var(--acc-sky)" {...thin} />

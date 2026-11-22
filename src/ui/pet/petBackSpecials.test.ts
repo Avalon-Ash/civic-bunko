@@ -5,7 +5,7 @@ import { HOUSE_SCENE } from '../../core/constants/house';
 import { PET_DUCK, PET_FLOAT, PET_GLIDE, PET_ROCKET, PET_SLIME } from '../../core/constants/pet';
 import type { OutfitSpecial } from '../../core/types';
 import { outfitSpecials } from '../../selectors/wardrobe';
-import { actorLift, houseMark, stepDucks, stepHouse, type HouseActor } from '../house/houseLogic';
+import { actorLift, decideNextAction, hopActor, houseMark, stepDucks, stepHouse, type HouseActor, type HouseSeat } from '../house/houseLogic';
 import { ducklingTargets, fallCap, floatHeight, gaitFor, landsSoftly, pushTrail, speedFactor } from './petLogic';
 
 const set = (...ids: OutfitSpecial[]) => new Set<OutfitSpecial>(ids);
@@ -115,5 +115,57 @@ describe('house: ducklings, wings and balloon', () => {
     assert.deepEqual(houseMark({ ...zoom, facing: 'left' }, rocket, undefined, 20), { kind: 'puff', x: 220, y: 40 });
     assert.equal(houseMark(zoom, rocket, { x: 200 - PET_ROCKET.stride / 2, y: 40 }, 20), null);
     assert.equal(houseMark(zoom, undefined, undefined, 20), null);
+  });
+});
+
+describe('house: cats go sit on the bought cushion and books', () => {
+  const bounds = { minX: 40, maxX: 320, minY: 10, maxY: 70, width: 360, floorHeight: 78 };
+  const seats: HouseSeat[] = [
+    { id: 'cushion', x: 260, y: 60, lift: 8, pose: 'loaf' },
+    { id: 'book-stack', x: 300, y: 12, lift: 26, pose: 'sit' },
+  ];
+  const cat = (id: string, x: number): HouseActor => ({ id, x, y: 40, facing: 'right', action: 'sit', remainMs: 0, hopMs: 0 });
+  const zero = () => 0;
+
+  it('walks to a free seat, hops up, then naps on the cushion at the seat height', () => {
+    let actors = decideNextAction('cat-1', [cat('cat-1', 60)], bounds, zero, { seats });
+    const me = actors[0]!;
+    assert.equal(me.action, 'walk');
+    assert.equal(me.seat, 'cushion');
+    assert.deepEqual(me.target, { x: 260, y: 60 });
+    for (let i = 0; i < 200 && actors[0]!.action === 'walk'; i += 1) actors = stepHouse(actors, 50, bounds, () => 0.9, { seats });
+    const sat = actors[0]!;
+    assert.equal(sat.action, 'loaf');
+    assert.equal(sat.perch?.on, true);
+    // 跳上去的那一下還沒到頂；落定後高度＝坐面
+    assert.ok(actorLift(sat) < HOUSE_SCENE.seatArc + 8);
+    const settled = stepHouse(actors, HOUSE_SCENE.hopMs, bounds, () => 0.9, { seats })[0]!;
+    assert.equal(actorLift(settled), 8);
+    // 點牠原地跳一下，不會掉回地板
+    const tapped = hopActor([settled], 'cat-1')[0]!;
+    assert.ok(actorLift(tapped) >= 8);
+  });
+
+  it('does not take a seat another cat is sitting on or walking to', () => {
+    const other: HouseActor = { ...cat('cat-2', 200), action: 'walk', seat: 'cushion', target: { x: 260, y: 60 } };
+    const actors = decideNextAction('cat-1', [cat('cat-1', 60), other], bounds, zero, { seats });
+    assert.equal(actors[0]!.seat, 'book-stack');
+    const both: HouseActor[] = [{ ...other, seat: 'book-stack' }, { ...cat('cat-3', 150), seat: 'cushion', perch: { lift: 8, on: true, jump: false } }];
+    const third = decideNextAction('cat-1', [cat('cat-1', 60), ...both], bounds, zero, { seats });
+    assert.equal(third[0]!.seat, undefined, 'no free seat left');
+  });
+
+  it('hops down when done, and when its seat is put away', () => {
+    const seated: HouseActor = { ...cat('cat-1', 260), y: 60, action: 'loaf', seat: 'cushion', perch: { lift: 8, on: true, jump: false } };
+    const left = decideNextAction('cat-1', [seated], bounds, () => 0.99, { seats })[0]!;
+    assert.equal(left.seat, undefined);
+    assert.equal(left.perch?.on, false);
+    assert.equal(left.hopMs, HOUSE_SCENE.hopMs);
+    const landed = stepHouse([left], HOUSE_SCENE.hopMs, bounds, () => 0.99, { seats })[0]!;
+    assert.equal(landed.perch, undefined);
+
+    const putAway = stepHouse([{ ...seated, remainMs: 10_000 }], 16, bounds, () => 0.99, { seats: [] })[0]!;
+    assert.equal(putAway.seat, undefined);
+    assert.equal(putAway.perch?.on, false);
   });
 });
