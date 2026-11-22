@@ -28,6 +28,17 @@ export function pickBehavior(
   return pool[pool.length - 1] ?? 'sit';
 }
 
+/**
+ * 目前不能挑的動作：在地面且畫面上沒有卡片時不能跳上去；
+ * 在卡片上時不能暴衝，但保留 perch（代表跳回地面）。
+ */
+export function roamUnavailable(surface: 'floor' | 'perch', perchCount: number): Set<RoamBehavior> {
+  const out = new Set<RoamBehavior>();
+  if (surface === 'perch') out.add('zoom');
+  else if (perchCount <= 0) out.add('perch');
+  return out;
+}
+
 /** 這身穿著走路的樣子：PET_GAITS 裡第一個符合的，都不符合就是平常的步態 */
 export function gaitFor(specials: ReadonlySet<OutfitSpecial>): PetGait {
   return PET_GAITS.find(({ when }) => specials.has(when))?.gait ?? PET_GAIT_DEFAULT;

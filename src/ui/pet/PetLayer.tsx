@@ -57,7 +57,7 @@ import { heldAxe } from '../kit/wardrobe/art';
 import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
-import { between, clamp, flyLift, gaitFor, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, stepWalk } from './petLogic';
+import { between, clamp, flyLift, gaitFor, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, roamUnavailable, stepWalk } from './petLogic';
 import { CLAW_MARK, ClawMark, FrostMark } from './petMarks';
 import { getPet, petHome, subscribePet } from './petStore';
 import { CAT_BURN_ATTR, scorchOffset } from './ScorchLayer';
@@ -484,11 +484,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       e.pounce = null;
       const floor = floorY();
       const perches = visiblePerches(floor);
-      const unavailable = new Set<RoamBehavior>();
-      if (perches.length === 0 || e.surface.kind === 'perch') unavailable.add('perch');
-      if (e.surface.kind === 'perch') {
-        unavailable.add('zoom');
-      }
+      const unavailable = roamUnavailable(e.surface.kind, perches.length);
       const baseRoute = ROAM_ROUTES[tabRef.current] ?? DEFAULT_ROUTE;
       // 睡衣全套：特別愛睡
       const route = specials.current.has('dream') ? { ...baseRoute, nap: baseRoute.nap * PET_PLAY.dream.napWeight } : baseRoute;
@@ -615,6 +611,22 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         }
       }
       if (b === 'perch') {
+        if (e.surface.kind === 'perch') {
+          // 在卡片上挑到 perch＝跳回地面：落在左右各兩個身長以內、腳下沒有按鈕的地方
+          const span = W * 2;
+          const tx =
+            pickWalkTarget(
+              Number.NaN,
+              Math.max(range.min, e.x - span),
+              Math.min(range.max, e.x + span),
+              0,
+              Math.random,
+              (x) => blockedAt(x, floor),
+            ) ?? clamp(e.x, range.min, range.max);
+          e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: tx, y: floor }, start: now, land: { kind: 'floor' } };
+          show('hop', tx > e.x ? 'right' : tx < e.x ? 'left' : shown.current.facing);
+          return;
+        }
         const el = perches[Math.floor(Math.random() * perches.length)];
         const r = el ? rectOf(el) : null;
         // 坐上去時身體會蓋到卡片上方的東西：那裡有按鈕就換個位置，都不行就不跳

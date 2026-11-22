@@ -3,6 +3,14 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-perch-down',
+    date: '2026-11-22',
+    title: '小貓跳上卡片後會自己跳下來',
+    items: [
+      '以前小貓跳上卡片就一直待在上面，現在會跳回地面繼續跑，企鵝也會再用肚子滑了',
+    ],
+  },
+  {
     id: '2026-11-22-cat-outing-all',
     date: '2026-11-22',
     title: '全家都可以一起出門了',
