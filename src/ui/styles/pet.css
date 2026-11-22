@@ -1000,15 +1000,16 @@
 /* 蝸牛留下的亮晶晶的線、小火箭的煙圈、餵小鴨的麵包屑 */
 .cb-pet-trail {
   border-radius: 999px;
-  background: var(--acc-silver);
+  background: var(--acc-sky);
+  border: 1px solid var(--ink-soft);
   box-shadow: 0 0 4px var(--acc-cream);
-  opacity: 0.75;
+  opacity: 0.85;
   animation: cb-pet-fade linear forwards;
 }
 
 .cb-pet-puff {
   border-radius: 50%;
-  border: 2px solid var(--acc-silver);
+  border: 2px solid var(--ink-soft);
   background: var(--acc-cream);
   animation: cb-pet-puff ease-out forwards;
 }

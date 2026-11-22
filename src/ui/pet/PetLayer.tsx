@@ -116,7 +116,8 @@ type Mode =
       /** 小火箭原地升空：一路冒煙圈 */
       rocket?: boolean;
     }
-  | { kind: 'fall'; vy: number }
+  /** to＝慢慢飄下來時一邊往這個 x 飄過去（翅膀、氣球從卡片下來） */
+  | { kind: 'fall'; vy: number; to?: number }
   | { kind: 'land'; until: number }
   | { kind: 'drag' }
   | { kind: 'goHome' };
@@ -303,8 +304,8 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
   const [facing, setFacing] = useState<'left' | 'right'>('right');
   const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false, firing: false, binky: false });
   const [bits, setBits] = useState<Bit[]>([]);
-  /** 小鴨跟班：幾隻（0＝沒穿小鴨裝）、每隻的 DOM（位置每一格直接寫）、正在呱的是哪一隻 */
-  const [duckCount, setDuckCount] = useState(0);
+  /** 小鴨跟班：幾隻（照穿著算；0＝沒穿小鴨裝）、每隻的 DOM（位置每一格直接寫）、正在呱的是哪一隻 */
+  const duckCount = specials.current.has('ducklings') ? PET_DUCK.count : 0;
   const duckNodes = useRef<Array<HTMLDivElement | null>>([]);
   const [quack, setQuack] = useState<{ who: number; key: number } | null>(null);
   const quackSeq = useRef(0);
@@ -687,12 +688,11 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               Math.random,
               (x) => blockedAt(x, floor),
             ) ?? clamp(e.x, range.min, range.max);
-          if (specials.current.has('glide') || specials.current.has('float')) {
-            // 天使翅膀、氣球：不用跳的，直接從卡片邊飄下去（往下掉的速度有上限）
-            e.x = tx;
+          if (landsSoftly(specials.current)) {
+            // 天使翅膀、氣球：不用跳的，從卡片上慢慢飄下去，一邊往落點飄過去（往下掉的速度有上限）
             e.surface = { kind: 'floor' };
-            e.mode = { kind: 'fall', vy: 0 };
-            show('fall');
+            e.mode = { kind: 'fall', vy: 0, to: tx };
+            show('fall', tx > e.x ? 'right' : tx < e.x ? 'left' : shown.current.facing);
             return;
           }
           e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: tx, y: floor }, start: now, land: { kind: 'floor' } };
@@ -870,10 +870,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
     const updateDucks = (e: Engine, now: number, dt: number) => {
       const nodes = duckNodes.current;
       if (!specials.current.has('ducklings')) {
-        if (e.ducks.length > 0) {
-          e.ducks = [];
-          setDuckCount(0);
-        }
+        e.ducks = [];
         return;
       }
       const catX = e.x + W / 2;
@@ -886,7 +883,6 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           pecking: false,
         }));
         e.trail = [];
-        setDuckCount(PET_DUCK.count);
       }
       if (e.surface.kind === 'floor' && e.mode.kind !== 'drag' && e.mode.kind !== 'jump') {
         e.trail = pushTrail(e.trail, catX, PET_DUCK.hop.stride / 2);
@@ -913,6 +909,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         const node = nodes[i];
         if (!node) return;
         node.style.transform = `translate3d(${Math.round(d.x - PET_DUCK.size / 2)}px, ${Math.round(ground - duckH)}px, 0)`;
+        node.style.visibility = '';
         node.classList.toggle('is-walking', d.walking);
         node.classList.toggle('is-pecking', d.pecking);
         node.classList.toggle('is-left', d.facing === 'left');
@@ -974,6 +971,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           // 天使翅膀、氣球：往下掉的速度有上限（慢慢飄下來）
           m.vy = Math.min(m.vy + ROAM_GRAVITY * dt, fallCap(specials.current));
           e.y += m.vy * dt;
+          if (m.to !== undefined) e.x = stepWalk(e.x, m.to, PET_GLIDE.drift, dt).x;
           const landY = surfaceY(e.surface) ?? floorY();
           if (e.y >= landY) {
             e.y = landY;
@@ -1350,7 +1348,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               left: bit.x,
               top: bit.y,
               width: bit.size,
-              height: bit.kind === 'trail' ? 3 : bit.size,
+              height: bit.kind === 'trail' ? 4 : bit.size,
               animationDuration: `${bit.kind === 'trail' ? PET_SLIME.lifeMs : bit.kind === 'puff' ? PET_ROCKET.lifeMs : PET_DUCK.crumb.lifeMs}ms`,
             }}
             aria-hidden="true"
@@ -1396,6 +1394,7 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
             duckNodes.current[i] = node;
           }}
           className="cb-pet-bit cb-pet-duck"
+          style={{ visibility: 'hidden' }}
           aria-hidden="true"
         >
           {quack?.who === i ? (

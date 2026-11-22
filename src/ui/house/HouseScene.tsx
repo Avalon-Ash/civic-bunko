@@ -17,6 +17,7 @@ import {
   hopActor,
   nextTickDelayMs,
   roomBounds,
+  stepDucks,
   stepHouse,
   syncActorsWithCats,
   type HouseActor,
@@ -288,6 +289,11 @@ export function HouseScene({ cats, selected, onSelect, entering = null, decor = 
   );
   const specialsRef = useRef<ReadonlyMap<CatId, ReadonlySet<OutfitSpecial>>>(specialsById);
   specialsRef.current = specialsById;
+  // 換上或脫掉小鴨裝：小鴨馬上出現或消失（不等那隻小貓換下一個動作）
+  const duckKey = cats.map((c) => (specialsById.get(c.id)?.has('ducklings') ? 1 : 0)).join('');
+  useEffect(() => {
+    setActors((prev) => prev.map((a) => stepDucks(a, Boolean(specialsRef.current.get(a.id)?.has('ducklings')), 0)));
+  }, [duckKey]);
 
   const [actors, setActors] = useState<HouseActor[]>(() =>
     createInitialActors(

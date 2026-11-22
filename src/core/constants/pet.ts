@@ -496,9 +496,10 @@ export const PET_DUCK = {
 } as const;
 /**
  * 天使翅膀緩降（glide）：往下掉的速度最多 maxVy（px／秒），左右晃 sway px、每 swayMs 一個來回；
+ * drift＝從卡片飄下來時往落點橫移的速度（px／秒，氣球也用）；
  * 落地不踉蹌（直接站好）；perch＝挑到「跳上卡片」時改用飛的上去（jump 的 ms 乘 slow、lift 用 lift）
  */
-export const PET_GLIDE = { maxVy: 130, sway: 10, swayMs: 1_400, slow: 2.2, lift: 70 } as const;
+export const PET_GLIDE = { maxVy: 130, sway: 10, swayMs: 1_400, slow: 2.2, lift: 70, drift: 60 } as const;
 /**
  * 氣球漂浮（float）：走路時離地 lift px 上下飄（每 bobMs 一個來回、振幅 bob px），速度乘 speed；
  * 放手時往下掉最多 maxVy（比翅膀更慢），落地前往上彈 bounce px
