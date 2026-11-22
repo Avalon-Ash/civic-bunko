@@ -398,14 +398,20 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
         const range = xRange();
         const spread = between(HOUSE_OUTING.jumpOffset, Math.random);
         const toX = clamp(from.x + (from.x < window.innerWidth / 2 ? spread : -spread), range.min, range.max);
-        engine.current = newEngine(from, {
-          kind: 'jump',
-          from,
-          to: { x: toX, y: floorY() },
-          start: performance.now(),
-          land: { kind: 'floor' },
-        });
-        show('hop');
+        if (landsSoftly(specials.current)) {
+          // 天使翅膀、氣球：從頭像出來不用跳的，拍著翅膀（或掛著氣球）慢慢飄到地面，一邊往落點飄過去
+          engine.current = newEngine(from, { kind: 'fall', vy: 0, to: toX });
+          show('fall', toX > from.x ? 'right' : 'left');
+        } else {
+          engine.current = newEngine(from, {
+            kind: 'jump',
+            from,
+            to: { x: toX, y: floorY() },
+            start: performance.now(),
+            land: { kind: 'floor' },
+          });
+          show('hop');
+        }
         setFlags((f) => ({ ...f, emerging: true }));
         window.setTimeout(() => setFlags((f) => ({ ...f, emerging: false })), ROAM_JUMP_MS);
       } else if (s.request?.kind === 'recall' && e) {

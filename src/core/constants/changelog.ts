@@ -3,6 +3,12 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-22-wings-release',
+    date: '2026-11-22',
+    title: '天使翅膀從頭像飄下來',
+    items: ['穿天使翅膀（或掛氣球）的小貓，按肉球放出來時不用跳的，會從頭像慢慢飄到地上'],
+  },
+  {
     id: '2026-11-22-house-trails',
     date: '2026-11-22',
     title: '小屋裡的蝸牛和火箭',
