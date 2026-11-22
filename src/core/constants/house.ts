@@ -34,7 +34,8 @@ export const HOUSE_MAX_CATS = 1 + HOUSE_ADOPT.length;
  * height／shortHeight＝房間高度（px；shortHeight 用於手機橫放，高 ≤ 500px）；
  * floorRatio＝地板佔房間高度的比例；floorInsetY＝地板可用區域的上下比例；
  * catWidth＝房間裡每隻小貓的圖寬（px）；edgeX＝小貓中心離左右牆至少留幾 px；
- * walkSpeed＝走路速度（px／秒）；minTrip＝走路目標至少離現在多遠（px）；walkTries＝挑目標最多試幾次；
+ * walkSpeed＝走路速度（px／秒）；zoomSpeed＝暴衝（跑過整個房間，企鵝全套是肚子滑）的速度；flySpeed＝披風飛過房間的速度；
+ * flyChance＝穿披風時要走路或暴衝改用飛的機率；flyLift＝飛行弧線最高離地多高（px）；napBoost＝睡衣全套挑睡覺的權重倍數；minTrip＝走路目標至少離現在多遠（px）；walkTries＝挑目標最多試幾次；
  * hopMs＝點小貓時跳一下的時間（毫秒）；maxDtMs＝單幀推進步長上限（毫秒，避免切回前景跳躍）；
  * dur＝各動作持續多久（毫秒，範圍內隨機）；weights＝動作權重；
  * nuzzle＝兩隻距離小於 dist（px）時，有 chance 的機率一起坐下互看冒 ♥，同時最多一對；
@@ -49,6 +50,11 @@ export const HOUSE_SCENE = {
   edgeX: 42,
   defaultWidth: 360,
   walkSpeed: 42,
+  zoomSpeed: 150,
+  flySpeed: 120,
+  flyChance: 0.4,
+  flyLift: 40,
+  napBoost: 3,
   minTrip: 36,
   walkTries: 8,
   hopMs: 520,
@@ -64,6 +70,7 @@ export const HOUSE_SCENE = {
     sit: 2,
     groom: 2,
     loaf: 1,
+    zoom: 1,
   },
   nuzzle: {
     dist: 88,
