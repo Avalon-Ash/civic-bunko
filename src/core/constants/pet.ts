@@ -472,7 +472,48 @@ export const PET_GAITS: ReadonlyArray<{ when: OutfitSpecial; gait: PetGait }> = 
   { when: 'slide', gait: { walk: 'waddle', zoom: 'slide', home: 'slide', rest: 'upright' } },
   { when: 'waddle', gait: { walk: 'waddle', zoom: 'waddle', home: 'waddle', rest: 'upright' } },
   { when: 'moo', gait: { walk: 'upwalk', zoom: 'upwalk', home: 'upwalk', rest: 'upright' } },
+  // 小鴨裝：鴨子搖搖擺擺地走（坐著照常坐，小鴨才窩得到旁邊）
+  { when: 'ducklings', gait: { walk: 'waddle', zoom: 'waddle', home: 'waddle', rest: 'sit' } },
 ];
+
+// ── 鴨子裝與背飾單件的特效（docs/plans/back-specials.md）──────────
+/**
+ * 小鴨跟班（OUTFIT_SPECIALS 的 ducklings、feed）：count 隻小鴨排成一列跟著小貓走過的路（第 n 隻落後 n × gap px），
+ * size＝小鴨的寬（px，亂跑的小貓是 ROAM_WIDTH）；trail＝記住小貓走過的幾個點（要夠 count × gap 用）；
+ * catchUp＝小鴨追上排隊位置的速度（px／秒）、hop＝小鴨走路一跳一跳的高度（px）與步距；
+ * quackMs＝多久呱一聲（範圍內隨機；答題頁不叫）；
+ * crumb＝餵小鴨：坐著時每 everyMs 撒一把 count 顆麵包屑（半徑 spread px 內、每顆 size px），lifeMs 後淡掉，小鴨跑過去啄
+ */
+export const PET_DUCK = {
+  count: 2,
+  gap: 30,
+  size: 26,
+  trail: 120,
+  catchUp: 120,
+  hop: { lift: 5, stride: 14 },
+  quackMs: { min: 9_000, max: 18_000 },
+  crumb: { everyMs: 6_000, count: 4, spread: 26, size: 5, lifeMs: 4_500 },
+} as const;
+/**
+ * 天使翅膀緩降（glide）：往下掉的速度最多 maxVy（px／秒），左右晃 sway px、每 swayMs 一個來回；
+ * 落地不踉蹌（直接站好）；perch＝挑到「跳上卡片」時改用飛的上去（jump 的 ms 乘 slow、lift 用 lift）
+ */
+export const PET_GLIDE = { maxVy: 130, sway: 10, swayMs: 1_400, slow: 2.2, lift: 70 } as const;
+/**
+ * 氣球漂浮（float）：走路時離地 lift px 上下飄（每 bobMs 一個來回、振幅 bob px），速度乘 speed；
+ * 放手時往下掉最多 maxVy（比翅膀更慢），落地前往上彈 bounce px
+ */
+export const PET_FLOAT = { lift: 14, bob: 5, bobMs: 1_800, speed: 0.8, maxVy: 90, bounce: 10 } as const;
+/**
+ * 蝸牛殼（slime）：走路速度乘 speed；每走 stride px 留下一段亮晶晶的線（lifeMs 後淡掉，跟蜂蜜腳印同一套）；
+ * 被點一下縮進殼裡 hideMs（姿勢 loaf）
+ */
+export const PET_SLIME = { speed: 0.5, stride: 10, lifeMs: 5_000, hideMs: 2_600 } as const;
+/**
+ * 小火箭（rocket）：暴衝速度乘 speed，每走 stride px 留一個煙圈（size px、lifeMs 淡掉）；
+ * 要走路時有 liftChance 的機率原地升空 lift px 再落下（ms）
+ */
+export const PET_ROCKET = { speed: 1.5, stride: 22, size: 14, lifeMs: 1_100, liftChance: 0.15, lift: 110, ms: 1_600 } as const;
 
 // ── 其他分頁：從頭像鑽出來自由亂跑 ─────────────────────────
 /** 亂跑的小貓寬度（px；高度照 PET_VIEW 比例） */

@@ -387,6 +387,9 @@ export function parseWardrobe(value: unknown): WardrobeState | undefined {
   const leader =
     typeof value.leader === 'string' && HOUSE_CAT_ID.test(value.leader) ? value.leader : undefined;
 
+  // 小屋擺設收起來的背景：字串、不重複（不認得的 ID 留著，較新版本買的）；空陣列也留（＝她都擺回去了，跟沒有這欄一樣）
+  const roomHidden = isStringArray(value.roomHidden) ? [...new Set(value.roomHidden)] : undefined;
+
   // 特價省下的：只收「配件 ID → 正數」，其他丟掉；一筆都沒有就不留這欄
   const saved = isRecord(value.saved)
     ? cleanSaved(
@@ -412,6 +415,7 @@ export function parseWardrobe(value: unknown): WardrobeState | undefined {
     ...(cats !== undefined ? { cats } : {}),
     ...(outing !== undefined ? { outing } : {}),
     ...(leader !== undefined ? { leader } : {}),
+    ...(roomHidden !== undefined ? { roomHidden } : {}),
   };
 }
 

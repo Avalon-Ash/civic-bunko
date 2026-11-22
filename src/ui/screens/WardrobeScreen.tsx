@@ -4,7 +4,9 @@ import { dispatch } from '../../core/commands';
 import { RUNNER_HOP_MS } from '../../core/constants/pet';
 import type { CatId, ItemId, Outfit, SlotId, TryOn } from '../../core/types';
 import type { World } from '../../core/world';
-import { catOutfit, houseCats, leaderCat, nextAdoption } from '../../selectors/house';
+import { catOutfit, houseCats, leaderCat, nextAdoption, roomDecor } from '../../selectors/house';
+import { soundOn } from '../../selectors/sound';
+import { playSound } from '../sound';
 import {
   achievementStatuses,
   dailyTierStatus,
@@ -117,6 +119,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   useWorld(world);
   const now = new Date();
   const cats = houseCats(world);
+  const decor = roomDecor(world);
   const leader = leaderCat(world);
   const adoption = nextAdoption(world, now);
   const fish = fishBalance(world, now);
@@ -242,7 +245,39 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
         </span>
       </div>
 
-      <HouseScene cats={cats} selected={selected} onSelect={selectCat} entering={entering} />
+      <HouseScene
+        cats={cats}
+        selected={selected}
+        onSelect={selectCat}
+        entering={entering}
+        decor={decor.filter((d) => d.on).map((d) => d.id)}
+        onQuack={() => {
+          if (soundOn(world)) playSound('quack', false);
+        }}
+      />
+
+      <div className="cb-house-decor-row" role="group" aria-label="小屋擺設">
+        <span className="cb-house-decor-label">擺設</span>
+        {decor.length === 0 ? (
+          <span className="cb-house-decor-hint">在下面的衣櫥買背景，就會擺進小屋</span>
+        ) : (
+          decor.map((d) => (
+            <button
+              key={d.id}
+              type="button"
+              className={`cb-house-decor-pill cb-press ${d.on ? 'is-on' : ''}`.trim()}
+              aria-pressed={d.on}
+              aria-label={`${d.name}${d.on ? '，擺在小屋裡，點一下收起來' : '，收起來了，點一下擺回去'}`}
+              onClick={() => dispatch(world, { type: 'setRoomDecor', item: d.id, on: !d.on })}
+            >
+              <span className="cb-house-decor-icon">
+                <ItemIcon id={d.id} />
+              </span>
+              {d.name}
+            </button>
+          ))
+        )}
+      </div>
 
       <div className="cb-house-roster" role="group" aria-label="全家小貓">
         {cats.map((cat) => {

@@ -45,6 +45,11 @@ export const TONES: Readonly<Record<Exclude<SoundName, 'meow'>, readonly ToneSpe
     { wave: 'sawtooth', from: 150, to: 112, at: 0.18, dur: 0.62, gain: 0.035 },
     { wave: 'triangle', from: 300, to: 224, at: 0.18, dur: 0.62, gain: 0.025 },
   ],
+  /** 小鴨的「呱呱」：兩聲短短往下掉的鼻音（方波帶出鼻音，音量壓得比哞還小） */
+  quack: [
+    { wave: 'square', from: 640, to: 470, at: 0, dur: 0.11, gain: 0.018 },
+    { wave: 'square', from: 610, to: 440, at: 0.15, dur: 0.13, gain: 0.018 },
+  ],
 };
 
 /** 貓叫錄音的目標音量（RMS）：比按鍵聲（約 0.02）稍大 */

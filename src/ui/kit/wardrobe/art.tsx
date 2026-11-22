@@ -77,6 +77,17 @@ export interface FurMarks {
   tail?: BodyArt['tail'];
 }
 
+/**
+ * 背景擺進小屋：node 畫在自己的 box 裡；wall＝掛在牆上（畫在窗戶後面），不然擺在地板上；
+ * at＝在房間裡的位置（CSS 長度：left 或 right、top 或 bottom）與大小（px）。每件的位置彼此錯開，全擺也不重疊
+ */
+export interface RoomArt {
+  node: ReactNode;
+  box: string;
+  wall: boolean;
+  at: { left?: string; right?: string; top?: string; bottom?: string; width: number; height: number };
+}
+
 export type ItemArt =
   /** 圖層：node 畫在貓的座標裡；box 是單獨顯示圖示時的 viewBox */
   | {
@@ -89,6 +100,8 @@ export type ItemArt =
       onBody?: BodyArt;
       /** 背景配件的全身版（身體座標，地面在 PET_GROUND）：畫在整隻貓後面。沒有就把頭像的圖放大墊在後面 */
       stage?: ReactNode;
+      /** 背景配件擺進小屋的樣子（docs/plans/back-specials.md §3）；沒有就不能擺 */
+      room?: RoomArt;
     }
   /** 毛色：套在貓外層的 class（色票在 theme.css），選填的花紋畫在頭、身體、腿、尾巴 */
   | { kind: 'fur'; className: string; marks?: FurMarks };
@@ -201,6 +214,7 @@ const KIGURUMI = {
   cow: { fill: 'var(--acc-cream)', belly: 'var(--acc-rose)', spots: 'var(--acc-shade)', pattern: 'patches' },
   tiger: { fill: 'var(--acc-orange)', belly: 'var(--acc-cream)', spots: 'var(--acc-shade)', pattern: 'stripes' },
   penguin: { fill: 'var(--acc-night)', belly: 'var(--acc-cream)', feet: 'var(--acc-gold)' },
+  duck: { fill: 'var(--acc-gold)', belly: 'var(--acc-cream)', feet: 'var(--acc-orange)' },
 } as const satisfies Record<string, KigurumiTheme>;
 /** 頭套上那隻動物自己的眼睛、鼻孔：固定用深色。外框線的顏色在黑貓＋深色模式會換成淺色，畫在布上看不清楚 */
 const HOOD_EYE = 'var(--acc-shade)';
@@ -741,6 +755,100 @@ const SIAMESE_MARKS: FurMarks = {
   tail: { fill: 'var(--cat-mark)' },
 };
 
+/** 往外繞的螺旋線（蝸牛殼）：中心 x,y、最外圈半徑 r、繞幾圈；從中心開始畫 */
+function spiralPath(x: number, y: number, r: number, turns: number): string {
+  const steps = Math.round(turns * 16);
+  const pts: string[] = [];
+  for (let i = 1; i <= steps; i += 1) {
+    const t = i / steps;
+    const a = t * turns * Math.PI * 2;
+    pts.push(`${n2(x + Math.cos(a) * r * t)} ${n2(y + Math.sin(a) * r * t)}`);
+  }
+  return `M${n2(x)} ${n2(y)} L${pts.join(' L')}`;
+}
+
+/**
+ * 蝸牛殼（背上）：r＝殼的半徑、at＝殼的中心離背對位點多遠（身體座標；-y 往上），turns＝螺紋繞幾圈。
+ * 殼坐在背上、往屁股那邊偏一點
+ */
+const SNAIL = { r: 13, at: { x: -7, y: -10 }, turns: 2.2 } as const;
+function snailShell(cx: number, cy: number, r: number, line: { strokeWidth: number }): ReactNode {
+  return (
+    <g>
+      <circle cx={cx} cy={cy} r={r} fill="var(--acc-orange)" {...line} stroke={LINE} strokeLinejoin="round" />
+      <path
+        d={spiralPath(cx + r * 0.08, cy - r * 0.08, r * 0.78, SNAIL.turns)}
+        fill="none"
+        stroke="var(--acc-cream)"
+        strokeWidth={n2(line.strokeWidth * 0.7)}
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+/** 正面坐時的蝸牛殼：一個大圓盤藏在身體後面，兩側露出一圈一圈的殼紋（左右對稱）；at＝圓心在身體長度的幾成處、grow＝比背半厚大多少 */
+const SNAIL_FRONT = { at: 0.38, grow: 5 } as const;
+function snailFrontBehind(body: BodyGeom): ReactNode {
+  const r = body.back + SNAIL_FRONT.grow;
+  const cy = body.len * SNAIL_FRONT.at;
+  return (
+    <g>
+      <circle cx="0" cy={n2(cy)} r={n2(r)} fill="var(--acc-orange)" {...bstroke} />
+      <circle cx="0" cy={n2(cy)} r={n2(r * 0.78)} fill="none" stroke="var(--acc-cream)" strokeWidth={n2(WT * PET_HEAD_SCALE)} />
+      <circle cx="0" cy={n2(cy)} r={n2(r * 0.56)} fill="none" stroke="var(--acc-cream)" strokeWidth={n2(WT * PET_HEAD_SCALE)} />
+    </g>
+  );
+}
+
+/**
+ * 小火箭（背上）：len＝火箭身長、half＝半寬、tilt＝往屁股那邊倒幾度、at＝噴嘴離背對位點多遠；
+ * 火焰（cb-rocket-flame，pet.css 讓它忽長忽短）從噴嘴往下噴
+ */
+const ROCKET = { len: 22, half: 4.6, tilt: -24, side: 1.3, at: { x: -5, y: 2 } } as const;
+function rocketBody(line: { strokeWidth: number }, thinLine: { strokeWidth: number }): ReactNode {
+  const { len, half } = ROCKET;
+  return (
+    <g>
+      <path
+        className="cb-rocket-flame"
+        d={`M${n2(-half * 0.6)} 1 Q0 ${n2(half * 2.4)} ${n2(half * 0.6)} 1 Z`}
+        fill="var(--acc-gold)"
+        stroke="var(--acc-coral)"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${-half - 3} 0 L${-half} ${n2(-len * 0.36)} V0 Z M${half + 3} 0 L${half} ${n2(-len * 0.36)} V0 Z`}
+        fill="var(--acc-coral)"
+        stroke={LINE}
+        strokeWidth={thinLine.strokeWidth}
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${-half} 0 V${n2(-len * 0.7)} Q0 ${-len - 4} ${half} ${n2(-len * 0.7)} V0 Z`}
+        fill="var(--acc-silver)"
+        stroke={LINE}
+        strokeWidth={line.strokeWidth}
+        strokeLinejoin="round"
+      />
+      <circle cx="0" cy={n2(-len * 0.56)} r={n2(half * 0.52)} fill="var(--acc-sky)" stroke={LINE} strokeWidth={thinLine.strokeWidth} />
+      <path d={`M${-half} -3.2 H${half}`} stroke="var(--acc-coral)" strokeWidth="2.2" />
+    </g>
+  );
+}
+/** 正面坐時兩支小火箭一左一右（像噴射背包）：離中線多遠（比背半厚多 out）、在身體長度的幾成處、縮成幾倍 */
+const ROCKET_FRONT = { out: 2.4, at: 0.62, scale: 0.8 } as const;
+function rocketFrontBehind(body: BodyGeom): ReactNode {
+  const x = body.back + ROCKET_FRONT.out;
+  const y = body.len * ROCKET_FRONT.at;
+  return (
+    <g>
+      <g transform={`translate(${n2(-x)} ${n2(y)}) scale(${ROCKET_FRONT.scale})`}>{rocketBody(bstroke, bthin)}</g>
+      <g transform={`translate(${n2(x)} ${n2(y)}) scale(${ROCKET_FRONT.scale})`}>{rocketBody(bstroke, bthin)}</g>
+    </g>
+  );
+}
+
 export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   // ── 舊集章配件（沿用原本的造型）──────────────────────────
   bow: {
@@ -1055,6 +1163,33 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   }),
+  'duck-hood': hoodArt({
+    theme: KIGURUMI.duck,
+    outline: HOOD_OUTLINE.egg,
+    box: '0 -6 64 60',
+    // 小鴨：黃色蛋形的帽子（鴨子沒有耳朵，把貓耳朵整個包進去），頭頂翹一撮毛，兩顆圓眼睛，額頭一片橘色的扁嘴喙
+    under: (
+      <path
+        d="M30.4 3.6 Q28.8 -1 33 -1.6 Q31.2 0.2 33.6 1.6 Q35.4 -0.6 37.2 0.4 Q35 1.8 34.4 3.6 Z"
+        fill={KIGURUMI.duck.fill}
+        {...thin}
+      />
+    ),
+    over: (
+      <g>
+        {mirrored(
+          <g>
+            <circle cx="24.2" cy="14.6" r="2" fill={HOOD_EYE} />
+            <circle cx="23.6" cy="13.9" r="0.7" fill="var(--acc-cream)" />
+          </g>,
+        )}
+        <path d="M24.4 20.2 Q32 16.2 39.6 20.2 Q41 24 32 24.8 Q23 24 24.4 20.2 Z" fill={KIGURUMI.duck.feet} {...thin} />
+        <path d="M25.8 21.8 Q32 23.2 38.2 21.8" fill="none" stroke={LINE} strokeWidth={WF} strokeLinecap="round" strokeOpacity="0.6" />
+        <circle cx="29.8" cy="19.6" r="0.6" fill={HOOD_EYE} />
+        <circle cx="34.2" cy="19.6" r="0.6" fill={HOOD_EYE} />
+      </g>
+    ),
+  }),
   // ── 頭側 ────────────────────────────────────────────────
   'star-clip': {
     kind: 'layer',
@@ -1299,6 +1434,21 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
       </g>
     ),
   },
+  bread: {
+    kind: 'layer',
+    motion: 'nibble',
+    box: '30 38 28 20',
+    // 叼一片吐司：咬住的那頭在嘴裡，圓圓的吐司頂在右邊；淺色的心、深色的邊，上面幾顆麵包屑的小點
+    node: (
+      <g transform="rotate(-10 34 48.4)">
+        <path d="M33.6 44.4 H46 Q53.4 44.2 53.2 48.8 Q53 51.6 50.6 52 V53.4 H33.6 Z" fill="var(--acc-wood)" {...thin} />
+        <path d="M35 45.8 H45.8 Q51.4 45.8 51.4 48.8 Q51.4 50.4 49.2 50.6 V52 H35 Z" fill="var(--acc-straw)" />
+        <circle cx="40" cy="48.4" r="0.6" fill="var(--acc-wood)" />
+        <circle cx="44.6" cy="49.6" r="0.6" fill="var(--acc-wood)" />
+        <circle cx="47.6" cy="47.6" r="0.6" fill="var(--acc-wood)" />
+      </g>
+    ),
+  },
   // ── 頸部 ────────────────────────────────────────────────
   bell: {
     kind: 'layer',
@@ -1404,6 +1554,7 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'cow-suit': onesieArt(KIGURUMI.cow),
   'tiger-suit': onesieArt(KIGURUMI.tiger),
   'penguin-suit': onesieArt(KIGURUMI.penguin),
+  'duck-suit': onesieArt(KIGURUMI.duck),
 
   // ── 背飾（畫在貓後面）────────────────────────────────────
   balloon: {
@@ -1485,10 +1636,49 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
     ),
   },
 
+  'snail-shell': {
+    kind: 'layer',
+    box: '36 28 30 32',
+    onBody: {
+      // 側面：一顆螺旋殼背在背上（往屁股那邊偏一點）
+      behind: snailShell(SNAIL.at.x, SNAIL.at.y, SNAIL.r, bstroke),
+      // 正面：大圓殼藏在身體後面，兩側露出殼紋
+      frontal: { behind: snailFrontBehind },
+    },
+    // 頭像：殼在頭的右下後方露出來
+    node: snailShell(55, 52, 10, stroke),
+  },
+  'rocket-pack': {
+    kind: 'layer',
+    box: '40 14 26 44',
+    onBody: {
+      // 側面：一支小火箭綁在背上，頭朝上往屁股那邊倒，噴嘴朝下
+      behind: <g transform={`translate(${ROCKET.at.x} ${ROCKET.at.y}) rotate(${ROCKET.tilt}) scale(${ROCKET.side})`}>{rocketBody(bstroke, bthin)}</g>,
+      // 正面：兩支一左一右，像噴射背包
+      frontal: { behind: rocketFrontBehind },
+    },
+    // 頭像：火箭在頭的右後方
+    node: <g transform="translate(57 46) rotate(22) scale(0.95)">{rocketBody(stroke, thin)}</g>,
+  },
+
   // ── 背景（畫在最後面）────────────────────────────────────
   cushion: {
     kind: 'layer',
     box: '-2 52 68 16',
+    // 小屋：地板右前方一塊大的格紋坐墊（房間原本那塊小的留著）
+    room: {
+      wall: false,
+      box: '0 0 84 32',
+      at: { right: '16%', bottom: '6px', width: 80, height: 30 },
+      node: (
+        <g>
+          <path d="M5 9 L1.5 6 M79 9 L82.5 6 M5 25 L1.5 28 M79 25 L82.5 28" stroke="var(--acc-gold)" strokeWidth="1.8" strokeLinecap="round" />
+          <rect x="4" y="6" width="76" height="21" rx="10" fill="var(--acc-sky)" {...stroke} />
+          <path d="M22 7 V26 M42 7 V26 M62 7 V26 M5 16.5 H79" stroke="var(--acc-cream)" strokeWidth="1.6" strokeOpacity="0.7" />
+          <circle cx="42" cy="16.5" r="2.2" fill="var(--acc-navy)" />
+        </g>
+      ),
+    },
     // 全身版：一塊大坐墊鋪在地上，小貓坐在上面
     stage: (
       <g>
@@ -1508,6 +1698,22 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   'book-stack': {
     kind: 'layer',
     box: '44 26 24 38',
+    // 小屋：地板後面靠門那邊一疊書，上面橫著一枝鉛筆
+    room: {
+      wall: false,
+      box: '0 0 40 38',
+      at: { right: '54px', bottom: 'calc(var(--house-floor-pct) - 22px)', width: 38, height: 36 },
+      node: (
+        <g>
+          <rect x="3" y="27" width="32" height="9" rx="2" fill="var(--acc-sky)" {...thin} />
+          <rect x="6" y="18" width="27" height="9" rx="2" fill="var(--acc-coral)" {...thin} />
+          <rect x="4" y="9" width="30" height="9" rx="2" fill="var(--acc-leaf)" {...thin} />
+          <path d="M7 31.5 H31 M10 22.5 H29 M8 13.5 H30" stroke="var(--acc-cream)" strokeWidth="1.1" strokeLinecap="round" />
+          <path d="M8 4 H26 L31 6.4 L26 8.8 H8 Z" fill="var(--acc-gold)" {...thin} />
+          <path d="M26 4 V8.8" fill="none" {...thin} />
+        </g>
+      ),
+    },
     // 全身版：三本書疊在小貓前面的地上，上面橫著一枝鉛筆（疊太高會頂到臉）。
     // 整疊往右挪 5：坐著的身體右緣到 x≈68，書放在身體旁邊，不壓在身體後面
     stage: (
@@ -1534,6 +1740,21 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   moon: {
     kind: 'layer',
     box: '-1 -1 66 66',
+    // 小屋：牆的左上掛一串月亮與星星吊飾（不管白天晚上都在）
+    room: {
+      wall: true,
+      box: '0 0 64 60',
+      at: { left: 'calc(50% - 128px)', top: '0px', width: 60, height: 56 },
+      node: (
+        <g>
+          <path d="M4 1 H60" stroke="var(--acc-wood)" strokeWidth="2.4" strokeLinecap="round" />
+          <path d="M18 1 V22 M40 1 V12 M52 1 V30" stroke="var(--line)" strokeWidth="1" />
+          <path d="M18 22 A11 11 0 1 0 29 36 A8.6 8.6 0 1 1 18 22 Z" fill="var(--acc-gold)" {...thin} />
+          <path d={starPath(40, 17, 5)} fill="var(--acc-straw)" {...thin} />
+          <path d={starPath(52, 35, 4)} fill="var(--acc-straw)" {...thin} />
+        </g>
+      ),
+    },
     // 全身版：一圈夜空在小貓背後，月亮掛在左上（右上是頭）
     stage: (
       <g>
@@ -1556,6 +1777,31 @@ export const ITEM_ART: Readonly<Record<ItemId, ItemArt>> = {
   rainbow: {
     kind: 'layer',
     box: '-4 -4 72 50',
+    // 小屋：一道彩虹壁貼跨過窗戶（畫在窗戶後面），兩端各一朵雲
+    room: {
+      wall: true,
+      box: '0 0 200 76',
+      at: { left: 'calc(50% - 100px)', top: '4px', width: 200, height: 76 },
+      node: (
+        <g>
+          <g fill="none" strokeLinecap="round" strokeWidth="6" opacity="0.9">
+            <path d="M28 72 A72 72 0 0 1 172 72" stroke="var(--acc-coral)" />
+            <path d="M34 72 A66 66 0 0 1 166 72" stroke="var(--acc-gold)" />
+            <path d="M40 72 A60 60 0 0 1 160 72" stroke="var(--acc-leaf)" />
+            <path d="M46 72 A54 54 0 0 1 154 72" stroke="var(--acc-sky)" />
+          </g>
+          {[16, 158].map((x) => (
+            <path
+              key={x}
+              transform={`translate(${x} 60)`}
+              d="M4 14 Q0 14 0.6 9.6 Q1.2 5.6 5.6 6.2 Q7.4 1 13 2.6 Q18.6 0.8 20.6 6.2 Q25.6 6.4 25.4 10.6 Q25.2 14 21.6 14 Z"
+              fill="var(--acc-cream)"
+              {...thin}
+            />
+          ))}
+        </g>
+      ),
+    },
     // 全身版：彩虹從小貓背後跨過去，兩端落在雲上
     stage: (
       <g>

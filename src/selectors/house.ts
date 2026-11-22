@@ -5,6 +5,8 @@ export {
   leaderCat,
   nextAdoption,
   outingCats,
+  roomDecor,
   type HouseCatView,
+  type RoomDecorView,
   type NextAdoptionView,
 } from '../systems/house';

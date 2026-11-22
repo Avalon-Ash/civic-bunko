@@ -1,4 +1,4 @@
-// 小貓之家系統：擁有 wardrobe.cats、wardrobe.outfitAt、wardrobe.outing、wardrobe.leader。
+// 小貓之家系統：擁有 wardrobe.cats、wardrobe.outfitAt、wardrobe.outing、wardrobe.leader、wardrobe.roomHidden。
 // 這裡是全專案唯一判斷「這隻是不是原本那隻（HOUSE_FIRST_CAT）」的地方：
 // 原本那隻沿用舊欄位（settings.catName／catNameAt、wardrobe.outfit＋outfitAt），其餘讀寫 wardrobe.cats[id]。
 import { CAT_CHARACTER } from '../core/constants/catLines';
@@ -415,4 +415,33 @@ export function applySyncedHouse(
   }
 
   commitWardrobe(world, patch);
+}
+
+// ── 小屋擺設（docs/plans/back-specials.md §3）──────────────────
+export interface RoomDecorView {
+  id: ItemId;
+  name: string;
+  /** 擺在小屋裡（沒收起來） */
+  on: boolean;
+}
+
+/** 買了的背景，照 ITEMS 的順序；on＝擺在小屋裡（買了就擺，收起來的記在 roomHidden）。 */
+export function roomDecor(world: World): RoomDecorView[] {
+  const owned = ownedItems(world);
+  const hidden = new Set(world.settings.wardrobe?.roomHidden ?? []);
+  return ITEMS.filter((item) => item.slot === 'bg' && owned.has(item.id)).map((item) => ({
+    id: item.id,
+    name: item.name,
+    on: !hidden.has(item.id),
+  }));
+}
+
+/** 把一件買了的背景擺進小屋（on）或收起來；沒買的、不是背景的、狀態沒變的不動作。 */
+export function setRoomDecor(world: World, item: ItemId, on: boolean): boolean {
+  const entry = roomDecor(world).find((d) => d.id === item);
+  if (!entry || entry.on === on) {
+    return false;
+  }
+  const prev = world.settings.wardrobe?.roomHidden ?? [];
+  return commitWardrobe(world, { roomHidden: on ? prev.filter((id) => id !== item) : [...prev, item] });
 }

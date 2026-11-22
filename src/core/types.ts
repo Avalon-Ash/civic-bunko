@@ -388,7 +388,10 @@ export type Celebration =
  * dream＝睡衣全套加奶嘴，特別愛睡、睡著會說夢話；
  * moo＝乳牛的頭套加連身裝，站起來走路、邊走邊哞哞叫；axe＝乳牛全套加牧草，偶爾拿大斧頭把卡片劈歪（只在畫面上，一下子就彈回來）；
  * pounce＝老虎全套加虎牙，伏低扭屁股、撲到卡片上留下抓痕（或撲到地面吼一聲）；
- * waddle＝企鵝的頭套加連身裝，站起來搖搖擺擺地走；slide＝企鵝全套加冰棒，暴衝改成趴下用肚子滑、滑完畫面上的卡片結冰
+ * waddle＝企鵝的頭套加連身裝，站起來搖搖擺擺地走；slide＝企鵝全套加冰棒，暴衝改成趴下用肚子滑、滑完畫面上的卡片結冰；
+ * ducklings＝小鴨的頭套加連身裝，兩隻小鴨排隊跟著走、會呱呱叫；feed＝小鴨全套加麵包，坐著時撒麵包屑給小鴨啄；
+ * 背飾單件（docs/plans/back-specials.md §2）：glide＝天使翅膀，跳下來、被放手時拍著翅膀慢慢飄下來；
+ * float＝氣球，走路時飄在空中；slime＝蝸牛殼，慢吞吞、留下一條亮晶晶的線，點牠縮進殼裡；rocket＝小火箭，暴衝改成噴射、留下煙圈
  */
 export type OutfitSpecial =
   | 'fly'
@@ -402,7 +405,13 @@ export type OutfitSpecial =
   | 'axe'
   | 'pounce'
   | 'waddle'
-  | 'slide';
+  | 'slide'
+  | 'ducklings'
+  | 'feed'
+  | 'glide'
+  | 'float'
+  | 'slime'
+  | 'rocket';
 /** 焦痕在卡片上緣的哪裡：左、中、右 */
 export type ScorchPlace = 'l' | 'm' | 'r';
 /**
@@ -437,6 +446,11 @@ export interface WardrobeState {
   outing?: CatId[];
   /** 陪我刷題的那隻（答題頁、頭像）；沒有這欄或不在家裡＝原本那隻。各裝置自己的設定，不同步 */
   leader?: CatId;
+  /**
+   * 小屋擺設裡收起來的背景（docs/plans/back-specials.md §3）：買了的背景預設都擺進小屋，這裡記下她收起來的那幾件。
+   * 沒有這欄＝全擺。各裝置自己的設定，不同步
+   */
+  roomHidden?: ItemId[];
 }
 
 // ── 小貓之家（多隻小貓；數字在 constants/house.ts）────────────
@@ -479,7 +493,7 @@ export interface ChangelogEntry {
 }
 
 // ── 音效（Web Audio 即時合成，數值在 constants/sound.ts）──────────
-export type SoundName = 'tap' | 'correct' | 'wrong' | 'reward' | 'meow' | 'moo';
+export type SoundName = 'tap' | 'correct' | 'wrong' | 'reward' | 'meow' | 'moo' | 'quack';
 /** 一個音：從 from 赫茲滑到 to 赫茲（沒有 to 就不滑），在 at 秒開始、持續 dur 秒 */
 export interface ToneSpec {
   wave: 'sine' | 'triangle' | 'square' | 'sawtooth';
@@ -853,5 +867,7 @@ export type UICommand =
   | { type: 'adoptCat'; name?: string; fur?: ItemId }
   /** 帶不帶這隻出門（沒有隻數上限） */
   | { type: 'setCatOuting'; cat: CatId; on: boolean }
+  /** 小屋擺設：把一件買了的背景擺進小屋（on）或收起來 */
+  | { type: 'setRoomDecor'; item: ItemId; on: boolean }
   /** 換成這隻陪我刷題（全家只有一隻）；不在家裡的 ID 不動作 */
   | { type: 'setLeader'; cat: CatId };

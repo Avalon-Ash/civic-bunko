@@ -882,3 +882,169 @@
     opacity: 0;
   }
 }
+
+/* 小火箭的火焰：從噴嘴（上緣）往下忽長忽短 */
+.cb-rocket-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: cb-rocket-flame 0.45s ease-in-out infinite;
+}
+
+@keyframes cb-rocket-flame {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(0.85, 1.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-rocket-flame {
+    animation: none;
+  }
+}
+
+/* 小鴨跟班（Duckling.tsx）：走路一跳一跳、低頭啄、呱的時候嘴巴張開 */
+.cb-duckling {
+  display: block;
+  pointer-events: none;
+}
+
+.cb-duckling-hop,
+.cb-duckling-head,
+.cb-duckling-jaw {
+  transform-box: fill-box;
+}
+
+.is-walking > .cb-duckling .cb-duckling-hop,
+.cb-duckling.is-walking .cb-duckling-hop {
+  transform-origin: 50% 100%;
+  animation: cb-duckling-hop 0.36s ease-in-out infinite;
+}
+
+@keyframes cb-duckling-hop {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(-6deg);
+  }
+}
+
+.is-pecking > .cb-duckling .cb-duckling-head,
+.cb-duckling.is-pecking .cb-duckling-head {
+  transform-origin: 30% 90%;
+  animation: cb-duckling-peck 0.5s ease-in-out infinite;
+}
+
+@keyframes cb-duckling-peck {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: translate(1px, 5px) rotate(38deg);
+  }
+}
+
+.cb-duckling-jaw {
+  transform-origin: 0% 0%;
+}
+
+.cb-duckling.is-quacking .cb-duckling-jaw {
+  transform: rotate(28deg);
+}
+
+/* 亂跑層裡的小鴨：位置由 PetLayer 每一格寫進 transform；面向左整隻翻過來 */
+.cb-pet-duck {
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cb-pet-duck.is-left > .cb-duckling {
+  transform: scaleX(-1);
+}
+
+/* 呱！的小字：從小鴨頭上冒出來，一下子就消失 */
+.cb-duckling-quack {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  translate: -50% 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-soft, var(--ink));
+  white-space: nowrap;
+  pointer-events: none;
+  animation: cb-duckling-quack 0.9s ease-out forwards;
+}
+
+@keyframes cb-duckling-quack {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.7);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(1);
+  }
+}
+
+/* 蝸牛留下的亮晶晶的線、小火箭的煙圈、餵小鴨的麵包屑 */
+.cb-pet-trail {
+  border-radius: 999px;
+  background: var(--acc-silver);
+  box-shadow: 0 0 4px var(--acc-cream);
+  opacity: 0.75;
+  animation: cb-pet-fade linear forwards;
+}
+
+.cb-pet-puff {
+  border-radius: 50%;
+  border: 2px solid var(--acc-silver);
+  background: var(--acc-cream);
+  animation: cb-pet-puff ease-out forwards;
+}
+
+@keyframes cb-pet-puff {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6) translateY(-6px);
+  }
+}
+
+.cb-pet-crumb {
+  border-radius: 35%;
+  background: var(--acc-straw);
+  border: 1px solid var(--acc-wood);
+  animation: cb-pet-fade linear forwards;
+}
+
+@keyframes cb-pet-fade {
+  0%,
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-duckling.is-walking .cb-duckling-hop,
+  .is-pecking > .cb-duckling .cb-duckling-head,
+.cb-duckling.is-pecking .cb-duckling-head {
+    animation: none;
+  }
+}

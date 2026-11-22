@@ -1,4 +1,4 @@
-import { adoptCat, setCatOuting, setHouseCatName, setLeader } from '../systems/house';
+import { adoptCat, setCatOuting, setHouseCatName, setLeader, setRoomDecor } from '../systems/house';
 import { importProgress, resetProgress } from '../systems/persistence';
 import {
   answerQuestion,
@@ -124,6 +124,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'setCatOuting':
       setCatOuting(world, cmd.cat, cmd.on);
+      break;
+    case 'setRoomDecor':
+      setRoomDecor(world, cmd.item, cmd.on);
       break;
     case 'setLeader':
       setLeader(world, cmd.cat);

@@ -3,11 +3,16 @@ import {
   CAT_HINT,
   PET_AXE,
   PET_CHOP_ARM,
+  PET_DUCK,
+  PET_FLOAT,
   PET_FLY,
+  PET_GLIDE,
   PET_MOO,
   PET_PLAY,
   PET_POUNCE,
+  PET_ROCKET,
   PET_SCORCH,
+  PET_SLIME,
   PET_SLIDE,
   PET_VIEW_H,
   PET_VIEW_W,
@@ -57,7 +62,26 @@ import { heldAxe } from '../kit/wardrobe/art';
 import { useCatBubble, useCatVoice } from '../kit/catVoice';
 import { playSound } from '../sound';
 import { useWorld } from '../useWorld';
-import { between, clamp, flyLift, gaitFor, jumpPoint, perchOffset, pickBehavior, pickWalkTarget, roamUnavailable, stepWalk } from './petLogic';
+import { Duckling, DUCKLING_VIEW } from './Duckling';
+import {
+  between,
+  clamp,
+  ducklingTargets,
+  fallCap,
+  floatHeight,
+  flyLift,
+  gaitFor,
+  glideSway,
+  jumpPoint,
+  landsSoftly,
+  perchOffset,
+  pickBehavior,
+  pickWalkTarget,
+  pushTrail,
+  roamUnavailable,
+  speedFactor,
+  stepWalk,
+} from './petLogic';
 import { CLAW_MARK, ClawMark, FrostMark } from './petMarks';
 import { getPet, petHome, subscribePet } from './petStore';
 import { CAT_BURN_ATTR, scorchOffset } from './ScorchLayer';
@@ -89,6 +113,8 @@ type Mode =
       land: Surface | 'home';
       ms?: number;
       lift?: number;
+      /** 小火箭原地升空：一路冒煙圈 */
+      rocket?: boolean;
     }
   | { kind: 'fall'; vy: number }
   | { kind: 'land'; until: number }
@@ -125,6 +151,18 @@ interface Engine {
   nextPrank: number;
   /** 下一個動作開始前把表情改回預設（燒焦後心虛的臉） */
   resetMood: boolean;
+  /** 小鴨跟班：小貓走過的 x（中心）、每隻小鴨的位置與狀態、下一次呱的時間 */
+  trail: number[];
+  ducks: Array<{ x: number; facing: 'left' | 'right'; walking: boolean; pecking: boolean }>;
+  nextQuack: number;
+  /** 餵小鴨：麵包屑撒在哪（中心 x）、到什麼時候；上一次撒的時間 */
+  crumb: { x: number; until: number } | null;
+  lastCrumbAt: number;
+  /** 氣球：現在飄離地面多高（px，慢慢接近目標高度） */
+  floatH: number;
+  /** 蝸牛的線、火箭的煙圈：上一個留在哪（走路時記 x；火箭原地升空時記 y） */
+  lastSlimeX: number;
+  lastPuffX: number;
 }
 
 /** 剛放出來的小貓 */
@@ -146,6 +184,14 @@ function newEngine(at: { x: number; y: number }, mode: Mode): Engine {
     lastBitAt: 0,
     lastMooAt: 0,
     lastPawX: at.x,
+    trail: [],
+    ducks: [],
+    nextQuack: performance.now() + between(PET_DUCK.quackMs, Math.random),
+    crumb: null,
+    lastCrumbAt: performance.now(),
+    floatH: 0,
+    lastSlimeX: at.x,
+    lastPuffX: at.x,
   };
 }
 
@@ -155,7 +201,7 @@ function newEngine(at: { x: number; y: number }, mode: Mode): Engine {
  */
 interface Bit {
   id: number;
-  kind: 'bubble' | 'paw' | 'chip' | 'crack' | 'claw' | 'frost';
+  kind: 'bubble' | 'paw' | 'chip' | 'crack' | 'claw' | 'frost' | 'trail' | 'puff' | 'crumb';
   x: number;
   y: number;
   size: number;
@@ -257,6 +303,16 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
   const [facing, setFacing] = useState<'left' | 'right'>('right');
   const [flags, setFlags] = useState({ shy: false, dragging: false, landing: false, emerging: false, hinting: false, firing: false, binky: false });
   const [bits, setBits] = useState<Bit[]>([]);
+  /** 小鴨跟班：幾隻（0＝沒穿小鴨裝）、每隻的 DOM（位置每一格直接寫）、正在呱的是哪一隻 */
+  const [duckCount, setDuckCount] = useState(0);
+  const duckNodes = useRef<Array<HTMLDivElement | null>>([]);
+  const [quack, setQuack] = useState<{ who: number; key: number } | null>(null);
+  const quackSeq = useRef(0);
+  useEffect(() => {
+    if (!quack) return undefined;
+    const t = window.setTimeout(() => setQuack(null), 900);
+    return () => window.clearTimeout(t);
+  }, [quack]);
   const bitSeq = useRef(0);
   /** 冒一個泡泡、腳印、裂痕或碎屑，lifeMs 後自己消失；畫面上最多 PET_PLAY.maxBits 個（舊的先擠掉） */
   const addBit = (bit: Omit<Bit, 'id'>, lifeMs: number) => {
@@ -593,6 +649,12 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           return;
         }
       }
+      // 背飾單件：小火箭——要走路時，有時原地升空再落下（一路冒煙圈）
+      if (b === 'walk' && specials.current.has('rocket') && Math.random() < PET_ROCKET.liftChance) {
+        e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: e.y }, start: now, land: e.surface, ms: PET_ROCKET.ms, lift: PET_ROCKET.lift, rocket: true };
+        show('fall');
+        return;
+      }
       if (b === 'walk' || b === 'zoom') {
         const to =
           b === 'zoom'
@@ -604,7 +666,9 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           // 步態看穿著：青蛙、兔子一蹦一蹦；乳牛站起來走；企鵝搖搖擺擺、暴衝改成用肚子滑
           const gait = gaitFor(specials.current);
           const walkPose = b === 'zoom' ? gait.zoom : gait.walk;
-          e.mode = { kind: 'walk', to, speed: b === 'zoom' ? ROAM_RUN_SPEED : ROAM_WALK_SPEED, ...(gait.hop ? { hop: true } : {}) };
+          // 蝸牛慢吞吞、氣球飄著走稍慢、小火箭暴衝更快
+          const speed = (b === 'zoom' ? ROAM_RUN_SPEED : ROAM_WALK_SPEED) * speedFactor(specials.current, b === 'zoom');
+          e.mode = { kind: 'walk', to, speed, ...(gait.hop ? { hop: true } : {}) };
           show(walkPose, to > e.x ? 'right' : 'left');
           if (walkPose === 'slide' && Math.random() < PET_SLIDE.cheer) say(pickLine(CAT_SLIDE_LINES));
           return;
@@ -623,6 +687,14 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               Math.random,
               (x) => blockedAt(x, floor),
             ) ?? clamp(e.x, range.min, range.max);
+          if (specials.current.has('glide') || specials.current.has('float')) {
+            // 天使翅膀、氣球：不用跳的，直接從卡片邊飄下去（往下掉的速度有上限）
+            e.x = tx;
+            e.surface = { kind: 'floor' };
+            e.mode = { kind: 'fall', vy: 0 };
+            show('fall');
+            return;
+          }
           e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: tx, y: floor }, start: now, land: { kind: 'floor' } };
           show('hop', tx > e.x ? 'right' : tx < e.x ? 'left' : shown.current.facing);
           return;
@@ -637,8 +709,17 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               )
             : null;
         if (el && r && tx !== null) {
-          e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: tx, y: r.top - H + 3 }, start: now, land: { kind: 'perch', el, dx: tx - r.left } };
-          show('hop', tx > e.x ? 'right' : 'left');
+          // 天使翅膀：拍著翅膀慢慢飛上去
+          const glide = specials.current.has('glide');
+          e.mode = {
+            kind: 'jump',
+            from: { x: e.x, y: e.y },
+            to: { x: tx, y: r.top - H + 3 },
+            start: now,
+            land: { kind: 'perch', el, dx: tx - r.left },
+            ...(glide ? { ms: ROAM_JUMP_MS * PET_GLIDE.slow, lift: PET_GLIDE.lift } : {}),
+          };
+          show(glide ? 'fly' : 'hop', tx > e.x ? 'right' : 'left');
           return;
         }
       }
@@ -782,6 +863,72 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       next(e, now);
     };
 
+    /**
+     * 小鴨跟班：沿著小貓在地面走過的路排隊跟著（第 i 隻落後 i × gap），撒了麵包屑就跑過去啄；
+     * 小鴨一直在地面上，小貓跳上卡片時牠們在下面等。位置直接寫到 DOM（每一格都動，不經過 React）
+     */
+    const updateDucks = (e: Engine, now: number, dt: number) => {
+      const nodes = duckNodes.current;
+      if (!specials.current.has('ducklings')) {
+        if (e.ducks.length > 0) {
+          e.ducks = [];
+          setDuckCount(0);
+        }
+        return;
+      }
+      const catX = e.x + W / 2;
+      const behind = shown.current.facing === 'right' ? -1 : 1;
+      if (e.ducks.length !== PET_DUCK.count) {
+        e.ducks = Array.from({ length: PET_DUCK.count }, (_, i) => ({
+          x: catX + behind * (i + 1) * PET_DUCK.gap,
+          facing: shown.current.facing,
+          walking: false,
+          pecking: false,
+        }));
+        e.trail = [];
+        setDuckCount(PET_DUCK.count);
+      }
+      if (e.surface.kind === 'floor' && e.mode.kind !== 'drag' && e.mode.kind !== 'jump') {
+        e.trail = pushTrail(e.trail, catX, PET_DUCK.hop.stride / 2);
+      }
+      if (e.crumb && now > e.crumb.until) e.crumb = null;
+      const crumb = e.crumb;
+      const range = xRange();
+      const targets = crumb
+        ? e.ducks.map((_, i) => crumb.x + (i - (e.ducks.length - 1) / 2) * PET_DUCK.size * 0.7)
+        : ducklingTargets(e.trail, catX, e.ducks.length, PET_DUCK.gap, behind);
+      const ground = floorY() + H;
+      const duckH = (PET_DUCK.size * DUCKLING_VIEW.h) / DUCKLING_VIEW.w;
+      e.ducks.forEach((d, i) => {
+        const target = clamp(targets[i] ?? d.x, range.min, range.max + W);
+        const far = Math.abs(target - d.x);
+        const step = stepWalk(d.x, target, Math.max(PET_DUCK.catchUp, far * 3), dt);
+        const moved = Math.abs(step.x - d.x) > 0.05;
+        d.walking = moved && far > 1;
+        if (moved) d.facing = step.x > d.x ? 'right' : 'left';
+        else if (crumb) d.facing = crumb.x >= d.x ? 'right' : 'left';
+        else d.facing = catX >= d.x ? 'right' : 'left';
+        d.x = step.x;
+        d.pecking = Boolean(crumb) && !d.walking;
+        const node = nodes[i];
+        if (!node) return;
+        node.style.transform = `translate3d(${Math.round(d.x - PET_DUCK.size / 2)}px, ${Math.round(ground - duckH)}px, 0)`;
+        node.classList.toggle('is-walking', d.walking);
+        node.classList.toggle('is-pecking', d.pecking);
+        node.classList.toggle('is-left', d.facing === 'left');
+      });
+      // 呱！（答題頁不叫，她要專心）
+      if (now >= e.nextQuack) {
+        e.nextQuack = now + between(PET_DUCK.quackMs, Math.random);
+        if (tabRef.current !== 'round') {
+          const who = Math.floor(Math.random() * e.ducks.length);
+          quackSeq.current += 1;
+          setQuack({ who, key: quackSeq.current });
+          if (soundOn(world)) playSound('quack', false);
+        }
+      }
+    };
+
     const tick = (now: number) => {
       const e = engine.current;
       const dt = Math.min(0.05, (now - last) / 1000);
@@ -805,6 +952,11 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           }
           if (e.mode === m) {
             const p = jumpPoint(m.from, to, m.lift ?? ROAM_JUMP_LIFT, t);
+            // 小火箭升空：每升高 stride 留一個煙圈在噴嘴下面
+            if (m.rocket && Math.abs(p.y - e.y) > 0 && Math.abs(p.y - e.lastPuffX) >= PET_ROCKET.stride) {
+              e.lastPuffX = p.y;
+              addBit({ kind: 'puff', x: p.x + W / 2 - PET_ROCKET.size / 2, y: p.y + H - PET_ROCKET.size, size: PET_ROCKET.size }, PET_ROCKET.lifeMs);
+            }
             e.x = p.x;
             e.y = p.y;
             if (t >= 1) {
@@ -819,14 +971,21 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
             }
           }
         } else if (m.kind === 'fall') {
-          m.vy += ROAM_GRAVITY * dt;
+          // 天使翅膀、氣球：往下掉的速度有上限（慢慢飄下來）
+          m.vy = Math.min(m.vy + ROAM_GRAVITY * dt, fallCap(specials.current));
           e.y += m.vy * dt;
           const landY = surfaceY(e.surface) ?? floorY();
           if (e.y >= landY) {
             e.y = landY;
-            e.mode = { kind: 'land', until: now + ROAM_LAND_MS };
-            setFlags((f) => ({ ...f, landing: true }));
-            show('stumble');
+            if (specials.current.has('float')) {
+              // 氣球：落地前往上彈一下再站好
+              e.mode = { kind: 'jump', from: { x: e.x, y: e.y }, to: { x: e.x, y: e.y }, start: now, land: e.surface, lift: PET_FLOAT.bounce };
+              show('stand');
+            } else {
+              e.mode = { kind: 'land', until: now + ROAM_LAND_MS };
+              setFlags((f) => ({ ...f, landing: true }));
+              show(landsSoftly(specials.current) ? 'stand' : 'stumble');
+            }
           }
         } else if (m.kind === 'land') {
           const y = surfaceY(e.surface);
@@ -879,6 +1038,17 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
                 { kind: 'paw', x: e.x + W / 2 - PET_PLAY.paw.size / 2, y: y + H - PET_PLAY.paw.size, size: PET_PLAY.paw.size },
                 PET_PLAY.paw.lifeMs,
               );
+            }
+            // 蝸牛殼：走過的地方留下一條亮晶晶的線
+            if (specials.current.has('slime') && Math.abs(e.x - e.lastSlimeX) >= PET_SLIME.stride) {
+              e.lastSlimeX = e.x;
+              addBit({ kind: 'trail', x: e.x + W / 2 - PET_SLIME.stride / 2, y: y + H - 4, size: PET_SLIME.stride + 2 }, PET_SLIME.lifeMs);
+            }
+            // 小火箭暴衝：屁股後面一串煙圈
+            if (specials.current.has('rocket') && m.speed > ROAM_WALK_SPEED * 2 && Math.abs(e.x - e.lastPuffX) >= PET_ROCKET.stride) {
+              e.lastPuffX = e.x;
+              const tailX = shown.current.facing === 'right' ? e.x : e.x + W - PET_ROCKET.size;
+              addBit({ kind: 'puff', x: tailX, y: y + H * 0.45, size: PET_ROCKET.size }, PET_ROCKET.lifeMs);
             }
             // 乳牛裝站起來走：邊走邊哞（答題頁不出聲，她要專心）
             if (
@@ -935,6 +1105,18 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               e.lastBitAt = now;
               say(pickLine(CAT_DREAM_LINES));
             }
+            // 小鴨全套：醒著坐在地上時撒麵包屑，小鴨跑過去啄
+            const crumb = PET_DUCK.crumb;
+            if (specials.current.has('feed') && !asleep && !e.hint && !e.prank && e.surface.kind === 'floor' && !e.crumb && now - e.lastCrumbAt > crumb.everyMs) {
+              e.lastCrumbAt = now;
+              const side = shown.current.facing === 'right' ? 1 : -1;
+              const cx = clamp(e.x + W / 2 + side * (W * 0.5 + crumb.spread), xRange().min, xRange().max + W);
+              for (let i = 0; i < crumb.count; i += 1) {
+                addBit({ kind: 'crumb', x: cx + (Math.random() - 0.5) * crumb.spread - crumb.size / 2, y: y + H - crumb.size - 1, size: crumb.size }, crumb.lifeMs);
+              }
+              e.crumb = { x: cx, until: now + crumb.lifeMs };
+              e.nextQuack = Math.min(e.nextQuack, now + 400);
+            }
             if (now >= m.until) {
               proceed(e, now);
             } else if (now - e.lastBlockCheck > ROAM_BLOCK_CHECK_MS) {
@@ -972,8 +1154,16 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           shown.current = { ...shown.current, shy };
           setFlags((f) => ({ ...f, shy }));
         }
+        // 氣球：走路時飄起來，停下來慢慢落回地面（只是畫面上的高度，不改牠站在哪）
+        const floatTarget = specials.current.has('float') && e.mode.kind === 'walk' ? floatHeight(now) : 0;
+        e.floatH += (floatTarget - e.floatH) * Math.min(1, dt * 6);
+        // 天使翅膀緩降：左右輕輕晃
+        const sway = e.mode.kind === 'fall' && specials.current.has('glide') ? glideSway(now) : 0;
+
+        updateDucks(e, now, dt);
+
         const actor = actorRef.current;
-        if (actor) actor.style.transform = `translate3d(${Math.round(e.x)}px, ${Math.round(e.y)}px, 0)`;
+        if (actor) actor.style.transform = `translate3d(${Math.round(e.x + sway)}px, ${Math.round(e.y - e.floatH)}px, 0)`;
       }
       raf = window.requestAnimationFrame(tick);
     };
@@ -1037,6 +1227,12 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
       if (soundOn(world)) playSound('meow', true);
       const line = voice({ mood: 'idle', place: 'roam', cat });
       if (line) say(line.text);
+      // 蝸牛殼：縮進殼裡一下下
+      if (specials.current.has('slime')) {
+        e.mode = { kind: 'idle', until: performance.now() + PET_SLIME.hideMs };
+        show('loaf');
+        return;
+      }
       // 兔子全套：高高跳起來轉一圈
       const binky = specials.current.has('binky');
       e.mode = {
@@ -1146,6 +1342,19 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
               <path d="M10 7 L4 10 M15 12 L21 14 M9 19 L5 22" />
             </svg>
           </div>
+        ) : bit.kind === 'trail' || bit.kind === 'puff' || bit.kind === 'crumb' ? (
+          <span
+            key={bit.id}
+            className={`cb-pet-bit cb-pet-${bit.kind}`}
+            style={{
+              left: bit.x,
+              top: bit.y,
+              width: bit.size,
+              height: bit.kind === 'trail' ? 3 : bit.size,
+              animationDuration: `${bit.kind === 'trail' ? PET_SLIME.lifeMs : bit.kind === 'puff' ? PET_ROCKET.lifeMs : PET_DUCK.crumb.lifeMs}ms`,
+            }}
+            aria-hidden="true"
+          />
         ) : bit.kind === 'chip' ? (
           <span
             key={bit.id}
@@ -1180,6 +1389,23 @@ export function PetLayer({ world, cat, tab, allowed }: PetLayerProps) {
           </svg>
         ),
       )}
+      {Array.from({ length: duckCount }, (_, i) => (
+        <div
+          key={`duck-${i}`}
+          ref={(node) => {
+            duckNodes.current[i] = node;
+          }}
+          className="cb-pet-bit cb-pet-duck"
+          aria-hidden="true"
+        >
+          {quack?.who === i ? (
+            <span key={quack.key} className="cb-duckling-quack">
+              呱！
+            </span>
+          ) : null}
+          <Duckling size={PET_DUCK.size} facing="right" quacking={quack?.who === i} />
+        </div>
+      ))}
       <div
         ref={actorRef}
         className={cls}

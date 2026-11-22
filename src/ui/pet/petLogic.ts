@@ -1,5 +1,5 @@
 // 自由亂跑的小貓：不碰 DOM 的計算（挑動作、挑落腳處、拋物線）。DOM 與動畫在 PetLayer。
-import { PET_GAITS, PET_GAIT_DEFAULT } from '../../core/constants/pet';
+import { PET_DUCK, PET_FLOAT, PET_GAITS, PET_GAIT_DEFAULT, PET_GLIDE, PET_ROCKET, PET_SLIME } from '../../core/constants/pet';
 import type { Choice, OutfitSpecial, PetGait, RoamBehavior } from '../../core/types';
 
 const BEHAVIORS: readonly RoamBehavior[] = ['walk', 'sit', 'groom', 'nap', 'perch', 'zoom'];
@@ -152,4 +152,74 @@ export function pickHint(
 export function flyLift(fromY: number, toY: number, lift: number): number {
   const drop = toY - fromY;
   return drop > lift ? -drop / 4 : lift;
+}
+
+// ── 鴨子裝與背飾單件的特效（docs/plans/back-specials.md；數字在 PET_DUCK、PET_GLIDE、PET_FLOAT、PET_SLIME、PET_ROCKET）──
+
+/** 走路速度的倍數：蝸牛殼慢吞吞、氣球飄著走稍慢；暴衝時小火箭再加速 */
+export function speedFactor(specials: ReadonlySet<OutfitSpecial>, zoom: boolean): number {
+  let k = 1;
+  if (specials.has('slime')) k *= PET_SLIME.speed;
+  if (specials.has('float')) k *= PET_FLOAT.speed;
+  if (zoom && specials.has('rocket')) k *= PET_ROCKET.speed;
+  return k;
+}
+
+/** 往下掉最快多快（px／秒）：氣球最慢、翅膀其次；都沒有就不設限 */
+export function fallCap(specials: ReadonlySet<OutfitSpecial>): number {
+  if (specials.has('float')) return PET_FLOAT.maxVy;
+  if (specials.has('glide')) return PET_GLIDE.maxVy;
+  return Number.POSITIVE_INFINITY;
+}
+
+/** 掉下來落地時要不要踉蹌：慢慢飄下來的（翅膀、氣球）直接站好 */
+export function landsSoftly(specials: ReadonlySet<OutfitSpecial>): boolean {
+  return specials.has('glide') || specials.has('float');
+}
+
+/** 氣球飄著走時離地多高（px）：基本高度加上慢慢的上下飄；t＝毫秒 */
+export function floatHeight(t: number): number {
+  return PET_FLOAT.lift + Math.sin((t / PET_FLOAT.bobMs) * Math.PI * 2) * PET_FLOAT.bob;
+}
+
+/** 翅膀緩降時左右晃多少（px）；t＝毫秒 */
+export function glideSway(t: number): number {
+  return Math.sin((t / PET_GLIDE.swayMs) * Math.PI * 2) * PET_GLIDE.sway;
+}
+
+/**
+ * 記下小貓走過的位置（只記 x：小鴨走在地面）：跟最後一點差 step 以上才記，最多留 PET_DUCK.trail 點。回傳新的陣列。
+ */
+export function pushTrail(trail: readonly number[], x: number, step: number): number[] {
+  const last = trail[trail.length - 1];
+  if (last !== undefined && Math.abs(x - last) < step) return trail as number[];
+  const next = [...trail, x];
+  return next.length > PET_DUCK.trail ? next.slice(next.length - PET_DUCK.trail) : next;
+}
+
+/**
+ * 小鴨排隊的位置：第 i 隻（從 1 起）沿著走過的路往回量 i × gap；路不夠長時排在小貓背後（behind＝背後那一側：-1 左、1 右）。
+ * catX＝小貓現在的中心 x
+ */
+export function ducklingTargets(trail: readonly number[], catX: number, count: number, gap: number, behind: number): number[] {
+  const out: number[] = [];
+  for (let i = 1; i <= count; i += 1) {
+    const want = i * gap;
+    let walked = 0;
+    let prev = catX;
+    let found: number | null = null;
+    for (let k = trail.length - 1; k >= 0; k -= 1) {
+      const p = trail[k] as number;
+      const d = Math.abs(prev - p);
+      if (walked + d >= want) {
+        const left = want - walked;
+        found = prev + Math.sign(p - prev) * left;
+        break;
+      }
+      walked += d;
+      prev = p;
+    }
+    out.push(found ?? catX + behind * want);
+  }
+  return out;
 }

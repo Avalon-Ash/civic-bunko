@@ -50,6 +50,7 @@ const bodyOutfits: Array<[string, Outfit]> = [
   ['乳牛全套', { 'head-top': 'cow-hood', body: 'cow-suit', 'face-low': 'grass-stalk' }],
   ['老虎全套', { 'head-top': 'tiger-hood', body: 'tiger-suit', 'face-low': 'tiger-fang' }],
   ['企鵝全套', { 'head-top': 'penguin-hood', body: 'penguin-suit', 'face-low': 'popsicle' }],
+  ['小鴨全套', { 'head-top': 'duck-hood', body: 'duck-suit', 'face-low': 'bread' }],
   ['小怪獸全套＋披風＋圍巾（灰貓）', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'cape', neck: 'scarf', fur: 'fur-gray' }],
   ['小怪獸全套＋翅膀＋眼鏡＋蝴蝶結（黑貓）', { 'head-top': 'dino-hood', body: 'dino-suit', back: 'wings', 'face-mid': 'glasses', 'head-side': 'bow', fur: 'fur-black' }],
 ];

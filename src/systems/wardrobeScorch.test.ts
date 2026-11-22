@@ -35,7 +35,16 @@ describe('outfit specials', () => {
   it('needs every listed slot: a cape flies; fire needs the whole dino set plus the flame', () => {
     assert.deepEqual([...outfitSpecials({})], []);
     assert.deepEqual([...outfitSpecials({ back: 'cape' })], ['fly']);
-    assert.deepEqual([...outfitSpecials({ back: 'wings' })], []);
+    // 2026-11-22 使用者改規格：背飾單件都有特效（docs/plans/back-specials.md §2）
+    assert.deepEqual([...outfitSpecials({ back: 'wings' })], ['glide']);
+    assert.deepEqual([...outfitSpecials({ back: 'balloon' })], ['float']);
+    assert.deepEqual([...outfitSpecials({ back: 'snail-shell' })], ['slime']);
+    assert.deepEqual([...outfitSpecials({ back: 'rocket-pack' })], ['rocket']);
+    // 小鴨：頭套＋小鴨裝就有跟班，再叼麵包才會餵
+    const duck = { 'head-top': 'duck-hood', body: 'duck-suit' };
+    assert.deepEqual([...outfitSpecials(duck)], ['ducklings']);
+    assert.deepEqual([...outfitSpecials({ ...duck, 'face-low': 'bread' })].sort(), ['ducklings', 'feed']);
+    assert.deepEqual([...outfitSpecials({ ...duck, body: 'penguin-suit', 'face-low': 'bread' })], []);
     const dino = { 'head-top': 'dino-hood', body: 'dino-suit', 'face-low': 'fire-breath' };
     assert.deepEqual([...outfitSpecials(dino)], ['scorch']);
     assert.deepEqual([...outfitSpecials({ ...dino, 'face-low': 'carrot' })], []);

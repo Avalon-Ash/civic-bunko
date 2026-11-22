@@ -204,16 +204,17 @@ describe('cat body', () => {
       'cow-suit',
       'tiger-suit',
       'penguin-suit',
+      'duck-suit',
     ]);
     for (const { id } of suits) {
       const stand = render('stand', { body: id });
-      // 睡衣、企鵝連腳掌都包住：整條腿換成一個顏色，不另外套袖子、褲管
-      const footed = id === 'pajama-suit' || id === 'penguin-suit';
+      // 睡衣、企鵝、小鴨連腳掌都包住：整條腿換成一個顏色，不另外套袖子、褲管
+      const footed = id === 'pajama-suit' || id === 'penguin-suit' || id === 'duck-suit';
       assert.equal(count(stand, 'class="cb-pet-sleeve"'), footed ? 0 : 2, id);
       assert.equal(count(stand, 'class="cb-pet-trouser"'), footed ? 0 : 2, id);
       assert.equal(/class="cb-pet-leg[^>]*><path[^>]*var\(--cat-fur/.test(stand), !footed, `${id} 的腿`);
       assert.ok(!(/<g class="cb-pet-tail">(.*?)<\/g>/.exec(stand)?.[1] ?? '').includes('var(--cat-patch)'), `${id} 的尾巴`);
-      // 金色：小怪獸的背鰭、睡衣的星星、企鵝的腳
+      // 金色：小怪獸的背鰭、睡衣的星星、企鵝的腳、小鴨的布
       assert.equal(stand.includes('var(--acc-gold)'), id === 'dino-suit' || footed, `${id} 的金色`);
     }
   });

@@ -2,10 +2,11 @@
 // 數字只讀 constants/house.ts 的 HOUSE_SCENE、constants/cat.ts 的 CAT_DAY_PARTS 與 constants/pet.ts 的 PET_GAIT_DEFAULT／PET_PLAY。
 import { CAT_DAY_PARTS } from '../../core/constants/cat';
 import { HOUSE_SCENE } from '../../core/constants/house';
-import { PET_GAIT_DEFAULT, PET_PLAY } from '../../core/constants/pet';
+import { PET_FLOAT, PET_GAIT_DEFAULT, PET_PLAY } from '../../core/constants/pet';
+import { speedFactor } from '../pet/petLogic';
 import type { CatId, CatMood, OutfitSpecial, PetGait, PetPose } from '../../core/types';
 
-export type HouseAction = 'walk' | 'zoom' | 'fly' | 'sit' | 'groom' | 'loaf' | 'nuzzle';
+export type HouseAction = 'walk' | 'zoom' | 'fly' | 'hover' | 'sit' | 'groom' | 'loaf' | 'nuzzle';
 export type HouseDayPart = 'day' | 'dusk' | 'night';
 
 export interface RoomBounds {
@@ -35,6 +36,15 @@ export interface HouseActor {
   partnerId?: CatId;
   /** 點擊跳一下的剩餘時間（毫秒） */
   hopMs: number;
+  /** 小鴨跟班（穿小鴨裝才有）：一隻跟著一隻排隊，位置是房間地板座標 */
+  ducks?: HouseDuck[];
+}
+
+export interface HouseDuck {
+  x: number;
+  y: number;
+  facing: 'left' | 'right';
+  walking: boolean;
 }
 
 export interface HouseOptions {
@@ -50,14 +60,14 @@ export interface NuzzlePair {
 }
 
 type StationaryAction = 'sit' | 'groom' | 'loaf';
-type MovingAction = 'walk' | 'zoom' | 'fly';
+type MovingAction = 'walk' | 'zoom' | 'fly' | 'hover';
 type PickableAction = 'walk' | StationaryAction | 'zoom';
 
 const STATIONARY_ACTIONS: readonly StationaryAction[] = ['sit', 'groom', 'loaf'];
 const ALL_ACTIONS: readonly PickableAction[] = ['walk', 'sit', 'groom', 'loaf', 'zoom'];
 
 function isMovingAction(action: HouseAction): action is MovingAction {
-  return action === 'walk' || action === 'zoom' || action === 'fly';
+  return action === 'walk' || action === 'zoom' || action === 'fly' || action === 'hover';
 }
 
 function actionWeight(action: PickableAction, specials?: ReadonlySet<OutfitSpecial>): number {
@@ -346,8 +356,9 @@ export function decideNextAction(
 
   const picked = pickWeighted(ALL_ACTIONS, rng, mySpecials);
   if (picked === 'walk' || picked === 'zoom') {
-    const flying = mySpecials?.has('fly') && rng() < HOUSE_SCENE.flyChance;
-    const action: MovingAction = flying ? 'fly' : picked;
+    // 披風：飛過房間；天使翅膀：飛起來繞一小段再慢慢降落（都照 flyChance 擲一次）
+    const flying = (mySpecials?.has('fly') || mySpecials?.has('glide')) && rng() < HOUSE_SCENE.flyChance;
+    const action: MovingAction = flying ? (mySpecials?.has('fly') ? 'fly' : 'hover') : picked;
     const target = action === 'walk' ? pickFloorTarget(me, bounds, rng) : pickFarTarget(me, bounds, rng);
     if (target) {
       next[idx] = {
@@ -402,13 +413,19 @@ export function stepHouse(
         finished.push(actor.id);
         return { ...actor, hopMs, target: undefined, origin: undefined, remainMs: 0 };
       }
+      const mySpecials = options.specials?.get(actor.id);
       const speed =
         actor.action === 'zoom'
           ? HOUSE_SCENE.zoomSpeed
           : actor.action === 'fly'
             ? HOUSE_SCENE.flySpeed
-            : HOUSE_SCENE.walkSpeed;
-      const step = speed * (dt / 1000);
+            : actor.action === 'hover'
+              ? HOUSE_SCENE.hoverSpeed
+              : HOUSE_SCENE.walkSpeed;
+      // 蝸牛殼慢吞吞、氣球飄著走稍慢、小火箭暴衝更快（倍數跟亂跑的小貓同一處）
+      const factor =
+        actor.action === 'walk' || actor.action === 'zoom' ? speedFactor(mySpecials ?? new Set(), actor.action === 'zoom') : 1;
+      const step = speed * factor * (dt / 1000);
       const dx = actor.target.x - actor.x;
       const dy = actor.target.y - actor.y;
       const dist = Math.hypot(dx, dy);
@@ -448,7 +465,40 @@ export function stepHouse(
     next = decideNextAction(id, next, bounds, rng, options);
   }
 
-  return next;
+  return next.map((actor) => stepDucks(actor, Boolean(options.specials?.get(actor.id)?.has('ducklings')), dt));
+}
+
+/**
+ * 小鴨跟班（小屋版）：一隻跟著一隻——每隻只追前面那隻（第一隻追小貓），離得比 HOUSE_SCENE.duck.gap 遠才走；
+ * 不穿小鴨裝就拿掉。剛穿上時排在小貓背後。
+ */
+export function stepDucks(actor: HouseActor, wearing: boolean, dtMs: number): HouseActor {
+  if (!wearing) return actor.ducks ? { ...actor, ducks: undefined } : actor;
+  const { count, gap, speed } = HOUSE_SCENE.duck;
+  const behind = actor.facing === 'right' ? -1 : 1;
+  const prev = actor.ducks ?? Array.from({ length: count }, (_, i) => ({
+    x: actor.x + behind * gap * (i + 1),
+    y: actor.y,
+    facing: actor.facing,
+    walking: false,
+  }));
+  const step = speed * (Math.max(0, dtMs) / 1000);
+  let leader = { x: actor.x, y: actor.y };
+  const ducks = prev.map((d) => {
+    const dx = leader.x - d.x;
+    const dy = leader.y - d.y;
+    const dist = Math.hypot(dx, dy);
+    let moved = d;
+    if (dist > gap) {
+      const k = Math.min(step, dist - gap) / dist;
+      moved = { x: d.x + dx * k, y: d.y + dy * k, facing: Math.abs(dx) > 0.5 ? (dx < 0 ? 'left' : 'right') : d.facing, walking: true };
+    } else {
+      moved = { ...d, facing: dx < 0 ? 'left' : 'right', walking: false };
+    }
+    leader = { x: moved.x, y: moved.y };
+    return moved;
+  });
+  return { ...actor, ducks };
 }
 
 /** 同步房間裡的小貓清單與邊界：新增的從右邊門口走進來，既有的夾進新範圍。 */
@@ -505,21 +555,37 @@ export function actorPose(actor: HouseActor, gait: PetGait = PET_GAIT_DEFAULT): 
   if (actor.hopMs > 0) return 'hop';
   if (actor.action === 'walk') return gait.walk;
   if (actor.action === 'zoom') return gait.zoom;
-  if (actor.action === 'fly') return 'fly';
+  if (actor.action === 'fly' || actor.action === 'hover') return 'fly';
   if (actor.action === 'groom') return 'groom';
   if (actor.action === 'loaf') return 'loaf';
   return gait.rest;
 }
 
 /** 計算小貓離地高度（px）：飛行時走拋物線（最高 HOUSE_SCENE.flyLift），蹦跳步態走路／暴衝時一蹦一蹦。 */
-export function actorLift(actor: HouseActor, gait: PetGait = PET_GAIT_DEFAULT): number {
+export function actorLift(
+  actor: HouseActor,
+  gait: PetGait = PET_GAIT_DEFAULT,
+  specials?: ReadonlySet<OutfitSpecial>,
+): number {
+  const traveled = actor.origin ? Math.hypot(actor.x - actor.origin.x, actor.y - actor.origin.y) : 0;
+  const total = actor.origin && actor.target ? Math.hypot(actor.target.x - actor.origin.x, actor.target.y - actor.origin.y) : 0;
   if (actor.action === 'fly') {
-    if (!actor.origin || !actor.target) return 0;
-    const total = Math.hypot(actor.target.x - actor.origin.x, actor.target.y - actor.origin.y);
     if (total <= 0) return 0;
-    const traveled = Math.hypot(actor.x - actor.origin.x, actor.y - actor.origin.y);
     const t = clamp(traveled / total, 0, 1);
     return 4 * t * (1 - t) * HOUSE_SCENE.flyLift;
+  }
+  if (actor.action === 'hover') {
+    // 天使翅膀：很快飛到最高，剩下的路慢慢降落
+    if (total <= 0) return 0;
+    const t = clamp(traveled / total, 0, 1);
+    const up = HOUSE_SCENE.hoverRise;
+    return HOUSE_SCENE.flyLift * (t < up ? t / up : 1 - (t - up) / (1 - up));
+  }
+  if (specials?.has('float') && actor.action === 'walk' && total > 0) {
+    // 氣球：飄著走，起步與停下都慢慢升降；飄的時候上下晃
+    const ease = Math.min(1, traveled / HOUSE_SCENE.floatEase, (total - traveled) / HOUSE_SCENE.floatEase);
+    const bob = Math.sin((traveled / HOUSE_SCENE.floatStride) * Math.PI * 2) * PET_FLOAT.bob;
+    return Math.max(0, ease) * (PET_FLOAT.lift + bob);
   }
   if (gait.hop && (actor.action === 'walk' || actor.action === 'zoom')) {
     const dist = actor.origin
@@ -540,7 +606,7 @@ export function actorMood(actor: HouseActor): CatMood | undefined {
 /** 下一次畫面需要更新的方式：有貓在移動（走／暴衝／飛）或跳時用連續影格，全部靜止時等到最近一個動作結束。 */
 export function nextTickDelayMs(actors: readonly HouseActor[]): number | null {
   if (actors.length === 0) return null;
-  if (actors.some((a) => isMovingAction(a.action) || a.hopMs > 0)) return 0;
+  if (actors.some((a) => isMovingAction(a.action) || a.hopMs > 0 || a.ducks?.some((d) => d.walking))) return 0;
   let soonest = Infinity;
   for (const a of actors) {
     if (a.remainMs < soonest) soonest = a.remainMs;

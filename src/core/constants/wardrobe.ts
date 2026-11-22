@@ -91,6 +91,23 @@ export const OUTFIT_SPECIALS: ReadonlyArray<{
     text: '跑起來改成趴下用肚子滑，滑完卡片都結冰',
     wear: { 'head-top': ['penguin-hood'], body: ['penguin-suit'], 'face-low': ['popsicle'] },
   },
+  {
+    id: 'ducklings',
+    name: '小鴨跟班',
+    text: '兩隻小鴨排隊跟著走，還會呱呱叫',
+    wear: { 'head-top': ['duck-hood'], body: ['duck-suit'] },
+  },
+  {
+    id: 'feed',
+    name: '餵小鴨',
+    text: '坐下來撒麵包屑，小鴨圍過來啄',
+    wear: { 'head-top': ['duck-hood'], body: ['duck-suit'], 'face-low': ['bread'] },
+  },
+  // 背飾單件：只穿這一件就有（docs/plans/back-specials.md §2）
+  { id: 'glide', name: '緩降', text: '跳下來、被放手時拍著翅膀慢慢飄下來', wear: { back: ['wings'] } },
+  { id: 'float', name: '飄著走', text: '走路時腳不著地，飄在空中', wear: { back: ['balloon'] } },
+  { id: 'slime', name: '慢吞吞', text: '慢慢爬、留下一條亮晶晶的線，點牠會縮進殼裡', wear: { back: ['snail-shell'] } },
+  { id: 'rocket', name: '噴射', text: '跑起來改成噴射，後面一串煙圈', wear: { back: ['rocket-pack'] } },
 ];
 /**
  * 燒焦：repairFish＝修好一處要幾條小魚乾（公布後不能調高）；max＝同時最多幾處燒焦（滿了小貓就不再噴）；
@@ -147,6 +164,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'cow-hood', slot: 'head-top', name: '乳牛頭套', source: shop(PRICE.l) },
   { id: 'tiger-hood', slot: 'head-top', name: '老虎頭套', source: shop(PRICE.l) },
   { id: 'penguin-hood', slot: 'head-top', name: '企鵝頭套', source: shop(PRICE.l) },
+  { id: 'duck-hood', slot: 'head-top', name: '小鴨頭套', source: shop(PRICE.l) },
   // 頭側
   { id: 'star-clip', slot: 'head-side', name: '星星髮夾', source: shop(PRICE.s) },
   { id: 'sakura', slot: 'head-side', name: '櫻花', source: shop(PRICE.m) },
@@ -166,6 +184,7 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'grass-stalk', slot: 'face-low', name: '叼牧草', source: shop(PRICE.m) },
   { id: 'tiger-fang', slot: 'face-low', name: '小虎牙', source: shop(PRICE.m) },
   { id: 'popsicle', slot: 'face-low', name: '咬冰棒', source: shop(PRICE.m) },
+  { id: 'bread', slot: 'face-low', name: '叼麵包', source: shop(PRICE.m) },
   // 頸部
   { id: 'bell', slot: 'neck', name: '鈴鐺項圈', source: shop(PRICE.s) },
   { id: 'bowtie', slot: 'neck', name: '領結', source: shop(PRICE.m) },
@@ -182,10 +201,13 @@ export const ITEMS: readonly WardrobeItem[] = [
   { id: 'cow-suit', slot: 'body', name: '乳牛裝', source: shop(PRICE.xl) },
   { id: 'tiger-suit', slot: 'body', name: '老虎裝', source: shop(PRICE.xl) },
   { id: 'penguin-suit', slot: 'body', name: '企鵝裝', source: shop(PRICE.xl) },
+  { id: 'duck-suit', slot: 'body', name: '小鴨裝', source: shop(PRICE.xl) },
   // 背飾
   { id: 'balloon', slot: 'back', name: '氣球', source: shop(PRICE.xl) },
   { id: 'cape', slot: 'back', name: '小披風', source: shop(PRICE.rare) },
   { id: 'wings', slot: 'back', name: '天使翅膀', source: shop(PRICE.epic) },
+  { id: 'snail-shell', slot: 'back', name: '蝸牛殼', source: shop(PRICE.l) },
+  { id: 'rocket-pack', slot: 'back', name: '小火箭', source: shop(PRICE.xxl) },
   // 背景
   { id: 'cushion', slot: 'bg', name: '坐墊', source: shop(PRICE.s) },
   { id: 'book-stack', slot: 'bg', name: '書堆', source: shop(PRICE.xl) },

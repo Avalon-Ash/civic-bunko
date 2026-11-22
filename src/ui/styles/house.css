@@ -418,3 +418,83 @@
     grid-row: 2;
   }
 }
+
+/* ── 小屋擺設（背景買了就擺進來；docs/plans/back-specials.md §3）──────── */
+.cb-house-decor {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* 牆上的（彩虹、吊飾）在窗戶後面；地上的（坐墊、書）跟家具同一層、在小貓後面 */
+.cb-house-decor.is-wall {
+  z-index: 0;
+}
+
+.cb-house-decor.is-floor {
+  z-index: 2;
+}
+
+.cb-house-window {
+  z-index: 1;
+}
+
+/* 小鴨跟班：位置寫在 transform，點擊穿過去 */
+.cb-house-duck {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+/* 擺設的開關列 */
+.cb-house-decor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 2px;
+}
+
+.cb-house-decor-label {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-inline-end: 2px;
+}
+
+.cb-house-decor-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 4px 10px 4px 6px;
+  border-radius: 999px;
+  border: var(--border-w) solid var(--hair);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.cb-house-decor-pill.is-on {
+  opacity: 1;
+  border-color: var(--ink);
+}
+
+.cb-house-decor-pill .cb-house-decor-icon {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+}
+
+.cb-house-decor-icon > svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cb-house-decor-hint {
+  font-size: 13px;
+  color: var(--ink-soft);
+}

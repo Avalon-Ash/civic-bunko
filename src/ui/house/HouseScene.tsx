@@ -1,10 +1,12 @@
 import { useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { HOUSE_SCENE } from '../../core/constants/house';
-import type { CatId, OutfitSpecial } from '../../core/types';
+import type { CatId, ItemId, OutfitSpecial } from '../../core/types';
 import type { HouseCatView } from '../../selectors/house';
 import { outfitSpecials } from '../../selectors/wardrobe';
 import { CatBody } from '../kit/CatBody';
-import { gaitFor } from '../pet/petLogic';
+import { ITEM_ART, type RoomArt } from '../kit/wardrobe/art';
+import { Duckling, DUCKLING_VIEW } from '../pet/Duckling';
+import { between, gaitFor } from '../pet/petLogic';
 import {
   activeNuzzlePair,
   actorLift,
@@ -28,6 +30,35 @@ export interface HouseSceneProps {
   onSelect: (id: CatId) => void;
   /** 新領養的小貓（由右邊門口走進來）；tick 變化時重新觸發 */
   entering?: { id: CatId; tick: number } | null;
+  /** 擺在小屋裡的背景（買了而且沒收起來的；docs/plans/back-specials.md §3） */
+  decor?: readonly ItemId[];
+  /** 小鴨呱的時候（畫面外的人決定要不要出聲） */
+  onQuack?: () => void;
+}
+
+/** 擺進小屋的背景：照 ITEM_ART 的 room 畫在它自己的位置（掛牆上的在窗戶後面） */
+function RoomDecor({ ids, wall }: { ids: readonly ItemId[]; wall: boolean }) {
+  const arts = ids
+    .map((id) => {
+      const art = ITEM_ART[id];
+      return art && art.kind === 'layer' && art.room && art.room.wall === wall ? { id, room: art.room } : null;
+    })
+    .filter((x): x is { id: ItemId; room: RoomArt } => x !== null);
+  return (
+    <>
+      {arts.map(({ id, room }) => (
+        <svg
+          key={id}
+          className={`cb-house-decor ${wall ? 'is-wall' : 'is-floor'}`}
+          viewBox={room.box}
+          aria-hidden="true"
+          style={{ ...room.at }}
+        >
+          {room.node}
+        </svg>
+      ))}
+    </>
+  );
 }
 
 const DAY_PART_LABEL: Readonly<Record<HouseDayPart, string>> = {
@@ -234,7 +265,7 @@ function useReducedMotion(): boolean {
  * 小貓之家房間場景：全家在地板活動，點一隻選牠、跳一下並喵；
  * 畫面不可見（IntersectionObserver）或 App 在背景（visibilitychange）時停止計時器。
  */
-export function HouseScene({ cats, selected, onSelect, entering = null }: HouseSceneProps) {
+export function HouseScene({ cats, selected, onSelect, entering = null, decor = [], onQuack }: HouseSceneProps) {
   const sceneRef = useRef<HTMLDivElement | null>(null);
   const reducedMotion = useReducedMotion();
   const [inView, setInView] = useState(true);
@@ -332,6 +363,36 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
     );
   }, [catIdsKey, size.width, size.height, reducedMotion, entering]);
 
+  // 小鴨偶爾呱一聲：畫面看得到、有小鴨的時候，隨機挑一隻冒「呱！」
+  const [quack, setQuack] = useState<{ cat: CatId; who: number; key: number } | null>(null);
+  const quackRef = useRef(onQuack);
+  quackRef.current = onQuack;
+  const actorsRef = useRef(actors);
+  actorsRef.current = actors;
+  const hasDucks = actors.some((a) => a.ducks && a.ducks.length > 0);
+  useEffect(() => {
+    if (!hasDucks || !inView || !docVisible || reducedMotion) return undefined;
+    let timer = 0;
+    const plan = () => {
+      timer = window.setTimeout(() => {
+        const withDucks = actorsRef.current.filter((a) => a.ducks && a.ducks.length > 0);
+        const pick = withDucks[Math.floor(Math.random() * withDucks.length)];
+        if (pick?.ducks) {
+          setQuack({ cat: pick.id, who: Math.floor(Math.random() * pick.ducks.length), key: Date.now() });
+          quackRef.current?.();
+        }
+        plan();
+      }, between(HOUSE_SCENE.duck.quackMs, Math.random));
+    };
+    plan();
+    return () => window.clearTimeout(timer);
+  }, [hasDucks, inView, docVisible, reducedMotion]);
+  useEffect(() => {
+    if (!quack) return undefined;
+    const t = window.setTimeout(() => setQuack(null), 900);
+    return () => window.clearTimeout(t);
+  }, [quack]);
+
   // 動作計時器：只有房間看得到且在前景才跑；有人在移動或跳用 rAF，全部靜止用單一 setTimeout
   const delayMs = nextTickDelayMs(actors);
   const running = inView && docVisible && delayMs !== null;
@@ -394,10 +455,12 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
       aria-label={`小貓的家（${DAY_PART_LABEL[dayPart]}，共 ${cats.length} 隻）`}
     >
       <div className="cb-house-wall" aria-hidden="true">
+        <RoomDecor ids={decor} wall />
         <RoomWindow part={dayPart} />
       </div>
       <div className="cb-house-floor" aria-hidden="true" />
       <RoomFurniture />
+      <RoomDecor ids={decor} wall={false} />
 
       {actors.map((actor) => {
         const cat = catsById.get(actor.id);
@@ -407,7 +470,7 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
         const gait = specials ? gaitFor(specials) : undefined;
         const pose = actorPose(actor, gait);
         const mood = actorMood(actor);
-        const lift = actorLift(actor, gait);
+        const lift = actorLift(actor, gait, specials);
         const feetY = wallHeight + actor.y - lift;
         const zIndex = Math.round(actor.y) + (isSelected ? 100 : 10);
 
@@ -438,6 +501,32 @@ export function HouseScene({ cats, selected, onSelect, entering = null }: HouseS
           </button>
         );
       })}
+
+      {actors.flatMap((actor) =>
+        (actor.ducks ?? []).map((d, i) => {
+          const w = HOUSE_SCENE.duck.size;
+          const h = (w * DUCKLING_VIEW.h) / DUCKLING_VIEW.w;
+          const quacking = quack?.cat === actor.id && quack.who === i;
+          return (
+            <span
+              key={`${actor.id}-duck-${i}`}
+              className="cb-house-duck"
+              aria-hidden="true"
+              style={{
+                transform: `translate3d(${Math.round(d.x - w / 2)}px, ${Math.round(wallHeight + d.y - h)}px, 0)`,
+                zIndex: Math.round(d.y) + 10,
+              }}
+            >
+              {quacking ? (
+                <span key={quack.key} className="cb-duckling-quack">
+                  呱！
+                </span>
+              ) : null}
+              <Duckling size={w} facing={d.facing} walking={d.walking} quacking={quacking} />
+            </span>
+          );
+        }),
+      )}
 
       {nuzzle ? (
         <span

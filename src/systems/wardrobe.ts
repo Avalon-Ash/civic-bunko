@@ -507,6 +507,8 @@ export interface WardrobePatch {
   outing?: CatId[];
   /** 陪我刷題的小貓 ID */
   leader?: CatId;
+  /** 小屋擺設收起來的背景換成這份清單 */
+  roomHidden?: ItemId[];
   /** 燒焦的地方換成這份清單 */
   scorch?: string[];
   /** 修過幾次燒焦（只會變多） */
@@ -553,6 +555,7 @@ export function commitWardrobe(
     patch?.cats !== undefined ||
     patch?.outing !== undefined ||
     patch?.leader !== undefined ||
+    patch?.roomHidden !== undefined ||
     patch?.scorch !== undefined ||
     patch?.repairs !== undefined;
 
@@ -568,6 +571,7 @@ export function commitWardrobe(
         ? [...prev.outing]
         : undefined;
   const nextLeader = patch?.leader !== undefined ? patch.leader : prev?.leader;
+  const nextRoomHidden = patch?.roomHidden ?? prev?.roomHidden;
 
   const nextWardrobe: WardrobeState = {
     owned: patch?.owned ? [...patch.owned] : [...(prev?.owned ?? [])],
@@ -591,6 +595,7 @@ export function commitWardrobe(
     ...catsField(patch?.cats !== undefined ? patch.cats : prev?.cats),
     ...(nextOuting !== undefined ? { outing: nextOuting } : {}),
     ...(nextLeader !== undefined ? { leader: nextLeader } : {}),
+    ...(nextRoomHidden !== undefined ? { roomHidden: [...nextRoomHidden] } : {}),
   };
 
   world.settings = {
@@ -604,7 +609,7 @@ export function commitWardrobe(
   return true;
 }
 
-/** 套用同步合併後的衣櫥資料，保留本機 outfit、outfitAt、cats、outing、leader、scorch 並發出 settingsChanged。 */
+/** 套用同步合併後的衣櫥資料，保留本機 outfit、outfitAt、cats、outing、leader、roomHidden、scorch 並發出 settingsChanged。 */
 export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
   const prev = world.settings.wardrobe;
   const nextQuests: Record<DayKey, QuestId[]> = {};
@@ -626,6 +631,7 @@ export function applySyncedWardrobe(world: World, merged: SyncWardrobe): void {
       ...catsField(prev?.cats),
       ...(prev?.outing !== undefined ? { outing: [...prev.outing] } : {}),
       ...(prev?.leader !== undefined ? { leader: prev.leader } : {}),
+      ...(prev?.roomHidden !== undefined ? { roomHidden: [...prev.roomHidden] } : {}),
     },
   };
   world.bus.emit({

@@ -12,7 +12,7 @@ interface NavigatorWithAudioSession {
   audioSession?: { type: string };
 }
 
-const SOUND_NAMES: ReadonlySet<string> = new Set<SoundName>(['tap', 'correct', 'wrong', 'reward', 'meow', 'moo']);
+const SOUND_NAMES: ReadonlySet<string> = new Set<SoundName>(['tap', 'correct', 'wrong', 'reward', 'meow', 'moo', 'quack']);
 
 export function isSoundName(value: string): value is SoundName {
   return SOUND_NAMES.has(value);
