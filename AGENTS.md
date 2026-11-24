@@ -64,13 +64,13 @@
 | :-- | :-- |
 | 合約、規格、資料 schema、驗收腳本（紅色測試先寫好）、審查、Git | 主代理（Claude） |
 | 定調類：視覺方向、互動手感、核心元件原型、畫面判讀、前後相依的一條鏈 | 主代理（Claude），不預設外派；Fable 有額度時 Fable 自己做（憲法「Fable 預算」） |
-| 規格明確、可拆、有可跑驗收的實作包 | agy `gemini-4-neon-medium`；難或跨檔的用 `gemini-4-neon-high` |
+| 規格明確、可拆、有可跑驗收的實作包 | agy `gemini-4-neon-medium`；難或跨檔的用 `gemini-4-neon-high`；Neon high 兩次不及格先試 `gemini-4-carbon-medium`（寫明新假設）再收回 Claude |
 | 大範圍、多檔、要讀很多再整理的包 | agy `gemini-pro-orchestrator-neon`（不帶 `--effort`） |
-| 雜事：讀檔摘要、機械性改動、補測試、資料驗證、內容加工批次、小而具體的包 | agy `gemini-4-hydrogen-high`（純讀檔摘要可用 `gemini-3.8-flash-medium`） |
+| 雜事：讀檔摘要、機械性改動、補測試、資料驗證、內容加工批次、小而具體的包 | agy `gemini-4-hydrogen-high`（3.8 Flash 2026-11-30 下架，不再用） |
 | 整包設計＋實作 | Codex `GPT-6.2 Sol` xhigh（見底時主代理接手；派工單要求把碰到的阻礙寫進報告） |
 | 邏輯根因、讀碼第二意見 | Codex `GPT-6.1 Sol`（6.2 Sol 讀碼庫答題退步，先不換） |
 | 看截圖審查 UI、美術判讀、法律解析抽樣第二意見 | Codex `GPT-6.2 Astra`（或主代理自己看） |
-| 有界的只讀長文件分析（整科考點頻率分析） | agy `gemini-4-argon-medium`（`--mode plan`，一定設 timeout） |
+| 有界的只讀長文件分析（整科考點頻率分析） | agy `gemini-4-carbon-medium`（`--mode plan`，脈絡 1M；只開 low／medium，一定設 timeout；Argon 2026-11-30 下架） |
 
 - Gemini Models 池偏低或見底時，實作包改派 Sonnet 子代理，再不行主代理自己做；Codex、Gemini 都見底就全部由主代理做（換池順序在 `agy-call`）。
 - 換池依 `~/.claude/QUOTA.md` 與全域 `agy-call`；外派池見底就由 Claude 接手，不停工。
