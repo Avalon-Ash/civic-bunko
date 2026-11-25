@@ -40,6 +40,7 @@
 
 **架構（ECS＋SSOT，細節在開案書 §4）**
 - 型別只定義在 `src/core/types.ts`；數值、上限、日期、顏色語意只定義在 `src/core/constants/*.ts` 與 `src/theme.css`。其他地方不寫魔術數字、不重複定義。
+- **不做耦合**：一個概念（狀態、設定、規則）的性質只定義在一處，其他地方讀它；同一個判斷出現在兩處以上就集中。測試與展示用的假資料也算：會變動的名稱、配件 ID、數值從正本表取（例：從 `constants/*.ts` 讀，或寫一個產生 fixture 的函式），不寫死在各測試裡。已出貨格式的固定樣本（`src/testing/golden/**`）例外，它本來就要凍結。碰到既有的寫死先回報、不順手再加一處；解耦先提案，使用者同意再動手。
 - Component 是純資料；邏輯放 System（純函式）；System 之間只透過 `src/core/bus.ts` 溝通。
 - 一個狀態欄位只有一個擁有者 System。畫面只經 `selectors` 讀、只經 `UICommand` 寫；System 不碰 DOM。
 - 題庫是可抽換的內容包：一包一個資料夾 `data/packs/<包ID>/`（`pack.json` 登記檔＋`official/`、`enrich/`、`zh/`、`cards/`、`topics.json`）；`data/laws/` 是各包共用的參考資料。App 只從 `src/data/source.ts` 取內容、工具只從 `tools/paths.mjs` 取路徑，其他地方不拼內容路徑；程式裡不得寫死考試名稱、年度、科目清單。細節在 `docs/plans/content-packs.md`。
@@ -70,7 +71,7 @@
 | 整包設計＋實作 | Codex `GPT-6.2 Sol` xhigh（見底時主代理接手；派工單要求把碰到的阻礙寫進報告） |
 | 邏輯根因、讀碼第二意見 | Codex `GPT-6.1 Sol`（6.2 Sol 讀碼庫答題退步，先不換） |
 | 看截圖審查 UI、美術判讀、法律解析抽樣第二意見 | Codex `GPT-6.2 Astra`（或主代理自己看） |
-| 有界的只讀長文件分析（整科考點頻率分析） | agy `gemini-4-carbon-medium`（`--mode plan`，脈絡 1M；只開 low／medium，一定設 timeout；Argon 2026-11-30 下架） |
+| 有界的只讀長文件分析（整科考點頻率分析） | agy `gemini-4-carbon-medium`（`--mode plan`，脈絡 1M；只開 low／medium，一定設 timeout；占 agy 實作席，不占雜事席；Argon 2026-11-30 下架） |
 
 - Gemini Models 池偏低或見底時，實作包改派 Sonnet 子代理，再不行主代理自己做；Codex、Gemini 都見底就全部由主代理做（換池順序在 `agy-call`）。
 - 換池依 `~/.claude/QUOTA.md` 與全域 `agy-call`；外派池見底就由 Claude 接手，不停工。
