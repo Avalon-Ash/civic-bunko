@@ -423,6 +423,7 @@
         { "law": "國家賠償法", "article": "11" }
       ],
       "essay": null,
+      "questions": ["113-general-admin-law-q47", "113-local4-admin-law-q49", "113-local4-admin-law-q50", "114-general-admin-law-q49", "114-general-admin-law-q50", "114-local4-admin-law-q48", "115-general-admin-law-q48"],
       "comic": { "layout": "versus",
         "columns": [{"from": "heading", "face": 0}, {"from": "heading", "face": 1}],
         "panels": [

@@ -14,6 +14,7 @@ import {
   StemTranslation,
 } from '../components/Bilingual';
 import { LawArticlePanel, OptionExplainList } from '../components/OptionExplain';
+import { CardLinks } from '../components/cards/CardLinks';
 import {
   CHOICES,
   CorrectionBox,
@@ -269,6 +270,7 @@ export function ResultScreen({ world, onAgain, onHome }: ResultScreenProps) {
                       catMood="oops"
                       catOutfit={outfit}
                       label={<small>錯題複習・口訣與陷阱</small>}
+                      extra={<CardLinks world={world} questionId={detail.question.id} />}
                     />
                     <OptionExplainList
                       question={detail.question}

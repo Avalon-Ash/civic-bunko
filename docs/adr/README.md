@@ -91,3 +91,4 @@
 - [0019 引導的目的地只定義在任務表與 guide.ts，畫面只經 go() 換頁與落點](0019-guide-targets-single-go.md)：任務的目的地寫在 `Quest.go`，其他目的地與落點清單在 `constants/guide.ts`，畫面用 `guideAnchor` 標落點、只經 `go()` 換頁；有回合進行時只回到那一題。
 - [0020 漫畫是卡片的選填衍生層，格子文字只用指標指向卡片原文](0020-comic-derived-layer-text-pointers.md)：`StudyCard.comic` 選填，格子的字、舉牌、欄標題都是指向 `hook`／`faces` 的指標，由 `systems/comic.ts` 解析與檢查，漫畫不可能出現卡片沒有的字。
 - [0021 漫畫的資料在 pack、版型與道具畫法在引擎，道具與角色是引擎的通用詞彙表](0021-comic-vocabulary-in-engine.md)：版型、構圖、道具、角色只列在 `constants/comic.ts`，畫法在 `ui/kit/comic/`，演員沿用小貓，卡片只引用詞彙表的 ID。
+- [0022 卡片↔官方題的連結只存在卡片的 questions；卡片回合不存卡片、複習狀態由作答紀錄導出](0022-card-question-links.md)：`StudyCard.questions` 是唯一正本，查詢只經 `cardLinks`；`startCardRound` 不在 `RoundConfig` 加欄位，零新存檔欄位。

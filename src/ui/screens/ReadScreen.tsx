@@ -12,6 +12,7 @@ import {
   QuestionVocabCard,
   StemTranslation,
 } from '../components/Bilingual';
+import { CardLinks } from '../components/cards/CardLinks';
 import {
   CHOICES,
   CorrectionBox,
@@ -340,6 +341,7 @@ export function ReadScreen({ world }: ReadScreenProps) {
             catMood="idle"
             catOutfit={outfit}
             label={<span className="cb-read-kou-label">口訣記憶</span>}
+            extra={<CardLinks world={world} questionId={question.id} />}
           />
         )}
 

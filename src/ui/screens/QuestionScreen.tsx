@@ -17,6 +17,7 @@ import {
   StemTranslation,
 } from '../components/Bilingual';
 import { LawArticlePanel, OptionExplainList } from '../components/OptionExplain';
+import { CardLinks } from '../components/cards/CardLinks';
 import {
   CHOICES,
   CorrectionBox,
@@ -512,6 +513,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                   label={
                     <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
                   }
+                  extra={<CardLinks world={world} questionId={question.id} />}
                 />
                 {showZh && zh && <QuestionVocabCard vocab={zh.vocab} />}
                 <div className="cb-acts">

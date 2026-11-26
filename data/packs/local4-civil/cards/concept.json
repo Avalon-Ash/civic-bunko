@@ -79,6 +79,7 @@
         { "law": "行政程序法", "article": "150" }
       ],
       "essay": null,
+      "questions": ["113-local4-admin-law-q05", "113-local4-admin-law-q21", "113-local4-admin-law-q28", "114-general-admin-law-q20", "114-general-admin-law-q25", "114-local4-admin-law-q02", "114-local4-admin-law-q29"],
       "comic": { "layout": "story",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["office"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "行政機關"},
@@ -120,6 +121,7 @@
         { "law": "行政訴訟法", "article": "106" }
       ],
       "essay": null,
+      "questions": ["113-general-admin-law-q39", "113-local4-admin-law-q40", "114-general-admin-law-q40", "114-local4-admin-law-q39", "114-local4-admin-law-q45", "115-general-admin-law-q47"],
       "comic": { "layout": "timeline",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["envelope", "calendar"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "30 日內"},
