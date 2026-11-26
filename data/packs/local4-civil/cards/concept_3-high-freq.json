@@ -428,8 +428,8 @@
         "panels": [
           {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["document"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "公權力"},
           {"scene": "duo", "actors": [{"cast": "official", "pose": "stumble", "mood": "oops", "facing": "right"}, {"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "left"}], "props": [], "text": {"from": "line", "face": 0, "line": 1}, "sign": "故意或過失"},
-          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "walk", "facing": "left"}], "props": ["pothole"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "欠缺"},
-          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "fall", "mood": "oops", "facing": "right"}], "props": ["lamp"], "text": {"from": "line", "face": 1, "line": 1}}
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "欠缺"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "fall", "mood": "oops", "facing": "right"}], "props": ["lamp"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "損害"}
         ] }
     },
     {

@@ -64,7 +64,7 @@ mkdirSync(dirname(out), { recursive: true });
 writeFileSync(
   out,
   `<!doctype html><html data-theme="${mode}"><meta charset="utf-8"><title>四格漫畫看圖 ${mode}</title><style>${css}
-  body{margin:16px;background:var(--bg,#fbf6ef);color:var(--ink);font-family:system-ui,"Noto Sans TC",sans-serif}
+  body{margin:16px;background:var(--surface);color:var(--ink);font-family:system-ui,"Noto Sans TC",sans-serif}
   .props{display:flex;flex-wrap:wrap;gap:12px}.prop{margin:0;width:110px;text-align:center}
   .prop .stage{width:96px;height:96px;margin:auto;background:var(--surface-sunken);border-radius:12px}
   .prop svg{width:96px;height:96px}

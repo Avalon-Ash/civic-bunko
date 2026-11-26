@@ -26,11 +26,11 @@ export const COMIC_SCENE_LAYOUT: Readonly<Record<ComicSceneId, ComicSceneLayout>
       { x: 25, y: 100, w: 48 },
       { x: 75, y: 100, w: 48 },
     ],
-    props: [{ x: 50, y: 62, w: 22 }],
+    props: [{ x: 50, y: 90, w: 24 }],
   },
   'prop-big': {
     actors: [{ x: 22, y: 100, w: 42 }],
-    props: [{ x: 68, y: 94, w: 54 }],
+    props: [{ x: 70, y: 94, w: 46 }],
   },
   crowd: {
     actors: [

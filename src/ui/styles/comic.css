@@ -52,7 +52,7 @@
   content: '';
   position: absolute;
   right: 6px;
-  top: 6px;
+  bottom: 10px;
   width: 0;
   height: 0;
   border-top: 7px solid transparent;
@@ -145,6 +145,17 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+/* 深色模式：道具的深棕外框會融進深色背景，描一圈淡淡的邊 */
+:root[data-theme='dark'] .cb-comic-prop svg {
+  filter: drop-shadow(0 0 1px var(--line)) drop-shadow(0 0 1px var(--line));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .cb-comic-prop svg {
+    filter: drop-shadow(0 0 1px var(--line)) drop-shadow(0 0 1px var(--line));
+  }
 }
 
 @keyframes cb-comic-in {
