@@ -9,6 +9,8 @@ const ANCHOR_ATTR = 'data-guide';
 const FLASH_CLASS = 'is-guided';
 /** 換頁後落點元素可能晚一兩格才畫出來（例如等題庫載入）；最多等這麼多格就放棄、只換分頁 */
 const LAND_MAX_FRAMES = 30;
+/** 落點比視窗這個比例還高（例如展開的成就清單）就對齊頂端，不置中：置中會把它的標題捲出畫面 */
+const LAND_TALL_RATIO = 0.5;
 
 /** 在元素上標落點：`<div {...guideAnchor('quiz-start')}>`。同一個 id 只標一個元素（guide.test.ts 守門）。 */
 export function guideAnchor(id: GuideAnchor): { [ANCHOR_ATTR]: GuideAnchor } {
@@ -91,7 +93,8 @@ export function useGuideLanding(request: GuideRequest | null): void {
         return;
       }
       const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-      el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+      const tall = el.getBoundingClientRect().height > window.innerHeight * LAND_TALL_RATIO;
+      el.scrollIntoView({ block: tall ? 'start' : 'center', behavior: reduce ? 'auto' : 'smooth' });
       el.classList.remove(FLASH_CLASS);
       void el.offsetWidth; // 重新觸發動畫
       el.classList.add(FLASH_CLASS);
