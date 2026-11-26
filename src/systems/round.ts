@@ -1,5 +1,6 @@
-import type { Choice, RoundConfig, RoundResult, RoundState } from '../core/types';
+import type { BankId, Choice, QuestionId, RoundConfig, RoundResult, RoundState } from '../core/types';
 import type { World } from '../core/world';
+import { cardQuestionIds } from './cardLinks';
 import { buildExamQueue, buildOptionOrders, buildQueue, shuffle } from './selection';
 
 export type RoundStepOutcome = 'noop' | 'advanced' | 'finished' | 'discarded';
@@ -31,6 +32,36 @@ export function attachRound(world: World): () => void {
     if (!world.savedRound) return;
     if (world.savedRound.config.bankId !== event.bankId) return;
     validateSavedRound(world);
+  });
+}
+
+/** 共用的標準回合啟動（含選項打亂與發出 roundStarted）；startRound／retryWrong／quizSameSet／startCardRound 共用。 */
+function beginStandardRound(
+  world: World,
+  config: RoundConfig,
+  queue: QuestionId[],
+  rng: () => number,
+): void {
+  const shouldShuffleOptions =
+    config.study === 'quiz' && world.settings.shuffleOptions === true;
+
+  world.savedRound = null;
+  world.round = {
+    config,
+    queue,
+    index: 0,
+    pick: null,
+    results: [],
+    combo: 0,
+    finished: false,
+    pass: 1,
+    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(queue, rng) } : {}),
+  };
+
+  world.bus.emit({
+    type: 'roundStarted',
+    config,
+    queue: [...queue],
   });
 }
 
@@ -94,27 +125,43 @@ export function startRound(
     passes: Math.max(1, Math.floor(config.passes)),
   };
 
-  const shouldShuffleOptions =
-    normalizedConfig.study === 'quiz' && world.settings.shuffleOptions === true;
+  beginStandardRound(world, normalizedConfig, queue, rng);
+}
 
-  world.savedRound = null;
-  world.round = {
-    config: normalizedConfig,
-    queue,
-    index: 0,
-    pick: null,
-    results: [],
-    combo: 0,
-    finished: false,
-    pass: 1,
-    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(queue, rng) } : {}),
+/** 開出只包含指定卡片對應官方題的作答回合；沒有題目就不動作。不在 RoundConfig 新增欄位。 */
+export function startCardRound(
+  world: World,
+  cardId: string,
+  rng: () => number = Math.random,
+): void {
+  const ids = cardQuestionIds(world, cardId);
+  if (ids.length === 0) {
+    return;
+  }
+
+  let bankId: BankId = world.settings.lastRound?.bankId ?? world.banks[0]?.id ?? '';
+  for (const id of ids) {
+    const question = world.questions.get(id);
+    const paper = question ? world.papers.get(question.paperId) : undefined;
+    if (paper) {
+      bankId = paper.bankId;
+      break;
+    }
+  }
+
+  const queue = shuffle(ids, rng);
+  const config: RoundConfig = {
+    bankId,
+    subjectKeys: [],
+    count: queue.length,
+    mode: 'mixed',
+    fast: false,
+    study: 'quiz',
+    ask: 'all',
+    passes: 1,
   };
 
-  world.bus.emit({
-    type: 'roundStarted',
-    config: normalizedConfig,
-    queue: [...queue],
-  });
+  beginStandardRound(world, config, queue, rng);
 }
 
 /** 作答目前題目；看答案模式與模擬考不接受作答，同一題只能作答一次。 */
@@ -396,26 +443,7 @@ export function retryWrong(world: World, rng: () => number = Math.random): void 
     count: wrongIds.length,
   };
 
-  const shouldShuffleOptions = world.settings.shuffleOptions === true;
-
-  world.savedRound = null;
-  world.round = {
-    config,
-    queue: wrongIds,
-    index: 0,
-    pick: null,
-    results: [],
-    combo: 0,
-    finished: false,
-    pass: 1,
-    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(wrongIds, rng) } : {}),
-  };
-
-  world.bus.emit({
-    type: 'roundStarted',
-    config,
-    queue: [...wrongIds],
-  });
+  beginStandardRound(world, config, wrongIds, rng);
 }
 
 /** 用上一回合（lastRound）同一批題目開一個作答（quiz）新回合，去除重複並重新洗牌（不帶模擬考）。 */
@@ -438,26 +466,7 @@ export function quizSameSet(world: World, rng: () => number = Math.random): void
     study: 'quiz',
   };
 
-  const shouldShuffleOptions = world.settings.shuffleOptions === true;
-
-  world.savedRound = null;
-  world.round = {
-    config,
-    queue,
-    index: 0,
-    pick: null,
-    results: [],
-    combo: 0,
-    finished: false,
-    pass: 1,
-    ...(shouldShuffleOptions ? { optionOrder: buildOptionOrders(queue, rng) } : {}),
-  };
-
-  world.bus.emit({
-    type: 'roundStarted',
-    config,
-    queue: [...queue],
-  });
+  beginStandardRound(world, config, queue, rng);
 }
 
 /** 將暫存於 savedRound 的未完成回合恢復為進行中回合並發出 roundRestored。 */

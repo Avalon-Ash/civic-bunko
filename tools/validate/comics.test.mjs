@@ -60,3 +60,20 @@ test('壞資料會被抓到：指不到的指標、不是子字串的舉牌、�
   bad3.comic.panels[0].props = ['no-such-prop'];
   assert.ok(comicProblems(bad3).some((p) => p.includes('道具')));
 });
+
+test('卡片的 questions：每個題號都在該包的官方題庫裡、不重複', () => {
+  for (const pack of readdirSync(packsDir)) {
+    const officialDir = join(packsDir, pack, 'official');
+    let files = [];
+    try {
+      files = readdirSync(officialDir).filter((f) => f.endsWith('.json'));
+    } catch {
+      continue;
+    }
+    const known = new Set(files.flatMap((f) => (JSON.parse(readFileSync(join(officialDir, f), 'utf8')).questions ?? []).map((q) => q.id)));
+    for (const { card } of allCards().filter((c) => c.pack === pack && c.card.questions)) {
+      assert.equal(new Set(card.questions).size, card.questions.length, `${card.id} 的 questions 有重複`);
+      for (const id of card.questions) assert.ok(known.has(id), `${card.id} 掛了不存在的題 ${id}`);
+    }
+  }
+});

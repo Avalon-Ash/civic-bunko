@@ -123,6 +123,8 @@ export interface EnrichCardProps {
   catSpin?: boolean;
   catOutfit?: Outfit | null;
   label: ReactNode;
+  /** 畫在口訣卡最下面的額外內容（例如相關圖卡按鈕） */
+  extra?: ReactNode;
 }
 
 /** 加工內容卡片（口訣、小圖、陷阱、低把握與修法提醒）。 */
@@ -135,6 +137,7 @@ export function EnrichCard({
   catSpin = false,
   catOutfit = null,
   label,
+  extra,
 }: EnrichCardProps) {
   return (
     <Card tone={tone} className={`cb-kou ${className}`.trim()}>
@@ -164,6 +167,7 @@ export function EnrichCard({
           <span className="cb-grow">{enrich.lawChanged}</span>
         </div>
       )}
+      {extra}
     </Card>
   );
 }

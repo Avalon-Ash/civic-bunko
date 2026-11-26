@@ -174,3 +174,8 @@
     animation: none;
   }
 }
+
+/* 圖卡抽屜的「刷這張卡的題」 */
+.cb-card-round-btn {
+  width: 100%;
+}

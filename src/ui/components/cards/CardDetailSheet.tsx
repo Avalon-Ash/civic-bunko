@@ -11,6 +11,7 @@ import { LawArticleView } from '../LawArticleView';
 import { CardFaceViewer } from './CardFaceViewer';
 import { EssayCardBody } from './EssayCardBody';
 import { ComicSection } from './comic/ComicSection';
+import { CardRoundButton } from './CardRoundButton';
 
 export interface CardDetailSheetProps {
   world: World;
@@ -93,6 +94,8 @@ export function CardDetailSheet({ world, card, onClose }: CardDetailSheetProps) 
               {activeCard.comic && activeCard.kind !== 'essay' ? (
                 <ComicSection card={{ ...activeCard, comic: activeCard.comic }} />
               ) : null}
+
+              <CardRoundButton world={world} cardId={activeCard.id} className="cb-card-round-btn" />
 
               {activeCard.visual && <Visual visual={activeCard.visual} />}
 

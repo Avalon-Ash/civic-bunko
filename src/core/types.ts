@@ -210,6 +210,8 @@ export interface StudyCard {
   essayText?: string;
   /** 四格漫畫（選填；沒有＝照舊只顯示文字卡）。docs/plans/comic-cards.md、ADR 0020 */
   comic?: CardComic;
+  /** 這張卡對應的官方題（選填；卡片↔題目連結的唯一正本，查詢只經 selectors/cardLinks.ts）。ADR 0022 */
+  questions?: QuestionId[];
 }
 
 // ── 四格漫畫（卡片的選填衍生層；字只用指標指向卡片原文，詞彙表在 constants/comic.ts） ──
@@ -908,6 +910,8 @@ export type UICommand =
   | { type: 'retryWrong' }
   /** 用剛看完的同一批題目開作答回合 */
   | { type: 'quizSameSet' }
+  /** 只出這張卡對應官方題（StudyCard.questions）的作答回合；卡片沒有題目時不動作。不在 RoundConfig 記卡片 */
+  | { type: 'startCardRound'; cardId: string }
   | { type: 'setTheme'; theme: ThemeChoice }
   | { type: 'setAccessory'; accessory: AccessoryId | null }
   | { type: 'dismissInstallHint' }
