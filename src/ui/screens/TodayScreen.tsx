@@ -153,6 +153,9 @@ export function TodayScreen({
   const fish = fishBalance(world, now);
   const isSoundOn = soundOn(world);
   const isWeatherOn = weatherOn(world);
+  const needsWeatherTap = isWeatherOn && weather !== undefined && WEATHER_RETRY[weather.status] !== undefined;
+  /** 設定收合：null＝她還沒自己開關過，照 needsWeatherTap */
+  const [settingsOpen, setSettingsOpen] = useState<boolean | null>(null);
 
   const handleThemeChange = (theme: ThemeChoice) => {
     dispatch(world, { type: 'setTheme', theme });
@@ -469,8 +472,10 @@ export function TodayScreen({
           <Collapse
             title="設定"
             summary={`音效${isSoundOn ? '開' : '關'}・天氣${isWeatherOn ? '開' : '關'}`}
-            // 天氣開著但要她按「問天氣」或「再試一次」時，打開設定，按鈕才不會被收起來
-            defaultOpen={isWeatherOn && weather !== undefined && WEATHER_RETRY[weather.status] !== undefined}
+            // 天氣開著但要她按「問天氣」或「再試一次」時自動打開，按鈕才不會被收起來。
+            // 天氣狀態是開 App 後才非同步問出來的，所以用受控：她自己按過就照她的
+            open={settingsOpen ?? needsWeatherTap}
+            onOpenChange={setSettingsOpen}
           >
             <div className="cb-stack-sm cb-settings-body">
               <Card className="cb-row cb-switch-card">
