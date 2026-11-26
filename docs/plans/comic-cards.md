@@ -1,6 +1,6 @@
 # 開案書：四格漫畫圖卡
 
-- 開案：2026-11-26，Fable 5.2（派工單 `docs/dispatch/CC0-comic-cards-plan.md`）。狀態：待使用者看過「§10 待使用者決定」後動工。**2026-11-27 和 `docs/plans/ux-cleanup.md` 合併時程：逐日表以那份 §7 為準，考前目標 22 張（§6）；本檔其他節提到的「30 張」「每天 7–8 張」是合併前的算法，以 §6、§7 為準。**
+- 開案：2026-11-26，Fable 5.2（派工單 `docs/dispatch/CC0-comic-cards-plan.md`）。狀態：2026-11-27 凌晨照 §10 的預設動工。CC1（3 張樣張、遮起來想）、CC3（卡片↔官方題；樣張 3 張＋另外 21 張有法條的卡已掛題，主席逐題看過題幹）已上線；道具由 agy Neon 畫、Codex 審兩輪。**等樣張關卡**（§9）才量產 A 批。**2026-11-27 和 `docs/plans/ux-cleanup.md` 合併時程：逐日表以那份 §7 為準，考前目標 22 張（§6）；本檔其他節提到的「30 張」「每天 7–8 張」是合併前的算法，以 §6、§7 為準。**
 - 需求來源：`docs/reference/comic-cards-request.md`（她的口述、主代理判讀、規格 → 卡片對照表、規格原文）。
 - 期限：可開發日 11-27 到 12-01（5 天）；12-02 起只修錯；考試 12-05、12-06。
 - 本檔裡的數字都附量法；沒量過的寫「估」。
@@ -154,7 +154,7 @@ type ComicTextRef =
 | 批 | 卡片 | 版型 | 備註 |
 | :-- | :-- | :-- | :-- |
 | 樣張 | `concept-admin-act` | story | 起承轉合的代表 |
-| 樣張 | `concept-remedy-route` | timeline | 30 日、2 個月、3 個月 |
+| 樣張 | `concept-remedy-route` | story | 30 日、3 個月、不作為、2 個月。原定 timeline；2×2 排列時箭頭會指到格外、「不作為」被讀成起訴後的一步（Codex 第二輪審圖），改起承轉合 |
 | 樣張 | `concept-al-state-comp` | versus | 公務員 vs 公共設施 |
 | A | `concept-con-thresholds` | lineup | 數字型樣張，D2 第一件事，同樣給她看 |
 | A | `concept-al-act-defect` | lineup | 撤銷、廢止、無效三種 |
