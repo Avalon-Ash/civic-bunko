@@ -5,6 +5,11 @@
   padding: 12px 14px;
 }
 
+.cb-sync-body {
+  padding-top: 12px;
+  border-top: 2px dashed var(--hair);
+}
+
 .cb-sync-status {
   display: flex;
   flex-direction: column;

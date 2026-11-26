@@ -1,16 +1,26 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { dispatch } from '../../core/commands';
+import type { SyncStatus } from '../../core/types';
 import type { World } from '../../core/world';
 import { progressOverview } from '../../selectors/backup';
 import { getSyncState } from '../../selectors/sync';
 import { exportProgress } from '../../systems/persistence';
 import { encodeSyncCode, validateSyncCredentials } from '../../systems/syncCode';
 import { Button } from '../kit/Button';
-import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
+import { Collapse } from '../kit/Collapse';
 import { Dialog } from '../kit/Dialog';
 import { Sheet } from '../kit/Sheet';
 import { Toast } from '../kit/Toast';
+import { guideAnchor, useGuidePreset } from '../useGuide';
+
+/** 同步狀態翻成收合列摘要的一句話（SSOT：只定義在這裡）。 */
+const SYNC_SUMMARY: Readonly<Record<SyncStatus, string>> = {
+  off: '還沒開啟',
+  idle: '已同步',
+  syncing: '同步中',
+  error: '出錯了',
+};
 
 function formatLastAnswered(iso: string | null): string {
   if (!iso) return '尚未作答';
@@ -68,6 +78,13 @@ export interface SyncBackupSectionProps {
 export function SyncBackupSection({ world }: SyncBackupSectionProps) {
   const overview = progressOverview(world);
   const sync = getSyncState(world);
+  const [syncOpen, setSyncOpen] = useState(sync.status === 'error');
+
+  useEffect(() => {
+    if (sync.status === 'error') setSyncOpen(true);
+  }, [sync.status]);
+
+  useGuidePreset('open-sync', () => setSyncOpen(true));
 
   const ownerInputId = useId();
   const repoInputId = useId();
@@ -207,9 +224,14 @@ export function SyncBackupSection({ world }: SyncBackupSectionProps) {
     <>
       <Toast message={toast} onDismiss={() => setToast(null)} />
 
-      <section className="cb-section">
-        <h2>同步與備份</h2>
-        <Card className="cb-stack-sm">
+      <Collapse
+        title="同步與備份"
+        summary={SYNC_SUMMARY[sync.status]}
+        open={syncOpen}
+        onOpenChange={setSyncOpen}
+        {...guideAnchor('stamps-sync')}
+      >
+        <div className="cb-stack-sm cb-sync-body">
           <div className="cb-sync-status">
             {sync.status === 'off' && <span className="cb-sub-strong">還沒開啟同步</span>}
             {sync.status === 'syncing' && (
@@ -387,8 +409,8 @@ export function SyncBackupSection({ world }: SyncBackupSectionProps) {
               清除全部進度
             </Button>
           </div>
-        </Card>
-      </section>
+        </div>
+      </Collapse>
 
       <Sheet open={syncSheetOpen} onClose={() => setSyncSheetOpen(false)} title="貼上同步碼">
         <div className="cb-stack-sm">

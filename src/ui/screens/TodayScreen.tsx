@@ -26,12 +26,13 @@ import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Chip } from '../kit/Chip';
 import { Cat } from '../kit/Cat';
+import { Collapse } from '../kit/Collapse';
 import { CountUp } from '../kit/CountUp';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { Toast } from '../kit/Toast';
 import { checkForUpdateNow, formatAppVersion, getCurrentAppVersion } from '../useAppVersion';
 import { useWorld } from '../useWorld';
-import { useGo } from '../useGuide';
+import { guideAnchor, useGo } from '../useGuide';
 import { GUIDE } from '../../core/constants/guide';
 
 const THEME_OPTIONS: readonly SegmentedOption<ThemeChoice>[] = [
@@ -104,7 +105,6 @@ export function TodayScreen({
   world,
   onStartQuiz,
   onGoSetup,
-  onGoStamps,
   onGoCat,
   onOpenChangelog,
   papersLoading = false,
@@ -151,6 +151,8 @@ export function TodayScreen({
   const outfit = catOutfit(world, leaderCat(world));
   const quest = todayQuest(world, now);
   const fish = fishBalance(world, now);
+  const isSoundOn = soundOn(world);
+  const isWeatherOn = weatherOn(world);
 
   const handleThemeChange = (theme: ThemeChoice) => {
     dispatch(world, { type: 'setTheme', theme });
@@ -290,8 +292,8 @@ export function TodayScreen({
             </Card>
           )}
 
-          {sync.status === 'error' && onGoStamps && (
-            <Card className="cb-sync-banner" onClick={onGoStamps}>
+          {sync.status === 'error' && (
+            <Card className="cb-sync-banner" onClick={() => go(GUIDE.syncError)}>
               <div className="cb-grow">
                 <strong className="cb-install-banner-title">進度同步暫時出了問題</strong>
                 <span className="cb-sub cb-block">{sync.error ?? '點這裡前往同步與備份查看'}</span>
@@ -335,7 +337,7 @@ export function TodayScreen({
 
           <section className="cb-section">
             <div className="cb-mission-head">
-              <h2>今天的 3 個小任務</h2>
+              <h2>今天的 3 回快刷</h2>
               <span className="cb-sub-strong cb-num-tabular">
                 今天 {today.count} / {today.goal} 題
               </span>
@@ -343,7 +345,7 @@ export function TodayScreen({
             <div
               className="cb-daily-paws"
               role="img"
-              aria-label={`今日已完成 ${today.missionsDone} / ${today.missionsTotal} 個小任務`}
+              aria-label={`今日已完成 ${today.missionsDone} / ${today.missionsTotal} 回快刷`}
             >
               {Array.from({ length: today.missionsTotal }, (_, idx) => {
                 const lit = idx < today.missionsDone;
@@ -404,6 +406,7 @@ export function TodayScreen({
                     key={mission.id}
                     className="cb-mission"
                     onClick={() => handleMissionClick(idx)}
+                    {...(idx === 0 ? guideAnchor('today-quick') : undefined)}
                   >
                     <span className={`cb-dot cb-tone-${mission.tone}`} aria-hidden="true">
                       {mission.badge}
@@ -427,7 +430,7 @@ export function TodayScreen({
             <p className="cb-sub cb-m0 cb-daily-goal-note">
               {today.stamped
                 ? '今天的章蓋好了！'
-                : `三個任務都做完（${DAILY_GOAL_QUESTIONS} 題）才會蓋今天的章`}
+                : `三回都刷完（${DAILY_GOAL_QUESTIONS} 題）才會蓋今天的章`}
             </p>
           </section>
 
@@ -463,69 +466,78 @@ export function TodayScreen({
             </div>
           </section>
 
-          <Card className="cb-row cb-switch-card">
-            <div className="cb-grow">
-              <strong className="cb-block">音效</strong>
-              <span className="cb-sub">按鈕、答題的聲音和小貓叫；手機靜音時不會響</span>
-            </div>
-            <Switch
-              checked={soundOn(world)}
-              onChange={(on) => dispatch(world, { type: 'setSound', on })}
-              ariaLabel="音效"
-            />
-          </Card>
+          <Collapse
+            title="設定"
+            summary={`音效${isSoundOn ? '開' : '關'}・天氣${isWeatherOn ? '開' : '關'}`}
+            // 天氣開著但要她按「問天氣」或「再試一次」時，打開設定，按鈕才不會被收起來
+            defaultOpen={isWeatherOn && weather !== undefined && WEATHER_RETRY[weather.status] !== undefined}
+          >
+            <div className="cb-stack-sm cb-settings-body">
+              <Card className="cb-row cb-switch-card">
+                <div className="cb-grow">
+                  <strong className="cb-block">音效</strong>
+                  <span className="cb-sub">按鈕、答題的聲音和小貓叫；手機靜音時不會響</span>
+                </div>
+                <Switch
+                  checked={isSoundOn}
+                  onChange={(on) => dispatch(world, { type: 'setSound', on })}
+                  ariaLabel="音效"
+                />
+              </Card>
 
-          <Card className="cb-stack-sm">
-            <div className="cb-row cb-switch-card">
-              <div className="cb-grow">
-                <strong className="cb-block">天氣天空</strong>
-                <span className="cb-sub">{weatherNote(weatherOn(world), weather, weatherPlace(world)?.name ?? null)}</span>
-              </div>
-              <Switch
-                checked={weatherOn(world)}
-                onChange={(on) => dispatch(world, { type: 'setWeather', on })}
-                ariaLabel="天氣天空"
-              />
-            </div>
-            {weatherOn(world) ? (
-              <div className="cb-row cb-wrap cb-weather-row">
-                <label className="cb-row cb-weather-place">
-                  <span className="cb-sub">地點</span>
-                  <select
-                    className="cb-select"
-                    value={weatherPlace(world)?.id ?? ''}
-                    onChange={(ev) => dispatch(world, { type: 'setWeatherPlace', place: ev.target.value || null })}
-                  >
-                    <option value="">用定位</option>
-                    {WEATHER_PLACES.map((place) => (
-                      <option key={place.id} value={place.id}>
-                        {place.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {weather && WEATHER_RETRY[weather.status] ? (
-                  <Chip tone="butter" onClick={weather.refresh}>
-                    {WEATHER_RETRY[weather.status]}
-                  </Chip>
+              <Card className="cb-stack-sm">
+                <div className="cb-row cb-switch-card">
+                  <div className="cb-grow">
+                    <strong className="cb-block">天氣天空</strong>
+                    <span className="cb-sub">{weatherNote(isWeatherOn, weather, weatherPlace(world)?.name ?? null)}</span>
+                  </div>
+                  <Switch
+                    checked={isWeatherOn}
+                    onChange={(on) => dispatch(world, { type: 'setWeather', on })}
+                    ariaLabel="天氣天空"
+                  />
+                </div>
+                {isWeatherOn ? (
+                  <div className="cb-row cb-wrap cb-weather-row">
+                    <label className="cb-row cb-weather-place">
+                      <span className="cb-sub">地點</span>
+                      <select
+                        className="cb-select"
+                        value={weatherPlace(world)?.id ?? ''}
+                        onChange={(ev) => dispatch(world, { type: 'setWeatherPlace', place: ev.target.value || null })}
+                      >
+                        <option value="">用定位</option>
+                        {WEATHER_PLACES.map((place) => (
+                          <option key={place.id} value={place.id}>
+                            {place.name}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {weather && WEATHER_RETRY[weather.status] ? (
+                      <Chip tone="butter" onClick={weather.refresh}>
+                        {WEATHER_RETRY[weather.status]}
+                      </Chip>
+                    ) : null}
+                  </div>
                 ) : null}
-              </div>
-            ) : null}
-          </Card>
+              </Card>
 
-          <section className="cb-section cb-update-row">
-            <Button variant="ghost" onClick={() => void handleCheckUpdate()} disabled={checkingUpdate}>
-              {checkingUpdate ? '檢查中…' : '檢查更新'}
-            </Button>
-            {onOpenChangelog ? (
-              <Button variant="ghost" onClick={onOpenChangelog}>
-                更新紀錄
-              </Button>
-            ) : null}
-            <span className="cb-sub" role="status">
-              {updateNote ?? (getCurrentAppVersion() ? `版本 ${formatAppVersion(getCurrentAppVersion())}` : '')}
-            </span>
-          </section>
+              <div className="cb-section cb-update-row">
+                <Button variant="ghost" onClick={() => void handleCheckUpdate()} disabled={checkingUpdate}>
+                  {checkingUpdate ? '檢查中…' : '檢查更新'}
+                </Button>
+                {onOpenChangelog ? (
+                  <Button variant="ghost" onClick={onOpenChangelog}>
+                    更新紀錄
+                  </Button>
+                ) : null}
+                <span className="cb-sub" role="status">
+                  {updateNote ?? (getCurrentAppVersion() ? `版本 ${formatAppVersion(getCurrentAppVersion())}` : '')}
+                </span>
+              </div>
+            </div>
+          </Collapse>
         </>
       ) : (
         <Card>

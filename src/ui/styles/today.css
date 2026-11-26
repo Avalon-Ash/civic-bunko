@@ -113,3 +113,8 @@
     transform: rotate(-10deg) scale(1);
   }
 }
+
+.cb-settings-body {
+  padding-top: 12px;
+  border-top: 2px dashed var(--hair);
+}

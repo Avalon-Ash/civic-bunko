@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { dispatch } from '../../core/commands';
+import { GUIDE } from '../../core/constants/guide';
 import { WEAK_MIN_ANSWERED, WEAK_ROUND_COUNT } from '../../core/constants/weak';
 import type { World } from '../../core/world';
 import { activeBank, availableCount, subjectStats } from '../../selectors';
@@ -10,12 +10,14 @@ import { topicStats, weakRoundConfig, weakSummary, weakTopics } from '../../sele
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
+import { Collapse } from '../kit/Collapse';
 import { CatHome } from '../pet/CatHome';
 import { SyncBackupSection } from '../components/SyncBackupSection';
 import { TopicList } from '../components/TopicList';
 import { CountUp } from '../kit/CountUp';
 import { ProgressBar } from '../kit/ProgressBar';
 import { formatAppVersion, getCurrentAppVersion } from '../useAppVersion';
+import { useGo } from '../useGuide';
 import { useWorld } from '../useWorld';
 
 export interface StampsScreenProps {
@@ -27,8 +29,9 @@ export interface StampsScreenProps {
 }
 
 /** 集章畫面：顯示我的章（換裝在小貓分頁）、弱點考點、各科總題數與答對率，以及最下方的同步與備份區塊。 */
-export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCat }: StampsScreenProps) {
+export function StampsScreen({ world, papersLoading = false, onStartQuiz }: StampsScreenProps) {
   useWorld(world);
+  const go = useGo();
   const bank = activeBank(world);
   const stats = bank ? subjectStats(world, bank.id) : [];
   const totals = stampTotals(world);
@@ -50,7 +53,6 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
     weakAllStats.every((t) => t.wrongAttempts === 0);
 
   const freqList = bank ? frequentTopics(world, bank.id) : [];
-  const [freqOpen, setFreqOpen] = useState(false);
 
   const versionLabel = formatAppVersion(getCurrentAppVersion());
 
@@ -105,7 +107,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
           </div>
         </div>
 
-        <Button variant="butter" onClick={onGoCat}>
+        <Button variant="butter" onClick={() => go(GUIDE.dressCat)}>
           幫小貓換裝
         </Button>
       </Card>
@@ -134,26 +136,27 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
         ) : (
           <Card className="cb-weak-empty" data-cat-perch="">
             <Cat size={54} mood={noMistakesYet ? 'yay' : 'idle'} interactive={false} />
-            <p className="cb-sub-strong cb-m0 cb-grow">
-              {noMistakesYet
-                ? '目前沒有明顯的弱點，繼續保持'
-                : '再多刷幾題，我就能找出你常錯的考點'}
-            </p>
+            <div className="cb-weak-empty-body">
+              <p className="cb-sub-strong cb-m0">
+                {noMistakesYet
+                  ? '目前沒有明顯的弱點，繼續保持'
+                  : '再多刷幾題，我就能找出你常錯的考點'}
+              </p>
+              <Button
+                variant="butter"
+                className="cb-weak-empty-btn"
+                onClick={() => go(GUIDE.weakEmpty)}
+              >
+                去刷題
+              </Button>
+            </div>
           </Card>
         )}
       </section>
 
       {!papersLoading && freqList.length > 0 ? (
-        <section className="cb-section">
-          <h2>高頻考點</h2>
-          <Button
-            variant="butter"
-            aria-expanded={freqOpen}
-            onClick={() => setFreqOpen((v) => !v)}
-          >
-            {freqOpen ? '收起高頻考點' : `看每科最常考的 ${freqList.length} 個考點`}
-          </Button>
-          {freqOpen ? (
+        <Collapse title="高頻考點" summary={`每科最常考的 ${freqList.length} 個`}>
+          <div className="cb-freq-body">
             <TopicList
               tone="freq"
               items={freqList.map((topic) => ({
@@ -165,8 +168,8 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz, onGoCa
               }))}
               onSolo={handleStartSingleFreq}
             />
-          ) : null}
-        </section>
+          </div>
+        </Collapse>
       ) : null}
 
       {stats.length > 0 ? (

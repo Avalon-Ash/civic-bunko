@@ -176,3 +176,24 @@
 .cb-acc-svg {
   display: block;
 }
+
+.cb-weak-empty-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.cb-weak-empty-btn {
+  width: auto;
+  min-height: var(--tap-min);
+  padding: 6px 18px;
+  font-size: var(--text-small);
+}
+
+.cb-freq-body {
+  padding-top: 12px;
+  border-top: 2px dashed var(--hair);
+}
