@@ -2,6 +2,7 @@
 import { dispatch } from '../../../core/commands';
 import { GUIDE } from '../../../core/constants/guide';
 import type { World } from '../../../core/world';
+import { currentQuestion, readView } from '../../../selectors';
 import { cardQuestionIds } from '../../../selectors/cardLinks';
 import { Button } from '../../kit/Button';
 import { useGo } from '../../useGuide';
@@ -18,7 +19,9 @@ export interface CardRoundButtonProps {
 export function CardRoundButton({ world, cardId, onStart, className = '' }: CardRoundButtonProps) {
   const go = useGo();
   const questionIds = cardQuestionIds(world, cardId);
-  if (questionIds.length === 0) {
+  // 刷題途中從解析區打開的抽屜不顯示：按下去會把進行中的回合換掉
+  const inRound = currentQuestion(world) !== null || readView(world) !== null;
+  if (questionIds.length === 0 || inRound) {
     return null;
   }
 
