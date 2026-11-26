@@ -32,16 +32,24 @@ import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
 import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
+import { Collapse } from '../kit/Collapse';
 import { PawPicker } from '../kit/PawPicker';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { Sheet } from '../kit/Sheet';
 import { Stepper } from '../kit/Stepper';
 import { Switch } from '../kit/Switch';
+import { guideAnchor, useGuidePreset } from '../useGuide';
 import { useWorld } from '../useWorld';
 
 const STUDY_OPTIONS: readonly SegmentedOption<StudyMode>[] = [
   { value: 'quiz', label: '自己作答' },
   { value: 'read', label: '看答案' },
+];
+
+const ASK_OPTIONS: ReadonlyArray<{ value: AskFilter; label: string }> = [
+  { value: 'positive', label: '正向題' },
+  { value: 'all', label: '全部' },
+  { value: 'negative', label: '反向題' },
 ];
 
 const MODE_OPTIONS: ReadonlyArray<{ value: RoundMode; label: string }> = [
@@ -54,6 +62,13 @@ const MODE_OPTIONS: ReadonlyArray<{ value: RoundMode; label: string }> = [
 const READ_MODE_OPTIONS: ReadonlyArray<{ value: RoundMode; label: string }> = MODE_OPTIONS.filter(
   (opt) => opt.value === 'mixed' || opt.value === 'new',
 );
+
+function resolveModeForStudy(study: StudyMode, mode: RoundMode): RoundMode {
+  if (study === 'read' && !READ_MODE_OPTIONS.some((opt) => opt.value === mode)) {
+    return 'mixed';
+  }
+  return mode;
+}
 
 function clampCount(value: number): number {
   return Math.min(ROUND_COUNT_MAX, Math.max(ROUND_COUNT_MIN, value));
@@ -86,15 +101,12 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   const [subjectKeys, setSubjectKeys] = useState<SubjectKey[]>(() =>
     initialLast ? initialLast.subjectKeys.filter((k) => validSubjectSet.has(k)) : [],
   );
-  const [mode, setMode] = useState<RoundMode>(() => {
-    const m = initialLast?.mode ?? 'mixed';
-    if ((initialLast?.study ?? 'quiz') === 'read' && (m === 'wrong' || m === 'due')) {
-      return 'mixed';
-    }
-    return m;
-  });
+  const [mode, setMode] = useState<RoundMode>(() =>
+    resolveModeForStudy(initialLast?.study ?? 'quiz', initialLast?.mode ?? 'mixed'),
+  );
   // 使用者回饋（2026-11-16）：答對也要看完整口訣卡，不自動跳題，所以不再提供快刷開關。
   const fast = false;
+  const [moreOpen, setMoreOpen] = useState(false);
   const [examSheetOpen, setExamSheetOpen] = useState(false);
   const [selectedPaperId, setSelectedPaperId] = useState<PaperId | null>(null);
 
@@ -102,6 +114,27 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     if (!bank) return;
     setSubjectKeys((prev) => prev.filter((k) => bank.subjects.some((s) => s.key === k)));
   }, [bank]);
+
+  const papers = bank ? examPapers(world, bank.id) : [];
+
+  const handleStudyChange = (nextStudy: StudyMode) => {
+    setStudy(nextStudy);
+    setMode((prev) => resolveModeForStudy(nextStudy, prev));
+  };
+
+  const handleOpenExamSheet = () => {
+    if (papersLoading || papers.length === 0) return;
+    setSelectedPaperId(null);
+    setExamSheetOpen(true);
+  };
+
+  useGuidePreset('wrong-mode', () => {
+    handleStudyChange('quiz');
+    setMode('wrong');
+    setMoreOpen(true);
+  });
+
+  useGuidePreset('exam-sheet', handleOpenExamSheet);
 
   if (!bank) {
     return (
@@ -114,7 +147,6 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     );
   }
 
-  const papers = examPapers(world, bank.id);
   const selectedPaper = papers.find((p) => p.paperId === selectedPaperId) ?? null;
 
   const groupedPapers: Array<{ subjectKey: SubjectKey; subjectName: string; items: ExamPaperView[] }> = [];
@@ -133,8 +165,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
     }
   }
 
-  const effectiveMode: RoundMode =
-    study === 'read' && (mode === 'wrong' || mode === 'due') ? 'mixed' : mode;
+  const effectiveMode: RoundMode = resolveModeForStudy(study, mode);
 
   const config: RoundConfig = {
     bankId: bank.id,
@@ -166,13 +197,6 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   const freqCount = Math.min(FREQ_ROUND_COUNT, freqAvail);
   const freqReady = !papersLoading && freqConfig !== null && freqAvail > 0;
 
-  const handleStudyChange = (nextStudy: StudyMode) => {
-    setStudy(nextStudy);
-    if (nextStudy === 'read' && (mode === 'wrong' || mode === 'due')) {
-      setMode('mixed');
-    }
-  };
-
   const toggleAllSubjects = () => {
     setSubjectKeys([]);
   };
@@ -191,12 +215,6 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
   const handleStart = () => {
     if (papersLoading || avail === 0) return;
     dispatch(world, { type: 'startRound', config });
-  };
-
-  const handleOpenExamSheet = () => {
-    if (papersLoading || papers.length === 0) return;
-    setSelectedPaperId(null);
-    setExamSheetOpen(true);
   };
 
   const handleStartExam = () => {
@@ -240,13 +258,28 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         ? `開始${verb} ${avail} 題（全部）`
         : `開始${verb} ${count} 題`;
 
-  const askOptions: ReadonlyArray<{ value: AskFilter; label: string }> = [
-    { value: 'positive', label: papersLoading ? '正向題' : `正向題 ${counts.positive}` },
-    { value: 'all', label: papersLoading ? '全部' : `全部 ${totalAskCount}` },
-    { value: 'negative', label: papersLoading ? '反向題' : `反向題 ${counts.negative}` },
-  ];
+  const askCountMap: Readonly<Record<AskFilter, number>> = {
+    positive: counts.positive,
+    all: totalAskCount,
+    negative: counts.negative,
+  };
+
+  const askOptions: ReadonlyArray<{ value: AskFilter; label: string }> = ASK_OPTIONS.map((opt) => ({
+    value: opt.value,
+    label: papersLoading ? opt.label : `${opt.label} ${askCountMap[opt.value]}`,
+  }));
 
   const visibleModeOptions = study === 'read' ? READ_MODE_OPTIONS : MODE_OPTIONS;
+
+  const askLabel = ASK_OPTIONS.find((opt) => opt.value === ask)?.label;
+  const modeLabel = MODE_OPTIONS.find((opt) => opt.value === effectiveMode)?.label;
+  const moreSummary = [
+    askLabel,
+    modeLabel,
+    ...(study !== 'read' ? [settings.shuffleOptions ? '打亂' : '不打亂'] : []),
+  ]
+    .filter(Boolean)
+    .join('・');
 
   return (
     <div className="cb-stack">
@@ -257,6 +290,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         className="cb-exam-entry"
         onClick={handleOpenExamSheet}
         disabled={papersLoading || papers.length === 0}
+        {...guideAnchor('quiz-exam')}
       >
         <div className="cb-grow">
           <strong className="cb-exam-entry-title">模擬考：整份考卷、計時、交卷才看答案</strong>
@@ -271,7 +305,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         <span className="cb-go">選考卷</span>
       </Card>
 
-      <div className="cb-quick-rounds">
+      <div className="cb-quick-rounds" {...guideAnchor('quiz-topic')}>
         <Card
           tone="mint"
           className="cb-quick-card"
@@ -381,67 +415,75 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         </div>
       </section>
 
-      <section className="cb-section">
-        <h2>題型</h2>
-        <div className="cb-pick-grid" role="group" aria-label="題型">
-          {askOptions.map((opt) => (
-            <Chip
-              key={opt.value}
-              tone="butter"
-              active={ask === opt.value}
-              onClick={() => setAsk(opt.value)}
-            >
-              {opt.label}
-            </Chip>
-          ))}
+      <Collapse
+        title="更多設定"
+        summary={moreSummary}
+        open={moreOpen}
+        onOpenChange={setMoreOpen}
+      >
+        <div className="cb-stack">
+          <section className="cb-section">
+            <h2>題型</h2>
+            <div className="cb-pick-grid" role="group" aria-label="題型">
+              {askOptions.map((opt) => (
+                <Chip
+                  key={opt.value}
+                  tone="butter"
+                  active={ask === opt.value}
+                  onClick={() => setAsk(opt.value)}
+                >
+                  {opt.label}
+                </Chip>
+              ))}
+            </div>
+            <p className="cb-sub cb-m0">正向題＝問『哪個對』；反向題＝問『哪個錯』，等熟了再加。</p>
+          </section>
+
+          {showUnlockHint && (
+            <Card tone="mint" className="cb-stack-sm">
+              <div className="cb-row">
+                <Cat size={54} mood="yay" interactive />
+                <p className="cb-sub-strong cb-m0 cb-grow">
+                  正向題已經看過六成，可以試試加入反向題了
+                </p>
+              </div>
+              <Button variant="butter" onClick={() => setAsk('all')}>
+                加入反向題
+              </Button>
+            </Card>
+          )}
+
+          <section className="cb-section">
+            <h2>出題模式</h2>
+            <div className="cb-pick-grid" role="group" aria-label="出題模式">
+              {visibleModeOptions.map((opt) => (
+                <Chip
+                  key={opt.value}
+                  tone="butter"
+                  active={effectiveMode === opt.value}
+                  onClick={() => setMode(opt.value)}
+                >
+                  {opt.label}
+                </Chip>
+              ))}
+            </div>
+          </section>
+
+          {study !== 'read' && (
+            <Card className="cb-row cb-switch-card">
+              <div className="cb-grow">
+                <strong className="cb-block">選項打亂</strong>
+                <span className="cb-sub">每題四個選項換位置，代號不變</span>
+              </div>
+              <Switch
+                checked={Boolean(settings.shuffleOptions)}
+                onChange={(on) => dispatch(world, { type: 'setShuffleOptions', on })}
+                ariaLabel="選項打亂"
+              />
+            </Card>
+          )}
         </div>
-        <p className="cb-sub cb-m0">正向題＝問『哪個對』；反向題＝問『哪個錯』，等熟了再加。</p>
-      </section>
-
-      {showUnlockHint && (
-        <Card tone="mint" className="cb-stack-sm">
-          <div className="cb-row">
-            <Cat size={54} mood="yay" interactive />
-            <p className="cb-sub-strong cb-m0 cb-grow">
-              正向題已經看過六成，可以試試加入反向題了
-            </p>
-          </div>
-          <Button variant="butter" onClick={() => setAsk('all')}>
-            加入反向題
-          </Button>
-        </Card>
-      )}
-
-      <section className="cb-section">
-        <h2>出題模式</h2>
-        <div className="cb-pick-grid" role="group" aria-label="出題模式">
-          {visibleModeOptions.map((opt) => (
-            <Chip
-              key={opt.value}
-              tone="butter"
-              active={effectiveMode === opt.value}
-              onClick={() => setMode(opt.value)}
-            >
-              {opt.label}
-            </Chip>
-          ))}
-        </div>
-      </section>
-
-
-      {study !== 'read' && (
-      <Card className="cb-row cb-switch-card">
-        <div className="cb-grow">
-          <strong className="cb-block">選項打亂</strong>
-          <span className="cb-sub">每題四個選項換位置，代號不變</span>
-        </div>
-        <Switch
-          checked={Boolean(settings.shuffleOptions)}
-          onChange={(on) => dispatch(world, { type: 'setShuffleOptions', on })}
-          ariaLabel="選項打亂"
-        />
-      </Card>
-      )}
+      </Collapse>
 
       <div className="cb-avail-hint" aria-live="polite">
         {papersLoading ? (
@@ -453,7 +495,7 @@ export function DrillSetupScreen({ world, papersLoading = false }: DrillSetupScr
         )}
       </div>
 
-      <div className="cb-start-dock" data-cat-floor="">
+      <div className="cb-start-dock" data-cat-floor="" {...guideAnchor('quiz-start')}>
         <Button onClick={handleStart} disabled={papersLoading || avail === 0}>
           {startLabel}
         </Button>
