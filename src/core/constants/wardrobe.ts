@@ -1,6 +1,7 @@
 // SSOT：小八喵衣櫥（部位、配件、小魚乾、成就、每日小任務）。開案書 docs/plans/cat-wardrobe.md。
 // ID 上線後不改（使用者資料的鍵）。價格不調高、獎勵不調低：餘額是從這些數字算出來的，一改她的餘額就跟著變；
 // 往「她拿到更多」的方向改要使用者同意（2026-11-18 同意過一次：每題、每日關卡、每日任務、成就都加碼）。
+import { GO_EXAM, GO_START, GO_TOPIC, GO_UNSEEN_CARD, GO_WRONG } from './guide';
 import type { AccessoryId, Achievement, ItemId, OutfitSpecial, Quest, ScorchPlace, SlotId, WardrobeItem } from '../types';
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, MISSION_SIZE, STAMPS_PER_REWARD } from './daily';
 
@@ -319,9 +320,9 @@ export const ACHIEVEMENTS: readonly Achievement[] = [
 export const QUEST_ROUND_MIN = MISSION_SIZE;
 /** 任務池；每天依日期從「今天做得到的」任務裡挑一個（兩台同一天挑到同一個）。 */
 export const QUESTS: readonly Quest[] = [
-  { id: 'quiz-round', kind: 'quiz-round', name: `完成一回作答（${QUEST_ROUND_MIN} 題以上）`, fish: 40 },
-  { id: 'wrong-round', kind: 'wrong-round', name: '錯題重做一回', fish: 40 },
-  { id: 'topic-round', kind: 'topic-round', name: '刷一回弱點或高頻考點', fish: 40 },
-  { id: 'new-card', kind: 'new-card', name: '看一張新圖卡', fish: 30 },
-  { id: 'exam', kind: 'exam', name: '交一份模擬考', fish: 60 },
+  { id: 'quiz-round', kind: 'quiz-round', name: `完成一回作答（${QUEST_ROUND_MIN} 題以上）`, fish: 40, go: GO_START },
+  { id: 'wrong-round', kind: 'wrong-round', name: '錯題重做一回', fish: 40, go: GO_WRONG },
+  { id: 'topic-round', kind: 'topic-round', name: '刷一回弱點或高頻考點', fish: 40, go: GO_TOPIC },
+  { id: 'new-card', kind: 'new-card', name: '看一張新圖卡', fish: 30, go: GO_UNSEEN_CARD },
+  { id: 'exam', kind: 'exam', name: '交一份模擬考', fish: 60, go: GO_EXAM },
 ];

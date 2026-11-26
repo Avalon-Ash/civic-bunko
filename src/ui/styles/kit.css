@@ -357,3 +357,98 @@
 .cb-tab-btn[aria-current='page'] svg {
   fill: var(--pink);
 }
+
+/* ── 收合（kit/Collapse.tsx） ─────────────────────────── */
+.cb-collapse {
+  background: var(--surface);
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+  min-width: 0;
+}
+
+.cb-collapse-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.cb-collapse-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cb-collapse-summary {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-collapse-chevron {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s var(--spring);
+}
+
+.cb-collapse.is-open .cb-collapse-chevron {
+  transform: rotate(180deg);
+}
+
+.cb-collapse-body {
+  padding: 0 16px 16px;
+}
+
+/* ── 引導落點閃一下（ui/useGuide.ts；動畫結束就拿掉 class） ── */
+@keyframes cb-guided-still {
+  0% {
+    outline-color: var(--pink-deep);
+  }
+  100% {
+    outline-color: transparent;
+  }
+}
+
+@keyframes cb-guided {
+  0%,
+  100% {
+    outline-color: transparent;
+  }
+  20%,
+  60% {
+    outline-color: var(--pink-deep);
+  }
+}
+
+.is-guided {
+  outline: 3px solid transparent;
+  outline-offset: 3px;
+  animation: cb-guided 1.4s ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-collapse-chevron {
+    transition: none;
+  }
+
+  /* 不閃、只亮著一下（用 steps 的動畫，結束時一樣會觸發 animationend 拿掉 class） */
+  .is-guided {
+    animation: cb-guided-still 2.4s steps(1, end) 1;
+  }
+}

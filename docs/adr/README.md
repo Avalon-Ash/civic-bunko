@@ -88,3 +88,4 @@
 - [0016 音效採 Web Audio 即時合成並獨立處理系統靜默恢復](0016-web-audio-synthesis-and-ios-recovery.md)：介面回饋音以 Web Audio 即時合成、貓叫採預載音檔並設為 ambient，且將環境喚醒與卡死重建抽離為可測試的純邏輯介面。
 - [0017 天氣天空為同步以外唯一對外連線並限制定位精度與時機](0017-weather-sky-sole-non-sync-external-call.md)：僅對 Open-Meteo 發出非同步對外連線，座標四捨五入至小數一位且不寫入存檔，並限制僅於明確操作或已授權時定位。
 - [0018 多隻小貓沿用舊欄位存原本那隻，長相改為帶改動時間跨裝置同步](0018-multi-cat-house-and-synced-looks.md)：（取代 0013）保留 0013 的合併規則，原本那隻留在舊欄位、領養的以固定編號存在選填欄位，名字與長相逐隻比改動時間同步，帶出門與陪我刷題只存本機。
+- [0019 引導的目的地只定義在任務表與 guide.ts，畫面只經 go() 換頁與落點](0019-guide-targets-single-go.md)：任務的目的地寫在 `Quest.go`，其他目的地與落點清單在 `constants/guide.ts`，畫面用 `guideAnchor` 標落點、只經 `go()` 換頁；有回合進行時只回到那一題。

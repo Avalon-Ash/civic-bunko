@@ -375,6 +375,31 @@ export interface Quest {
   kind: QuestKind;
   name: string;
   fish: number;
+  /** 點了這個任務去哪裡完成它（docs/plans/ux-cleanup.md §2.2；常用目的地在 constants/guide.ts） */
+  go: GuideTarget;
+}
+/** 底部五個分頁 */
+export type TabId = 'today' | 'cards' | 'quiz' | 'cat' | 'stamps';
+/**
+ * 引導的落點：畫面上用 ui/useGuide.ts 的 guideAnchor() 標在元素上，引導到了就捲過去、閃一下。
+ * 每個 id 的說明在 constants/guide.ts 的 GUIDE_ANCHORS；同一個 id 只標在一個元素上。
+ */
+export type GuideAnchor =
+  | 'quiz-start'
+  | 'quiz-topic'
+  | 'quiz-exam'
+  | 'today-quick'
+  | 'cards-unseen'
+  | 'cat-wardrobe'
+  | 'cat-achievements'
+  | 'stamps-sync';
+/** 引導到了之後，目的地畫面先做的一件事（只做一次；說明在 constants/guide.ts 的 GUIDE_PRESETS） */
+export type GuidePreset = 'wrong-mode' | 'exam-sheet' | 'open-sync' | 'all-achievements';
+/** 「叫她去做某件事」的目的地：哪個分頁、落在哪個元素、到了先做什麼 */
+export interface GuideTarget {
+  tab: TabId;
+  anchor?: GuideAnchor;
+  preset?: GuidePreset;
 }
 /** 畫面要放的慶祝（只在記憶體，不存檔） */
 export type Celebration =

@@ -3,6 +3,12 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-27-quest-go',
+    date: '2026-11-27',
+    title: '今日任務點了會帶你去做',
+    items: ['今日頁的「今日任務」卡，點下去會到能完成它的地方（刷題、圖卡或模擬考），不再一律跑去小貓頁；做完了才帶你去幫小貓換裝'],
+  },
+  {
     id: '2026-11-22-house-seats',
     date: '2026-11-22',
     title: '小貓會坐上坐墊和書堆',

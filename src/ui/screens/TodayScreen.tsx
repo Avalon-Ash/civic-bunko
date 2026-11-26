@@ -31,6 +31,8 @@ import { Segmented, type SegmentedOption } from '../kit/Segmented';
 import { Toast } from '../kit/Toast';
 import { checkForUpdateNow, formatAppVersion, getCurrentAppVersion } from '../useAppVersion';
 import { useWorld } from '../useWorld';
+import { useGo } from '../useGuide';
+import { GUIDE } from '../../core/constants/guide';
 
 const THEME_OPTIONS: readonly SegmentedOption<ThemeChoice>[] = [
   { value: 'system', label: '系統' },
@@ -114,6 +116,7 @@ export function TodayScreen({
   onCelebrationDone,
 }: TodayScreenProps) {
   useWorld(world);
+  const go = useGo();
   const [wobbleState, setWobbleState] = useState<{ idx: number; tick: number } | null>(null);
   const [showStampAnim, setShowStampAnim] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -308,7 +311,13 @@ export function TodayScreen({
           )}
 
           {onGoCat && !papersLoading ? (
-            <Card tone="butter" className="cb-wd-today-card" onClick={onGoCat} data-cat-perch="" data-cat-burn="today-quest">
+            <Card
+              tone="butter"
+              className="cb-wd-today-card"
+              onClick={() => go(quest && !quest.done ? quest.quest.go : GUIDE.questDone)}
+              data-cat-perch=""
+              data-cat-burn="today-quest"
+            >
               <span className="cb-wd-quest-tag">今日任務</span>
               <span className="cb-grow cb-wd-today-text">
                 {quest

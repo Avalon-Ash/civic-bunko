@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { dispatch } from '../core/commands';
 import { ACCESSORIES, DAILY_GOAL_QUESTIONS, STAMPS_PER_REWARD } from '../core/constants/daily';
-import type { ChangelogEntry, DayKey } from '../core/types';
+import type { ChangelogEntry, DayKey, GuidePreset, GuideTarget, TabId } from '../core/types';
 import type { World } from '../core/world';
 import { currentQuestion, getSettings, readView, roundSummary, type RoundSummaryView } from '../selectors';
 import { isInstallHintDismissed } from '../selectors/backup';
@@ -10,7 +10,8 @@ import { leaderCat, outingCats } from '../selectors/house';
 import { toLocalDateString } from '../systems/date';
 import { InstallHintSheet } from './components/InstallHintSheet';
 import { UpdateBanner } from './components/UpdateBanner';
-import { TabBar, type TabId } from './kit/TabBar';
+import { TabBar } from './kit/TabBar';
+import { GuideProvider, planGo, useGuideLanding, type GuideRequest } from './useGuide';
 import { Toast } from './kit/Toast';
 import { isStandaloneApp } from './platform';
 import { CardsScreen } from './screens/CardsScreen';
@@ -196,7 +197,32 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
     mainRef.current?.scrollTo({ top: 0 });
   }, [tab, quizStage, activeQuestionKey]);
 
+  // 引導：畫面只經 go() 換頁與落點（ADR 0019）。go 要穩定，回合與結果頁的狀態從 ref 讀。
+  const [guide, setGuide] = useState<GuideRequest | null>(null);
+  const guideSeqRef = useRef(0);
+  const guideTakenRef = useRef(new Set<number>());
+  const guideRef = useRef(guide);
+  guideRef.current = guide;
+  const goStateRef = useRef({ hasActiveRound, showResult });
+  goStateRef.current = { hasActiveRound, showResult };
+  const go = useCallback((target: GuideTarget) => {
+    const plan = planGo(target, goStateRef.current);
+    if (plan.closeResult) setShowResult(false);
+    setTab(plan.tab);
+    guideSeqRef.current += 1;
+    setGuide(plan.land ? { target: plan.land, seq: guideSeqRef.current } : null);
+  }, []);
+  const takePreset = useCallback((preset: GuidePreset) => {
+    const current = guideRef.current;
+    if (!current || current.target.preset !== preset || guideTakenRef.current.has(current.seq)) return false;
+    guideTakenRef.current.add(current.seq);
+    return true;
+  }, []);
+  // 要排在上面「換頁捲回頂端」之後：同一次畫面更新裡先捲回頂端，再捲到落點
+  useGuideLanding(guide);
+
   const handleTabSelect = (nextTab: TabId) => {
+    setGuide(null);
     if (nextTab === 'quiz' && !hasActiveRound && showResult) {
       setShowResult(false);
     }
@@ -268,6 +294,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
   return (
     <CatVoiceProvider world={world}>
+      <GuideProvider value={{ go, request: guide, takePreset }}>
       <div className="cb-shell">
         <Toast message={examToast} onDismiss={() => setExamToast(null)} />
         <RewardToast world={world} />
@@ -304,6 +331,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
           />
         )}
       </div>
+      </GuideProvider>
     </CatVoiceProvider>
   );
 }

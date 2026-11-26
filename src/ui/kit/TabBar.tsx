@@ -1,4 +1,4 @@
-export type TabId = 'today' | 'cards' | 'quiz' | 'cat' | 'stamps';
+import type { TabId } from '../../core/types';
 
 interface TabDef {
   id: TabId;
