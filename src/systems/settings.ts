@@ -117,6 +117,7 @@ export function applySyncedSettings(
 /** 訂閱 roundStarted 與 examFinished，自動記住最後一次回合設定與模擬考歷次成績並發出 settingsChanged。 */
 export function attachSettings(world: World): () => void {
   const unsubRound = world.bus.on('roundStarted', (event) => {
+    if (event.remember === false) return;
     if (event.config.topicIds && event.config.topicIds.length > 0) {
       return;
     }

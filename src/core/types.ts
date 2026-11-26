@@ -878,7 +878,8 @@ export interface SyncState {
 // ── 事件（System 之間唯一的溝通方式）──────────────────────
 export type AppEvent =
   | { type: 'bankLoaded'; bankId: BankId; questionCount: number }
-  | { type: 'roundStarted'; config: RoundConfig; queue: QuestionId[] }
+  /** remember: false＝不要把這回合的設定記成刷題頁的預設（卡片回合；不存檔，只在事件上） */
+  | { type: 'roundStarted'; config: RoundConfig; queue: QuestionId[]; remember?: false }
   | { type: 'answered'; id: QuestionId; pick: Choice; correct: boolean; at: string }
   | { type: 'viewed'; id: QuestionId; at: string }
   | { type: 'roundFinished'; results: RoundResult[]; at: string; config: RoundConfig }

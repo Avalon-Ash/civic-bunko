@@ -54,3 +54,16 @@ test('卡片沒有題目、或卡片不存在：不開回合', () => {
   dispatch(world, { type: 'startCardRound', cardId: 'missing' });
   assert.equal(world.round, null);
 });
+
+test('刷這張卡的題不會改掉刷題頁記住的設定（lastRound）', () => {
+  const world = createTestWorld();
+  world.cards = [card('c1', ids.slice(0, 3))];
+  const before = makeConfig({ ask: 'positive', count: 20 });
+  dispatch(world, { type: 'startRound', config: before }, { rng: makeSeededRng(3) });
+  const remembered = structuredClone(world.settings.lastRound);
+  assert.ok(remembered);
+  dispatch(world, { type: 'quitRound' });
+  dispatch(world, { type: 'startCardRound', cardId: 'c1' }, { rng: makeSeededRng(7) });
+  assert.ok(world.round);
+  assert.deepEqual(world.settings.lastRound, remembered);
+});

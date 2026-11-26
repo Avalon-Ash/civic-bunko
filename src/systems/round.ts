@@ -41,6 +41,7 @@ function beginStandardRound(
   config: RoundConfig,
   queue: QuestionId[],
   rng: () => number,
+  remember = true,
 ): void {
   const shouldShuffleOptions =
     config.study === 'quiz' && world.settings.shuffleOptions === true;
@@ -62,6 +63,7 @@ function beginStandardRound(
     type: 'roundStarted',
     config,
     queue: [...queue],
+    ...(remember ? {} : { remember: false as const }),
   });
 }
 
@@ -161,7 +163,8 @@ export function startCardRound(
     passes: 1,
   };
 
-  beginStandardRound(world, config, queue, rng);
+  // 不記成刷題頁的預設：卡片回合的題型、題數是這張卡決定的，不是她選的
+  beginStandardRound(world, config, queue, rng, false);
 }
 
 /** 作答目前題目；看答案模式與模擬考不接受作答，同一題只能作答一次。 */
