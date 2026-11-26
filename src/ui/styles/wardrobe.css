@@ -252,8 +252,24 @@
   font-weight: 700;
 }
 
+button.cb-wd-quest {
+  width: 100%;
+  min-height: var(--tap-min);
+  text-align: left;
+  color: var(--ink);
+  box-shadow: 0 3px 0 var(--line);
+}
+
 .cb-wd-quest.is-done {
   background: var(--mint);
+}
+
+.cb-wd-mini-btn {
+  width: auto;
+  justify-self: start;
+  min-height: var(--tap-min);
+  padding: 6px 14px;
+  font-size: var(--text-small);
 }
 
 .cb-wd-quest-tag {
@@ -335,7 +351,8 @@
   font-weight: 600;
 }
 
-.cb-wd-ach {
+.cb-wd-ach,
+.cb-wd-ach.cb-card-btn {
   display: grid;
   gap: 8px;
 }

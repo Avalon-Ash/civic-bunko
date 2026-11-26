@@ -374,11 +374,22 @@
 }
 
 .cb-adopt-short {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
   padding: 12px;
   border-radius: 14px;
   background: var(--surface-sunken);
   border: 2px dashed var(--hair);
   text-align: center;
+}
+
+.cb-adopt-go-btn {
+  width: auto;
+  min-height: var(--tap-min);
+  padding: 6px 16px;
+  font-size: var(--text-small);
 }
 
 /* ── iPad 寬版（≥ 768px）：房間佔滿上方寬度，下面兩欄 ─────── */

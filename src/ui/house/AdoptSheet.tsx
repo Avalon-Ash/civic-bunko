@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type FormEvent } from 'react';
 import { CAT_NAME_MAX } from '../../core/constants/cat';
 import { CAT_CHARACTER } from '../../core/constants/catLines';
+import { GUIDE } from '../../core/constants/guide';
 import { HOUSE_ADOPT } from '../../core/constants/house';
 import type { ItemId, WardrobeItem } from '../../core/types';
 import { cleanCatNameInput } from '../../selectors/cat';
@@ -10,6 +11,7 @@ import { Cat, ItemIcon } from '../kit/Cat';
 import { CatBody } from '../kit/CatBody';
 import { Sheet } from '../kit/Sheet';
 import { FishIcon } from '../screens/WardrobeScreen';
+import { useGo } from '../useGuide';
 
 export interface AdoptSheetProps {
   open: boolean;
@@ -33,6 +35,7 @@ export function AdoptSheet({
   ownedFurs,
   onAdopt,
 }: AdoptSheetProps) {
+  const go = useGo();
   const inputId = useId();
   const [draft, setDraft] = useState('');
   const [fur, setFur] = useState<ItemId | null>(null);
@@ -158,9 +161,21 @@ export function AdoptSheet({
         {canAfford ? (
           <Button type="submit">帶牠回家</Button>
         ) : (
-          <p className="cb-adopt-short cb-sub-strong cb-m0" role="status">
-            還差 {target.short} 條小魚乾，再刷幾題就能帶牠回家！
-          </p>
+          <div className="cb-adopt-short" role="status">
+            <p className="cb-sub-strong cb-m0">
+              還差 {target.short} 條小魚乾，再刷幾題就能帶牠回家！
+            </p>
+            <Button
+              variant="butter"
+              className="cb-adopt-go-btn"
+              onClick={() => {
+                onClose();
+                go(GUIDE.fishShort);
+              }}
+            >
+              去刷題
+            </Button>
+          </div>
         )}
       </form>
     </Sheet>
