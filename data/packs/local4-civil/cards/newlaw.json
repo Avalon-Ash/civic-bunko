@@ -29,7 +29,8 @@
       "lawRefs": [
         { "law": "地方制度法", "article": "55" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["114-general-local-gov-q08"]
     },
     {
       "id": "newlaw-lga-56-county",
@@ -52,7 +53,8 @@
       "lawRefs": [
         { "law": "地方制度法", "article": "56" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["115-general-local-gov-q11"]
     },
     {
       "id": "newlaw-lga-57-township",
@@ -70,7 +72,8 @@
       "lawRefs": [
         { "law": "地方制度法", "article": "57" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["114-local4-local-gov-q11"]
     },
     {
       "id": "newlaw-lga-33-gender",
@@ -97,7 +100,8 @@
       "lawRefs": [
         { "law": "地方制度法", "article": "33" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-local-gov-q25"]
     },
     {
       "id": "newlaw-lga-61-pay",
@@ -114,7 +118,8 @@
       "lawRefs": [
         { "law": "地方制度法", "article": "61" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-local-gov-q11", "114-general-local-gov-q23"]
     },
     {
       "id": "newlaw-lga-83-7-fund",
@@ -132,7 +137,8 @@
         { "law": "地方制度法", "article": "83-7" },
         { "law": "地方制度法", "article": "83-2" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-local-gov-q02", "113-general-local-gov-q19", "114-local4-local-gov-q06", "115-general-local-gov-q15"]
     },
     {
       "id": "newlaw-fiscal-8-source",
@@ -161,7 +167,8 @@
       "lawRefs": [
         { "law": "財政收支劃分法", "article": "8" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q30", "114-general-local-gov-q18"]
     },
     {
       "id": "newlaw-fiscal-16-1-split",
@@ -184,7 +191,8 @@
         { "law": "財政收支劃分法", "article": "16-1" },
         { "law": "財政收支劃分法", "article": "8" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q30", "114-general-local-gov-q18", "115-general-public-admin-q43"]
     }
   ]
 }

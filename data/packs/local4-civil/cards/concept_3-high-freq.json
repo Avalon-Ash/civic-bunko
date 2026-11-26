@@ -69,7 +69,8 @@
         { "law": "行政程序法", "article": "9" },
         { "law": "行政程序法", "article": "10" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-admin-law-q50", "114-general-admin-law-q04"]
     },
     {
       "id": "concept-al-act-defect",
@@ -140,7 +141,8 @@
         { "law": "行政程序法", "article": "125" },
         { "law": "行政程序法", "article": "126" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-admin-law-q18", "113-general-admin-law-q22", "113-general-admin-law-q23", "113-local4-admin-law-q22", "113-local4-admin-law-q48", "114-general-admin-law-q23", "114-local4-admin-law-q26"]
     },
     {
       "id": "concept-al-discipline",
@@ -207,7 +209,8 @@
         { "law": "公務人員保障法", "article": "25" },
         { "law": "公務人員保障法", "article": "77" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["114-general-admin-law-q17", "114-general-public-admin-q25", "114-local4-admin-law-q18", "115-general-admin-law-q13"]
     },
     {
       "id": "concept-al-delegation",
@@ -286,7 +289,8 @@
         { "law": "行政程序法", "article": "16" },
         { "law": "地方制度法", "article": "2" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-local4-admin-law-q07", "114-general-admin-law-q11", "114-local4-admin-law-q12", "114-local4-admin-law-q41", "115-general-admin-law-q10"]
     },
     {
       "id": "concept-al-penalty",
@@ -355,7 +359,8 @@
         { "law": "行政罰法", "article": "26" },
         { "law": "行政罰法", "article": "27" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-admin-law-q28", "113-general-admin-law-q30", "113-local4-admin-law-q29", "113-local4-admin-law-q30", "114-general-admin-law-q30", "114-local4-admin-law-q30", "114-local4-admin-law-q31", "114-local4-admin-law-q33", "115-general-admin-law-q29", "115-general-admin-law-q30", "115-general-admin-law-q31"]
     },
     {
       "id": "concept-al-state-comp",
@@ -505,7 +510,8 @@
         { "law": "地方制度法", "article": "78" },
         { "law": "地方制度法", "article": "79" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-local-gov-q10", "113-general-local-gov-q20", "114-general-local-gov-q07", "114-general-local-gov-q25", "114-general-public-admin-q45", "114-local4-local-gov-q15", "115-general-local-gov-q08", "115-general-local-gov-q14"]
     },
     {
       "id": "concept-lg-residents",
@@ -561,7 +567,8 @@
         { "law": "地方制度法", "article": "16" },
         { "law": "地方制度法", "article": "17" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q44", "114-general-local-gov-q03", "114-local4-local-gov-q05", "115-general-local-gov-q09"]
     },
     {
       "id": "concept-con-limit",
@@ -690,7 +697,8 @@
         { "law": "中華民國憲法增修條文", "article": "4" },
         { "law": "中華民國憲法增修條文", "article": "2" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-law-english-q09"]
     },
     {
       "id": "concept-con-five-yuan",
@@ -757,7 +765,8 @@
         { "law": "中華民國憲法增修條文", "article": "7" },
         { "law": "行政院組織法", "article": "5" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-local4-law-english-q14", "114-general-public-admin-q20", "114-local4-law-english-q08", "115-general-law-english-q12"]
     },
     {
       "id": "concept-lg-council",
@@ -827,7 +836,8 @@
         { "law": "地方制度法", "article": "51" },
         { "law": "地方制度法", "article": "53" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-local-gov-q12", "113-general-local-gov-q13", "113-local4-local-gov-q12", "113-local4-local-gov-q13", "114-general-local-gov-q09", "114-general-local-gov-q11", "114-general-local-gov-q12", "114-local4-local-gov-q13", "115-general-local-gov-q13"]
     }
   ]
 }

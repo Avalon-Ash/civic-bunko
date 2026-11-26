@@ -47,8 +47,8 @@
   color: inherit;
 }
 
-/* 時間軸：格子之間的箭頭（第 2、4 格的右邊接到下一列） */
-.cb-comic-timeline .cb-comic-panel:not(:last-child)::after {
+/* 時間軸：2×2 排列時只有往右接的格子（第 1、3 格）畫箭頭；換列的那一步靠編號，箭頭會指到格外 */
+.cb-comic-timeline .cb-comic-panel:nth-child(odd):not(:last-child)::after {
   content: '';
   position: absolute;
   right: 6px;

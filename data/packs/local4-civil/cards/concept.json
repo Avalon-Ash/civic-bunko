@@ -55,7 +55,8 @@
         { "law": "地方制度法", "article": "14" },
         { "law": "地方制度法", "article": "83-2" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-admin-law-q08", "113-general-local-gov-q19", "113-local4-admin-law-q07", "114-local4-admin-law-q41", "115-general-local-gov-q15"]
     },
     {
       "id": "concept-admin-act",
@@ -122,12 +123,12 @@
       ],
       "essay": null,
       "questions": ["113-general-admin-law-q39", "113-local4-admin-law-q40", "114-general-admin-law-q40", "114-local4-admin-law-q39", "114-local4-admin-law-q45", "115-general-admin-law-q47"],
-      "comic": { "layout": "timeline",
+      "comic": { "layout": "story",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["envelope", "calendar"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "30 日內"},
           {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}], "props": ["hourglass"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "3 個月"},
-          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}], "props": ["courthouse"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "2 個月內起訴"},
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "loaf", "mood": "sleepy", "facing": "right"}, {"cast": "citizen", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "不作為"}
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "loaf", "mood": "sleepy", "facing": "right"}, {"cast": "citizen", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "不作為"},
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}], "props": ["courthouse"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "2 個月內起訴"}
         ] }
     },
     {
@@ -149,7 +150,8 @@
       "lawRefs": [
         { "law": "行政程序法", "article": "48" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["115-general-admin-law-q07"]
     }
   ]
 }
