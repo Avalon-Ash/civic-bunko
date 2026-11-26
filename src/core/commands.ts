@@ -10,6 +10,7 @@ import {
   quizSameSet,
   resumeRound,
   retryWrong,
+  startCardRound,
   startRound,
 } from '../systems/round';
 import {
@@ -46,6 +47,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
   switch (cmd.type) {
     case 'startRound':
       startRound(world, cmd.config, now, rng);
+      break;
+    case 'startCardRound':
+      startCardRound(world, cmd.cardId, rng);
       break;
     case 'answer':
       answerQuestion(world, cmd.pick, now);

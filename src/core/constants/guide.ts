@@ -76,4 +76,6 @@ export const GUIDE = {
   fishShort: GO_START,
   /** 完成提示（任務、成就） */
   rewardToast: GO_WARDROBE,
+  /** 圖卡抽屜「刷這張卡的題」：回合已經開好，換到刷題分頁就是題目頁 */
+  cardRound: { tab: 'quiz' },
 } as const satisfies Record<string, GuideTarget>;

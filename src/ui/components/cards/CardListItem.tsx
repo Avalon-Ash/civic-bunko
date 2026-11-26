@@ -1,10 +1,16 @@
-import type { CardView } from '../../../selectors/cards';
+import type { ReactNode } from 'react';
+import { cardHasComic, type CardView } from '../../../selectors/cards';
 import { Card } from '../../kit/Card';
 import { Chip } from '../../kit/Chip';
+import { ComicThumb } from '../../kit/comic/ComicStrip';
 
 export interface CardListItemProps {
   card: CardView;
   onSelect: (id: string) => void;
+  /** 是否顯示科目籤（依科目分組時傳 false；平鋪時預設 true） */
+  showSubject?: boolean;
+  /** 標題旁的額外記號（例如之後的「該複習」記號） */
+  badge?: ReactNode;
 }
 
 function PawCheckIcon() {
@@ -26,34 +32,37 @@ function PawCheckIcon() {
   );
 }
 
-/** 圖卡清單的單張卡片項目：顯示科目短名、標題、一句話重點，已看過右上顯示貓掌勾。 */
-export function CardListItem({ card, onSelect }: CardListItemProps) {
-  const showTopRow = card.subjectShort !== null || card.seen;
-
+/** 圖卡清單的單張卡片項目：左漫畫小圖（有漫畫時）、中標題與兩行重點、右已看過貓掌勾。 */
+export function CardListItem({
+  card,
+  onSelect,
+  showSubject = true,
+  badge,
+}: CardListItemProps) {
   return (
     <Card
       pressable
       onClick={() => onSelect(card.id)}
       className={`cb-card-item ${card.seen ? 'is-seen' : ''}`.trim()}
     >
-      {showTopRow && (
-        <div className="cb-card-item-head">
-          {card.subjectShort ? (
+      {cardHasComic(card) && card.comic ? <ComicThumb comic={card.comic} /> : null}
+      <div className="cb-card-item-main">
+        <div className="cb-card-item-title-row">
+          {showSubject && card.subjectShort ? (
             <Chip tone="butter" className="cb-card-item-subj">
               {card.subjectShort}
             </Chip>
-          ) : (
-            <span />
-          )}
-          {card.seen && (
-            <span className="cb-card-seen-badge" aria-label="已看過" title="已看過">
-              <PawCheckIcon />
-            </span>
-          )}
+          ) : null}
+          <strong className="cb-card-item-title">{card.title}</strong>
+          {badge}
         </div>
-      )}
-      <strong className="cb-card-item-title">{card.title}</strong>
-      <p className="cb-card-item-hook">{card.hook}</p>
+        <p className="cb-card-item-hook">{card.hook}</p>
+      </div>
+      {card.seen ? (
+        <span className="cb-card-seen-badge" aria-label="已看過" title="已看過">
+          <PawCheckIcon />
+        </span>
+      ) : null}
     </Card>
   );
 }

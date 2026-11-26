@@ -257,6 +257,45 @@ mark {
   margin-top: 2px;
 }
 
+.cb-card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cb-card-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-height: var(--tap-min);
+  padding: 6px 12px;
+  border: var(--border-w) solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-raised);
+  color: var(--ink);
+  box-shadow: 0 var(--press-depth) 0 var(--line);
+  font-size: var(--text-small);
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.cb-card-link-btn .cb-comic-thumb {
+  width: 48px;
+  border-width: 2px;
+  border-radius: 8px;
+}
+
+.cb-card-link-label {
+  min-width: 0;
+  word-break: break-word;
+}
+
+.cb-card-link-portal {
+  display: contents;
+}
+
 @keyframes cb-pop {
   from {
     transform: scale(0.92) translateY(10px);

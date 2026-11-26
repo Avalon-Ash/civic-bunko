@@ -147,3 +147,6 @@ export function cardById(world: World, id: string): CardView | null {
   }
   return toCardView(world, card, buildSeenSet(world));
 }
+
+/** 這張卡有沒有漫畫（圖卡列表的小圖與「漫畫」篩選用；docs/plans/comic-cards.md §3-1） */
+export { cardHasComic } from '../systems/comic';

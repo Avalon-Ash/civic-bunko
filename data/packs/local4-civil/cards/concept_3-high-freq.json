@@ -422,7 +422,16 @@
         { "law": "國家賠償法", "article": "10" },
         { "law": "國家賠償法", "article": "11" }
       ],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-admin-law-q47", "113-local4-admin-law-q49", "113-local4-admin-law-q50", "114-general-admin-law-q49", "114-general-admin-law-q50", "114-local4-admin-law-q48", "115-general-admin-law-q48"],
+      "comic": { "layout": "versus",
+        "columns": [{"from": "heading", "face": 0}, {"from": "heading", "face": 1}],
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["document"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "公權力"},
+          {"scene": "duo", "actors": [{"cast": "official", "pose": "stumble", "mood": "oops", "facing": "right"}, {"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "left"}], "props": [], "text": {"from": "line", "face": 0, "line": 1}, "sign": "故意或過失"},
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "欠缺"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "fall", "mood": "oops", "facing": "right"}], "props": ["lamp"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "損害"}
+        ] }
     },
     {
       "id": "concept-lg-supervision",

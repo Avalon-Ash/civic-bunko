@@ -208,6 +208,58 @@ export interface StudyCard {
   essay: { paperId: PaperId; no: number } | null;
   /** 申論題原文：由 cardLoader 從官方層填入，卡片檔裡不寫 */
   essayText?: string;
+  /** 四格漫畫（選填；沒有＝照舊只顯示文字卡）。docs/plans/comic-cards.md、ADR 0020 */
+  comic?: CardComic;
+  /** 這張卡對應的官方題（選填；卡片↔題目連結的唯一正本，查詢只經 selectors/cardLinks.ts）。ADR 0022 */
+  questions?: QuestionId[];
+}
+
+// ── 四格漫畫（卡片的選填衍生層；字只用指標指向卡片原文，詞彙表在 constants/comic.ts） ──
+/** 版型：story＝起承轉合 2×2；timeline＝沿時間依序；versus＝左右對照；ladder＝上到下；lineup＝排排站舉牌 */
+export type ComicLayout = 'story' | 'timeline' | 'versus' | 'ladder' | 'lineup';
+/** 一格的構圖模板（演員與道具擺在哪裡；擺位在 ui/kit/comic/scenes.ts） */
+export type ComicSceneId = 'solo' | 'duo' | 'prop-big' | 'crowd';
+/** 道具（通用名詞；畫法在 ui/kit/comic/props.tsx，名稱在 constants/comic.ts） */
+export type ComicPropId =
+  | 'stamp'
+  | 'document'
+  | 'ticket'
+  | 'envelope'
+  | 'hourglass'
+  | 'calendar'
+  | 'courthouse'
+  | 'office'
+  | 'pothole'
+  | 'lamp'
+  | 'target'
+  | 'door';
+/** 角色（同一個角色在每張卡都穿一樣；穿著在 constants/comic.ts 的 COMIC_CASTS） */
+export type ComicCast = 'agency' | 'citizen' | 'official';
+/** 格子裡的字：指向卡片原文的指標，不是字串（pick＝那一行的子字串） */
+export type ComicTextRef =
+  | { from: 'hook' }
+  | { from: 'heading'; face: number }
+  | { from: 'line'; face: number; line: number; pick?: string };
+export interface ComicActor {
+  cast: ComicCast;
+  pose: PetPose;
+  mood?: CatMood;
+  facing?: 'left' | 'right';
+}
+export interface ComicPanel {
+  scene: ComicSceneId;
+  actors: ComicActor[];
+  props: ComicPropId[];
+  /** 這格的一句話 */
+  text: ComicTextRef;
+  /** 舉牌上的大字：必須是 text 解析出來那句話的子字串 */
+  sign?: string;
+}
+export interface CardComic {
+  layout: ComicLayout;
+  panels: ComicPanel[];
+  /** versus 兩欄的標題（左、右） */
+  columns?: [ComicTextRef, ComicTextRef];
 }
 export interface CardFile {
   deck: string;
@@ -858,6 +910,8 @@ export type UICommand =
   | { type: 'retryWrong' }
   /** 用剛看完的同一批題目開作答回合 */
   | { type: 'quizSameSet' }
+  /** 只出這張卡對應官方題（StudyCard.questions）的作答回合；卡片沒有題目時不動作。不在 RoundConfig 記卡片 */
+  | { type: 'startCardRound'; cardId: string }
   | { type: 'setTheme'; theme: ThemeChoice }
   | { type: 'setAccessory'; accessory: AccessoryId | null }
   | { type: 'dismissInstallHint' }
