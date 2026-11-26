@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
+import { ACHIEVEMENT_GO, GUIDE } from '../../core/constants/guide';
 import { ACHIEVEMENTS, DAILY_SALE, SLOTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
 import { RUNNER_HOP_MS } from '../../core/constants/pet';
-import type { CatId, ItemId, Outfit, SlotId, TryOn } from '../../core/types';
+import type { CatId, GuideTarget, ItemId, Outfit, SlotId, TryOn } from '../../core/types';
 import type { World } from '../../core/world';
 import { catOutfit, houseCats, leaderCat, nextAdoption, roomDecor } from '../../selectors/house';
 import { soundOn } from '../../selectors/sound';
@@ -30,6 +31,7 @@ import { CountUp } from '../kit/CountUp';
 import { ProgressBar } from '../kit/ProgressBar';
 import { Switch } from '../kit/Switch';
 import { CatNameEditor } from '../pet/CatNameEditor';
+import { guideAnchor, useGo, useGuidePreset } from '../useGuide';
 import { useWorld } from '../useWorld';
 
 /** 成就列表收合時顯示幾個「還沒解鎖」的 */
@@ -52,12 +54,15 @@ function achievementName(id: string): string {
   return ACHIEVEMENTS.find((a) => a.id === id)?.name ?? id;
 }
 
-function nonShopCondition(status: ItemStatusView): string | null {
+function nonShopCondition(status: ItemStatusView): { text: string; go: GuideTarget } | null {
   if (status.state === 'stamps') {
-    return `再蓋 ${status.need} 個章就會送你`;
+    return { text: `再蓋 ${status.need} 個章就會送你`, go: GUIDE.stampsItem };
   }
   if (status.state === 'achievement' && status.achievement) {
-    return `解鎖成就「${achievementName(status.achievement)}」就會送你`;
+    return {
+      text: `解鎖成就「${achievementName(status.achievement)}」就會送你`,
+      go: GUIDE.achievementItem,
+    };
   }
   return null;
 }
@@ -117,6 +122,7 @@ export interface WardrobeScreenProps {
 /** 小貓之家：房間場景、全家名牌列、領養、各自取名與換裝、今日關卡與小任務、成就。 */
 export function WardrobeScreen({ world }: WardrobeScreenProps) {
   useWorld(world);
+  const go = useGo();
   const now = new Date();
   const cats = houseCats(world);
   const decor = roomDecor(world);
@@ -129,10 +135,11 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   const achievements = achievementStatuses(world);
 
   const [selectedId, setSelectedId] = useState<CatId>(() => leader);
-  const [filter, setFilter] = useState<SlotFilter>('all');
+  const [filter, setFilter] = useState<SlotFilter>(() => SLOTS[0]!.id);
   /** 試穿中（還沒拿到）的配件，每個部位最多一件 */
   const [tryOn, setTryOn] = useState<TryOn>({});
   const [showAllAch, setShowAllAch] = useState(false);
+  useGuidePreset('all-achievements', () => setShowAllAch(true));
   const [happy, setHappy] = useState(0);
   const [adoptOpen, setAdoptOpen] = useState(false);
   const [entering, setEntering] = useState<{ id: CatId; tick: number } | null>(null);
@@ -220,11 +227,14 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
   };
 
   /** 只試穿集章、成就送的配件時：一件就說它的條件；好幾件時條件已經寫在每張籤上，只說一句短的（試衣間是黏住的，不能太高） */
-  const nonShopHint =
+  const nonShopHint: { text: string; go: GuideTarget | null } | null =
     basket.items.length > 0 && basket.shop.length === 0
       ? basket.items.length === 1
         ? nonShopCondition(basket.items[0]!)
-        : '這幾件是集章、成就送的，不用買；還差什麼寫在下面'
+        : {
+            text: '這幾件是集章、成就送的，不用買；還差什麼寫在下面',
+            go: nonShopCondition(basket.items[0]!)?.go ?? null,
+          }
       : null;
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
@@ -361,7 +371,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
 
           <Card tone="pink" className="cb-wd-today" data-cat-perch="" data-cat-burn="cat-today">
             <div className="cb-sub-strong">
-              今天刷了 <b className="cb-num-tabular">{tiers.count}</b> 題
+              題數獎勵・今天刷了 <b className="cb-num-tabular">{tiers.count}</b> 題
             </div>
             <ol className="cb-wd-tiers" aria-label="今日題數關卡">
               {tiers.tiers.map((t) => (
@@ -373,8 +383,17 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                 </li>
               ))}
             </ol>
+            {tiers.tiers.some((t) => !t.reached) ? (
+              <Button variant="butter" className="cb-wd-mini-btn" onClick={() => go(GUIDE.fishBonus)}>
+                去刷題
+              </Button>
+            ) : null}
             {quest ? (
-              <div className={`cb-wd-quest ${quest.done ? 'is-done' : ''}`.trim()}>
+              <button
+                type="button"
+                className={`cb-wd-quest cb-press ${quest.done ? 'is-done' : ''}`.trim()}
+                onClick={() => go(quest.done ? GUIDE.questDone : quest.quest.go)}
+              >
                 <span className="cb-wd-quest-tag">今日任務</span>
                 <span className="cb-grow">{quest.quest.name}</span>
                 <span className="cb-wd-tier-fish">
@@ -384,7 +403,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                     </>
                   )}
                 </span>
-              </div>
+              </button>
             ) : null}
             {onSale.length > 0 ? (
               <div className="cb-wd-quest cb-wd-sale">
@@ -396,7 +415,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
           </Card>
         </div>
 
-        <section className="cb-section cb-wd-dress">
+        <section className="cb-section cb-wd-dress" {...guideAnchor('cat-wardrobe')}>
           <h2>換裝</h2>
           {/* 試衣間：捲到下面挑配件時黏在上方，一直看得到小貓穿起來的樣子 */}
           <div ref={roomRef} className={['cb-wd-room', stuck ? 'is-stuck' : '', basket.items.length > 0 ? 'has-try' : ''].filter(Boolean).join(' ')}>
@@ -409,7 +428,7 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                       還差 {basket.short} 條小魚乾，再刷幾題、或先脫掉幾件就買得起！
                     </p>
                   ) : nonShopHint ? (
-                    <p className="cb-sub-strong cb-m0">{nonShopHint}</p>
+                    <p className="cb-sub-strong cb-m0">{nonShopHint.text}</p>
                   ) : null}
                   <div className="cb-wd-room-actions">
                     {basket.shop.length > 0 && basket.short === 0 ? (
@@ -420,8 +439,16 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
                           {basket.base > basket.total ? <s className="cb-wd-was">{basket.base}</s> : null}
                         </span>
                       </Button>
+                    ) : basket.shop.length > 0 && basket.short > 0 ? (
+                      <Button variant="butter" className="cb-wd-mini-btn" onClick={() => go(GUIDE.fishShort)}>
+                        去刷題
+                      </Button>
+                    ) : nonShopHint?.go ? (
+                      <Button variant="butter" className="cb-wd-mini-btn" onClick={() => go(nonShopHint.go!)}>
+                        去拿
+                      </Button>
                     ) : null}
-                    <Button variant="ghost" onClick={() => setTryOn({})}>
+                    <Button variant="ghost" className="cb-wd-mini-btn" onClick={() => setTryOn({})}>
                       不試了
                     </Button>
                   </div>
@@ -548,13 +575,18 @@ export function WardrobeScreen({ world }: WardrobeScreenProps) {
           </div>
         </section>
 
-        <section className="cb-section cb-house-ach">
+        <section className="cb-section cb-house-ach" {...guideAnchor('cat-achievements')}>
           <h2>
             成就 <span className="cb-sub">{unlockedCount} / {achievements.length}</span>
           </h2>
           <div className="cb-stack-sm">
             {shownAch.map((a) => (
-              <Card key={a.achievement.id} className={`cb-wd-ach ${a.unlocked ? 'is-unlocked' : ''}`.trim()} data-cat-perch="">
+              <Card
+                key={a.achievement.id}
+                className={`cb-wd-ach ${a.unlocked ? 'is-unlocked' : ''}`.trim()}
+                {...(a.unlocked ? {} : { onClick: () => go(ACHIEVEMENT_GO[a.achievement.metric]) })}
+                data-cat-perch=""
+              >
                 <div className="cb-row">
                   <div className="cb-grow">
                     <strong>{a.achievement.name}</strong>
