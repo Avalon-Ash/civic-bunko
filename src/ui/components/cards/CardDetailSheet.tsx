@@ -10,6 +10,7 @@ import { Visual } from '../../kit/Visual';
 import { LawArticleView } from '../LawArticleView';
 import { CardFaceViewer } from './CardFaceViewer';
 import { EssayCardBody } from './EssayCardBody';
+import { ComicSection } from './comic/ComicSection';
 
 export interface CardDetailSheetProps {
   world: World;
@@ -88,6 +89,10 @@ export function CardDetailSheet({ world, card, onClose }: CardDetailSheetProps) 
                 <h2 className="cb-card-sheet-title">{activeCard.title}</h2>
                 <p className="cb-card-sheet-hook">{activeCard.hook}</p>
               </header>
+
+              {activeCard.comic && activeCard.kind !== 'essay' ? (
+                <ComicSection card={{ ...activeCard, comic: activeCard.comic }} />
+              ) : null}
 
               {activeCard.visual && <Visual visual={activeCard.visual} />}
 
