@@ -85,14 +85,18 @@
   position: absolute;
   left: 6px;
   top: 6px;
-  max-width: 62%;
+  max-width: calc(100% - 12px);
   padding: 2px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: 2px solid var(--cat-line);
   border-radius: 8px;
   background: var(--acc-cream);
   color: var(--cat-line);
   font-weight: 900;
-  font-size: 0.95rem;
+  /* 320 寬時一格只有約 140px：字跟著縮，舉牌才不會斷行蓋到道具 */
+  font-size: clamp(0.78rem, 3.6vw, 0.95rem);
   line-height: 1.3;
   box-shadow: 0 2px 0 var(--cat-line);
 }
@@ -178,4 +182,9 @@
 /* 圖卡抽屜的「刷這張卡的題」 */
 .cb-card-round-btn {
   width: 100%;
+}
+
+.cb-comic-hide {
+  flex: none;
+  white-space: nowrap;
 }
