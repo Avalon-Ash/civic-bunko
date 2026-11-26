@@ -3,7 +3,9 @@ import { ACHIEVEMENTS, QUESTS } from '../../core/constants/wardrobe';
 import { dispatch } from '../../core/commands';
 import type { Celebration } from '../../core/types';
 import type { World } from '../../core/world';
+import { GUIDE } from '../../core/constants/guide';
 import { Toast } from '../kit/Toast';
+import { useGo } from '../useGuide';
 import { useWorld } from '../useWorld';
 
 /** 慶祝提示停留時間 */
@@ -39,6 +41,15 @@ export function rewardMessage(rewards: readonly Celebration[]): string | null {
 export function RewardToast({ world }: { world: World }) {
   useWorld(world);
   const message = rewardMessage(world.celebrations);
+  const go = useGo();
   const handleDismiss = useCallback(() => dispatch(world, { type: 'dismissCelebrations' }), [world]);
-  return <Toast message={message} onDismiss={handleDismiss} durationMs={REWARD_TOAST_MS} />;
+  // 點提示去換裝（ux-cleanup §2.2）；不點照舊自己消失
+  return (
+    <Toast
+      message={message}
+      onDismiss={handleDismiss}
+      durationMs={REWARD_TOAST_MS}
+      onClick={() => go(GUIDE.rewardToast)}
+    />
+  );
 }

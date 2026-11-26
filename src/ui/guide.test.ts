@@ -57,8 +57,13 @@ test('畫面上標的落點都在清單裡、同一個 id 只標一次、只用 
   }
 });
 
-// UX5 才打開：各畫面到 11-30 才全部標上落點，提早開會讓 main 紅好幾天。
-test.todo('清單裡每個落點都有畫面標上（UX5 打開）');
+test('清單裡每個落點都有畫面標上', () => {
+  const marked = new Set<string>();
+  for (const file of tsxFiles(UI_DIR)) {
+    for (const match of readFileSync(file, 'utf8').matchAll(/guideAnchor\(\s*'([^']+)'\s*\)/g)) marked.add(match[1] ?? '');
+  }
+  for (const id of Object.keys(GUIDE_ANCHORS)) assert.ok(marked.has(id), `落點 ${id} 沒有畫面標上`);
+});
 
 test('有回合正在進行時，去刷題分頁只回到那一題，不落點、不預選', () => {
   const quizTarget = QUESTS.find((q) => q.go.tab === 'quiz')?.go;
