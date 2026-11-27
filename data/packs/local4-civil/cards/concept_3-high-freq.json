@@ -391,8 +391,8 @@
       "questions": ["113-general-admin-law-q28", "113-general-admin-law-q30", "113-local4-admin-law-q29", "113-local4-admin-law-q30", "114-general-admin-law-q30", "114-local4-admin-law-q30", "114-local4-admin-law-q31", "114-local4-admin-law-q33", "115-general-admin-law-q29", "115-general-admin-law-q30", "115-general-admin-law-q31"],
       "comic": { "layout": "story",
         "panels": [
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["shop"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "停止營業"},
-          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["ticket", "eraser"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "不罰"},
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["shop"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "停止營業"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["eraser", "ticket"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "不罰"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["courthouse", "handcuffs"], "text": {"from": "line", "face": 3, "line": 2}, "sign": "刑事法律"},
           {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "loaf", "mood": "sleepy", "facing": "right"}], "props": ["hourglass"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 0}, "sign": "3 年"}
         ] }

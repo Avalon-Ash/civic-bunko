@@ -1022,20 +1022,20 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <path d="M21.5 31 H37.5 V37.8 H21.5 Z" fill="var(--acc-coral)" />
       <path d="M21.5 35.8 H37.5 V37.8 H21.5 Z" fill="var(--acc-gold)" />
       <path d="M21.5 31 H37.5 V37.8 H21.5 Z" fill="none" {...stroke} />
-      <path d="M35.1 37.3 A16 11.8 0 0 1 5.5 31 V37.8 A16 11.8 0 0 0 35.1 44.1 Z" fill="var(--acc-orange)" {...stroke} />
-      <path d="M21.5 31 L35.1 37.3 A16 11.8 0 1 1 37.5 31 Z" fill="var(--acc-gold)" />
-      <path d="M21.5 31 L32.2 35.9 A12.6 9.2 0 1 1 34.1 31 Z" fill="var(--acc-coral)" />
-      <path d="M32.2 35.9 A12.6 9.2 0 1 1 34.1 31" fill="none" {...fine} />
+      <path d="M36.88 34.25 A16 11.8 0 0 1 5.5 31 V37.8 A16 11.8 0 0 0 36.88 41.05 Z" fill="var(--acc-orange)" {...stroke} />
+      <path d="M21.5 31 L36.88 34.25 A16 11.8 0 1 1 37.5 31 Z" fill="var(--acc-gold)" />
+      <path d="M21.5 31 L33.61 33.54 A12.6 9.2 0 1 1 34.1 31 Z" fill="var(--acc-coral)" />
+      <path d="M33.61 33.54 A12.6 9.2 0 1 1 34.1 31" fill="none" {...fine} />
       <path d="M12.2 28.4 A10 7 0 0 1 20.5 24" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.8" />
-      <path d="M21.5 31 L35.1 37.3 A16 11.8 0 1 1 37.5 31 Z" fill="none" {...stroke} />
-      <path d="M57.5 35.2 A16 11.8 0 0 1 55.1 41.5 V48.3 A16 11.8 0 0 0 57.5 42 Z" fill="var(--acc-orange)" {...stroke} />
-      <path d="M41.5 35.2 L55.1 41.5 V48.3 L41.5 42 Z" fill="var(--acc-coral)" />
-      <path d="M41.5 40 L55.1 46.3 V48.3 L41.5 42 Z" fill="var(--acc-gold)" />
-      <path d="M41.5 35.2 L55.1 41.5 V48.3 L41.5 42 Z" fill="none" {...stroke} />
-      <path d="M41.5 35.2 H57.5 A16 11.8 0 0 1 55.1 41.5 Z" fill="var(--acc-gold)" />
-      <path d="M41.5 35.2 H54.1 A12.6 9.2 0 0 1 52.2 40.1 Z" fill="var(--acc-coral)" />
-      <path d="M54.1 35.2 A12.6 9.2 0 0 1 52.2 40.1" fill="none" {...fine} />
-      <path d="M41.5 35.2 H57.5 A16 11.8 0 0 1 55.1 41.5 Z" fill="none" {...stroke} />
+      <path d="M21.5 31 L36.88 34.25 A16 11.8 0 1 1 37.5 31 Z" fill="none" {...stroke} />
+      <path d="M57.5 35.2 A16 11.8 0 0 1 56.88 38.45 V45.25 A16 11.8 0 0 0 57.5 42 Z" fill="var(--acc-orange)" {...stroke} />
+      <path d="M41.5 35.2 L56.88 38.45 V45.25 L41.5 42 Z" fill="var(--acc-coral)" />
+      <path d="M41.5 40 L56.88 43.25 V45.25 L41.5 42 Z" fill="var(--acc-gold)" />
+      <path d="M41.5 35.2 L56.88 38.45 V45.25 L41.5 42 Z" fill="none" {...stroke} />
+      <path d="M41.5 35.2 H57.5 A16 11.8 0 0 1 56.88 38.45 Z" fill="var(--acc-gold)" />
+      <path d="M41.5 35.2 H54.1 A12.6 9.2 0 0 1 53.61 37.74 Z" fill="var(--acc-coral)" />
+      <path d="M54.1 35.2 A12.6 9.2 0 0 1 53.61 37.74" fill="none" {...fine} />
+      <path d="M41.5 35.2 H57.5 A16 11.8 0 0 1 56.88 38.45 Z" fill="none" {...stroke} />
     </g>
   ),
   shop: (

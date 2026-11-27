@@ -31,7 +31,7 @@
       "comic": { "layout": "story",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["test-paper"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "表明立場"},
-          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document", "magnifier"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "具體例子"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["test-paper", "magnifier"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "具體例子"},
           {"scene": "solo", "actors": [{"cast": "official", "pose": "hop", "facing": "right"}], "props": ["fence"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "換個角度"},
           {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "回扣題目"}
         ] }
@@ -63,8 +63,8 @@
       "questions": ["113-general-chinese-q03", "113-general-chinese-q06", "113-local4-chinese-q09", "114-general-chinese-q04", "114-local4-chinese-q04", "114-local4-chinese-q07", "115-general-chinese-q09"],
       "comic": { "layout": "timeline",
         "panels": [
-          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["test-paper", "magnifier"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "先讀題目"},
-          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document", "target"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "然而"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["test-paper"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "先讀題目"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document", "magnifier"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "然而"},
           {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["eraser", "test-paper"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "先刪掉"},
           {"scene": "solo", "actors": [{"cast": "official", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "太絕對"}
         ] }
@@ -92,7 +92,7 @@
         "panels": [
           {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "請鑒核"},
           {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "text": {"from": "line", "face": 3, "line": 1}, "sign": "請查照"},
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 3, "line": 2}, "sign": "希照辦"}
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "local", "pose": "sit", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 3, "line": 2}, "sign": "希照辦"}
         ] }
     }
   ]
