@@ -27,7 +27,14 @@
         { "heading": "動筆前", "lines": ["先花 5 分鐘列大綱再寫", "字跡工整、分段清楚、不離題"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["test-paper"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "表明立場"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document", "magnifier"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "具體例子"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "hop", "facing": "right"}], "props": ["fence"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "換個角度"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "回扣題目"}
+        ] }
     },
     {
       "id": "concept-zh-reading",
@@ -52,7 +59,15 @@
         { "heading": "文言文", "lines": ["先看注釋與題目，抓人物與事件", "不懂的字先跳過，看上下文推意思"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-chinese-q03", "113-general-chinese-q06", "113-local4-chinese-q09", "114-general-chinese-q04", "114-local4-chinese-q04", "114-local4-chinese-q07", "115-general-chinese-q09"],
+      "comic": { "layout": "timeline",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["test-paper", "magnifier"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "先讀題目"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document", "target"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "然而"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["eraser", "test-paper"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "先刪掉"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "太絕對"}
+        ] }
     },
     {
       "id": "concept-zh-official-doc",
@@ -72,7 +87,13 @@
         { "heading": "期望語", "lines": ["上行：請鑒核、請核示", "平行：請查照、請查照見復", "下行：希查照、希照辦"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "comic": { "layout": "ladder",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "請鑒核"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "text": {"from": "line", "face": 3, "line": 1}, "sign": "請查照"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 3, "line": 2}, "sign": "希照辦"}
+        ] }
     }
   ]
 }
