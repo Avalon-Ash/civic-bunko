@@ -69,6 +69,9 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
   phone: '手機',
   fish: '魚',
   whale: '虎鯨',
+  mountain: '山',
+  pie: '切開的派',
+  shop: '拉下鐵門的小店',
 };
 
 /**

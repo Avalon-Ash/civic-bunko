@@ -105,6 +105,10 @@ const FISH_BODY =
 
 const WHALE_BODY =
   'M7.5 39 C7.5 28 16 24 27 24.5 C28 18 30 11 33 7.5 C34.5 6 36.2 7.2 36 10.5 C35.8 16 35.5 21 37.5 26.5 C43 29 46.5 34.5 49 36.5 C50.5 34 51.5 31 51.5 28.5 C48.5 27.5 45.5 24.5 46.5 21.8 C47.8 20 51.5 22 53.5 25.5 C56.5 23 60 23.5 60.2 26 C60.5 29 56.5 31.5 53.5 32.5 C52 38 49 44 45 49 H9.5 C7.5 46 7.5 42.5 7.5 39 Z';
+/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4d-props.md 會換掉並刪掉這個函式） */
+function draft(): ReactNode {
+  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
+}
 
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
@@ -968,6 +972,9 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <path d="M11 53.5 Q16.5 51.5 22 53.5 Q27.5 55.5 33 53.5 M39.5 54.2 Q44.8 52.2 50 54.2 Q53 55.2 55.5 53.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.9" />
     </g>
   ),
+  mountain: draft(),
+  pie: draft(),
+  shop: draft(),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
