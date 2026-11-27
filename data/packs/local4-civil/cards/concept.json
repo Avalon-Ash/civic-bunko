@@ -31,7 +31,13 @@
         { "law": "中央法規標準法", "article": "3" },
         { "law": "中央法規標準法", "article": "5" }
       ],
-      "essay": null
+      "essay": null,
+      "comic": { "layout": "ladder",
+        "panels": [
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "sit", "mood": "yay", "facing": "right"}], "props": ["crown"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "憲法"},
+          {"scene": "prop-big", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}], "props": ["document"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "法律"},
+          {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["stamp"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "命令"}
+        ] }
     },
     {
       "id": "concept-central-local",
@@ -56,7 +62,15 @@
         { "law": "地方制度法", "article": "83-2" }
       ],
       "essay": null,
-      "questions": ["113-general-admin-law-q08", "113-general-local-gov-q19", "113-local4-admin-law-q07", "114-local4-admin-law-q41", "115-general-local-gov-q15"]
+      "questions": ["113-general-admin-law-q08", "113-general-local-gov-q19", "113-local4-admin-law-q07", "114-local4-admin-law-q41", "115-general-local-gov-q15"],
+      "comic": { "layout": "versus",
+        "columns": [{"from": "heading", "face": 1}, {"from": "heading", "face": 2}],
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["document", "stamp"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "自己立法"},
+          {"scene": "prop-big", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "政策規劃"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "sit", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "上級政府交付"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["stamp"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "只負行政執行"}
+        ] }
     },
     {
       "id": "concept-admin-act",

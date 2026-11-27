@@ -65,20 +65,21 @@ function panelPlace(comic: CardComic, i: number): CSSProperties | undefined {
   return { gridColumn: left ? 1 : 2, gridRow: (left ? i : i - half) + 2 };
 }
 
-/** 排排站一列最多幾格：再多一格在手機上每格不到 100px，舉牌與說明都擠 */
-const LINEUP_MAX_COLS = 3;
-/** 排排站一列放幾格：4 格排成 2×2，不要 3＋1 落單 */
+/**
+ * 排排站一列放幾格：剛好 2 或 4 格排成兩欄（2×2 不落單）；其他格數一格一列（圖左字右）。
+ * 手機上三欄每格只剩約 110px，貓太小、舉牌被截斷（2026-11-27 在 390 寬抽屜量過）。
+ */
 function lineupColumns(count: number): number {
-  return count === 4 ? 2 : Math.min(count, LINEUP_MAX_COLS);
+  return count === 2 || count === 4 ? 2 : 1;
 }
 
 export function ComicStrip({ card, hidden = false, revealed, onReveal }: ComicStripProps) {
   const { comic } = card;
   const columns = comic.columns?.map((ref) => resolveComicText(card, ref));
-  const gridStyle =
-    comic.layout === 'lineup' ? ({ '--cb-comic-cols': lineupColumns(comic.panels.length) } as CSSProperties) : undefined;
+  const cols = comic.layout === 'lineup' ? lineupColumns(comic.panels.length) : null;
+  const gridStyle = cols ? ({ '--cb-comic-cols': cols } as CSSProperties) : undefined;
   return (
-    <div className={`cb-comic cb-comic-${comic.layout}`} style={gridStyle}>
+    <div className={`cb-comic cb-comic-${comic.layout} ${cols === 1 ? 'cb-comic-rows' : ''}`.trim()} style={gridStyle}>
       {columns
         ? columns.map((title, i) => (
             <div key={`c${i}`} className="cb-comic-column" style={{ gridColumn: i + 1, gridRow: 1 }}>

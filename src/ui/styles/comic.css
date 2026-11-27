@@ -7,34 +7,56 @@
   margin: 4px 0 8px;
 }
 
-/* 上到下：一層一列（圖在左、字在右），每往下一層往右退一階，像樓梯 */
-.cb-comic-ladder {
+/* 一格一列（圖在左、字在右）：上到下一律這樣排；排排站算出一列只放一格時也這樣排（ComicStrip 加 cb-comic-rows） */
+.cb-comic-ladder,
+.cb-comic-rows {
   grid-template-columns: 1fr;
   gap: 8px;
 }
 
+.cb-comic-ladder .cb-comic-panel,
+.cb-comic-rows .cb-comic-panel {
+  display: grid;
+  grid-template-columns: 42% minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+}
+
+.cb-comic-ladder .cb-comic-art,
+.cb-comic-rows .cb-comic-art {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  border-inline-end: var(--border-w) solid var(--line);
+}
+
+.cb-comic-ladder .cb-comic-label,
+.cb-comic-rows .cb-comic-label,
+.cb-comic-ladder .cb-comic-caption,
+.cb-comic-rows .cb-comic-caption {
+  grid-column: 2;
+}
+
+.cb-comic-ladder .cb-comic-caption,
+.cb-comic-rows .cb-comic-caption {
+  align-self: center;
+  font-size: var(--text-body);
+}
+
+/* 沒有標籤的那格：字在右邊上下置中 */
+.cb-comic-ladder .cb-comic-panel:not(:has(.cb-comic-label)) .cb-comic-caption,
+.cb-comic-rows .cb-comic-panel:not(:has(.cb-comic-label)) .cb-comic-caption {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* 上到下：每往下一層往右退一階，像樓梯 */
 .cb-comic-ladder .cb-comic-panel {
-  flex-direction: row;
-  align-items: center;
   margin-inline-start: calc(var(--cb-comic-i, 0) * var(--cb-comic-step));
   --cb-comic-step: 7%;
 }
 
-.cb-comic-ladder .cb-comic-art {
-  flex: none;
-  width: 42%;
-}
-
-/* 排排站：一列幾格由 ComicStrip 算（--cb-comic-cols）；窄螢幕最多兩格 */
+/* 排排站：一列幾格由 ComicStrip 算（--cb-comic-cols） */
 .cb-comic-lineup {
   grid-template-columns: repeat(var(--cb-comic-cols, 2), minmax(0, 1fr));
-  gap: 8px;
-}
-
-@media (max-width: 360px) {
-  .cb-comic-lineup {
-    grid-template-columns: repeat(min(var(--cb-comic-cols, 2), 2), minmax(0, 1fr));
-  }
 }
 
 /* 這格是哪一項（排排站的「修憲」「罷免總統」）：遮起來想時照樣顯示 */
