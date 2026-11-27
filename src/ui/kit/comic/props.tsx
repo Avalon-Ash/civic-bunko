@@ -20,10 +20,17 @@ const OFFICE_WINDOWS = [
   [41, 46],
 ] as const;
 
-/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4a-props.md 會換掉並刪掉這個函式） */
-function draft(): ReactNode {
-  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
-}
+const COIN_LAYERS = [
+  [31, 51],
+  [31, 44.5],
+  [31, 38],
+  [31, 31.5],
+  [16, 53],
+  [16, 46.5],
+  [47, 53],
+  [47, 46.5],
+  [47, 40],
+] as const;
 
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
@@ -253,13 +260,175 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <rect x="7" y="56" width="50" height="4" rx="1.6" fill="var(--acc-silver)" {...stroke} />
     </g>
   ),
-  'torn-paper': draft(),
-  eraser: draft(),
-  coins: draft(),
-  scissors: draft(),
-  handcuffs: draft(),
-  'ballot-box': draft(),
-  crown: draft(),
+  'torn-paper': (
+    <g>
+      <g transform="rotate(-6 20 56)">
+        <path
+          d="M12 9 H28 L24.5 17 L29.5 25 L25 33 L29.5 41 L25.5 49 L28.5 57.5 H12 Q10 57.5 10 55.5 V11 Q10 9 12 9 Z"
+          fill="var(--acc-cream)"
+        />
+        <path d="M14 16 H22.5" fill="none" stroke="var(--acc-navy)" strokeWidth="2.8" strokeLinecap="round" />
+        <path d="M14 23.5 H24.5 M14 30.5 H22 M14 37.5 H24" fill="none" stroke={LINE} strokeWidth="1.9" strokeLinecap="round" strokeOpacity="0.65" />
+        <path d="M20 43.5 H28.3 L25.5 49 L27.1 53.5 H20 Q18.5 53.5 18.5 52 V45 Q18.5 43.5 20 43.5 Z" fill="var(--acc-coral)" {...fine} />
+        <path d="M21.2 47 H24.5 M21.2 50 H23.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.3" strokeLinecap="round" />
+        <path
+          d="M12 9 H28 L24.5 17 L29.5 25 L25 33 L29.5 41 L25.5 49 L28.5 57.5 H12 Q10 57.5 10 55.5 V11 Q10 9 12 9 Z"
+          fill="none"
+          {...stroke}
+        />
+      </g>
+      <g transform="rotate(6 44 56)">
+        <path
+          d="M33 9 H50 Q52 9 52 11 V55.5 Q52 57.5 50 57.5 H33.5 L30.5 49 L34.5 41 L30 33 L34.5 25 L29.5 17 Z"
+          fill="var(--acc-cream)"
+        />
+        <path d="M36 16 H47" fill="none" stroke="var(--acc-navy)" strokeWidth="2.8" strokeLinecap="round" />
+        <path d="M37 23.5 H47.5 M35.5 30.5 H47.5 M37 37.5 H45" fill="none" stroke={LINE} strokeWidth="1.9" strokeLinecap="round" strokeOpacity="0.65" />
+        <path d="M33.3 43.5 H41 Q42.5 43.5 42.5 45 V52 Q42.5 53.5 41 53.5 H32.1 L30.5 49 Z" fill="var(--acc-coral)" {...fine} />
+        <path d="M35.5 47 H39.5 M35 50 H39.5 M37.5 47 V50.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.3" strokeLinecap="round" />
+        <path
+          d="M33 9 H50 Q52 9 52 11 V55.5 Q52 57.5 50 57.5 H33.5 L30.5 49 L34.5 41 L30 33 L34.5 25 L29.5 17 Z"
+          fill="none"
+          {...stroke}
+        />
+      </g>
+    </g>
+  ),
+  eraser: (
+    <g>
+      <path d="M8 42 H56 Q58.5 42 59 45 L60 56.5 Q60 59.5 57 59.5 H7 Q4 59.5 4 56.5 L5 45 Q5.5 42 8 42 Z" fill="var(--acc-cream)" {...stroke} />
+      <path d="M10 53.5 Q18 46.5 29.5 49.5 Q33 51 29 54.5 Q19 57 10 53.5 Z" fill="var(--acc-silver)" fillOpacity="0.5" />
+      <path d="M13 49.5 H17 M21 49.5 H24.5" fill="none" stroke={LINE} strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.25" />
+      <path d="M36 48.5 H52 M40 54 H52" fill="none" stroke={LINE} strokeWidth="2.2" strokeLinecap="round" strokeOpacity="0.72" />
+      <ellipse cx="13" cy="54.5" rx="2.4" ry="1.4" transform="rotate(-14 13 54.5)" fill="var(--acc-rose)" {...fine} />
+      <circle cx="19.5" cy="55.8" r="1.5" fill="var(--acc-rose)" {...fine} />
+      <ellipse cx="34.5" cy="54.8" rx="2.2" ry="1.3" transform="rotate(18 34.5 54.8)" fill="var(--acc-rose)" {...fine} />
+      <circle cx="15" cy="47.5" r="1.3" fill="var(--acc-rose)" {...fine} />
+      <g transform="translate(36 27) rotate(-38)">
+        <rect x="-20.5" y="-9.5" width="19" height="19" rx="3.5" fill="var(--acc-rose)" {...stroke} />
+        <path d="M-19.5 5 H-2 V8.5 H-17 Q-19.5 8.5 -19.5 6 Z" fill="var(--pink-deep)" fillOpacity="0.4" />
+        <path d="M-16.5 -6 H-8.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.85" />
+        <rect x="-4" y="-10.5" width="24.5" height="21" rx="2.8" fill="var(--acc-navy)" />
+        <rect x="2.5" y="-10.5" width="7.5" height="21" fill="var(--acc-sky)" />
+        <rect x="10" y="-10.5" width="4" height="21" fill="var(--acc-cream)" />
+        <path d="M2.5 -10.5 V10.5 M10 -10.5 V10.5 M14 -10.5 V10.5" fill="none" {...fine} />
+        <rect x="-4" y="-10.5" width="24.5" height="21" rx="2.8" fill="none" {...stroke} />
+      </g>
+    </g>
+  ),
+  coins: (
+    <g>
+      {COIN_LAYERS.map(([cx, y]) => (
+        <g key={`${cx}-${y}`}>
+          <path d={`M${cx - 10.5} ${y - 3.5} V${y + 2} A10.5 4 0 0 0 ${cx + 10.5} ${y + 2} V${y - 3.5} Z`} fill="var(--acc-orange)" {...stroke} />
+          <path
+            d={`M${cx - 5.5} ${y + 0.5} V${y + 4.4} M${cx} ${y + 1.2} V${y + 5} M${cx + 5.5} ${y + 0.5} V${y + 4.4}`}
+            fill="none"
+            stroke={LINE}
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeOpacity="0.65"
+          />
+          <ellipse cx={cx} cy={y - 3.5} rx="10.5" ry="4" fill="var(--acc-gold)" {...thin} />
+        </g>
+      ))}
+      <circle cx="31" cy="17.5" r="11.5" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="31" cy="17.5" r="8.2" fill="none" stroke="var(--acc-orange)" strokeWidth="1.8" />
+      <path d="M24 12.8 A8.2 8.2 0 0 1 29.5 9.6" fill="none" stroke="var(--acc-cream)" strokeWidth="1.7" strokeLinecap="round" strokeOpacity="0.85" />
+      <rect x="27.8" y="14.3" width="6.4" height="6.4" rx="1.1" fill="var(--acc-cream)" {...thin} />
+    </g>
+  ),
+  scissors: (
+    <g>
+      <path d="M19 27 L22 25 L28 33 L49 39.5 Q50.5 40.5 49 42 Q41 46 26 39 Z" fill="var(--acc-silver)" {...stroke} />
+      <path d="M45 6 H55 Q57 6 57 8 V31.5 L43 35 V8 Q43 6 45 6 Z" fill="var(--acc-cream)" {...stroke} />
+      <path d="M46.5 12 H53.5" fill="none" stroke="var(--acc-navy)" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M46.5 18 H53.5 M46.5 23.5 H52.5" fill="none" stroke={LINE} strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.65" />
+      <g transform="translate(49 49.5) rotate(15)">
+        <path d="M-7 -6.5 L7 -8.5 V6 Q7 8 5 8 H-5 Q-7 8 -7 6 Z" fill="var(--acc-cream)" {...stroke} />
+        <path d="M-4 -1 H4 M-4 3.5 H2.5" fill="none" stroke={LINE} strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.65" />
+      </g>
+      <path d="M56.5 38 L59.5 40.5 M37.5 43 L35 46.5" fill="none" {...fine} />
+      <path d="M19 42 L26 30 Q42 21 51 25.5 Q52.5 26.5 51 28 L28 36 L22 44 Z" fill="var(--acc-silver)" {...stroke} />
+      <circle cx="15" cy="21" r="6.8" fill="none" stroke={LINE} strokeWidth="7.8" />
+      <circle cx="15" cy="21" r="6.8" fill="none" stroke="var(--acc-coral)" strokeWidth="3.6" />
+      <circle cx="15" cy="48.5" r="6.8" fill="none" stroke={LINE} strokeWidth="7.8" />
+      <circle cx="15" cy="48.5" r="6.8" fill="none" stroke="var(--acc-coral)" strokeWidth="3.6" />
+      <circle cx="28" cy="34.5" r="2.7" fill="var(--acc-gold)" {...fine} />
+    </g>
+  ),
+  handcuffs: (
+    <g>
+      <rect x="23.5" y="22.5" width="7.2" height="4.4" rx="2.2" transform="rotate(8 27.1 24.7)" fill="none" stroke={LINE} strokeWidth="3.8" />
+      <rect x="23.5" y="22.5" width="7.2" height="4.4" rx="2.2" transform="rotate(8 27.1 24.7)" fill="none" stroke="var(--acc-silver)" strokeWidth="1.5" />
+      <rect x="33.5" y="26.5" width="7.2" height="4.4" rx="2.2" transform="rotate(24 37.1 28.7)" fill="none" stroke={LINE} strokeWidth="3.8" />
+      <rect x="33.5" y="26.5" width="7.2" height="4.4" rx="2.2" transform="rotate(24 37.1 28.7)" fill="none" stroke="var(--acc-silver)" strokeWidth="1.5" />
+      <path d="M29.5 25.5 L35.2 28" fill="none" stroke={LINE} strokeWidth="4.4" strokeLinecap="round" />
+      <path d="M29.5 25.5 L35.2 28" fill="none" stroke="var(--acc-silver)" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="16" cy="42.5" r="8.4" fill="none" stroke={LINE} strokeWidth="8" />
+      <circle cx="16" cy="42.5" r="8.4" fill="none" stroke="var(--acc-silver)" strokeWidth="3.8" />
+      <path d="M9.5 39 A7.5 7.5 0 0 1 14 34.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
+      <circle cx="10.2" cy="48.5" r="1.4" fill={LINE} />
+      <g transform="translate(22.8 30.8) rotate(32)">
+        <rect x="-4.5" y="-5" width="9" height="10" rx="2.5" fill="var(--acc-silver)" {...stroke} />
+        <circle cx="0" cy="0.5" r="1.5" fill={LINE} />
+      </g>
+      <circle cx="47.5" cy="47" r="8.4" fill="none" stroke={LINE} strokeWidth="8" />
+      <circle cx="47.5" cy="47" r="8.4" fill="none" stroke="var(--acc-silver)" strokeWidth="3.8" />
+      <path d="M49.5 39 A7.5 7.5 0 0 1 54.5 44" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
+      <circle cx="53.3" cy="53" r="1.4" fill={LINE} />
+      <g transform="translate(41 35.2) rotate(-32)">
+        <rect x="-4.5" y="-5" width="9" height="10" rx="2.5" fill="var(--acc-silver)" {...stroke} />
+        <circle cx="0" cy="0.5" r="1.5" fill={LINE} />
+      </g>
+    </g>
+  ),
+  'ballot-box': (
+    <g>
+      <path d="M15 19 H49 L55 27.5 H9 Z" fill="var(--acc-cream)" {...stroke} />
+      <rect x="20" y="21.8" width="24" height="3.2" rx="1.6" fill="var(--acc-shade)" {...fine} />
+      <path d="M24 6.5 L42.5 8 L41.5 23.4 H23 Z" fill="var(--acc-silver)" {...stroke} />
+      <path d="M24 6.5 L38.5 10.5 L37.5 23.4 H23 Z" fill="var(--acc-cream)" {...stroke} />
+      <circle cx="30.5" cy="15.2" r="2.6" fill="none" stroke="var(--acc-coral)" strokeWidth="1.8" />
+      <path d="M26.8 20 H34" fill="none" stroke={LINE} strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.55" />
+      <path d="M19.5 23.8 H44.5" fill="none" {...stroke} />
+      <rect x="10" y="32" width="44" height="23" fill="var(--acc-cream)" {...stroke} />
+      <rect x="8" y="27" width="48" height="5.5" rx="1.8" fill="var(--acc-navy)" {...stroke} />
+      <rect x="8" y="54.5" width="48" height="5" rx="1.8" fill="var(--acc-navy)" {...stroke} />
+      <rect x="17" y="38" width="30" height="11" rx="2.2" fill="var(--acc-sky)" {...thin} />
+      <path d="M23.5 43.5 H40.5" fill="none" stroke="var(--acc-navy)" strokeWidth="2.4" strokeLinecap="round" />
+    </g>
+  ),
+  crown: (
+    <g>
+      <circle cx="7.5" cy="54" r="2.6" fill="var(--acc-gold)" {...thin} />
+      <circle cx="56.5" cy="54" r="2.6" fill="var(--acc-gold)" {...thin} />
+      <path
+        d="M9 48 Q13 43 32 43 Q51 43 55 48 Q57 52 54 56.5 Q51 59.5 32 59.5 Q13 59.5 10 56.5 Q7 52 9 48 Z"
+        fill="var(--acc-coral)"
+        {...stroke}
+      />
+      <path d="M15 47.5 Q32 45 49 47.5" fill="none" stroke="var(--acc-rose)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.65" />
+      <path d="M13 55.2 Q32 57.5 51 55.2" fill="none" stroke={LINE} strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.35" />
+      <path
+        d="M15 44 L11.5 22 Q18 29 23 29 Q27.5 28 32 16.5 Q36.5 28 41 29 Q46 29 52.5 22 L49 44 Q32 47 15 44 Z"
+        fill="var(--acc-gold)"
+      />
+      <path d="M13.8 36.5 Q32 39 50.2 36.5 L49 44 Q32 47 15 44 Z" fill="var(--acc-orange)" {...thin} />
+      <path
+        d="M15 44 L11.5 22 Q18 29 23 29 Q27.5 28 32 16.5 Q36.5 28 41 29 Q46 29 52.5 22 L49 44 Q32 47 15 44 Z"
+        fill="none"
+        {...stroke}
+      />
+      <path d="M32 38.6 L35 41.8 L32 44.8 L29 41.8 Z" fill="var(--acc-coral)" {...fine} />
+      <circle cx="21.5" cy="40.8" r="2.3" fill="var(--acc-sky)" {...fine} />
+      <circle cx="42.5" cy="40.8" r="2.3" fill="var(--acc-sky)" {...fine} />
+      <circle cx="11.5" cy="19" r="3.2" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="32" cy="13" r="3.8" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="52.5" cy="19" r="3.2" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="30.6" cy="11.7" r="1.1" fill="var(--acc-cream)" />
+    </g>
+  ),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
