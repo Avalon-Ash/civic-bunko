@@ -77,11 +77,6 @@ const WEATHER_RETRY: Partial<Record<WeatherView['status'], string>> = {
 
 export interface TodayScreenProps {
   world: World;
-  onStartQuiz: () => void;
-  onGoSetup: () => void;
-  onGoStamps?: () => void;
-  /** 打開小貓衣櫥分頁 */
-  onGoCat?: () => void;
   /** 打開完整的更新紀錄 */
   onOpenChangelog?: () => void;
   papersLoading?: boolean;
@@ -103,9 +98,6 @@ function formatExamDate(isoDate: string): string {
 /** 今日畫面：主題切換、筆試倒數、題庫總數與已刷數、三個 5 題快速任務、本週集章。 */
 export function TodayScreen({
   world,
-  onStartQuiz,
-  onGoSetup,
-  onGoCat,
   onOpenChangelog,
   papersLoading = false,
   loadError = false,
@@ -164,7 +156,7 @@ export function TodayScreen({
   const handleResumeSaved = () => {
     if (papersLoading) return;
     dispatch(world, { type: 'resumeRound' });
-    onStartQuiz();
+    go(GUIDE.roundStarted);
   };
 
   const handleDiscardSaved = () => {
@@ -176,7 +168,7 @@ export function TodayScreen({
     const mission = missions[index];
     if (!mission) return;
     dispatch(world, { type: 'startRound', config: mission.config });
-    onStartQuiz();
+    go(GUIDE.roundStarted);
   };
 
   const [updateNote, setUpdateNote] = useState<string | null>(null);
@@ -315,7 +307,7 @@ export function TodayScreen({
             </Card>
           )}
 
-          {onGoCat && !papersLoading ? (
+          {!papersLoading ? (
             <Card
               tone="butter"
               className="cb-wd-today-card"
@@ -426,7 +418,7 @@ export function TodayScreen({
               <Card>
                 <p className="cb-sub">目前沒有可刷題目，去刷題頁調整範圍試試看。</p>
                 <div className="cb-mt-sm">
-                  <Button onClick={onGoSetup}>前往刷題設定</Button>
+                  <Button onClick={() => go(GUIDE.noMissions)}>前往刷題設定</Button>
                 </div>
               </Card>
             )}

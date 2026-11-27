@@ -40,6 +40,8 @@ export const GO_UNSEEN_CARD: GuideTarget = { tab: 'cards', anchor: 'cards-unseen
 export const GO_WARDROBE: GuideTarget = { tab: 'cat', anchor: 'cat-wardrobe' };
 /** 去看全部成就 */
 export const GO_ACHIEVEMENTS: GuideTarget = { tab: 'cat', anchor: 'cat-achievements', preset: 'all-achievements' };
+/** 回合已經開好：換到刷題分頁就是題目頁（不落點、不預選） */
+export const GO_ROUND: GuideTarget = { tab: 'quiz' };
 /** 去同步與備份（自動展開） */
 export const GO_SYNC: GuideTarget = { tab: 'stamps', anchor: 'stamps-sync', preset: 'open-sync' };
 
@@ -76,6 +78,10 @@ export const GUIDE = {
   fishShort: GO_START,
   /** 完成提示（任務、成就） */
   rewardToast: GO_WARDROBE,
-  /** 圖卡抽屜「刷這張卡的題」：回合已經開好，換到刷題分頁就是題目頁 */
-  cardRound: { tab: 'quiz' },
+  /** 圖卡抽屜「刷這張卡的題」 */
+  cardRound: GO_ROUND,
+  /** 今日頁的快刷、續玩，集章頁的弱點與高頻回合：開好回合就去作答 */
+  roundStarted: GO_ROUND,
+  /** 今日頁：沒有可刷的題，去刷題設定調範圍 */
+  noMissions: GO_START,
 } as const satisfies Record<string, GuideTarget>;

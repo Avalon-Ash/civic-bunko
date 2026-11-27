@@ -265,13 +265,6 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
             onOpenInstallHint={() => setInstallSheetOpen(true)}
             celebration={pendingCelebration}
             onCelebrationDone={handleCelebrationDone}
-            onStartQuiz={() => setTab('quiz')}
-            onGoSetup={() => {
-              setShowResult(false);
-              setTab('quiz');
-            }}
-            onGoStamps={() => setTab('stamps')}
-            onGoCat={() => setTab('cat')}
             onOpenChangelog={openAllChangelog}
           />
         );
@@ -284,8 +277,6 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
           <StampsScreen
             world={world}
             papersLoading={papersLoading}
-            onStartQuiz={() => setTab('quiz')}
-            onGoCat={() => setTab('cat')}
           />
         );
       case 'quiz':

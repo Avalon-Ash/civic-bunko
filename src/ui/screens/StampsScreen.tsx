@@ -23,13 +23,10 @@ import { useWorld } from '../useWorld';
 export interface StampsScreenProps {
   world: World;
   papersLoading?: boolean;
-  onStartQuiz?: () => void;
-  /** 打開小貓衣櫥分頁 */
-  onGoCat?: () => void;
 }
 
 /** 集章畫面：顯示我的章（換裝在小貓分頁）、弱點考點、各科總題數與答對率，以及最下方的同步與備份區塊。 */
-export function StampsScreen({ world, papersLoading = false, onStartQuiz }: StampsScreenProps) {
+export function StampsScreen({ world, papersLoading = false }: StampsScreenProps) {
   useWorld(world);
   const go = useGo();
   const bank = activeBank(world);
@@ -59,7 +56,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
   const handleStartAllWeak = () => {
     if (papersLoading || !weakAllConfig || weakCount === 0) return;
     dispatch(world, { type: 'startRound', config: weakAllConfig });
-    onStartQuiz?.();
+    go(GUIDE.roundStarted);
   };
 
   const handleStartSingleWeak = (topicId: string) => {
@@ -67,7 +64,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
     const config = weakRoundConfig(world, bank.id, [topicId]);
     if (!config) return;
     dispatch(world, { type: 'startRound', config });
-    onStartQuiz?.();
+    go(GUIDE.roundStarted);
   };
 
   const handleStartSingleFreq = (topicId: string) => {
@@ -75,7 +72,7 @@ export function StampsScreen({ world, papersLoading = false, onStartQuiz }: Stam
     const config = frequentRoundConfig(world, bank.id, [topicId]);
     if (!config) return;
     dispatch(world, { type: 'startRound', config });
-    onStartQuiz?.();
+    go(GUIDE.roundStarted);
   };
 
   return (
