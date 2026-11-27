@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-28-comic-tags',
+    date: '2026-11-28',
+    title: '漫畫裡每隻小貓腳下都有名牌',
+    items: [
+      '每一格裡的小貓腳下立著名牌（機關、人民、公務員、民意代表、地方政府），不用再對照上面的介紹',
+      '配對那一步的圖也有名牌；遮起來想時名牌照樣看得到，遮住的只有答案',
+    ],
+  },
+  {
     id: '2026-11-28-comic-cast',
     date: '2026-11-28',
     title: '漫畫上面會介紹誰是誰',

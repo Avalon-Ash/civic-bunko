@@ -18,7 +18,7 @@ export function ComicCastList({ comic }: { comic: Pick<CardComic, 'panels'> }) {
           <li key={id} className="cb-comic-cast-item">
             <Cat size={CAST_FACE_PX} interactive={false} outfit={cast.outfit} />
             <span className="cb-comic-cast-text">
-              <b>{cast.name}</b>
+              <b>{cast.tag === cast.name ? cast.name : `${cast.name}（${cast.tag}）`}</b>
               <span>{cast.role}</span>
             </span>
           </li>

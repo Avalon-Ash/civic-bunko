@@ -138,7 +138,7 @@ export function ComicMatch({ world, card, onComplete }: ComicMatchProps) {
               onClick={() => pickLeft(i)}
             >
               {label ? <span className="cb-comic-label">{label}</span> : null}
-              <ComicPanelArt panel={panel} sign={comicPanelText(card, panel)?.sign} hideSign={!done.has(i)} />
+              <ComicPanelArt panel={panel} sign={comicPanelText(card, panel)?.sign} hideSign={!done.has(i)} nameTags />
             </button>
           );
         })}

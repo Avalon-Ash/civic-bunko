@@ -15,9 +15,21 @@ function slotStyle(slot: ComicSlot): CSSProperties {
   return { left: `${slot.x}%`, bottom: `${100 - slot.y}%`, width: `${slot.w}%` };
 }
 
-/** 一格的畫面（不含字）：演員、道具、舉牌。列表小圖也用它 */
-export function ComicPanelArt({ panel, sign, hideSign = false }: { panel: ComicPanel; sign?: string | null; hideSign?: boolean }) {
+/** 一格的畫面（不含字）：演員、道具、舉牌。列表小圖也用它（小圖不掛名牌：72px 放不下字） */
+export function ComicPanelArt({
+  panel,
+  sign,
+  hideSign = false,
+  nameTags = false,
+}: {
+  panel: ComicPanel;
+  sign?: string | null;
+  hideSign?: boolean;
+  /** 貓腳下立角色名牌（同一格同一個角色只掛第一隻） */
+  nameTags?: boolean;
+}) {
   const layout = COMIC_SCENE_LAYOUT[panel.scene];
+  const tagged = nameTags ? panel.actors.map((actor, i) => panel.actors.findIndex((a) => a.cast === actor.cast) === i) : [];
   return (
     <div className="cb-comic-art">
       {panel.props.map((id, i) => {
@@ -39,6 +51,7 @@ export function ComicPanelArt({ panel, sign, hideSign = false }: { panel: ComicP
               facing={actor.facing}
               quiet
             />
+            {tagged[i] ? <span className="cb-comic-tag">{COMIC_CASTS[actor.cast].tag}</span> : null}
           </span>
         ) : null;
       })}
@@ -94,7 +107,7 @@ export function ComicStrip({ card, hidden = false, revealed, onReveal }: ComicSt
         const body = (
           <>
             {view?.label ? <span className="cb-comic-label">{view.label}</span> : null}
-            <ComicPanelArt panel={panel} sign={view?.sign} hideSign={covered} />
+            <ComicPanelArt panel={panel} sign={view?.sign} hideSign={covered} nameTags />
             <span className="cb-comic-caption">
               {beat ? <b className="cb-comic-beat">{beat}</b> : null}
               <span className={`cb-comic-text ${covered ? 'is-hidden' : ''}`.trim()}>

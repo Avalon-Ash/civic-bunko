@@ -140,6 +140,23 @@
   height: auto;
 }
 
+/* 貓腳下的角色名牌（ComicPanelArt nameTags）：頭上是舉牌的位置（左上角），所以名牌立在地面上、蓋一點腳 */
+.cb-comic-tag {
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  transform: translateX(-50%);
+  padding: 0 3px;
+  white-space: nowrap;
+  border: 1.5px solid var(--cat-line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 0.68rem;
+  line-height: 1.25;
+}
+
 .cb-comic-sign {
   position: absolute;
   left: 6px;

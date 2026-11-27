@@ -79,12 +79,12 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
  * agency＝機關（領帶＋單片眼鏡、灰毛）；citizen＝人民（毛帽、橘毛）；official＝公務員（領結＋學士帽、銀虎斑）；
  * council＝民意代表（立委、議員：貝雷帽、暹羅）；local＝地方政府（頭巾、三花）。
  * 格子小（列表小圖 72px），所以靠毛色＋頭頂的輪廓分辨，臉上的小配件只是加分。
- * role＝漫畫上方「登場角色」裡的一句說明（ComicCastList）。
+ * role＝漫畫上方「登場角色」裡的一句說明（ComicCastList）；tag＝格子裡貓腳下的名牌（320 寬一格三隻貓時每隻只有約 50px，最多 3 個字）。
  */
-export const COMIC_CASTS: Readonly<Record<ComicCast, { name: string; role: string; outfit: Outfit }>> = {
-  agency: { name: '機關', role: '政府機關，也演上級、中央', outfit: { neck: 'necktie', 'face-mid': 'monocle', fur: 'fur-gray' } },
-  citizen: { name: '人民', role: '一般民眾，也演故事裡的人', outfit: { 'head-top': 'beanie', fur: 'fur-orange' } },
-  official: { name: '公務員', role: '機關裡辦事的人，也演寫考卷的你', outfit: { neck: 'bowtie', 'head-top': 'grad-cap', fur: 'fur-silver' } },
-  council: { name: '民意代表', role: '立委、議員、代表', outfit: { 'head-top': 'beret', fur: 'fur-siamese' } },
-  local: { name: '地方政府', role: '直轄市、縣（市）、鄉（鎮、市）', outfit: { 'head-top': 'hachimaki', fur: 'fur-calico' } },
+export const COMIC_CASTS: Readonly<Record<ComicCast, { name: string; tag: string; role: string; outfit: Outfit }>> = {
+  agency: { name: '機關', tag: '機關', role: '政府機關，也演上級、中央', outfit: { neck: 'necktie', 'face-mid': 'monocle', fur: 'fur-gray' } },
+  citizen: { name: '人民', tag: '人民', role: '一般民眾，也演故事裡的人', outfit: { 'head-top': 'beanie', fur: 'fur-orange' } },
+  official: { name: '公務員', tag: '公務員', role: '機關裡辦事的人，也演寫考卷的你', outfit: { neck: 'bowtie', 'head-top': 'grad-cap', fur: 'fur-silver' } },
+  council: { name: '民意代表', tag: '民代', role: '立委、議員、代表', outfit: { 'head-top': 'beret', fur: 'fur-siamese' } },
+  local: { name: '地方政府', tag: '地方', role: '直轄市、縣（市）、鄉（鎮、市）', outfit: { 'head-top': 'hachimaki', fur: 'fur-calico' } },
 };
