@@ -239,7 +239,15 @@ export type ComicPropId =
   | 'scissors'
   | 'handcuffs'
   | 'ballot-box'
-  | 'crown';
+  | 'crown'
+  | 'scale'
+  | 'fence'
+  | 'umbrella'
+  | 'magnifier'
+  | 'test-paper'
+  | 'house'
+  | 'bench'
+  | 'money-bag';
 /** 角色（同一個角色在每張卡都穿一樣；穿著在 constants/comic.ts 的 COMIC_CASTS） */
 export type ComicCast = 'agency' | 'citizen' | 'official' | 'council' | 'local';
 /** 格子裡的字：指向卡片原文的指標，不是字串（pick＝那一行的子字串） */

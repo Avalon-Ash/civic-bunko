@@ -47,6 +47,14 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
   handcuffs: '手銬',
   'ballot-box': '投票箱',
   crown: '皇冠',
+  scale: '天秤',
+  fence: '柵欄',
+  umbrella: '雨傘',
+  magnifier: '放大鏡',
+  'test-paper': '考卷',
+  house: '房子',
+  bench: '公園長椅',
+  'money-bag': '錢袋',
 };
 
 /**

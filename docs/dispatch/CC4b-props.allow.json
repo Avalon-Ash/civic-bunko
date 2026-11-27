@@ -1,0 +1,1 @@
+{"permissions":{"allow":["command(npx tsc --noEmit)","command(npm test)","command(npm run lint)","command(npx tsx tools/gallery/comic-gallery.mts .gallery/comic-light.html light)","command(npx tsx tools/gallery/comic-gallery.mts .gallery/comic-dark.html dark)"]}}

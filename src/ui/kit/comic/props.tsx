@@ -32,6 +32,11 @@ const COIN_LAYERS = [
   [47, 40],
 ] as const;
 
+/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4b-props.md 會換掉並刪掉這個函式） */
+function draft(): ReactNode {
+  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
+}
+
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
     <g>
@@ -435,6 +440,14 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <circle cx="30.6" cy="11.7" r="1.1" fill="var(--acc-cream)" />
     </g>
   ),
+  scale: draft(),
+  fence: draft(),
+  umbrella: draft(),
+  magnifier: draft(),
+  'test-paper': draft(),
+  house: draft(),
+  bench: draft(),
+  'money-bag': draft(),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
