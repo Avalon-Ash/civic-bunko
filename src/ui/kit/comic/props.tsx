@@ -32,10 +32,22 @@ const COIN_LAYERS = [
   [47, 40],
 ] as const;
 
-/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4b-props.md 會換掉並刪掉這個函式） */
-function draft(): ReactNode {
-  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
-}
+const FENCE_PICKETS = [10, 21, 32, 43, 54] as const;
+
+const RAINDROPS = [
+  [11, 10],
+  [45, 5.5],
+  [54, 12],
+] as const;
+
+const TEST_ROWS = [
+  [26, true],
+  [34.5, false],
+  [43, true],
+  [51.5, false],
+] as const;
+
+const BENCH_SLATS = [32, 39] as const;
 
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
@@ -440,14 +452,165 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <circle cx="30.6" cy="11.7" r="1.1" fill="var(--acc-cream)" />
     </g>
   ),
-  scale: draft(),
-  fence: draft(),
-  umbrella: draft(),
-  magnifier: draft(),
-  'test-paper': draft(),
-  house: draft(),
-  bench: draft(),
-  'money-bag': draft(),
+  scale: (
+    <g>
+      <path d="M13.5 17.5 L6.5 37 M13.5 17.5 L20.5 37 M50.5 17.5 L43.5 37 M50.5 17.5 L57.5 37" fill="none" {...thin} />
+      <rect x="29.5" y="16" width="5" height="33" rx="2" fill="var(--acc-gold)" {...stroke} />
+      <path d="M22 54 Q23 48 32 48 Q41 48 42 54 Z" fill="var(--acc-gold)" {...stroke} />
+      <rect x="16" y="54" width="32" height="5.5" rx="2.5" fill="var(--acc-wood)" {...stroke} />
+      <rect x="10" y="13.5" width="44" height="4.2" rx="2.1" fill="var(--acc-gold)" {...stroke} />
+      <path d="M32 7 L34.6 12.2 H29.4 Z" fill="var(--acc-orange)" {...thin} />
+      <circle cx="32" cy="15.6" r="4.2" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="30.8" cy="14.4" r="1.1" fill="var(--acc-cream)" />
+      <circle cx="13.5" cy="15.6" r="2.2" fill="var(--acc-orange)" {...fine} />
+      <circle cx="50.5" cy="15.6" r="2.2" fill="var(--acc-orange)" {...fine} />
+      <circle cx="13.5" cy="33" r="5" fill="var(--acc-coral)" {...stroke} />
+      <path d="M10.8 31.2 A3.2 3.2 0 0 1 13.2 29.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.85" />
+      <rect x="46" y="28.5" width="9" height="9" rx="2" fill="var(--acc-sky)" {...stroke} />
+      <path d="M48.2 31 H51.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.85" />
+      <path d="M4.5 37 H22.5 C21.5 43.5 17.5 44.5 13.5 44.5 C9.5 44.5 5.5 43.5 4.5 37 Z" fill="var(--acc-gold)" {...stroke} />
+      <path d="M41.5 37 H59.5 C58.5 43.5 54.5 44.5 50.5 44.5 C46.5 44.5 42.5 43.5 41.5 37 Z" fill="var(--acc-gold)" {...stroke} />
+    </g>
+  ),
+  fence: (
+    <g>
+      <rect x="4.5" y="29" width="55" height="5.8" rx="2.4" fill="var(--acc-wood)" {...stroke} />
+      <rect x="4.5" y="47" width="55" height="5.8" rx="2.4" fill="var(--acc-wood)" {...stroke} />
+      {FENCE_PICKETS.map((cx) => (
+        <g key={cx}>
+          <path
+            d={`M${cx - 4} 25.5 L${cx} 18.5 L${cx + 4} 25.5 V57.5 Q${cx + 4} 59.5 ${cx + 2} 59.5 H${cx - 2} Q${cx - 4} 59.5 ${cx - 4} 57.5 Z`}
+            fill="var(--acc-wood)"
+            {...stroke}
+          />
+          <circle cx={cx} cy="31.9" r="1.2" fill="var(--acc-silver)" />
+          <circle cx={cx} cy="49.9" r="1.2" fill="var(--acc-silver)" />
+        </g>
+      ))}
+      <circle cx="32" cy="40.8" r="11.5" fill="var(--acc-coral)" {...stroke} />
+      <circle cx="32" cy="40.8" r="7.5" fill="var(--acc-cream)" {...fine} />
+      <path d="M26.8 35.6 L37.2 46" fill="none" stroke="var(--acc-coral)" strokeWidth="3.4" strokeLinecap="round" />
+    </g>
+  ),
+  umbrella: (
+    <g>
+      {RAINDROPS.map(([x, y]) => (
+        <path
+          key={`${x}-${y}`}
+          d={`M${x} ${y} C${x + 3.6} ${y + 4.2} ${x + 3.6} ${y + 8.2} ${x} ${y + 8.2} C${x - 3.6} ${y + 8.2} ${x - 3.6} ${y + 4.2} ${x} ${y} Z`}
+          fill="var(--acc-sky)"
+          {...thin}
+        />
+      ))}
+      <path d="M32 34 V49" fill="none" stroke={LINE} strokeWidth="5.4" strokeLinecap="round" />
+      <path d="M32 34 V49" fill="none" stroke="var(--acc-silver)" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M32 47.5 V51 A5.2 5.2 0 0 1 21.6 51" fill="none" stroke={LINE} strokeWidth="7" strokeLinecap="round" />
+      <path d="M32 47.5 V51 A5.2 5.2 0 0 1 21.6 51" fill="none" stroke="var(--acc-wood)" strokeWidth="3" strokeLinecap="round" />
+      <rect x="30.2" y="11.5" width="3.6" height="5.5" rx="1.8" fill="var(--acc-gold)" {...thin} />
+      <path
+        d="M6 37 C6 21 18 16.5 32 16.5 C46 16.5 58 21 58 37 Q51.5 31.5 45 37 Q38.5 31.5 32 37 Q25.5 31.5 19 37 Q12.5 31.5 6 37 Z"
+        fill="var(--acc-lav)"
+      />
+      <path d="M32 16.5 Q22 23 19 37 Q25.5 31.5 32 37 Z" fill="var(--acc-cream)" fillOpacity="0.32" />
+      <path d="M32 16.5 Q42 23 45 37 Q51.5 31.5 58 37 C58 21 46 16.5 32 16.5 Z" fill="var(--acc-cream)" fillOpacity="0.32" />
+      <path d="M32 16.5 Q22 23 19 37 M32 16.5 V37 M32 16.5 Q42 23 45 37" fill="none" {...thin} />
+      <path d="M12.5 27.5 Q16.5 20.8 24.5 19.2" fill="none" stroke="var(--acc-cream)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.85" />
+      <path
+        d="M6 37 C6 21 18 16.5 32 16.5 C46 16.5 58 21 58 37 Q51.5 31.5 45 37 Q38.5 31.5 32 37 Q25.5 31.5 19 37 Q12.5 31.5 6 37 Z"
+        fill="none"
+        {...stroke}
+      />
+    </g>
+  ),
+  magnifier: (
+    <g>
+      <g transform="translate(26 25) rotate(45)">
+        <rect x="17.5" y="-3.8" width="6.5" height="7.6" rx="1.8" fill="var(--acc-silver)" {...stroke} />
+        <rect x="23" y="-5" width="21.5" height="10" rx="5" fill="var(--acc-wood)" {...stroke} />
+        <path d="M27.5 -1.8 H40.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.55" />
+      </g>
+      <circle cx="26" cy="25" r="18.5" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="26" cy="25" r="13.5" fill="var(--acc-sky)" {...stroke} />
+      <path d="M20.5 33.5 L33.5 20.5" fill="none" stroke="var(--acc-cream)" strokeWidth="2.4" strokeLinecap="round" strokeOpacity="0.4" />
+      <path d="M17.5 23 A9.5 9.5 0 0 1 25 15.5" fill="none" stroke="var(--acc-cream)" strokeWidth="3.2" strokeLinecap="round" strokeOpacity="0.9" />
+      <circle cx="17.2" cy="27.5" r="1.6" fill="var(--acc-cream)" fillOpacity="0.9" />
+    </g>
+  ),
+  'test-paper': (
+    <g>
+      <rect x="7" y="6.5" width="38" height="52.5" rx="4.5" fill="var(--acc-cream)" {...stroke} />
+      <path d="M13 14 H31" fill="none" stroke="var(--acc-navy)" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M13 19 H38" fill="none" stroke={LINE} strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.35" />
+      {TEST_ROWS.map(([y, filled]) => (
+        <g key={y}>
+          <circle cx="16.5" cy={y} r="3" fill={filled ? 'var(--acc-navy)' : 'var(--acc-cream)'} {...thin} />
+          <path d={`M23 ${y} H37.5`} fill="none" stroke={LINE} strokeWidth="2" strokeLinecap="round" strokeOpacity="0.65" />
+        </g>
+      ))}
+      <g transform="translate(47.5 37.5) rotate(16)">
+        <path d="M-4.5 -17 V-20.5 Q-4.5 -23.5 0 -23.5 Q4.5 -23.5 4.5 -20.5 V-17 Z" fill="var(--acc-rose)" {...stroke} />
+        <rect x="-4.5" y="-17" width="9" height="4.5" fill="var(--acc-silver)" {...stroke} />
+        <rect x="-4.5" y="-12.5" width="9" height="24.5" fill="var(--acc-gold)" {...stroke} />
+        <path d="M0 -12.5 V12" fill="none" stroke="var(--acc-orange)" strokeWidth="1.6" />
+        <path d="M-4.5 12 L0 22.5 L4.5 12 Z" fill="var(--acc-wood)" {...stroke} />
+        <path d="M-1.8 18.2 L0 22.5 L1.8 18.2 Z" fill={LINE} />
+      </g>
+    </g>
+  ),
+  house: (
+    <g>
+      <rect x="42.5" y="11" width="7.5" height="16" rx="1.8" fill="var(--acc-wood)" {...stroke} />
+      <rect x="41" y="9" width="10.5" height="3.8" rx="1.5" fill="var(--acc-silver)" {...stroke} />
+      <rect x="12" y="30" width="40" height="29.5" rx="2.5" fill="var(--acc-cream)" {...stroke} />
+      <path d="M17.5 59.5 V42.5 Q17.5 38 22.5 38 Q27.5 38 27.5 42.5 V59.5 Z" fill="var(--acc-wood)" {...stroke} />
+      <circle cx="24.5" cy="49.5" r="1.6" fill="var(--acc-gold)" />
+      <rect x="33.5" y="38.5" width="13" height="12.5" rx="2.2" fill="var(--acc-sky)" {...stroke} />
+      <path d="M40 38.5 V51 M33.5 44.8 H46.5" fill="none" {...fine} />
+      <rect x="32" y="50.8" width="16" height="3" rx="1.4" fill="var(--acc-wood)" {...thin} />
+      <path d="M5.5 32 L30.2 9.8 Q32 8.2 33.8 9.8 L58.5 32 Q59.5 33 58 34 H6 Q4.5 33 5.5 32 Z" fill="var(--acc-coral)" {...stroke} />
+      <path d="M12.5 29.5 L31 13" fill="none" stroke="var(--acc-rose)" strokeWidth="2.2" strokeLinecap="round" strokeOpacity="0.65" />
+    </g>
+  ),
+  bench: (
+    <g>
+      <path d="M46.5 59.5 L47.2 34 H51.8 L52.5 59.5 Z" fill="var(--acc-wood)" {...stroke} />
+      <path
+        d="M38.5 28.5 C36.5 24 38.5 18.5 42.5 17 C43.5 11.5 47.5 9.5 51.8 10.8 C55.5 12 57.8 15.5 57.2 19.5 C60 22 60 28 56.8 31.5 C54.5 34 51 34.5 48.2 33.8 C44 35.2 39.8 33 38.5 28.5 Z"
+        fill="var(--acc-leaf)"
+        {...stroke}
+      />
+      <path d="M43.5 16.5 Q45.8 12.8 50 13.2" fill="none" stroke="var(--acc-mint)" strokeWidth="2.2" strokeLinecap="round" />
+      <rect x="8.5" y="31" width="4.4" height="28.5" rx="1.8" fill="var(--acc-navy)" {...stroke} />
+      <rect x="31.1" y="31" width="4.4" height="28.5" rx="1.8" fill="var(--acc-navy)" {...stroke} />
+      {BENCH_SLATS.map((y) => (
+        <rect key={y} x="5" y={y} width="34" height="5" rx="2" fill="var(--acc-wood)" {...stroke} />
+      ))}
+      <path d="M6 46 H38 L40 50 H4 Z" fill="var(--acc-wood)" {...stroke} />
+      <path d="M9 48 H35" fill="none" stroke="var(--acc-cream)" strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.45" />
+      <rect x="4" y="49.5" width="36" height="3.6" rx="1.5" fill="var(--acc-wood)" {...stroke} />
+    </g>
+  ),
+  'money-bag': (
+    <g>
+      <circle cx="24" cy="14" r="5.5" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="40" cy="14" r="5.5" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="32" cy="11.5" r="6" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="32" cy="11.5" r="3.4" fill="none" stroke="var(--acc-orange)" strokeWidth="1.4" />
+      <path d="M22.5 23 L17.5 15 Q24.5 18 32 16.5 Q39.5 18 46.5 15 L41.5 23 Z" fill="var(--acc-cream)" {...stroke} />
+      <path
+        d="M22.5 23 C14 28 9 37 9 46.5 C9 55.5 16.5 59.5 32 59.5 C47.5 59.5 55 55.5 55 46.5 C55 37 50 28 41.5 23 Z"
+        fill="var(--acc-cream)"
+        {...stroke}
+      />
+      <path d="M13 51.5 Q32 57.5 51 51.5 Q47.5 57.8 32 58.2 Q16.5 57.8 13 51.5 Z" fill="var(--acc-silver)" fillOpacity="0.4" />
+      <path d="M26 27.5 Q24 31 22.5 33 M38 27.5 Q40 31 41.5 33" fill="none" stroke={LINE} strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.4" />
+      <path d="M42.5 24.5 L48.5 22 L47 26.5 Z M42 25.5 L49 28.5 L45 30 Z" fill="var(--acc-coral)" {...thin} />
+      <rect x="20.5" y="21.5" width="23" height="5" rx="2.5" fill="var(--acc-coral)" {...stroke} />
+      <circle cx="32" cy="43" r="9.2" fill="var(--acc-gold)" {...stroke} />
+      <circle cx="32" cy="43" r="5.6" fill="none" stroke="var(--acc-orange)" strokeWidth="1.8" />
+      <path d="M26.5 39.2 A6.8 6.8 0 0 1 30.8 36.6" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
+    </g>
+  ),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
