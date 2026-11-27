@@ -239,7 +239,7 @@
         "panels": [
           {"scene": "solo", "actors": [{"cast": "local", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole", "document"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "窒礙難行"},
           {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "council", "pose": "sit", "facing": "left"}], "props": ["envelope"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "30 日內"},
-          {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "三分之二"},
+          {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "council", "pose": "sit", "mood": "oops", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "三分之二"},
           {"scene": "solo", "actors": [{"cast": "council", "pose": "sit", "facing": "right"}], "props": ["document", "eraser"], "text": {"from": "line", "face": 4, "line": 1}, "sign": "自己修正"}
         ] }
     },
@@ -346,7 +346,7 @@
       "comic": { "layout": "story",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["document"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "自治綱要"},
-          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "首次民選"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["document", "ballot-box"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "1994 年"},
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["office", "scissors"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "精省"},
           {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["stamp", "calendar"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "地方制度法"}
         ] }
