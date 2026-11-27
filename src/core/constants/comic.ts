@@ -55,6 +55,10 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
   house: '房子',
   bench: '公園長椅',
   'money-bag': '錢袋',
+  bridge: '拱橋',
+  phone: '手機',
+  fish: '魚',
+  whale: '虎鯨',
 };
 
 /**
