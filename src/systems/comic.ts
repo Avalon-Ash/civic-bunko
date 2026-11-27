@@ -24,6 +24,8 @@ export function resolveComicText(card: CardText, ref: ComicTextRef): string | nu
 export interface ComicPanelText {
   text: string;
   sign: string | null;
+  /** 這格是誰、哪一項；沒指或指不到是 null */
+  label: string | null;
 }
 
 /** 一格要顯示的字；資料壞了（指不到）回 null，畫面就不畫那句 */
@@ -31,7 +33,8 @@ export function comicPanelText(card: CardText, panel: ComicPanel): ComicPanelTex
   const text = resolveComicText(card, panel.text);
   if (text === null) return null;
   const sign = panel.sign !== undefined && text.includes(panel.sign) ? panel.sign : null;
-  return { text, sign };
+  const label = panel.label ? resolveComicText(card, panel.label) : null;
+  return { text, sign, label };
 }
 
 /** 這張卡的漫畫資料哪裡不對（空陣列＝沒問題）；給驗證與看圖頁用 */
@@ -63,6 +66,11 @@ export function comicProblems(card: StudyCard): string[] {
     }
     for (const prop of panel.props) {
       if (!COMIC_PROPS[prop]) out.push(`${at}的道具 ${prop} 不在清單裡`);
+    }
+    if (panel.label) {
+      if (resolveComicText(card, panel.label) === null) out.push(`${at}的標籤指不到原文（${JSON.stringify(panel.label)}）`);
+    } else if (layout.needsLabel) {
+      out.push(`${at}沒有標籤：${comic.layout} 每一格都要標出是哪一項`);
     }
     const text = resolveComicText(card, panel.text);
     if (text === null) {

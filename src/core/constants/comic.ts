@@ -3,13 +3,16 @@
 // 漫畫沒有自己的字數上限：字都是卡片原文，受 constants/cards.ts 管。
 import type { ComicCast, ComicLayout, ComicPropId, ComicSceneId, Outfit } from '../types';
 
-/** 每種版型：幾格（上下限）、怎麼排 */
-export const COMIC_LAYOUTS: Readonly<Record<ComicLayout, { name: string; min: number; max: number }>> = {
-  story: { name: '起承轉合', min: 4, max: 4 },
-  timeline: { name: '時間軸', min: 2, max: 5 },
-  versus: { name: '左右對照', min: 2, max: 4 },
-  ladder: { name: '上到下', min: 2, max: 4 },
-  lineup: { name: '排排站', min: 2, max: 5 },
+/**
+ * 每種版型：幾格（上下限）、每格要不要標籤（label）。
+ * 排排站的每一格是並列的一項（修憲、罷免…），帶數字的那行不含項目名稱，所以要另外指一個標籤。
+ */
+export const COMIC_LAYOUTS: Readonly<Record<ComicLayout, { name: string; min: number; max: number; needsLabel: boolean }>> = {
+  story: { name: '起承轉合', min: 4, max: 4, needsLabel: false },
+  timeline: { name: '時間軸', min: 2, max: 5, needsLabel: false },
+  versus: { name: '左右對照', min: 2, max: 4, needsLabel: false },
+  ladder: { name: '上到下', min: 2, max: 4, needsLabel: false },
+  lineup: { name: '排排站', min: 2, max: 5, needsLabel: true },
 };
 
 /** story 版型四格的角標（引擎的介面字，不是內容） */
@@ -41,10 +44,14 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
 
 /**
  * 角色：同一個角色在每張卡都穿一樣，她一看就知道誰是誰。
- * agency＝機關（領帶＋單片眼鏡、灰毛）；citizen＝人民（毛帽、橘毛）；official＝公務員（領結＋學士帽、銀虎斑）。
+ * agency＝機關（領帶＋單片眼鏡、灰毛）；citizen＝人民（毛帽、橘毛）；official＝公務員（領結＋學士帽、銀虎斑）；
+ * council＝民意代表（立委、議員：貝雷帽、暹羅）；local＝地方政府（頭巾、三花）。
+ * 格子小（列表小圖 72px），所以靠毛色＋頭頂的輪廓分辨，臉上的小配件只是加分。
  */
 export const COMIC_CASTS: Readonly<Record<ComicCast, { name: string; outfit: Outfit }>> = {
   agency: { name: '機關', outfit: { neck: 'necktie', 'face-mid': 'monocle', fur: 'fur-gray' } },
   citizen: { name: '人民', outfit: { 'head-top': 'beanie', fur: 'fur-orange' } },
   official: { name: '公務員', outfit: { neck: 'bowtie', 'head-top': 'grad-cap', fur: 'fur-silver' } },
+  council: { name: '民意代表', outfit: { 'head-top': 'beret', fur: 'fur-siamese' } },
+  local: { name: '地方政府', outfit: { 'head-top': 'hachimaki', fur: 'fur-calico' } },
 };

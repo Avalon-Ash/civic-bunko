@@ -234,7 +234,7 @@ export type ComicPropId =
   | 'target'
   | 'door';
 /** 角色（同一個角色在每張卡都穿一樣；穿著在 constants/comic.ts 的 COMIC_CASTS） */
-export type ComicCast = 'agency' | 'citizen' | 'official';
+export type ComicCast = 'agency' | 'citizen' | 'official' | 'council' | 'local';
 /** 格子裡的字：指向卡片原文的指標，不是字串（pick＝那一行的子字串） */
 export type ComicTextRef =
   | { from: 'hook' }
@@ -252,6 +252,8 @@ export interface ComicPanel {
   props: ComicPropId[];
   /** 這格的一句話 */
   text: ComicTextRef;
+  /** 這格是誰、哪一項（例：面的標題「修憲」）；遮起來想時照樣顯示，當回想的提示 */
+  label?: ComicTextRef;
   /** 舉牌上的大字：必須是 text 解析出來那句話的子字串 */
   sign?: string;
 }

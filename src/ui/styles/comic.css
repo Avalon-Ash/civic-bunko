@@ -7,12 +7,47 @@
   margin: 4px 0 8px;
 }
 
+/* 上到下：一層一列（圖在左、字在右），每往下一層往右退一階，像樓梯 */
 .cb-comic-ladder {
   grid-template-columns: 1fr;
+  gap: 8px;
 }
 
+.cb-comic-ladder .cb-comic-panel {
+  flex-direction: row;
+  align-items: center;
+  margin-inline-start: calc(var(--cb-comic-i, 0) * var(--cb-comic-step));
+  --cb-comic-step: 7%;
+}
+
+.cb-comic-ladder .cb-comic-art {
+  flex: none;
+  width: 42%;
+}
+
+/* 排排站：一列幾格由 ComicStrip 算（--cb-comic-cols）；窄螢幕最多兩格 */
 .cb-comic-lineup {
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  grid-template-columns: repeat(var(--cb-comic-cols, 2), minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (max-width: 360px) {
+  .cb-comic-lineup {
+    grid-template-columns: repeat(min(var(--cb-comic-cols, 2), 2), minmax(0, 1fr));
+  }
+}
+
+/* 這格是哪一項（排排站的「修憲」「罷免總統」）：遮起來想時照樣顯示 */
+.cb-comic-label {
+  display: block;
+  padding: 3px 6px;
+  text-align: center;
+  font-weight: 800;
+  font-size: var(--text-small);
+  line-height: 1.3;
+  color: var(--ink);
+  background: var(--butter);
+  border-bottom: var(--border-w) solid var(--line);
 }
 
 .cb-comic-column {

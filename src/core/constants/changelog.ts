@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-27-comic-numbers',
+    date: '2026-11-27',
+    title: '數字卡也有漫畫了：憲法上的門檻數字',
+    items: [
+      '「憲法上的門檻數字」最上面多了一排小貓舉牌：修憲、罷免總統、彈劾總統、不信任案與解散，各舉著要背的數字',
+      '戴貝雷帽的暹羅貓是立委（民意代表）；打開「遮起來想」時，數字蓋住、每格上面的項目名稱留著，看名稱想數字',
+    ],
+  },
+  {
     id: '2026-11-27-comic-trial',
     date: '2026-11-27',
     title: '圖卡試畫四格漫畫（3 張）',

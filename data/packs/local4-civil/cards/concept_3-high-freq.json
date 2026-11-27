@@ -698,7 +698,14 @@
         { "law": "中華民國憲法增修條文", "article": "2" }
       ],
       "essay": null,
-      "questions": ["113-general-law-english-q09"]
+      "questions": ["113-general-law-english-q09"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "yay"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["document"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "3/4 決議"},
+          {"scene": "duo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "stand", "facing": "left"}], "props": ["envelope"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "2/3 同意"},
+          {"scene": "prop-big", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}], "props": ["courthouse"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "2/3 以上"},
+          {"scene": "solo", "actors": [{"cast": "council", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["door", "calendar"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 1}, "sign": "10 日內"}
+        ] }
     },
     {
       "id": "concept-con-five-yuan",

@@ -65,11 +65,20 @@ function panelPlace(comic: CardComic, i: number): CSSProperties | undefined {
   return { gridColumn: left ? 1 : 2, gridRow: (left ? i : i - half) + 2 };
 }
 
+/** 排排站一列最多幾格：再多一格在手機上每格不到 100px，舉牌與說明都擠 */
+const LINEUP_MAX_COLS = 3;
+/** 排排站一列放幾格：4 格排成 2×2，不要 3＋1 落單 */
+function lineupColumns(count: number): number {
+  return count === 4 ? 2 : Math.min(count, LINEUP_MAX_COLS);
+}
+
 export function ComicStrip({ card, hidden = false, revealed, onReveal }: ComicStripProps) {
   const { comic } = card;
   const columns = comic.columns?.map((ref) => resolveComicText(card, ref));
+  const gridStyle =
+    comic.layout === 'lineup' ? ({ '--cb-comic-cols': lineupColumns(comic.panels.length) } as CSSProperties) : undefined;
   return (
-    <div className={`cb-comic cb-comic-${comic.layout}`}>
+    <div className={`cb-comic cb-comic-${comic.layout}`} style={gridStyle}>
       {columns
         ? columns.map((title, i) => (
             <div key={`c${i}`} className="cb-comic-column" style={{ gridColumn: i + 1, gridRow: 1 }}>
@@ -83,6 +92,7 @@ export function ComicStrip({ card, hidden = false, revealed, onReveal }: ComicSt
         const beat = comic.layout === 'story' ? COMIC_STORY_BEATS[i] : comic.layout === 'timeline' ? String(i + 1) : null;
         const body = (
           <>
+            {view?.label ? <span className="cb-comic-label">{view.label}</span> : null}
             <ComicPanelArt panel={panel} sign={view?.sign} hideSign={covered} />
             <span className="cb-comic-caption">
               {beat ? <b className="cb-comic-beat">{beat}</b> : null}

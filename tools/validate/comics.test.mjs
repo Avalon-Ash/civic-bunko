@@ -77,3 +77,16 @@ test('卡片的 questions：每個題號都在該包的官方題庫裡、不重�
     }
   }
 });
+
+test('格子的標籤（誰、哪一項）：指不到原文會被抓到；排排站每一格都要有標籤', () => {
+  const { card } = withComic[0];
+  const bad = structuredClone(card);
+  bad.comic.panels[0].label = { from: 'heading', face: 99 };
+  assert.ok(comicProblems(bad).some((p) => p.includes('標籤')));
+  const lineup = structuredClone(card);
+  lineup.comic = { layout: 'lineup', panels: lineup.comic.panels.slice(0, 2).map(({ label, ...p }) => p) };
+  assert.ok(comicProblems(lineup).some((p) => p.includes('標籤')));
+  lineup.comic.panels = lineup.comic.panels.map((p) => ({ ...p, label: { from: 'heading', face: 0 } }));
+  assert.deepEqual(comicProblems(lineup), []);
+  assert.equal(comicPanelText(lineup, lineup.comic.panels[0]).label, card.faces[0].heading);
+});

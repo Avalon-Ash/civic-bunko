@@ -44,6 +44,7 @@ interface ComicPanel {
   props: ComicPropId[];       // 道具（引擎的詞彙表）
   text: ComicTextRef;         // 這格的一句話：指標，不是字串
   sign?: string;              // 舉牌上的大字：必須是 text 那一行的子字串（例「30 日」）
+  label?: ComicTextRef;       // 這格是哪一項（例：面標題「修憲」）；遮起來想時照樣顯示。lineup 必填（2026-11-27 CC4a 加：帶數字的那行不含項目名稱）
 }
 type ComicTextRef =
   | { from: 'hook' }
