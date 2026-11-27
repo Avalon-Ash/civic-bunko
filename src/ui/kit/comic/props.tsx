@@ -105,10 +105,21 @@ const FISH_BODY =
 
 const WHALE_BODY =
   'M7.5 39 C7.5 28 16 24 27 24.5 C28 18 30 11 33 7.5 C34.5 6 36.2 7.2 36 10.5 C35.8 16 35.5 21 37.5 26.5 C43 29 46.5 34.5 49 36.5 C50.5 34 51.5 31 51.5 28.5 C48.5 27.5 45.5 24.5 46.5 21.8 C47.8 20 51.5 22 53.5 25.5 C56.5 23 60 23.5 60.2 26 C60.5 29 56.5 31.5 53.5 32.5 C52 38 49 44 45 49 H9.5 C7.5 46 7.5 42.5 7.5 39 Z';
-/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4d-props.md 會換掉並刪掉這個函式） */
-function draft(): ReactNode {
-  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
-}
+
+const SHOP_AWNING = [
+  [8, 17.6, 6, 16.4, true],
+  [17.6, 27.2, 16.4, 26.8, false],
+  [27.2, 36.8, 26.8, 37.2, true],
+  [36.8, 46.4, 37.2, 47.6, false],
+  [46.4, 56, 47.6, 58, true],
+] as const;
+
+const SHOP_SLATS = [33.5, 38.5, 43.5, 48.5, 53.5] as const;
+
+const MOUNTAIN_TREES = [
+  [13, 48, 5.8],
+  [51.5, 50.5, 4.8],
+] as const;
 
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
@@ -972,9 +983,91 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <path d="M11 53.5 Q16.5 51.5 22 53.5 Q27.5 55.5 33 53.5 M39.5 54.2 Q44.8 52.2 50 54.2 Q53 55.2 55.5 53.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.9" />
     </g>
   ),
-  mountain: draft(),
-  pie: draft(),
-  shop: draft(),
+  mountain: (
+    <g>
+      <path
+        d="M7 59.5 Q3.8 59.5 4.5 56.5 C11 44 18.5 11 25 11 C31.5 11 39 44 45.5 56.5 Q46.2 59.5 43 59.5 Z"
+        fill="var(--acc-leaf)"
+      />
+      <path
+        d="M16.2 25.1 C19.2 17.1 22.2 11 25 11 C27.8 11 30.8 17.1 33.8 25.1 Q31 29.2 28.2 25.8 Q25 30.8 21.8 25.8 Q19 29.2 16.2 25.1 Z"
+        fill="var(--acc-cream)"
+      />
+      <path d="M16.2 25.1 Q19 29.2 21.8 25.8 Q25 30.8 28.2 25.8 Q31 29.2 33.8 25.1" fill="none" {...thin} />
+      <path d="M10.5 46 Q13 38 15.8 31.5" fill="none" stroke="var(--acc-mint)" strokeWidth="2.4" strokeLinecap="round" strokeOpacity="0.7" />
+      <path
+        d="M7 59.5 Q3.8 59.5 4.5 56.5 C11 44 18.5 11 25 11 C31.5 11 39 44 45.5 56.5 Q46.2 59.5 43 59.5 Z"
+        fill="none"
+        {...stroke}
+      />
+      <path
+        d="M29.5 59.5 Q26.8 59.5 27.5 56.8 C32.5 48 38 29.5 43.5 29.5 C49 29.5 54.5 48 59.5 56.8 Q60.2 59.5 57.5 59.5 Z"
+        fill="var(--acc-leaf)"
+        {...stroke}
+      />
+      <path d="M33.8 46.5 Q36.8 38 41.5 34" fill="none" stroke="var(--acc-mint)" strokeWidth="2.2" strokeLinecap="round" strokeOpacity="0.7" />
+      {MOUNTAIN_TREES.map(([cx, cy, r]) => (
+        <g key={cx}>
+          <rect x={cx - 1.6} y={cy + r - 1.5} width="3.2" height={59.5 - (cy + r - 1.5)} rx="1.2" fill="var(--acc-wood)" {...thin} />
+          <circle cx={cx} cy={cy} r={r} fill="var(--acc-mint)" {...thin} />
+        </g>
+      ))}
+    </g>
+  ),
+  pie: (
+    <g>
+      <ellipse cx="32" cy="44" rx="26.5" ry="15.5" fill="var(--acc-silver)" {...stroke} />
+      <ellipse cx="32" cy="41" rx="27.5" ry="16" fill="var(--acc-silver)" {...stroke} />
+      <ellipse cx="32" cy="41" rx="21.5" ry="12.2" fill="var(--acc-cream)" fillOpacity="0.35" stroke={LINE} strokeWidth="1.2" strokeOpacity="0.3" />
+      <path d="M21.5 31 H37.5 V37.8 H21.5 Z" fill="var(--acc-coral)" />
+      <path d="M21.5 35.8 H37.5 V37.8 H21.5 Z" fill="var(--acc-gold)" />
+      <path d="M21.5 31 H37.5 V37.8 H21.5 Z" fill="none" {...stroke} />
+      <path d="M35.1 37.3 A16 11.8 0 0 1 5.5 31 V37.8 A16 11.8 0 0 0 35.1 44.1 Z" fill="var(--acc-orange)" {...stroke} />
+      <path d="M21.5 31 L35.1 37.3 A16 11.8 0 1 1 37.5 31 Z" fill="var(--acc-gold)" />
+      <path d="M21.5 31 L32.2 35.9 A12.6 9.2 0 1 1 34.1 31 Z" fill="var(--acc-coral)" />
+      <path d="M32.2 35.9 A12.6 9.2 0 1 1 34.1 31" fill="none" {...fine} />
+      <path d="M12.2 28.4 A10 7 0 0 1 20.5 24" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.8" />
+      <path d="M21.5 31 L35.1 37.3 A16 11.8 0 1 1 37.5 31 Z" fill="none" {...stroke} />
+      <path d="M57.5 35.2 A16 11.8 0 0 1 55.1 41.5 V48.3 A16 11.8 0 0 0 57.5 42 Z" fill="var(--acc-orange)" {...stroke} />
+      <path d="M41.5 35.2 L55.1 41.5 V48.3 L41.5 42 Z" fill="var(--acc-coral)" />
+      <path d="M41.5 40 L55.1 46.3 V48.3 L41.5 42 Z" fill="var(--acc-gold)" />
+      <path d="M41.5 35.2 L55.1 41.5 V48.3 L41.5 42 Z" fill="none" {...stroke} />
+      <path d="M41.5 35.2 H57.5 A16 11.8 0 0 1 55.1 41.5 Z" fill="var(--acc-gold)" />
+      <path d="M41.5 35.2 H54.1 A12.6 9.2 0 0 1 52.2 40.1 Z" fill="var(--acc-coral)" />
+      <path d="M54.1 35.2 A12.6 9.2 0 0 1 52.2 40.1" fill="none" {...fine} />
+      <path d="M41.5 35.2 H57.5 A16 11.8 0 0 1 55.1 41.5 Z" fill="none" {...stroke} />
+    </g>
+  ),
+  shop: (
+    <g>
+      <rect x="10" y="13" width="44" height="46.5" rx="2.5" fill="var(--acc-cream)" {...stroke} />
+      <rect x="8" y="8" width="48" height="6" rx="2.2" fill="var(--acc-wood)" {...stroke} />
+      <rect x="15" y="27.5" width="34" height="32" rx="1.5" fill="var(--acc-silver)" {...stroke} />
+      {SHOP_SLATS.map((y) => (
+        <path key={y} d={`M16.5 ${y} H47.5`} fill="none" stroke={LINE} strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.65" />
+      ))}
+      <rect x="15" y="56" width="34" height="3.5" rx="0.8" fill="var(--acc-silver)" {...thin} />
+      <path d="M28.5 57.8 H35.5" fill="none" {...stroke} />
+      {SHOP_AWNING.map(([tx0, tx1, bx0, bx1, red]) => (
+        <path
+          key={tx0}
+          d={`M${tx0} 14 H${tx1} L${bx1} 24.5 A5.2 4.6 0 0 1 ${bx0} 24.5 Z`}
+          fill={red ? 'var(--acc-coral)' : 'var(--acc-cream)'}
+          {...thin}
+        />
+      ))}
+      <path
+        d="M8 14 H56 L58 24.5 A5.2 4.6 0 0 1 47.6 24.5 A5.2 4.6 0 0 1 37.2 24.5 A5.2 4.6 0 0 1 26.8 24.5 A5.2 4.6 0 0 1 16.4 24.5 A5.2 4.6 0 0 1 6 24.5 Z"
+        fill="none"
+        {...stroke}
+      />
+      <g transform="translate(32 43.5) rotate(-18)">
+        <rect x="-18" y="-4.8" width="36" height="9.6" rx="1.6" fill="var(--acc-coral)" {...stroke} />
+        <path d="M-12.5 0 H-4.5 M4.5 0 H12.5" fill="none" stroke="var(--acc-cream)" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="0" cy="0" r="2" fill="var(--acc-cream)" />
+      </g>
+    </g>
+  ),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
