@@ -27,7 +27,14 @@
         { "heading": "作文：結論", "lines": ["好的設計讓人自發持續參與", "工具是中性的，關鍵在規劃者的初衷"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "115-general-chinese", "no": 1 }
+      "essay": { "paperId": "115-general-chinese", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["phone"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "觸發"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "hop", "mood": "yay", "facing": "right"}], "props": ["phone"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "行動"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["coins", "hourglass"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "不確定的回報"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "mood": "yay", "facing": "right"}], "props": ["calendar"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "好習慣"}
+        ] }
     },
     {
       "id": "essay-114-general-chinese-1",
@@ -48,7 +55,14 @@
         { "heading": "作文：結論", "lines": ["臺灣是移民社會，多元是資產", "以開放而審慎的態度面對"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "114-general-chinese", "no": 1 }
+      "essay": { "paperId": "114-general-chinese", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["fence", "fish"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "預防最有效"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "yay", "facing": "right"}], "props": ["fish", "coins"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "臺灣鯛"},
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["fish"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "入侵種"},
+          {"scene": "crowd", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "yay"}, {"cast": "council", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["house"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "多元是資產"}
+        ] }
     },
     {
       "id": "essay-114-local4-chinese-1",
@@ -69,7 +83,14 @@
         { "heading": "作文：結論", "lines": ["好政策要有善意，也要有周延的規劃", "扣回公務：執行前先想清楚後果"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "114-local4-chinese", "no": 1 }
+      "essay": { "paperId": "114-local4-chinese", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "right"}], "props": ["whale"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "同情心"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["fence", "whale"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "只禁演"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "loaf", "mood": "sleepy", "facing": "right"}], "props": ["coins", "hourglass"], "text": {"from": "line", "face": 3, "line": 1}, "sign": "養成依賴"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["magnifier", "document"], "text": {"from": "line", "face": 3, "line": 2}, "sign": "事前評估"}
+        ] }
     },
     {
       "id": "essay-113-general-chinese-1",
@@ -86,7 +107,14 @@
         { "heading": "結論", "lines": ["期許持續精進，把超越變成習慣", "扣回公務：終身學習，把服務做得更好"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "113-general-chinese", "no": 1 }
+      "essay": { "paperId": "113-general-chinese", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "sleepy", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "比較的對象是自己"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["magnifier", "test-paper"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "見聞更廣"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole"], "text": {"from": "line", "face": 2, "line": 1}, "sign": "挫折與堅持"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["coins", "calendar"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "每天一點點的累積"}
+        ] }
     },
     {
       "id": "essay-113-local4-chinese-1",
@@ -106,7 +134,14 @@
         { "heading": "作答提醒", "lines": ["限 300 字：定義、分析、結論各一段", "不要重講故事，直接分析"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "113-local4-chinese", "no": 1 }
+      "essay": { "paperId": "113-local4-chinese", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "run", "facing": "right"}], "props": ["hourglass"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "把事做好"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "做對的事"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "run", "facing": "left"}], "props": ["target"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "離楚國越來越遠"},
+          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "效能卻是零"}
+        ] }
     },
     {
       "id": "essay-113-local4-chinese-2",
@@ -132,7 +167,14 @@
         { "heading": "結論", "lines": ["方向與方法兼備，努力才會有成果", "扣回公務：依法、便民、有效"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "113-local4-chinese", "no": 2 }
+      "essay": { "paperId": "113-local4-chinese", "no": 2 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "mood": "oops", "facing": "right"}], "props": ["hourglass"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "不等於有收穫"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "sit", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "先問目標"},
+          {"scene": "crowd", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "stand"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 2, "line": 1}, "sign": "分工、時程、檢查"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["target", "coins"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "方向與方法兼備"}
+        ] }
     }
   ]
 }

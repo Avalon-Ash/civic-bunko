@@ -33,7 +33,7 @@
           {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "不是地方自治團體"},
           {"scene": "duo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "sit", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "任期 4 年"},
           {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "指揮監督"},
-          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["bench"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "橋樑"}
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["bridge"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "橋樑"}
         ] }
     },
     {
@@ -64,7 +64,14 @@
         { "law": "地方制度法", "article": "24" },
         { "law": "地方制度法", "article": "24-1" }
       ],
-      "essay": { "paperId": "115-general-local-gov", "no": 2 }
+      "essay": { "paperId": "115-general-local-gov", "no": 2 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["bridge"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "跨轄區"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "left"}, {"cast": "local", "pose": "stand", "facing": "right"}], "props": ["fence"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "本位主義"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "mood": "oops", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["money-bag"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "難有共識"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["coins"], "text": {"from": "line", "face": 4, "line": 1}, "sign": "優先補助"}
+        ] }
     },
     {
       "id": "essay-114-general-local-gov-1",
@@ -97,7 +104,14 @@
         { "law": "地方制度法", "article": "30" },
         { "law": "地方制度法", "article": "32" }
       ],
-      "essay": { "paperId": "114-general-local-gov", "no": 1 }
+      "essay": { "paperId": "114-general-local-gov", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "自治條例"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["ticket", "coins"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "10 萬元"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["torn-paper"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "無效"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["calendar", "document"], "text": {"from": "line", "face": 4, "line": 1}, "sign": "第 3 日生效"}
+        ] }
     },
     {
       "id": "essay-114-general-local-gov-2",
@@ -126,7 +140,14 @@
         { "law": "地方制度法", "article": "53" },
         { "law": "地方制度法", "article": "79" }
       ],
-      "essay": { "paperId": "114-general-local-gov", "no": 2 }
+      "essay": { "paperId": "114-general-local-gov", "no": 2 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "對外不負責"},
+          {"scene": "solo", "actors": [{"cast": "council", "pose": "sit", "facing": "right"}], "props": ["umbrella", "calendar"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "不得逮捕拘禁"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["handcuffs"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "現行犯、通緝犯"},
+          {"scene": "solo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}], "props": ["fence", "office"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "不得兼任"}
+        ] }
     },
     {
       "id": "essay-114-local4-local-gov-1",
@@ -151,7 +172,14 @@
         { "law": "地方制度法", "article": "40" },
         { "law": "地方制度法", "article": "43" }
       ],
-      "essay": { "paperId": "114-local4-local-gov", "no": 1 }
+      "essay": { "paperId": "114-local4-local-gov", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "分別由人民選出"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["scale"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "互相制衡"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}], "props": ["courthouse", "envelope"], "text": {"from": "line", "face": 3, "line": 1}, "sign": "聲請司法院解釋"},
+          {"scene": "crowd", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}, {"cast": "agency", "pose": "stand"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "協商決定"}
+        ] }
     },
     {
       "id": "essay-114-local4-local-gov-2",
@@ -176,7 +204,14 @@
         { "law": "地方制度法", "article": "16" },
         { "law": "地方制度法", "article": "17" }
       ],
-      "essay": { "paperId": "114-local4-local-gov", "no": 2 }
+      "essay": { "paperId": "114-local4-local-gov", "no": 2 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "設籍"},
+          {"scene": "crowd", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "stand"}, {"cast": "citizen", "pose": "stand", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "居民意思決定"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["office", "stamp"], "text": {"from": "line", "face": 3, "line": 1}, "sign": "自己機關"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["house"], "text": {"from": "line", "face": 4, "line": 1}, "sign": "兩者結合"}
+        ] }
     },
     {
       "id": "essay-113-general-local-gov-1",
@@ -199,7 +234,14 @@
       "lawRefs": [
         { "law": "地方制度法", "article": "39" }
       ],
-      "essay": { "paperId": "113-general-local-gov", "no": 1 }
+      "essay": { "paperId": "113-general-local-gov", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole", "document"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "窒礙難行"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["envelope"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "30 日內"},
+          {"scene": "duo", "actors": [{"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "三分之二"},
+          {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "council", "pose": "stand"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 4, "line": 1}, "sign": "復議"}
+        ] }
     },
     {
       "id": "essay-113-general-local-gov-2",
@@ -226,7 +268,14 @@
         { "heading": "檢討與結論", "lines": ["監察院要求建立成果績效評估機制", "人口外流未完全扭轉，仍依賴補助", "114 年起接續「永續共好」計畫"] }
       ],
       "lawRefs": [],
-      "essay": { "paperId": "113-general-local-gov", "no": 2 }
+      "essay": { "paperId": "113-general-local-gov", "no": 2 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["document", "calendar"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "108 年"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "walk", "mood": "yay", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["house"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "青年培力工作站"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["magnifier", "document"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "績效評估"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["bench", "calendar"], "text": {"from": "line", "face": 4, "line": 2}, "sign": "永續共好"}
+        ] }
     },
     {
       "id": "essay-113-local4-local-gov-1",
@@ -255,7 +304,14 @@
         { "law": "地方制度法", "article": "29" },
         { "law": "地方制度法", "article": "30" }
       ],
-      "essay": { "paperId": "113-local4-local-gov", "no": 1 }
+      "essay": { "paperId": "113-local4-local-gov", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["ballot-box"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "地方立法機關通過"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "sit", "facing": "right"}], "props": ["document", "stamp"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "地方行政機關"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["stamp"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 2}, "sign": "核定後發布"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["crown", "torn-paper"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 0}, "sign": "不得牴觸"}
+        ] }
     },
     {
       "id": "essay-113-local4-local-gov-2",
@@ -286,7 +342,14 @@
         { "law": "地方制度法", "article": "24-1" },
         { "law": "地方制度法", "article": "83-2" }
       ],
-      "essay": { "paperId": "113-local4-local-gov", "no": 2 }
+      "essay": { "paperId": "113-local4-local-gov", "no": 2 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["document"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "自治綱要"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "local", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "首次民選"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["office", "scissors"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "精省"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["document", "stamp"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "地方制度法"}
+        ] }
     }
   ]
 }
