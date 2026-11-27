@@ -454,7 +454,8 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   ),
   scale: (
     <g>
-      <path d="M13.5 17.5 L6.5 37 M13.5 17.5 L20.5 37 M50.5 17.5 L43.5 37 M50.5 17.5 L57.5 37" fill="none" {...thin} />
+      <path d="M13.5 17.5 L6.5 37 M13.5 17.5 L20.5 37 M50.5 17.5 L43.5 37 M50.5 17.5 L57.5 37" fill="none" stroke="var(--acc-gold)" strokeWidth="3" strokeLinecap="round" />
+      <path d="M13.5 17.5 L6.5 37 M13.5 17.5 L20.5 37 M50.5 17.5 L43.5 37 M50.5 17.5 L57.5 37" fill="none" {...fine} />
       <rect x="29.5" y="16" width="5" height="33" rx="2" fill="var(--acc-gold)" {...stroke} />
       <path d="M22 54 Q23 48 32 48 Q41 48 42 54 Z" fill="var(--acc-gold)" {...stroke} />
       <rect x="16" y="54" width="32" height="5.5" rx="2.5" fill="var(--acc-wood)" {...stroke} />
@@ -487,9 +488,9 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
           <circle cx={cx} cy="49.9" r="1.2" fill="var(--acc-silver)" />
         </g>
       ))}
-      <circle cx="32" cy="40.8" r="11.5" fill="var(--acc-coral)" {...stroke} />
-      <circle cx="32" cy="40.8" r="7.5" fill="var(--acc-cream)" {...fine} />
-      <path d="M26.8 35.6 L37.2 46" fill="none" stroke="var(--acc-coral)" strokeWidth="3.4" strokeLinecap="round" />
+      <circle cx="32" cy="40.8" r="7.5" fill="var(--acc-coral)" {...thin} />
+      <circle cx="32" cy="40.8" r="4.8" fill="var(--acc-cream)" {...fine} />
+      <path d="M28.8 37.6 L35.2 44" fill="none" stroke="var(--acc-coral)" strokeWidth="2.4" strokeLinecap="round" />
     </g>
   ),
   umbrella: (

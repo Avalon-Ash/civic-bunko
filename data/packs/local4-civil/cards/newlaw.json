@@ -33,9 +33,9 @@
       "questions": ["114-general-local-gov-q08"],
       "comic": { "layout": "lineup",
         "panels": [
-          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"},{"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "行政院備查"},
-          {"scene": "crowd", "actors": [{"cast": "local", "pose": "stand", "facing": "right"},{"cast": "local", "pose": "stand"},{"cast": "local", "pose": "stand", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "第 14 職等"},
-          {"scene": "crowd", "actors": [{"cast": "official", "pose": "sit", "facing": "right"},{"cast": "official", "pose": "sit"},{"cast": "official", "pose": "sit", "facing": "left"}], "props": ["document"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "副秘書長 3 人"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "行政院備查"},
+          {"scene": "crowd", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "第 14 職等"},
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}, {"cast": "official", "pose": "sit"}, {"cast": "official", "pose": "sit", "facing": "left"}], "props": ["document"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "副秘書長 3 人"},
           {"scene": "prop-big", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["office"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 0}, "sign": "第 13 職等"}
         ] }
     },
@@ -64,8 +64,8 @@
       "questions": ["115-general-local-gov-q11"],
       "comic": { "layout": "lineup",
         "panels": [
-          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"},{"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "內政部備查"},
-          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"},{"cast": "local", "pose": "stand", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "第 13 職等"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["envelope"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "內政部備查"},
+          {"scene": "duo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "第 13 職等"},
           {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "副秘書長 1 人"},
           {"scene": "prop-big", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["office"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "第 12 職等"}
         ] }
@@ -186,7 +186,7 @@
       "comic": { "layout": "lineup",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["coins"], "label": {"from": "line", "face": 0, "line": 0, "pick": "所得稅"}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "11%"},
-          {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["money-bag"], "label": {"from": "line", "face": 0, "line": 1, "pick": "營業稅"}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "全部"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["money-bag", "scissors"], "label": {"from": "line", "face": 0, "line": 1, "pick": "營業稅"}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "全部"},
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}], "props": ["coins"], "label": {"from": "line", "face": 0, "line": 2, "pick": "貨物稅"}, "text": {"from": "line", "face": 0, "line": 2}, "sign": "10%"},
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["fence"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 0}}
         ] }

@@ -169,8 +169,8 @@
       "comic": { "layout": "story",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "hop", "facing": "right"}], "props": ["calendar"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "始日不算"},
-          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "loaf", "mood": "sleepy"}], "props": ["calendar"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "下星期一上午"},
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"},{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["ticket"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "始日算一日"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "loaf", "mood": "sleepy"}], "props": ["calendar", "hourglass"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "下星期一上午"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["ticket", "calendar"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "始日算一日"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["scale"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "對人民有利"}
         ] }
     }

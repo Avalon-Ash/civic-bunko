@@ -188,6 +188,11 @@
   font-size: 0.8rem;
 }
 
+/* 換行時別讓最後一行只剩一個字（「上午」的「午」、「備查」的「查」）；不支援的瀏覽器照舊換行 */
+.cb-comic-text {
+  text-wrap: pretty;
+}
+
 .cb-comic-text.is-hidden {
   color: var(--ink-soft);
   border-bottom: 2px dashed var(--line);

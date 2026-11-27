@@ -1,6 +1,6 @@
 # 開案書：四格漫畫圖卡
 
-- 開案：2026-11-26，Fable 5.2（派工單 `docs/dispatch/CC0-comic-cards-plan.md`）。狀態：2026-11-27 凌晨照 §10 的預設動工。CC1（3 張樣張、遮起來想）、CC3（卡片↔官方題；樣張 3 張＋另外 21 張有法條的卡已掛題，主席逐題看過題幹）已上線；道具由 agy Neon 畫、Codex 審兩輪。樣張關卡 11-27 使用者回「可以，量產」；**CC4a（A 批 7 張）11-27 上午完成**：主席寫分鏡、agy Neon high 畫 7 個新道具（約 6 分鐘）、Codex 審圖一輪；含引擎補 `label`（排排站每格標項目名稱）、排排站與上到下的列式版面、角色加民意代表與地方政府。實測速率：分鏡加看圖每張約 10–15 分鐘，道具另外平行跑，所以 B 批 8 張不必砍。**2026-11-27 和 `docs/plans/ux-cleanup.md` 合併時程：逐日表以那份 §7 為準，考前目標 22 張（§6）；本檔其他節提到的「30 張」「每天 7–8 張」是合併前的算法，以 §6、§7 為準。**
+- 開案：2026-11-26，Fable 5.2（派工單 `docs/dispatch/CC0-comic-cards-plan.md`）。狀態：2026-11-27 凌晨照 §10 的預設動工。CC1（3 張樣張、遮起來想）、CC3（卡片↔官方題；樣張 3 張＋另外 21 張有法條的卡已掛題，主席逐題看過題幹）已上線；道具由 agy Neon 畫、Codex 審兩輪。樣張關卡 11-27 使用者回「可以，量產」；**CC4a（A 批 7 張）11-27 上午完成**：主席寫分鏡、agy Neon high 畫 7 個新道具（約 6 分鐘）、Codex 審圖一輪；含引擎補 `label`（排排站每格標項目名稱）、排排站與上到下的列式版面、角色加民意代表與地方政府。實測速率：分鏡加看圖每張約 10–15 分鐘，道具另外平行跑，所以 B 批 8 張不必砍。**CC4b（B 批 8 張）11-27 完成（分支 `claude/cc4b-comics-f4dea8`，待主席審）**：主席寫分鏡（8 張約 10 分鐘）、agy Neon high 畫 8 個新道具（天秤、柵欄、雨傘、放大鏡、考卷、房子、公園長椅、錢袋，約 5 分鐘）、Codex 審圖一輪（gpt-6.2-sol medium）；兩張換版型（§4）；格子文字加 `text-wrap: pretty`，換行不再剩一個字。Codex 意見沒照改的：雨傘那格「貓移到傘下」（構圖模板沒有重疊擺位）、考卷「像待辦清單」（格子上有「考試院」標籤）、營業稅加的是剪刀不是橡皮擦（橡皮擦已代表撤銷）；第二輪沒跑（Codex 週額度偏低，三條必改都照改）。**2026-11-27 和 `docs/plans/ux-cleanup.md` 合併時程：逐日表以那份 §7 為準，考前目標 22 張（§6）；本檔其他節提到的「30 張」「每天 7–8 張」是合併前的算法，以 §6、§7 為準。**
 - 需求來源：`docs/reference/comic-cards-request.md`（她的口述、主代理判讀、規格 → 卡片對照表、規格原文）。
 - 期限：可開發日 11-27 到 12-01（5 天）；12-02 起只修錯；考試 12-05、12-06。
 - 本檔裡的數字都附量法；沒量過的寫「估」。
@@ -272,7 +272,7 @@ type ComicTextRef =
 | CC3 卡片↔題目 | 11-29 | `StudyCard.questions`、`suggest-links.mjs`、`selectors/cardLinks.ts`、`startCardRound`（§2.5，不加 `RoundConfig` 欄位）、解析區的圖卡鈕（`QuestionParts.tsx`，模擬考作答中不顯示）、匯出一顆「刷這張卡的題」按鈕元件（由主席接進抽屜，避免和 CC2 改同一檔）。型別與指令（`types.ts`、`commands.ts`）由主席連同紅色測試先放進 `main`，執行代理不改這兩個檔；主席另審腳本列出的候選、寫 §2.6 第三份 ADR（執行代理不新增 ADR） | agy Neon high（`C:\Git\_wt_civic_comic_links`） | CC1 併入 |
 | CC4a 美術 A 批 | 11-29 | A 批 7 張（含數字型樣張與 `ladder`、`lineup` 版型）＋道具；更新紀錄 | 主席 | 樣張過關 |
 | CC2 排一排（2026-11-27 改成 `docs/plans/level-mode.md` 的連連看，不另做） | 11-30 | `systems/comicQuiz.ts`（純函式，給種子就固定）＋ `src/ui/components/cards/comic/*` 的排序與配對練習。主席先寫紅色測試 | agy Neon medium（`C:\Git\_wt_civic_comic_quiz`） | CC1 併入 |
-| CC4b 美術 B 批 | 11-30 | 8 張 | 主席 | CC4a |
+| CC4b 美術 B 批 | 11-30（11-27 完成） | 8 張 | 主席 | CC4a |
 | CC4c 美術 C 批前 4 | 12-01 上午 | `concept-pa-classic`、`concept-pa-three-new`、`concept-pa-leadership`、`concept-pa-ppp`；這四張的掛題由主席自己挑（行政學沒有法條可比對），來不及就先不掛、沒有「刷題」鈕 | 主席 | CC4b |
 | CC5 複習記號 | 12-01 上午 | 「該複習／熟了」：由 `Progress` 導出的 selector＋測試，加一個小元件放進 UX3 在列表上留的位置（不改 `CardsScreen.tsx`、`cards.css` 的版面）。中午前併不進來就留到考後 | agy Neon medium | CC3、UX3 併入 |
 | CC7 收尾 | 12-01 下午 | 全量驗收、兩種尺寸×日夜截圖、`docs/HANDOFF.md` 更新（含沒在實機驗到的）；和 UX5 同一個下午一起做 | 主席 | 全部 |
