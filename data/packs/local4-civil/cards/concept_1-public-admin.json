@@ -141,7 +141,7 @@
           {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["scale"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "社會公平"},
           {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["ship-wheel"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 2}, "sign": "領航而不操槳"},
           {"scene": "duo", "actors": [{"cast": "official", "pose": "walk", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "服務的是公民"},
-          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}, {"cast": "official", "pose": "stand", "facing": "left"}], "props": ["key"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "受託者"}
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}, {"cast": "official", "pose": "sit", "facing": "left"}], "props": ["key"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "受託者"}
         ] }
     },
     {
@@ -211,7 +211,7 @@
       "questions": ["113-general-public-admin-q41", "114-general-public-admin-q42", "114-local4-public-admin-q40"],
       "comic": { "layout": "timeline",
         "panels": [
-          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["target", "pothole"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "第三類型錯誤"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["pothole", "target"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "第三類型錯誤"},
           {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "可行性"},
           {"scene": "solo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}], "props": ["ballot-box"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "審議通過"},
           {"scene": "duo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "stand", "facing": "left"}], "props": ["pothole"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "由下而上"},
@@ -247,7 +247,7 @@
       "comic": { "layout": "timeline",
         "panels": [
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["crown"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "天生"},
-          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["scale", "document"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 2}, "sign": "關心人或事"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["heart", "document"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 2}, "sign": "關心人或事"},
           {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["umbrella"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "看情境"},
           {"scene": "crowd", "actors": [{"cast": "official", "pose": "walk", "facing": "right"}, {"cast": "official", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "walk", "mood": "yay", "facing": "right"}], "props": ["flag"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "願景與魅力"}
         ] }
@@ -306,9 +306,9 @@
         "columns": [{"from": "heading", "face": 0}, {"from": "heading", "face": 1}],
         "panels": [
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}], "props": ["crane", "coins"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "民間出錢"},
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "citizen", "pose": "walk", "facing": "left"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "產權"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "sit", "mood": "yay", "facing": "right"}, {"cast": "citizen", "pose": "walk", "facing": "left"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "產權"},
           {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["house"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "政府蓋好"},
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "walk", "facing": "left"}], "props": ["key"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "營運權"}
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}, {"cast": "citizen", "pose": "walk", "facing": "left"}], "props": ["key"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "營運權"}
         ] }
     },
     {
