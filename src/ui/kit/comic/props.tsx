@@ -49,6 +49,11 @@ const TEST_ROWS = [
 
 const BENCH_SLATS = [32, 39] as const;
 
+/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4c-props.md 會換掉並刪掉這個函式） */
+function draft(): ReactNode {
+  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
+}
+
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
     <g>
@@ -612,6 +617,16 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <path d="M26.5 39.2 A6.8 6.8 0 0 1 30.8 36.6" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
     </g>
   ),
+  stopwatch: draft(),
+  'org-chart': draft(),
+  'ship-wheel': draft(),
+  flag: draft(),
+  crane: draft(),
+  key: draft(),
+  curtain: draft(),
+  ladder: draft(),
+  heart: draft(),
+  megaphone: draft(),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {

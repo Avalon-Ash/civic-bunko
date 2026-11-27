@@ -55,6 +55,16 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
   house: '房子',
   bench: '公園長椅',
   'money-bag': '錢袋',
+  stopwatch: '碼錶',
+  'org-chart': '組織圖',
+  'ship-wheel': '舵輪',
+  flag: '旗子',
+  crane: '起重機',
+  key: '鑰匙',
+  curtain: '舞台布幕',
+  ladder: '梯子',
+  heart: '愛心',
+  megaphone: '大聲公',
 };
 
 /**
