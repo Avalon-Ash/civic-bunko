@@ -16,6 +16,7 @@ import {
 import {
   dismissInstallHint,
   markCardSeen,
+  markCardMatched,
   markChangelogSeen,
   setAccessory,
   setBilingual,
@@ -140,6 +141,9 @@ export function dispatch(world: World, cmd: UICommand, deps?: DispatchDeps): voi
       break;
     case 'markCardSeen':
       markCardSeen(world, cmd.id, now);
+      break;
+    case 'markCardMatched':
+      markCardMatched(world, cmd.id, now);
       break;
     case 'importProgress': {
       const result = importProgress(world, cmd.json);

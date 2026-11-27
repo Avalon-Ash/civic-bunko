@@ -848,6 +848,8 @@ export interface Settings {
   shuffleOptions?: boolean;
   /** 看過的卡片 ID */
   cardsSeen?: string[];
+  /** 連連看全部配對過的卡片 ID（只增不減，同步取聯集；ADR 0023） */
+  cardsMatched?: string[];
   /** 英文題顯示中英對照；沒設定視為開啟 */
   bilingual?: boolean;
   /** 模擬考歷次成績，舊到新；上限在 constants/exam.ts */
@@ -928,6 +930,8 @@ export type UICommand =
   | { type: 'setShuffleOptions'; on: boolean }
   | { type: 'setBilingual'; on: boolean }
   | { type: 'markCardSeen'; id: string }
+  /** 連連看全部配對對了（也算看過這張卡；ADR 0023） */
+  | { type: 'markCardMatched'; id: string }
   | { type: 'importProgress'; json: string }
   | { type: 'resetProgress' }
   | { type: 'setSyncCode'; code: string }

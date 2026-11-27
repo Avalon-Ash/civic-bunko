@@ -156,6 +156,9 @@ export function mergeCardsSeen(local: readonly string[], remote: readonly string
   return result;
 }
 
+/** 配對過的卡片：和看過的卡片同一條規則（聯集、本機順序在前；ADR 0023） */
+export const mergeCardsMatched = mergeCardsSeen;
+
 function examKey(record: ExamRecord): string {
   return `${record.at}|${record.paperId}`;
 }

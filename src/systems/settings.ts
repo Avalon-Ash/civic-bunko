@@ -94,18 +94,35 @@ export function markCardSeen(
   });
 }
 
+/** 連連看全部配對對了：記下這張卡（只增不減），也算看過（ADR 0023） */
+export function markCardMatched(
+  world: World,
+  id: string,
+  now: () => Date = defaultNow,
+): void {
+  const matched = world.settings.cardsMatched ?? [];
+  if (!matched.includes(id)) {
+    world.settings = { ...world.settings, cardsMatched: [...matched, id] };
+    world.bus.emit({ type: 'settingsChanged', settings: { ...world.settings } });
+  }
+  markCardSeen(world, id, now);
+}
+
 /**
- * 套用同步合併後的「看過的卡片」與「模擬考歷次成績」，並發出 settingsChanged。
+ * 套用同步合併後的「看過的卡片」「配對過的卡片」與「模擬考歷次成績」，並發出 settingsChanged。
  * 這兩欄的擁有者是本系統；同步系統只負責算出合併結果再交給這裡寫入。
  */
 export function applySyncedSettings(
   world: World,
   cardsSeen: readonly string[],
   examHistory: readonly ExamRecord[],
+  cardsMatched: readonly string[],
 ): void {
   world.settings = {
     ...world.settings,
     cardsSeen: [...cardsSeen],
+    // 沒配對過就不寫這一欄：存檔長得跟以前一樣
+    ...(cardsMatched.length > 0 ? { cardsMatched: [...cardsMatched] } : {}),
     examHistory: examHistory.map((record) => ({ ...record })),
   };
   world.bus.emit({

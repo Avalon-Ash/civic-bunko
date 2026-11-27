@@ -537,6 +537,8 @@ function parsePayload(raw: string): { ok: true; data: PersistedPayload } | { ok:
       ...(parsed.settings.accessory !== undefined ? { accessory: parsed.settings.accessory } : {}),
       ...(parsed.settings.shuffleOptions !== undefined ? { shuffleOptions: parsed.settings.shuffleOptions } : {}),
       ...(parsed.settings.cardsSeen !== undefined ? { cardsSeen: [...parsed.settings.cardsSeen] } : {}),
+      // 後來加的欄位：格式不對就丟掉這一欄，不讓整份存檔失敗
+      ...(isStringArray(parsed.settings.cardsMatched) ? { cardsMatched: [...parsed.settings.cardsMatched] } : {}),
       ...(typeof parsed.settings.bilingual === 'boolean' ? { bilingual: parsed.settings.bilingual } : {}),
       ...(typeof parsed.settings.sound === 'boolean' ? { sound: parsed.settings.sound } : {}),
       ...(typeof parsed.settings.weather === 'boolean' ? { weather: parsed.settings.weather } : {}),

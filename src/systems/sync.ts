@@ -41,6 +41,7 @@ import {
   mergeCatLooks,
   mergeCatProfile,
   mergeCatProfiles,
+  mergeCardsMatched,
   mergeCardsSeen,
   mergeDays,
   mergeExamHistory,
@@ -85,6 +86,8 @@ interface RemoteContent {
   days: Map<DayKey, number>;
   /** 看過的卡片；舊版同步檔沒有這欄，視為空 */
   cardsSeen: string[];
+  /** 配對過的卡片（ADR 0023）；舊版同步檔沒有這欄或格式不對，視為空 */
+  cardsMatched: string[];
   /** 模擬考歷次成績；舊版同步檔沒有這欄，視為空 */
   examHistory: ExamRecord[];
   /** 衣櫥進度（不含 outfit）；舊版或損毀視為空 */
@@ -380,6 +383,10 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
       Array.isArray(parsed.cardsSeen) && parsed.cardsSeen.every((id) => typeof id === 'string')
         ? (parsed.cardsSeen as string[])
         : [];
+    const cardsMatched =
+      Array.isArray(parsed.cardsMatched) && parsed.cardsMatched.every((id) => typeof id === 'string')
+        ? (parsed.cardsMatched as string[])
+        : [];
     const examHistory = parseExamHistory(parsed.examHistory) ?? [];
     const parsedWardrobe = parseWardrobe(parsed.wardrobe);
     const wardrobe: SyncWardrobe = toSyncWardrobe(parsedWardrobe);
@@ -388,6 +395,7 @@ function parseRemoteContent(base64Content: string): RemoteContent | null {
       progress,
       days,
       cardsSeen,
+      cardsMatched,
       examHistory,
       wardrobe,
       cat: parseCatProfile(parsed.cat),
@@ -484,6 +492,7 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     const remoteDays = remote.kind === 'ok' ? remote.days : new Map<DayKey, number>();
     const remoteSha = remote.kind === 'ok' ? remote.sha : null;
     const remoteCards = remote.kind === 'ok' ? remote.cardsSeen : [];
+    const remoteMatched = remote.kind === 'ok' ? remote.cardsMatched : [];
     const remoteExams = remote.kind === 'ok' ? remote.examHistory : [];
     const remoteWardrobe = remote.kind === 'ok' ? remote.wardrobe : emptyWardrobe();
 
@@ -514,10 +523,16 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
 
     const localCards = world.settings.cardsSeen ?? [];
     const localExams = world.settings.examHistory ?? [];
+    const localMatched = world.settings.cardsMatched ?? [];
     const mergedCards = mergeCardsSeen(localCards, remoteCards);
+    const mergedMatched = mergeCardsMatched(localMatched, remoteMatched);
     const mergedExams = mergeExamHistory(localExams, remoteExams, EXAM_HISTORY_MAX);
-    if (!sameStrings(mergedCards, localCards) || !sameExamHistory(mergedExams, localExams)) {
-      applySyncedSettings(world, mergedCards, mergedExams);
+    if (
+      !sameStrings(mergedCards, localCards) ||
+      !sameStrings(mergedMatched, localMatched) ||
+      !sameExamHistory(mergedExams, localExams)
+    ) {
+      applySyncedSettings(world, mergedCards, mergedExams, mergedMatched);
       if (isStale(controller, gen)) return;
     }
 
@@ -556,9 +571,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
     const looksDiffer = !sameCatRecord(remoteLooks, mergedLooks, sameCatLook);
 
     // 卡片已看、模擬考成績與衣櫥只比內容：遠端順序不同不必寫回
-    const remoteCardSet = new Set(remoteCards);
-    const cardsDiffer =
-      mergedCards.length !== remoteCardSet.size || mergedCards.some((id) => !remoteCardSet.has(id));
+    const cardsDiffer = stringSetDiffers(mergedCards, remoteCards);
+    const matchedDiffer = stringSetDiffers(mergedMatched, remoteMatched);
     const examsDiffer = !sameExamHistory(
       mergedExams,
       mergeExamHistory([], remoteExams, EXAM_HISTORY_MAX),
@@ -570,6 +584,7 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       !progressMapsEqual(merged, remoteMap) ||
       !dayMapsEqual(mergedDays, remoteDays) ||
       cardsDiffer ||
+      matchedDiffer ||
       examsDiffer ||
       wardrobeDiffers ||
       catDiffers ||
@@ -590,6 +605,8 @@ async function runSingleSync(controller: SyncController, gen: number): Promise<v
       progress: Object.fromEntries(merged),
       days: Object.fromEntries(mergedDays),
       cardsSeen: mergedCards,
+      // 沒配對過就不寫這一欄：同步檔長得跟以前一樣
+      ...(mergedMatched.length > 0 ? { cardsMatched: mergedMatched } : {}),
       examHistory: mergedExams,
       wardrobe: mergedWardrobe,
       // 沒取過名字就不寫這一欄：沒用到這個功能的人，同步檔長得跟以前一樣

@@ -440,6 +440,9 @@ export function getSettings(world: World): Settings {
     ...(world.settings.cardsSeen !== undefined
       ? { cardsSeen: [...world.settings.cardsSeen] }
       : {}),
+    ...(world.settings.cardsMatched !== undefined
+      ? { cardsMatched: [...world.settings.cardsMatched] }
+      : {}),
     ...(world.settings.bilingual !== undefined
       ? { bilingual: world.settings.bilingual }
       : {}),
