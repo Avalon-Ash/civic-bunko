@@ -40,6 +40,13 @@ export const COMIC_PROPS: Readonly<Record<ComicPropId, string>> = {
   lamp: '壞掉的路燈',
   target: '靶心',
   door: '大門',
+  'torn-paper': '撕破的紙',
+  eraser: '橡皮擦',
+  coins: '一疊硬幣',
+  scissors: '剪刀',
+  handcuffs: '手銬',
+  'ballot-box': '投票箱',
+  crown: '皇冠',
 };
 
 /**

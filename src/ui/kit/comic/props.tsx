@@ -20,6 +20,11 @@ const OFFICE_WINDOWS = [
   [41, 46],
 ] as const;
 
+/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4a-props.md 會換掉並刪掉這個函式） */
+function draft(): ReactNode {
+  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
+}
+
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
     <g>
@@ -248,6 +253,13 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <rect x="7" y="56" width="50" height="4" rx="1.6" fill="var(--acc-silver)" {...stroke} />
     </g>
   ),
+  'torn-paper': draft(),
+  eraser: draft(),
+  coins: draft(),
+  scissors: draft(),
+  handcuffs: draft(),
+  'ballot-box': draft(),
+  crown: draft(),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
