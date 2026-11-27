@@ -9,13 +9,44 @@
       "title": "法律位階",
       "hook": "憲法最大、法律第二、命令第三，下面不能牴觸上面。",
       "visual": {
-        "kind": "flow",
-        "lanes": [
-          { "steps": [
-            { "text": "憲法", "tone": "key" },
-            { "text": "法律", "tone": "hot" },
-            { "text": "命令", "tone": "plain" }
-          ] }
+        "kind": "tree",
+        "legend": "粗框＝位階的三層",
+        "roots": [
+          {
+            "text": "憲法",
+            "note": "國家根本大法，最高",
+            "tone": "key",
+            "children": [
+              {
+                "via": "牴觸無效",
+                "text": "法律",
+                "note": "立法院通過、總統公布",
+                "tone": "key",
+                "children": [
+                  {
+                    "text": "法、律、條例、通則",
+                    "note": "法律的四種名稱"
+                  },
+                  {
+                    "text": "一定要用法律",
+                    "note": "人民權利義務、機關組織"
+                  },
+                  {
+                    "via": "牴觸無效",
+                    "text": "命令",
+                    "note": "行政機關訂",
+                    "tone": "key",
+                    "children": [
+                      {
+                        "text": "規程、規則、細則、辦法",
+                        "note": "綱要、標準、準則"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
         ]
       },
       "faces": [
@@ -46,9 +77,66 @@
       "title": "中央與地方",
       "hook": "自治事項自己決定，委辦事項聽上級指揮。",
       "visual": {
-        "kind": "versus",
-        "left": { "title": "自治事項", "points": ["自己立法、自己執行", "負規劃＋執行責任"] },
-        "right": { "title": "委辦事項", "points": ["上級交辦，不是自己的事", "只負執行責任"] }
+        "kind": "tree",
+        "legend": "粗框＝地方自治團體",
+        "roots": [
+          {
+            "text": "直轄市",
+            "tone": "key",
+            "children": [
+              {
+                "text": "區",
+                "note": "不是自治團體",
+                "children": [
+                  {
+                    "text": "里"
+                  }
+                ]
+              },
+              {
+                "text": "山地原住民區",
+                "note": "由山地鄉改制",
+                "tone": "key"
+              }
+            ]
+          },
+          {
+            "text": "縣",
+            "tone": "key",
+            "children": [
+              {
+                "text": "鄉、鎮、縣轄市",
+                "tone": "key",
+                "children": [
+                  {
+                    "text": "村、里"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "市",
+            "note": "和縣同一層",
+            "tone": "key",
+            "children": [
+              {
+                "text": "區",
+                "note": "不是自治團體",
+                "children": [
+                  {
+                    "text": "里"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "省",
+            "note": "行政院派出機關，不是自治團體",
+            "tone": "hot"
+          }
+        ]
       },
       "faces": [
         { "heading": "誰是自治團體", "lines": ["直轄市、縣（市）、鄉（鎮、市）", "省不是：省政府是行政院派出機關", "直轄市的區不是（山地原住民區例外）"] },
@@ -110,14 +198,52 @@
       "title": "訴願到行政訴訟",
       "hook": "收到處分 30 日內訴願，訴願決定後 2 個月內起訴。",
       "visual": {
-        "kind": "flow",
-        "lanes": [
-          { "steps": [
-            { "text": "收到處分", "tone": "plain" },
-            { "text": "30 日內訴願", "tone": "hot" },
-            { "text": "訴願決定", "tone": "plain" },
-            { "text": "2 個月內起訴", "tone": "key" }
-          ] }
+        "kind": "tree",
+        "legend": "粗框＝行政訴訟的種類",
+        "roots": [
+          {
+            "text": "收到行政處分",
+            "note": "達到的次日起算",
+            "children": [
+              {
+                "via": "30 日內",
+                "text": "訴願",
+                "note": "經原處分機關送管轄機關",
+                "children": [
+                  {
+                    "via": "3 個月內",
+                    "text": "訴願決定",
+                    "note": "可延長一次，最長 2 個月",
+                    "children": [
+                      {
+                        "via": "送達後 2 個月",
+                        "text": "撤銷訴訟",
+                        "note": "要撤銷處分",
+                        "tone": "key"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "text": "申請後機關不作為",
+            "note": "法令沒定期間：2 個月",
+            "children": [
+              {
+                "text": "訴願",
+                "children": [
+                  {
+                    "via": "送達後 2 個月",
+                    "text": "課予義務訴訟",
+                    "note": "要機關作出處分",
+                    "tone": "key"
+                  }
+                ]
+              }
+            ]
+          }
         ]
       },
       "faces": [

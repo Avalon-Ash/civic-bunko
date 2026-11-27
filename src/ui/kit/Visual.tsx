@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react';
-import type { EnrichVisual } from '../../core/types';
+import type { CardVisual, VisualNode } from '../../core/types';
 
 export interface VisualProps {
-  visual: EnrichVisual;
+  visual: CardVisual;
   className?: string;
 }
 
@@ -12,8 +12,76 @@ function stepDelayStyle(order: number): CSSProperties {
   return { '--step-delay': `${order * STEP_DELAY_MS}ms` } as CSSProperties;
 }
 
-/** 加工小圖元件：支援流程圖（flow）與雙欄對比卡（versus），出現時步驟依序彈入。 */
+/** 樹狀圖的一層：每個節點一列，via 寫在連下來的線上；子節點縮排、用線接起來（樣式 visual-law.css 的 cb-tree） */
+function TreeLevel({ nodes, order }: { nodes: VisualNode[]; order: { n: number } }) {
+  return (
+    <ul className="cb-tree-level">
+      {nodes.map((node, i) => {
+        const delay = stepDelayStyle(order.n++);
+        return (
+          <li key={i} className="cb-tree-item">
+            <span className="cb-tree-row cb-vis-step" style={delay}>
+              {node.via ? <span className="cb-tree-via">{node.via}</span> : null}
+              <span className={`cb-tree-node is-${node.tone ?? 'plain'}`}>
+                <span className="cb-tree-text">{node.text}</span>
+                {node.note ? <span className="cb-tree-note">{node.note}</span> : null}
+              </span>
+            </span>
+            {node.children?.length ? <TreeLevel nodes={node.children} order={order} /> : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** 加工小圖元件：流程圖（flow）、雙欄對比卡（versus），卡片另有樹狀圖（tree）與表格（table）；出現時依序彈入。ADR 0025 */
 export function Visual({ visual, className = '' }: VisualProps) {
+  if (visual.kind === 'tree') {
+    return (
+      <div className={`cb-pic cb-pic-tree ${className}`.trim()}>
+        {visual.legend ? (
+          <span className="cb-tree-legend">
+            <span className="cb-tree-legend-mark" aria-hidden="true" />
+            {visual.legend}
+          </span>
+        ) : null}
+        <TreeLevel nodes={visual.roots} order={{ n: 0 }} />
+      </div>
+    );
+  }
+
+  if (visual.kind === 'table') {
+    return (
+      <div className={`cb-pic cb-pic-table ${className}`.trim()}>
+        <table className="cb-vtable">
+          <thead>
+            <tr>
+              <th scope="col" className="cb-vtable-corner">
+                {visual.corner}
+              </th>
+              {visual.columns.map((col, i) => (
+                <th key={i} scope="col">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {visual.rows.map((row, r) => (
+              <tr key={r} className="cb-vis-step" style={stepDelayStyle(r)}>
+                <th scope="row">{row.head}</th>
+                {row.cells.map((cell, c) => (
+                  <td key={c}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
+
   if (visual.kind === 'flow') {
     let stepOrder = 0;
 

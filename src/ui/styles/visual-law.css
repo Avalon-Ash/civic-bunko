@@ -111,6 +111,186 @@
   gap: 4px;
 }
 
+/* ── 樹狀圖（卡片架構圖：層級、分流；ADR 0025）──
+   每個節點一列、往下一層縮排，左邊一條直線、每個子節點一條橫線接過來；線上的字（via）是小籤。
+   粗框（is-key）＝圖例說的那一類；紅（is-hot）＝問法陷阱（四色語意，不拿來做別的） */
+.cb-pic-tree {
+  align-items: stretch;
+  --cb-tree-indent: 18px;
+  --cb-tree-line: 2px;
+  /* 橫線接到第一行字的中間：節點上框＋上內距＋半行字 */
+  --cb-tree-mid: calc(2px + 4px + 0.875rem * 1.4 / 2);
+}
+
+.cb-tree-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.cb-tree-legend-mark {
+  width: 14px;
+  height: 10px;
+  border: 2.5px solid var(--line);
+  border-radius: 4px;
+  background: var(--butter);
+}
+
+.cb-tree-level {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cb-tree-level .cb-tree-level {
+  margin-top: 6px;
+  margin-left: calc(var(--cb-tree-indent) / 2);
+  padding-left: calc(var(--cb-tree-indent) / 2 + 4px);
+}
+
+.cb-tree-item {
+  position: relative;
+  min-width: 0;
+}
+
+/* 子節點的線：從上一層往下一條直線到這一列的中間，再往右一條橫線接到節點（└ 形）；
+   不是最後一個的，直線一路畫到下一個兄弟（├ 形） */
+.cb-tree-level .cb-tree-level > .cb-tree-item::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * (var(--cb-tree-indent) / 2 + 4px));
+  top: -6px;
+  width: calc(var(--cb-tree-indent) / 2 + 2px);
+  height: calc(6px + var(--cb-tree-mid));
+  border-left: var(--cb-tree-line) solid var(--ink-soft);
+  border-bottom: var(--cb-tree-line) solid var(--ink-soft);
+  border-bottom-left-radius: 6px;
+}
+
+.cb-tree-level .cb-tree-level > .cb-tree-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(-1 * (var(--cb-tree-indent) / 2 + 4px));
+  top: 0;
+  bottom: -6px;
+  border-left: var(--cb-tree-line) solid var(--ink-soft);
+}
+
+.cb-tree-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  min-width: 0;
+}
+
+.cb-tree-via {
+  flex: none;
+  margin-top: calc(var(--cb-tree-mid) - 0.8em);
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  color: var(--ink-soft);
+  font-size: var(--text-small);
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.cb-tree-via::after {
+  content: ' →';
+}
+
+.cb-tree-node {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  padding: 4px 10px;
+  border: 2px solid var(--hair);
+  border-radius: 10px;
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.cb-tree-node.is-key {
+  border-color: var(--line);
+  background: var(--butter);
+}
+
+.cb-tree-node.is-hot {
+  border-color: var(--red);
+  background: var(--red-bg);
+}
+
+.cb-tree-text {
+  font-weight: 800;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.cb-tree-node.is-hot .cb-tree-text {
+  color: var(--red);
+}
+
+.cb-tree-note {
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+/* ── 表格（卡片架構圖：同一件事各層級怎麼做；ADR 0025）── */
+.cb-pic-table {
+  padding: 8px;
+  align-items: stretch;
+}
+
+.cb-vtable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  table-layout: fixed;
+  font-size: var(--text-small);
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.cb-vtable th,
+.cb-vtable td {
+  padding: 5px 4px;
+  border-radius: 8px;
+  text-align: center;
+  vertical-align: middle;
+  overflow-wrap: anywhere;
+}
+
+.cb-vtable thead th {
+  font-weight: 900;
+  background: var(--butter);
+}
+
+.cb-vtable thead .cb-vtable-corner {
+  background: transparent;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.cb-vtable tbody th {
+  font-weight: 900;
+  background: var(--mint);
+}
+
+.cb-vtable td {
+  font-weight: 700;
+  background: var(--surface-sunken);
+}
+
 .cb-vis-step {
   animation: cb-vis-pop 0.28s var(--spring) both;
   animation-delay: var(--step-delay, 0ms);

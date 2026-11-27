@@ -10,8 +10,8 @@ import {
   CARD_HOOK_MAX,
   CARD_LINE_MAX,
   CARD_TITLE_MAX,
-  CARD_VISUAL_TEXT_MAX,
 } from '../../src/core/constants/cards.ts';
+import { cardVisualProblems } from '../../src/systems/cardVisual.ts';
 
 const LIMIT = {
   title: CARD_TITLE_MAX,
@@ -20,10 +20,8 @@ const LIMIT = {
   line: CARD_LINE_MAX,
   faceLines: CARD_FACE_LINES_MAX,
   faces: CARD_FACES_MAX,
-  visualText: CARD_VISUAL_TEXT_MAX,
 };
 const KINDS = new Set(['concept', 'newlaw', 'essay']);
-const TONES = new Set(['plain', 'hot', 'key']);
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'));
 const len = (s) => [...s].length;
 
@@ -98,29 +96,8 @@ for (const packId of packs) {
         });
       }
       if (c.visual !== null) {
-        const v = c.visual;
-        const texts = [];
-        if (v?.kind === 'flow' && Array.isArray(v.lanes) && v.lanes.length > 0) {
-          for (const lane of v.lanes) {
-            if (!Array.isArray(lane.steps) || lane.steps.length < 2 || lane.steps.length > 5) err(id, 'flow 每列要 2–5 步');
-            for (const s of lane.steps ?? []) {
-              if (!TONES.has(s.tone)) err(id, `tone 不合法：${s.tone}`);
-              texts.push(s.text);
-            }
-          }
-        } else if (v?.kind === 'versus' && v.left && v.right) {
-          for (const side of [v.left, v.right]) {
-            texts.push(side.title);
-            if (!Array.isArray(side.points) || side.points.length === 0 || side.points.length > 3) err(id, 'versus 每邊要 1–3 點');
-            texts.push(...(side.points ?? []));
-          }
-        } else {
-          err(id, 'visual 形狀不合法');
-        }
-        for (const t of texts) {
-          if (typeof t !== 'string' || !t.trim()) err(id, 'visual 有空字串');
-          else if (len(t) > LIMIT.visualText) err(id, `visual 文字「${t}」${len(t)} 字，上限 ${LIMIT.visualText}`);
-        }
+        // 架構圖的形狀與字數只在 src/systems/cardVisual.ts 判斷（ADR 0025）
+        for (const problem of cardVisualProblems(c.visual)) err(id, `visual：${problem}`);
       }
       if (!Array.isArray(c.lawRefs)) err(id, 'lawRefs 要是陣列');
       else for (const r of c.lawRefs) if (!hasArticle(r.law, r.article)) err(id, `法條查不到：${r.law} 第 ${r.article} 條`);

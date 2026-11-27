@@ -94,3 +94,4 @@
 - [0022 卡片↔官方題的連結只存在卡片的 questions；卡片回合不存卡片、複習狀態由作答紀錄導出](0022-card-question-links.md)：`StudyCard.questions` 是唯一正本，查詢只經 `cardLinks`；`startCardRound` 不在 `RoundConfig` 加欄位，零新存檔欄位。
 - [0023 圖卡闖關：配對完成存進選填的 settings.cardsMatched，三顆星只在一處導出](0023-card-levels-match-saved.md)：（部分取代 0022）配對全對過的卡片 ID 存選填欄位、同步取聯集；看過、配對、實戰三顆星只在 `systems/cardStars.ts` 導出；連連看由漫畫資料機械產生，實戰只用官方題。
 - [0024 驗證腳本經 tsx 直接讀 src 的常數，字數上限只有一份](0024-validators-read-ts-constants.md)：（部分取代 0002 的後果）`tools/validate/cards.mjs` 經 `--import tsx` 讀 `constants/cards.ts`，visual 格子上限一起搬進去；新驗證腳本用 `src/` 的常數一律經 tsx 讀，不抄。
+- [0025 卡片架構圖加樹狀圖與表格，形狀檢查只在 systems/cardVisual.ts](0025-card-visual-tree-table.md)：卡片的 `visual` 改用 `CardVisual`（流程、對照＋樹狀圖、表格），題目加工層不變；四種形狀的檢查只在 `cardVisualProblems`，驗證腳本經 tsx 呼叫。

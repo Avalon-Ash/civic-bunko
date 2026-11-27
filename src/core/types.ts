@@ -110,6 +110,23 @@ export type VisualTone = 'plain' | 'hot' | 'key';
 export type EnrichVisual =
   | { kind: 'flow'; lanes: Array<{ steps: Array<{ text: string; tone: VisualTone }> }> }
   | { kind: 'versus'; left: { title: string; points: string[] }; right: { title: string; points: string[] } };
+/** 卡片架構圖的樹狀圖節點：via＝從上一層連下來那條線上的字（「30 日內」「牴觸無效」）。ADR 0025 */
+export interface VisualNode {
+  text: string;
+  /** 節點下面的小字補充 */
+  note?: string;
+  via?: string;
+  tone?: VisualTone;
+  children?: VisualNode[];
+}
+/**
+ * 卡片的架構圖：題目解析用的流程、對照兩種，加上卡片專用的樹狀圖（層級、分流）與表格（多項比較）。
+ * 題目加工層（Enrich）仍只用 EnrichVisual。ADR 0025
+ */
+export type CardVisual =
+  | EnrichVisual
+  | { kind: 'tree'; /** 粗框（tone: key）代表什麼，例「粗框＝地方自治團體」 */ legend?: string; roots: VisualNode[] }
+  | { kind: 'table'; corner: string; columns: string[]; rows: Array<{ head: string; cells: string[] }> };
 export interface LawRef {
   /** data/laws/index.json 裡的法規名稱 */
   law: string;
@@ -201,7 +218,7 @@ export interface StudyCard {
   title: string;
   /** 一句話重點，卡片收合時只看得到這句 */
   hook: string;
-  visual: EnrichVisual | null;
+  visual: CardVisual | null;
   faces: CardFace[];
   lawRefs: LawRef[];
   /** 申論卡對應的官方申論題 */

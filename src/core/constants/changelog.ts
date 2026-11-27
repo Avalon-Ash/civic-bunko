@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-28-card-diagrams',
+    date: '2026-11-28',
+    title: '圖卡的架構圖畫得更完整（先改 4 張）',
+    items: [
+      '「法律位階」「中央與地方」「訴願到行政訴訟」改成有分支的架構圖：每一層是什麼、線上寫著「30 日內」「牴觸無效」這些關鍵',
+      '「自治監督怎麼管」改成表格：直轄市、縣（市）、鄉（鎮、市）各由誰撤銷、代行處理、停職解職',
+      '其他圖卡的架構圖接著改',
+    ],
+  },
+  {
     id: '2026-11-28-comic-compact',
     date: '2026-11-28',
     title: '漫畫格子變緊湊，名牌不擋小貓',
