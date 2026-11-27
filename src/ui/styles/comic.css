@@ -140,21 +140,35 @@
   height: auto;
 }
 
-/* 貓腳下的角色名牌（ComicPanelArt nameTags）：頭上是舉牌的位置（左上角），所以名牌立在地面上、蓋一點腳 */
+/* 角色名牌（ComicPanelArt nameTags）：頭上是舉牌的位置（左上角），所以掛在腳底下；
+   貓整隻往上抬 --cb-comic-tag-room（＝名牌高度＋間隔），名牌不蓋到貓；
+   同時縮成 --cb-comic-tag-scale，頭頂大約留在原本的高度，不頂到左上角的舉牌（320 寬上到下的小格子量過） */
+.cb-comic-art.has-tags {
+  --cb-comic-tag-font: 0.62rem;
+  --cb-comic-tag-room: calc(var(--cb-comic-tag-font) * 1.2 + 5px);
+  --cb-comic-tag-scale: 0.8;
+}
+
+/* 一格一列（圖左字右）的圖只有格子寬的 42%，舉牌相對大：貓再縮一點 */
+.cb-comic-ladder .cb-comic-art.has-tags,
+.cb-comic-rows .cb-comic-art.has-tags {
+  --cb-comic-tag-scale: 0.68;
+}
+
 .cb-comic-tag {
   position: absolute;
   left: 50%;
-  bottom: 2px;
+  top: calc(100% + 1px);
   transform: translateX(-50%);
   padding: 0 3px;
   white-space: nowrap;
-  border: 1.5px solid var(--cat-line);
-  border-radius: 6px;
+  border: 1px solid var(--cat-line);
+  border-radius: 5px;
   background: var(--surface);
   color: var(--ink);
   font-weight: 800;
-  font-size: 0.68rem;
-  line-height: 1.25;
+  font-size: var(--cb-comic-tag-font);
+  line-height: 1.2;
 }
 
 .cb-comic-sign {

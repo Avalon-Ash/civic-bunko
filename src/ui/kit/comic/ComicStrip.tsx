@@ -10,9 +10,17 @@ import { COMIC_SCENE_LAYOUT, type ComicSlot } from './scenes';
 
 type ComicCard = Pick<StudyCard, 'hook' | 'faces'> & { comic: CardComic };
 
-/** 演員、道具放到格子裡的位置（百分比） */
-function slotStyle(slot: ComicSlot): CSSProperties {
-  return { left: `${slot.x}%`, bottom: `${100 - slot.y}%`, width: `${slot.w}%` };
+/** 演員、道具放到格子裡的位置（百分比）；tagged＝掛名牌的貓：往上抬、縮小一點，讓出腳底下的位置、頭頂不頂到舉牌 */
+function slotStyle(slot: ComicSlot, tagged = false): CSSProperties {
+  const bottom = `${100 - slot.y}%`;
+  const width = `${slot.w}%`;
+  if (!tagged) return { left: `${slot.x}%`, bottom, width };
+  // 抬多高、縮多少在 comic.css 的 .cb-comic-art.has-tags
+  return {
+    left: `${slot.x}%`,
+    bottom: `calc(${bottom} + var(--cb-comic-tag-room))`,
+    width: `calc(${width} * var(--cb-comic-tag-scale))`,
+  };
 }
 
 /** 一格的畫面（不含字）：演員、道具、舉牌。列表小圖也用它（小圖不掛名牌：72px 放不下字） */
@@ -25,13 +33,13 @@ export function ComicPanelArt({
   panel: ComicPanel;
   sign?: string | null;
   hideSign?: boolean;
-  /** 貓腳下立角色名牌（同一格同一個角色只掛第一隻） */
+  /** 貓腳底下掛角色名牌（同一格同一個角色只掛第一隻）；貓整隻往上抬，名牌不蓋到貓 */
   nameTags?: boolean;
 }) {
   const layout = COMIC_SCENE_LAYOUT[panel.scene];
   const tagged = nameTags ? panel.actors.map((actor, i) => panel.actors.findIndex((a) => a.cast === actor.cast) === i) : [];
   return (
-    <div className="cb-comic-art">
+    <div className={`cb-comic-art ${nameTags ? 'has-tags' : ''}`.trim()}>
       {panel.props.map((id, i) => {
         const slot = layout.props[i];
         return slot ? (
@@ -43,7 +51,7 @@ export function ComicPanelArt({
       {panel.actors.map((actor, i) => {
         const slot = layout.actors[i];
         return slot ? (
-          <span key={`a${i}`} className="cb-comic-actor" style={slotStyle(slot)}>
+          <span key={`a${i}`} className="cb-comic-actor" style={slotStyle(slot, nameTags)}>
             <CatBody
               pose={actor.pose}
               outfit={COMIC_CASTS[actor.cast].outfit}
