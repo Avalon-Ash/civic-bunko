@@ -49,10 +49,32 @@ const TEST_ROWS = [
 
 const BENCH_SLATS = [32, 39] as const;
 
-/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC4c-props.md 會換掉並刪掉這個函式） */
-function draft(): ReactNode {
-  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
-}
+const STOPWATCH_TICKS = [
+  [32, 26, 32, 29],
+  [45, 39, 42, 39],
+  [32, 52, 32, 49],
+  [19, 39, 22, 39],
+] as const;
+
+const ORG_CHILD_X = [10, 26.5, 43] as const;
+
+const WHEEL_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315] as const;
+
+const CRANE_TIERS = [21, 32, 43] as const;
+
+const CRANE_BRICKS = [
+  [33.5, 53.5],
+  [46.5, 53.5],
+  [40, 47.5],
+] as const;
+
+const LADDER_RUNGS = [-20, -10, 0, 10, 20] as const;
+
+const MEGAPHONE_WAVES = [
+  [19, 7, 22.5],
+  [24.5, 10, 28.8],
+  [30, 13, 35],
+] as const;
 
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
@@ -617,16 +639,227 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <path d="M26.5 39.2 A6.8 6.8 0 0 1 30.8 36.6" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
     </g>
   ),
-  stopwatch: draft(),
-  'org-chart': draft(),
-  'ship-wheel': draft(),
-  flag: draft(),
-  crane: draft(),
-  key: draft(),
-  curtain: draft(),
-  ladder: draft(),
-  heart: draft(),
-  megaphone: draft(),
+  stopwatch: (
+    <g>
+      <path d="M25 16.5 C21.5 11.5 24 5.5 32 5.5 C40 5.5 42.5 11.5 39 16.5" fill="none" stroke={LINE} strokeWidth="5.2" strokeLinecap="round" />
+      <path d="M25 16.5 C21.5 11.5 24 5.5 32 5.5 C40 5.5 42.5 11.5 39 16.5" fill="none" stroke="var(--acc-silver)" strokeWidth="2.2" strokeLinecap="round" />
+      <rect x="29.5" y="14" width="5" height="5.5" fill="var(--acc-silver)" {...stroke} />
+      <rect x="27" y="10.2" width="10" height="4.2" rx="2" fill="var(--acc-coral)" {...stroke} />
+      <g transform="translate(46.8 24.2) rotate(45)">
+        <rect x="-3.4" y="-3.8" width="6.8" height="5.2" rx="1.8" fill="var(--acc-silver)" {...stroke} />
+      </g>
+      <circle cx="32" cy="39" r="20.5" fill="var(--acc-silver)" {...stroke} />
+      <circle cx="32" cy="39" r="15.5" fill="var(--acc-cream)" {...stroke} />
+      <path d="M32 39 V25.2 A13.8 13.8 0 0 1 41.8 29.2 Z" fill="var(--acc-sky)" fillOpacity="0.6" />
+      {STOPWATCH_TICKS.map(([x1, y1, x2, y2]) => (
+        <path key={`${x1}-${y1}`} d={`M${x1} ${y1} L${x2} ${y2}`} fill="none" {...thin} />
+      ))}
+      <path d="M17.2 29 A18 18 0 0 1 25.5 22.2" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.85" />
+      <path d="M32 39 L40.5 30.5" fill="none" stroke="var(--acc-coral)" strokeWidth="3.2" strokeLinecap="round" />
+      <circle cx="32" cy="39" r="3" fill="var(--acc-coral)" {...thin} />
+    </g>
+  ),
+  'org-chart': (
+    <g>
+      <path d="M16 49 L12 59.5 H17.5 L21 49 Z M48 49 L52 59.5 H46.5 L43 49 Z" fill="var(--acc-wood)" {...stroke} />
+      <rect x="5.5" y="10.5" width="53" height="39.5" rx="4.5" fill="var(--acc-cream)" {...stroke} />
+      <rect x="4.5" y="8.5" width="55" height="4.5" rx="2.2" fill="var(--acc-wood)" {...stroke} />
+      <rect x="4.5" y="48" width="55" height="4.5" rx="2.2" fill="var(--acc-wood)" {...stroke} />
+      <path d="M32 25.5 V36 M15.5 36 V31 H48.5 V36" fill="none" {...stroke} />
+      <rect x="23" y="16" width="18" height="10" rx="2.6" fill="var(--acc-coral)" {...stroke} />
+      <path d="M27.5 21 H36.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.85" />
+      {ORG_CHILD_X.map((x) => (
+        <g key={x}>
+          <rect x={x} y="35.5" width="11" height="9.5" rx="2.2" fill="var(--acc-sky)" {...stroke} />
+          <path d={`M${x + 2.8} 40.2 H${x + 8.2}`} fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
+        </g>
+      ))}
+    </g>
+  ),
+  'ship-wheel': (
+    <g>
+      <rect x="28.5" y="34" width="7" height="21.5" rx="2" fill="var(--acc-navy)" {...stroke} />
+      <rect x="19" y="54.5" width="26" height="5" rx="2.2" fill="var(--acc-navy)" {...stroke} />
+      {WHEEL_ANGLES.map((deg) => (
+        <g key={deg} transform={`translate(32 30) rotate(${deg})`}>
+          <path d="M0 0 V-21.2" fill="none" stroke={LINE} strokeWidth="5.4" strokeLinecap="round" />
+          <path d="M0 0 V-21.2" fill="none" stroke="var(--acc-wood)" strokeWidth="2.2" strokeLinecap="round" />
+          <circle cx="0" cy="-21.5" r="2.7" fill="var(--acc-wood)" {...thin} />
+        </g>
+      ))}
+      <circle cx="32" cy="30" r="14.2" fill="none" stroke={LINE} strokeWidth="9" />
+      <circle cx="32" cy="30" r="14.2" fill="none" stroke="var(--acc-wood)" strokeWidth="4.8" />
+      <path d="M21.5 20.5 A14.2 14.2 0 0 1 32 15.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.5" />
+      <circle cx="32" cy="30" r="5.8" fill="var(--acc-wood)" {...stroke} />
+      <circle cx="32" cy="30" r="2.6" fill="var(--acc-gold)" {...fine} />
+    </g>
+  ),
+  flag: (
+    <g>
+      <rect x="13" y="10" width="4.4" height="44" rx="2.2" fill="var(--acc-silver)" {...stroke} />
+      <path d="M5 59.5 Q8 51.5 16.5 51.5 Q25 51.5 28 59.5 Z" fill="var(--acc-leaf)" {...stroke} />
+      <path d="M10.5 55.2 Q15 53 20.5 54.5" fill="none" stroke="var(--acc-mint)" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="15.2" cy="8.2" r="3.6" fill="var(--acc-gold)" {...stroke} />
+      <path
+        d="M17.4 13.5 C27 10 36 17.5 46 14 C51 12.2 55 11.8 58 13.2 L55.5 36.2 C48.5 33.5 41.5 39.5 32.5 36.5 C25.5 34.2 21.5 36.2 17.4 37.5 Z"
+        fill="var(--acc-coral)"
+        {...stroke}
+      />
+      <path d="M21 17.5 Q27 15.2 33 17.8" fill="none" stroke="var(--acc-rose)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.7" />
+      <path
+        d="M36 17.8 L37.9 22.4 L42.8 22.8 L39 26 L40.2 30.8 L36 28.2 L31.8 30.8 L33 26 L29.2 22.8 L34.1 22.4 Z"
+        fill="var(--acc-gold)"
+        {...thin}
+      />
+    </g>
+  ),
+  crane: (
+    <g>
+      <path d="M8 14 L19 6.5 L53 14" fill="none" stroke="var(--acc-silver)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M8 14 L19 6.5 L53 14" fill="none" {...fine} />
+      <path d="M14.5 14 L19 6 L23.5 14 Z" fill="var(--acc-gold)" {...stroke} />
+      <rect x="14.5" y="16" width="9" height="38.5" fill="var(--acc-gold)" {...stroke} />
+      {CRANE_TIERS.map((y) => (
+        <path key={y} d={`M15 ${y} H23 M15 ${y} L23 ${y + 10} M23 ${y} L15 ${y + 10}`} fill="none" {...fine} />
+      ))}
+      <rect x="9" y="54.5" width="20" height="5" rx="2" fill="var(--acc-silver)" {...stroke} />
+      <rect x="5.5" y="18.5" width="7.5" height="6.5" rx="1.8" fill="var(--acc-silver)" {...stroke} />
+      <rect x="22.5" y="19" width="7" height="6.5" rx="1.6" fill="var(--acc-sky)" {...thin} />
+      <rect x="6" y="13.5" width="51" height="5.5" rx="2" fill="var(--acc-gold)" {...stroke} />
+      <path d="M26 14 L31 18.5 M35 14 L40 18.5 M44 14 L49 18.5" fill="none" {...fine} />
+      <rect x="42.5" y="18.5" width="7" height="3.2" rx="1.2" fill="var(--acc-navy)" {...fine} />
+      <path d="M46 21.7 V28 M40.5 31.8 L46 28 L51.5 31.8" fill="none" stroke="var(--acc-silver)" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M46 21.7 V28 M40.5 31.8 L46 28 L51.5 31.8" fill="none" {...fine} />
+      <rect x="39" y="31.5" width="14" height="8.5" rx="2" fill="var(--acc-coral)" {...stroke} />
+      <path d="M42 34.5 H49" fill="none" stroke="var(--acc-rose)" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.75" />
+      {CRANE_BRICKS.map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width="12" height="6" rx="1.6" fill="var(--acc-coral)" {...stroke} />
+      ))}
+    </g>
+  ),
+  key: (
+    <g>
+      <circle cx="16.2" cy="37.8" r="3.2" fill="none" stroke={LINE} strokeWidth="4.4" />
+      <circle cx="16.2" cy="37.8" r="3.2" fill="none" stroke="var(--acc-gold)" strokeWidth="1.8" />
+      <circle cx="15.5" cy="49" r="7.5" fill="var(--acc-coral)" {...stroke} />
+      <circle cx="15.5" cy="44.2" r="1.5" fill="var(--acc-cream)" {...fine} />
+      <circle cx="15.5" cy="50.5" r="2.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeOpacity="0.85" />
+      <g transform="translate(22 22) rotate(42)">
+        <path
+          d="M12 -3.2 H43 Q46 -3.2 46 0 Q46 3.2 43 3.2 H42 V11 Q42 13 40 13 H38 Q36 13 36 11 V5.5 H33.5 V9.5 Q33.5 11.5 31.5 11.5 H29.5 Q27.5 11.5 27.5 9.5 V3.2 H12 Z"
+          fill="var(--acc-gold)"
+          {...stroke}
+        />
+        <path d="M17.5 -0.8 H41.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.7" />
+        <rect x="11.5" y="-5" width="4.5" height="10" rx="2" fill="var(--acc-orange)" {...stroke} />
+        <circle cx="0" cy="0" r="9.2" fill="none" stroke={LINE} strokeWidth="10.4" />
+        <circle cx="0" cy="0" r="9.2" fill="none" stroke="var(--acc-gold)" strokeWidth="6" />
+        <path d="M-7 -4.5 A8.5 8.5 0 0 1 2 -8.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.8" />
+      </g>
+    </g>
+  ),
+  curtain: (
+    <g>
+      <rect x="7" y="11" width="50" height="40.5" rx="2" fill="var(--acc-night)" {...stroke} />
+      <path d="M32 16 L20 51 H44 Z" fill="var(--acc-gold)" fillOpacity="0.22" />
+      <path d="M5 51 H59 L60 56.5 Q60 59.5 57 59.5 H7 Q4 59.5 4 56.5 Z" fill="var(--acc-wood)" {...stroke} />
+      <path d="M18 51 L15.5 59.5 M32 51 V59.5 M46 51 L48.5 59.5" fill="none" stroke={LINE} strokeWidth="1.3" strokeOpacity="0.45" />
+      <ellipse cx="32" cy="54.8" rx="9.5" ry="2" fill="var(--acc-cream)" fillOpacity="0.35" />
+      <path d="M6.5 13 H26.5 C26 24 21 31 15 35 C17.5 40.5 18.5 46 18 51.5 H6.5 Z" fill="var(--acc-coral)" {...stroke} />
+      <path d="M13 18 C13 26 11.5 31 10.5 35 C11.5 41 11.5 46 11 50" fill="none" stroke={LINE} strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.45" />
+      <path d="M57.5 13 H37.5 C38 24 43 31 49 35 C46.5 40.5 45.5 46 46 51.5 H57.5 Z" fill="var(--acc-coral)" {...stroke} />
+      <path d="M51 18 C51 26 52.5 31 53.5 35 C52.5 41 52.5 46 53 50" fill="none" stroke={LINE} strokeWidth="1.4" strokeLinecap="round" strokeOpacity="0.45" />
+      <path d="M6.5 34 Q11 36.5 15.5 35 M57.5 34 Q53 36.5 48.5 35" fill="none" stroke={LINE} strokeWidth="4.6" strokeLinecap="round" />
+      <path d="M6.5 34 Q11 36.5 15.5 35 M57.5 34 Q53 36.5 48.5 35" fill="none" stroke="var(--acc-gold)" strokeWidth="2.2" strokeLinecap="round" />
+      <circle cx="15.8" cy="35.5" r="2.2" fill="var(--acc-gold)" {...fine} />
+      <circle cx="48.2" cy="35.5" r="2.2" fill="var(--acc-gold)" {...fine} />
+      <path
+        d="M6 10.5 H58 V17.5 Q51.5 22.5 45 17.5 Q38.5 22.5 32 17.5 Q25.5 22.5 19 17.5 Q12.5 22.5 6 17.5 Z"
+        fill="var(--acc-coral)"
+        {...stroke}
+      />
+      <rect x="4.5" y="7" width="55" height="4.2" rx="2.1" fill="var(--acc-gold)" {...stroke} />
+    </g>
+  ),
+  ladder: (
+    <g>
+      <g transform="translate(29 33) rotate(7)">
+        {LADDER_RUNGS.map((y) => (
+          <rect key={y} x="-9.5" y={y - 2.1} width="19" height="4.2" rx="1.6" fill="var(--acc-wood)" {...stroke} />
+        ))}
+        <rect x="-12.5" y="-26" width="5.2" height="51" rx="2.4" fill="var(--acc-wood)" {...stroke} />
+        <rect x="7.3" y="-26" width="5.2" height="51" rx="2.4" fill="var(--acc-wood)" {...stroke} />
+        <path d="M-10.2 -21 V20 M9.6 -21 V20" fill="none" stroke="var(--acc-cream)" strokeWidth="1.2" strokeLinecap="round" strokeOpacity="0.4" />
+      </g>
+      <path
+        d="M50 7.2 L52.1 11.7 L57 12.2 L53.3 15.6 L54.3 20.5 L50 18 L45.7 20.5 L46.7 15.6 L43 12.2 L47.9 11.7 Z"
+        fill="var(--acc-gold)"
+        {...stroke}
+      />
+      <circle cx="56.5" cy="7.5" r="1.5" fill="var(--acc-gold)" />
+    </g>
+  ),
+  heart: (
+    <g>
+      <path
+        d="M32 58.5 C26 53 7.5 41 7.5 24.5 C7.5 14.5 15 9.5 22.5 9.5 C27.2 9.5 30.5 12.2 32 16.2 C33.5 12.2 36.8 9.5 41.5 9.5 C49 9.5 56.5 14.5 56.5 24.5 C56.5 41 38 53 32 58.5 Z"
+        fill="var(--acc-coral)"
+        {...stroke}
+      />
+      <path
+        d="M32 54.5 C42 47 52 37.5 52.5 25.5 C51 35 42 44.5 32 50.5 Z"
+        fill="var(--pink-deep)"
+        fillOpacity="0.45"
+      />
+      <path
+        d="M14.5 24.5 C14.5 18.2 18.5 14.8 23.5 14.8"
+        fill="none"
+        stroke="var(--acc-cream)"
+        strokeWidth="4.2"
+        strokeLinecap="round"
+        strokeOpacity="0.9"
+      />
+      <circle cx="15" cy="30.5" r="2" fill="var(--acc-cream)" fillOpacity="0.9" />
+      <path
+        d="M54.5 5.5 Q55.2 10.3 59.5 11 Q55.2 11.7 54.5 16.5 Q53.8 11.7 49.5 11 Q53.8 10.3 54.5 5.5 Z"
+        fill="var(--acc-gold)"
+        {...fine}
+      />
+      <path
+        d="M10.5 47 Q11 50.5 14 51 Q11 51.5 10.5 55 Q10 51.5 7 51 Q10 50.5 10.5 47 Z"
+        fill="var(--acc-gold)"
+        {...fine}
+      />
+    </g>
+  ),
+  megaphone: (
+    <g>
+      <g transform="translate(24 35) rotate(-26)">
+        <path
+          d="M-11 5 L-13.2 20 Q-13.4 22 -11 22 H-7.5 Q-5.2 22 -5.2 20 L-4 5 Z"
+          fill="var(--acc-navy)"
+          {...stroke}
+        />
+        <rect x="-19" y="-6.5" width="7" height="13" rx="3" fill="var(--acc-navy)" {...stroke} />
+        <path d="M-13.5 -6.8 L12 -16.5 V16.5 L-13.5 6.8 Z" fill="var(--acc-coral)" {...stroke} />
+        <path d="M-4.5 -10.2 L2 -12.6 V12.6 L-4.5 10.2 Z" fill="var(--acc-cream)" {...thin} />
+        <path d="M-9.5 -4.2 L7.5 -10.6" fill="none" stroke="var(--acc-rose)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.7" />
+        <ellipse cx="12.5" cy="0" rx="4.4" ry="16.8" fill="var(--acc-cream)" {...stroke} />
+        <ellipse cx="13" cy="0" rx="2.3" ry="12" fill="var(--acc-navy)" {...thin} />
+        <circle cx="12.2" cy="0" r="2.6" fill="var(--acc-silver)" {...fine} />
+        {MEGAPHONE_WAVES.map(([x, h, cx]) => (
+          <path
+            key={x}
+            d={`M${x} ${-h} Q${cx} 0 ${x} ${h}`}
+            fill="none"
+            stroke="var(--acc-orange)"
+            strokeWidth="2.8"
+            strokeLinecap="round"
+          />
+        ))}
+      </g>
+    </g>
+  ),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
