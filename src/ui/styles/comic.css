@@ -74,6 +74,62 @@
   border-bottom: var(--border-w) solid var(--line);
 }
 
+/*
+ * 兩欄的格子（排排站 2×2、時間軸、起承轉合、左右對照）與連連看左邊的圖：標題壓在格子上緣（像表單外框上的標籤），
+ * 大半在格子外、伸進圖裡的只有 --cb-comic-label-in（舉牌只要往下讓這麼多，才不會壓到貓頭），不另外占一列。
+ * 一格一列（圖左字右）的標題在右欄，不受影響。
+ * 標題最長 7 個字（2026-11-28 量過），320 寬一格約 135px 放得下一行。
+ */
+.cb-comic:not(.cb-comic-ladder):not(.cb-comic-rows):has(.cb-comic-label),
+.cb-match-grid:has(.cb-comic-label) {
+  --cb-comic-label-h: calc(var(--text-small) * 1.3 + 2px + 2 * var(--border-w));
+  --cb-comic-label-in: 6px;
+  --cb-comic-label-out: calc(var(--cb-comic-label-h) - var(--cb-comic-label-in));
+  row-gap: calc(var(--cb-comic-label-out) + 6px);
+  padding-top: var(--cb-comic-label-out);
+}
+
+.cb-comic:not(.cb-comic-ladder):not(.cb-comic-rows) .cb-comic-panel:has(.cb-comic-label),
+.cb-match-item:has(.cb-comic-label) {
+  overflow: visible;
+}
+
+/* 格子不裁切了，圖的角自己跟著格子的圓角（漫畫格下面接著字，只圓上面兩角；連連看的圖占滿整格，四角都圓） */
+.cb-comic:not(.cb-comic-ladder):not(.cb-comic-rows) .cb-comic-panel:has(.cb-comic-label) .cb-comic-art {
+  border-radius: calc(14px - var(--border-w)) calc(14px - var(--border-w)) 0 0;
+}
+
+.cb-match-item:has(.cb-comic-label) .cb-comic-art {
+  border-radius: calc(14px - var(--border-w));
+}
+
+.cb-comic:not(.cb-comic-ladder):not(.cb-comic-rows) .cb-comic-label,
+.cb-match-item .cb-comic-label {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--cb-comic-label-in) - var(--cb-comic-label-h));
+  left: 8px;
+  max-width: calc(100% - 16px);
+  padding: 1px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-pill);
+}
+
+/* 標題不占一列省下的高度，一部分還給圖（16:11 → 16:12），舉牌和貓頭之間才有空隙 */
+.cb-comic:not(.cb-comic-ladder):not(.cb-comic-rows) .cb-comic-panel:has(.cb-comic-label) .cb-comic-art,
+.cb-match-item:has(.cb-comic-label) .cb-comic-art {
+  aspect-ratio: 16 / 12;
+}
+
+/* 舉牌往下讓開標題伸進圖裡的那一點 */
+.cb-comic:not(.cb-comic-ladder):not(.cb-comic-rows) .cb-comic-panel:has(.cb-comic-label) .cb-comic-sign,
+.cb-match-item:has(.cb-comic-label) .cb-comic-sign {
+  top: calc(var(--cb-comic-label-in) + 3px);
+}
+
 .cb-comic-column {
   text-align: center;
   font-weight: 800;

@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-28-comic-compact',
+    date: '2026-11-28',
+    title: '漫畫格子變緊湊，名牌不擋小貓',
+    items: [
+      '格子的標題改成壓在格子上緣的小籤，不再占一整列，一頁看得到更多格；配對那一步也一樣',
+      '小貓的名牌掛在腳底下，不會蓋到小貓；舉牌和小貓的頭之間也留了空隙',
+    ],
+  },
+  {
     id: '2026-11-28-comic-tags',
     date: '2026-11-28',
     title: '漫畫裡每隻小貓腳下都有名牌',
