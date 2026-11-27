@@ -66,10 +66,10 @@
       "comic": { "layout": "versus",
         "columns": [{"from": "heading", "face": 1}, {"from": "heading", "face": 2}],
         "panels": [
-          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["document", "stamp"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "自己立法"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["document"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "自己立法"},
           {"scene": "prop-big", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "政策規劃"},
           {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "local", "pose": "sit", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "上級政府交付"},
-          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["stamp"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "只負行政執行"}
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["stamp"], "text": {"from": "line", "face": 2, "line": 2}, "sign": "只負行政執行"}
         ] }
     },
     {
