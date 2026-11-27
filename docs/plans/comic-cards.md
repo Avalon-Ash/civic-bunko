@@ -172,7 +172,7 @@ type ComicTextRef =
 | B | `newlaw-lga-55-city` | lineup | 3 人、14 職等、行政院；2×2：市長（備查）、副市長、秘書長、一級主管 |
 | B | `newlaw-lga-56-county` | lineup | 和上一張同構圖，方便對照 |
 | B | `newlaw-fiscal-8-source` | lineup | 三種稅的標籤用那一行的 `pick`；第四格「不是來源」不舉牌 |
-| C | `concept-pa-classic` | lineup | 原定三位學者；加古立克（POSDCORB）成 2×2：泰勒碼錶、費堯「中上層」配辦公大樓（對應 hook「泰勒管工人、費堯管主管」）、韋伯組織圖（CC4c） |
+| C | `concept-pa-classic` | lineup | 原定三位學者；加古立克（POSDCORB）成 2×2：泰勒碼錶、費堯「中上層」配組織圖（對應 hook「泰勒管工人、費堯管主管」）、古立克考卷（清單）、韋伯公文＋印章（CC4c，Codex 第一輪後） |
 | C | `concept-pa-three-new` | lineup | 2×2：三個「新」＋黑堡宣言，新公共管理握舵輪（CC4c） |
 | C | `concept-pa-leadership` | timeline | 第一張上線的 timeline；每格加 `label`（面標題），2×2 只有往右接的格畫箭頭（CC4c） |
 | C | `concept-pa-ppp` | versus | BOT vs OT：上列誰蓋（民間出錢／政府蓋好）、下列期滿還什麼（產權／營運權）（CC4c） |
