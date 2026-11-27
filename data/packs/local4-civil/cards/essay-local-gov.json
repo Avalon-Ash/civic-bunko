@@ -27,7 +27,14 @@
         { "law": "地方制度法", "article": "60" },
         { "law": "地方制度法", "article": "61" }
       ],
-      "essay": { "paperId": "115-general-local-gov", "no": 1 }
+      "essay": { "paperId": "115-general-local-gov", "no": 1 },
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "facing": "right"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "不是地方自治團體"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "sit", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "任期 4 年"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "指揮監督"},
+          {"scene": "solo", "actors": [{"cast": "local", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["bench"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "橋樑"}
+        ] }
     },
     {
       "id": "essay-115-general-local-gov-2",

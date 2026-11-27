@@ -92,7 +92,7 @@ export function CardDetailSheet({ world, card, onClose }: CardDetailSheetProps) 
                 <p className="cb-card-sheet-hook">{activeCard.hook}</p>
               </header>
 
-              {activeCard.comic && activeCard.kind !== 'essay' ? (
+              {activeCard.comic ? (
                 <ComicSection card={{ ...activeCard, comic: activeCard.comic }} />
               ) : null}
 

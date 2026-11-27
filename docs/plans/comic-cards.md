@@ -198,7 +198,7 @@ type ComicTextRef =
 
 張數核對：樣張 3＋A 7＋B 8＋C 8＋D 4＝30（規格列的全部）；加碼 11；合計 41。版型（CC4b 改完，含樣張 remedy-route 改 story）：story 12、timeline 5、versus 8、ladder 3、lineup 13。
 
-**16 張申論卡排在第三條切線（考後，或 12-01 前 41 張都做完還有時間）**：它們已經是編號骨架加「遮起來背」，最不缺；一張 10–15 行的論述骨架要先決定哪四行當錨點，比觀念卡費工。做的時候版型一律 `story`（申論本來就是起承轉合），順序照 `essay-local-gov.json`、`essay_chinese.json` 的檔案順序（年度新的在前）。要不要整個拿掉見 §10-4。
+**16 張申論卡**（2026-11-27 使用者：考後才畫沒有用 → 提前到考前，由工作樹線 comic-essay 做；申論卡的關卡只有看圖、配對兩步，看圖下面是原本的遮起來背）。原排在第三條切線（考後，或 12-01 前 41 張都做完還有時間）：它們已經是編號骨架加「遮起來背」，最不缺；一張 10–15 行的論述骨架要先決定哪四行當錨點，比觀念卡費工。做的時候版型一律 `story`（申論本來就是起承轉合），順序照 `essay-local-gov.json`、`essay_chinese.json` 的檔案順序（年度新的在前）。要不要整個拿掉見 §10-4。
 
 ## 5. 規格每一項的去向
 
@@ -278,7 +278,7 @@ type ComicTextRef =
 | CC7 收尾 | 12-01 下午 | 全量驗收、兩種尺寸×日夜截圖、`docs/HANDOFF.md` 更新（含沒在實機驗到的）；和 UX5 同一個下午一起做 | 主席 | 全部 |
 | CC4c 後 4、CC4d、加碼 | 考後 | §6 第三條切線列的 8 張＋加碼 11 張；其餘行政學、國文卡的掛題（Hydrogen 找候選、主席審） | 主席＋agy Hydrogen | 使用者決定 |
 | CC6 驗證腳本解耦 | 考後（使用者同意後） | `tools/validate/cards.mjs` 改用 `node --import tsx` 讀 `constants/cards.ts`；證明行為不變：改前改後 `npm run validate` 輸出逐字相同，再故意放一張超長卡確認仍會紅 | agy Hydrogen high | §10-3 同意 |
-| CC8 申論卡漫畫 | 考後 | 16 張，版型 `story` | 主席 | 使用者決定要做（§10-4） |
+| CC8 申論卡漫畫 | 11-27 起（使用者：考後才畫沒有用） | 16 張，版型 `story` | 工作樹線 comic-essay | — |
 
 **檔案歸屬**（完整的表在 `ux-cleanup.md` §6）：
 - `CardsScreen.tsx`、`CardListItem.tsx`、`cards.css` 歸 UX 案的 UX3，漫畫案的包都不改。列表小圖與「漫畫」篩選（§3-1）由 UX3 做。

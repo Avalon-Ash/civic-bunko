@@ -21,6 +21,7 @@ import { useWorld } from '../../useWorld';
 import { LawArticleView } from '../LawArticleView';
 import { CardFaceViewer } from './CardFaceViewer';
 import { CardLawChips } from './CardLawChips';
+import { EssayCardBody } from './EssayCardBody';
 import { ComicMatch } from './comic/ComicMatch';
 import { ComicSection } from './comic/ComicSection';
 
@@ -137,15 +138,31 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
             <>
               {comic ? <ComicSection card={{ ...card, comic }} /> : null}
               {card.visual ? <Visual visual={card.visual} /> : null}
-              <CardFaceViewer
-                cardId={card.id}
-                faces={card.faces}
-                onComplete={handleSeen}
-                completing={completing}
-                burstTick={burstTick}
-                onBurstDone={handleBurstDone}
-              />
-              <CardLawChips lawRefs={card.lawRefs} onOpen={setActiveLawRef} />
+              {card.kind === 'essay' ? (
+                <>
+                  {/* 申論卡：照抽屜的順序，法條在架構上面 */}
+                  <CardLawChips lawRefs={card.lawRefs} onOpen={setActiveLawRef} />
+                  <EssayCardBody
+                    card={card}
+                    onComplete={handleSeen}
+                    completing={completing}
+                    burstTick={burstTick}
+                    onBurstDone={handleBurstDone}
+                  />
+                </>
+              ) : (
+                <>
+                  <CardFaceViewer
+                    cardId={card.id}
+                    faces={card.faces}
+                    onComplete={handleSeen}
+                    completing={completing}
+                    burstTick={burstTick}
+                    onBurstDone={handleBurstDone}
+                  />
+                  <CardLawChips lawRefs={card.lawRefs} onOpen={setActiveLawRef} />
+                </>
+              )}
             </>
           ) : null}
 

@@ -69,9 +69,9 @@ function groupCardsBySubject(cards: readonly CardView[]): CardGroup[] {
   return groups;
 }
 
-/** 這張卡打開是關卡（有漫畫的觀念、新法卡），不是抽屜 */
+/** 這張卡打開是關卡（有漫畫的卡，申論卡也算），不是抽屜 */
 function isLevelCard(card: CardView): boolean {
-  return card.kind !== 'essay' && cardHasComic(card);
+  return cardHasComic(card);
 }
 
 function CardGrid({
