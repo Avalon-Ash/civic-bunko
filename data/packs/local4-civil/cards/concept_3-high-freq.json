@@ -869,7 +869,7 @@
           {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "council", "pose": "sit"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "6 個月"},
           {"scene": "duo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "agency", "pose": "stand", "mood": "oops", "facing": "left"}], "props": ["scissors"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "不得為增加支出"},
           {"scene": "solo", "actors": [{"cast": "council", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["handcuffs"], "text": {"from": "line", "face": 3, "line": 2}, "sign": "通緝犯除外"},
-          {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}, {"cast": "council", "pose": "stand", "mood": "yay"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "記名投票"}
+          {"scene": "duo", "actors": [{"cast": "council", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": ["ballot-box"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "記名投票"}
         ] }
     }
   ]
