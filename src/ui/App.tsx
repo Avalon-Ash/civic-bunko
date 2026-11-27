@@ -53,7 +53,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   const [showResult, setShowResult] = useState(false);
   // 圖卡闖關：開著哪一關、目前的回合是不是從關卡開的（只在記憶體；docs/plans/level-mode.md §4）
   const [level, setLevel] = useState<LevelState | null>(null);
-  const [quizFromLevel, setQuizFromLevel] = useState(false);
+  const [quizCardId, setQuizCardId] = useState<string | null>(null);
   const tabRef = useRef(tab);
   tabRef.current = tab;
 
@@ -178,15 +178,15 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
     if (wasInRoundRef.current) {
       wasInRoundRef.current = false;
       // 關卡裡答完：成績在關卡的第 3 步看，刷題頁不跳結果頁（在刷題頁答完的照常跳）
-      const levelOwnsResult = quizFromLevel && tabRef.current === 'cards';
-      setQuizFromLevel(false);
+      const levelOwnsResult = quizCardId !== null && tabRef.current === 'cards';
+      setQuizCardId(null);
       if (summary !== null && summary !== entrySummaryRef.current && !levelOwnsResult) {
         setShowResult(true);
       } else {
         setShowResult(false);
       }
     }
-  }, [hasActiveRound, summary, quizFromLevel]);
+  }, [hasActiveRound, summary, quizCardId]);
 
   const quizStage = questionView
     ? 'question'
@@ -247,9 +247,9 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
     close: () => setLevel(null),
     startQuiz: (cardId: string) => {
       dispatch(world, { type: 'startCardRound', cardId });
-      setQuizFromLevel(true);
+      setQuizCardId(cardId);
     },
-    quizFromLevel,
+    quizCardId,
   };
 
   const renderMain = () => {

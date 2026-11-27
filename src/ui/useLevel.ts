@@ -18,8 +18,8 @@ export interface LevelApi {
   close: () => void;
   /** 從關卡開這張卡的作答回合（回合結束時不跳刷題頁的結果頁） */
   startQuiz: (cardId: string) => void;
-  /** 目前進行中的回合是從關卡開的 */
-  quizFromLevel: boolean;
+  /** 目前進行中的回合是從哪一關開的（卡片 ID）；不是從關卡開的就是 null */
+  quizCardId: string | null;
 }
 
 const LevelContext = createContext<LevelApi>({
@@ -28,7 +28,7 @@ const LevelContext = createContext<LevelApi>({
   setStep: () => {},
   close: () => {},
   startQuiz: () => {},
-  quizFromLevel: false,
+  quizCardId: null,
 });
 
 export const LevelProvider = LevelContext.Provider;

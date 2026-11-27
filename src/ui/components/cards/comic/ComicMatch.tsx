@@ -23,8 +23,9 @@ export interface ComicMatchProps {
 
 export function ComicMatch({ world, card, onComplete }: ComicMatchProps) {
   const [round, setRound] = useState(0);
-  // 每一輪重新洗一次右邊（亂數只在這裡；判對錯不看順序）
-  const set = useMemo(() => comicMatchSet(card, Math.random), [card, round]);
+  // 每一輪重新洗一次右邊（亂數只在這裡；判對錯不看順序）。只看卡片 ID 與輪次：
+  // 呼叫的一方每次重畫都會傳新的 card 物件，跟著它重洗會讓右邊在她手指下換位置
+  const set = useMemo(() => comicMatchSet(card, Math.random), [card.id, round]);
   const [pickedLeft, setPickedLeft] = useState<number | null>(null);
   const [pickedRight, setPickedRight] = useState<string | null>(null);
   const [done, setDone] = useState<ReadonlySet<number>>(() => new Set());

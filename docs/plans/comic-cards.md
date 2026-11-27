@@ -123,7 +123,7 @@ type ComicTextRef =
 | 這張卡看過沒 | 沿用 `settings.cardsSeen`（已同步、取聯集，ADR 0013） |
 | 情境題的對錯、什麼時候再出現 | 官方題照常走 `answered` → `Progress` → `REVIEW_INTERVAL_DAYS`（`src/systems/scheduling.ts`），已同步 |
 | 這張卡「該複習了」「熟了」 | 由連到的題的 `Progress` 導出（做法同 ADR 0012 的小魚乾餘額），不存 |
-| 遮字回想、配對的成績 | **不存**。它們是暖身，不是紀錄；題目 ID 以外的東西不寫進 `progress` |
+| 遮字回想、配對的成績 | **不存**。它們是暖身，不是紀錄；題目 ID 以外的東西不寫進 `progress`。（2026-11-27 改：配對全對存卡片 ID 到 `settings.cardsMatched`，見 ADR 0023、`docs/plans/level-mode.md`） |
 | 小魚乾、成就 | 刷卡片的題就是一般回合，照既有規則給；「看新圖卡」的每日任務與 `cardsSeen` 成就照舊 |
 
 「刷這張卡的題」**不在 `RoundConfig` 加欄位**。查過存檔：進行中的回合會整包存進本機（`persistence.ts:578–591`，內容是 `config`＋`queue`…；續玩時 `parseRoundState` 以 `normalizeRoundConfig(value.config)` 保留 `topicIds`，`persistence.ts:442`），所以在設定裡加「哪張卡」就等於加存檔欄位。做法改成：新的 `UICommand`（例 `startCardRound { cardId }`）直接用卡片的 `questions` 組出 `queue`，`config` 用一般回合的既有欄位。存下來的東西和平常的回合同形，續玩靠既有的 `queue`（`validateSavedRound` 只檢查題目 ID 都在）。「這回合是從哪張卡來的」只放記憶體（給結果頁顯示「回到這張卡」）：重開 App 後續玩照常，只是少了那顆鈕，結果頁的「再來一回」會是一般回合。這條路若實作時走不通（例如某處會用 `config` 重新組題），停下來回報，不自己加欄位。
@@ -271,7 +271,7 @@ type ComicTextRef =
 | CC1 樣張與引擎 | 11-28 | 型別、`constants/comic.ts`、`ComicStrip`、五種版型裡樣張用到的三種、樣張要的道具、`CardDetailSheet` 接上（漫畫在上、文字在下）、**「遮起來想」**（照 `EssayCardBody` 的遮字做法，第一天就能看也能練）、`comics.test.mjs`、`comic-gallery.mts`、3 張樣張資料、更新紀錄一則（寫「試畫 3 張」，被退時拿掉 `comic` 欄位也不會變成假話）、§2.6 前兩份 ADR。**另外匯出給 UX3 用的兩樣東西**：列表小圖元件（`kit/comic/` 裡）、「這張卡有沒有漫畫」的 selector；CC1 自己不改圖卡列表 | 主席（定調＋美術） | §10-1 的預設；UX1a 已併入 |
 | CC3 卡片↔題目 | 11-29 | `StudyCard.questions`、`suggest-links.mjs`、`selectors/cardLinks.ts`、`startCardRound`（§2.5，不加 `RoundConfig` 欄位）、解析區的圖卡鈕（`QuestionParts.tsx`，模擬考作答中不顯示）、匯出一顆「刷這張卡的題」按鈕元件（由主席接進抽屜，避免和 CC2 改同一檔）。型別與指令（`types.ts`、`commands.ts`）由主席連同紅色測試先放進 `main`，執行代理不改這兩個檔；主席另審腳本列出的候選、寫 §2.6 第三份 ADR（執行代理不新增 ADR） | agy Neon high（`C:\Git\_wt_civic_comic_links`） | CC1 併入 |
 | CC4a 美術 A 批 | 11-29 | A 批 7 張（含數字型樣張與 `ladder`、`lineup` 版型）＋道具；更新紀錄 | 主席 | 樣張過關 |
-| CC2 排一排 | 11-30 | `systems/comicQuiz.ts`（純函式，給種子就固定）＋ `src/ui/components/cards/comic/*` 的排序與配對練習。主席先寫紅色測試 | agy Neon medium（`C:\Git\_wt_civic_comic_quiz`） | CC1 併入 |
+| CC2 排一排（2026-11-27 改成 `docs/plans/level-mode.md` 的連連看，不另做） | 11-30 | `systems/comicQuiz.ts`（純函式，給種子就固定）＋ `src/ui/components/cards/comic/*` 的排序與配對練習。主席先寫紅色測試 | agy Neon medium（`C:\Git\_wt_civic_comic_quiz`） | CC1 併入 |
 | CC4b 美術 B 批 | 11-30 | 8 張 | 主席 | CC4a |
 | CC4c 美術 C 批前 4 | 12-01 上午 | `concept-pa-classic`、`concept-pa-three-new`、`concept-pa-leadership`、`concept-pa-ppp`；這四張的掛題由主席自己挑（行政學沒有法條可比對），來不及就先不掛、沒有「刷題」鈕 | 主席 | CC4b |
 | CC5 複習記號 | 12-01 上午 | 「該複習／熟了」：由 `Progress` 導出的 selector＋測試，加一個小元件放進 UX3 在列表上留的位置（不改 `CardsScreen.tsx`、`cards.css` 的版面）。中午前併不進來就留到考後 | agy Neon medium | CC3、UX3 併入 |

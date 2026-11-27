@@ -137,7 +137,7 @@ function CardsContent({ world }: { world: World }) {
 
   const levelCard = levelApi.level ? cardById(world, levelApi.level.cardId) : null;
   if (levelCard) {
-    return <CardLevelScreen world={world} card={levelCard} />;
+    return <CardLevelScreen key={levelCard.id} world={world} card={levelCard} />;
   }
   const selectCard = (id: string) => {
     const card = cardById(world, id);

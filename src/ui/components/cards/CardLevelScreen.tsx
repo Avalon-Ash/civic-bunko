@@ -55,13 +55,12 @@ export interface CardLevelScreenProps {
 
 export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
   useWorld(world);
-  const { level, setStep, close, startQuiz, quizFromLevel } = useLevel();
+  const { level, setStep, close, startQuiz, quizCardId } = useLevel();
   const go = useGo();
   const [activeLawRef, setActiveLawRef] = useState<LawRef | null>(null);
   const [completing, setCompleting] = useState(false);
   const [burstTick, setBurstTick] = useState<number | null>(null);
   const [matchedNow, setMatchedNow] = useState(false);
-  const [quizDone, setQuizDone] = useState(false);
 
   const comic = card.comic;
   const questionCount = cardQuestionIds(world, card.id).length;
@@ -70,12 +69,10 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
   const stars = cardStars(world, card);
   const nextStep = steps[steps.indexOf(step) + 1] ?? null;
 
-  // 關卡裡開的回合結束了：在第 3 步顯示這次的成績
-  const wasQuizRef = useRef(quizFromLevel);
-  useEffect(() => {
-    if (wasQuizRef.current && !quizFromLevel) setQuizDone(true);
-    wasQuizRef.current = quizFromLevel;
-  }, [quizFromLevel]);
+  // 第 3 步的「這次成績」：只認這一關打開之後才有的回合成績（一題都沒答就結束的不算），避免顯示上一回合的舊成績。
+  // 換一關時 CardsScreen 會用 key 重建本元件，這個起點跟著重設。
+  const myQuiz = quizCardId === card.id;
+  const entrySummaryRef = useRef(roundSummary(world));
 
   useEffect(() => {
     setActiveLawRef(null);
@@ -102,9 +99,11 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
     label: `${i + 1} ${STEP_LABEL[s]}${stepDone(s, stars) ? ' ★' : ''}`,
   }));
 
-  const inLevelQuiz = quizFromLevel && currentQuestion(world) !== null;
-  const otherRound = !quizFromLevel && (currentQuestion(world) !== null || readView(world) !== null);
-  const summary = roundSummary(world);
+  const anyRound = currentQuestion(world) !== null || readView(world) !== null;
+  const inLevelQuiz = myQuiz && currentQuestion(world) !== null;
+  const otherRound = anyRound && !myQuiz;
+  const latest = roundSummary(world);
+  const summary = latest !== entrySummaryRef.current && latest && latest.total > 0 ? latest : null;
 
   return (
     <div className="cb-stack cb-level">
@@ -182,7 +181,7 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
               </Card>
             ) : (
               <Card className="cb-level-note">
-                {quizDone && summary ? (
+                {summary ? (
                   <p className="cb-level-result">
                     這次答對 <strong>{summary.correct}</strong> / {summary.total} 題
                     {stars.cleared
@@ -199,11 +198,11 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
                   variant="mint"
                   className="cb-level-next"
                   onClick={() => {
-                    setQuizDone(false);
+                    entrySummaryRef.current = roundSummary(world);
                     startQuiz(card.id);
                   }}
                 >
-                  {quizDone ? '再實戰一次' : `開始實戰（${questionCount} 題）`}
+                  {summary ? '再實戰一次' : `開始實戰（${questionCount} 題）`}
                 </Button>
               </Card>
             )
