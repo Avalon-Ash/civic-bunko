@@ -247,3 +247,108 @@
   flex: none;
   white-space: nowrap;
 }
+
+/* 連連看（components/cards/comic/ComicMatch.tsx）：左邊圖、右邊字，同一列對齊；對＝綠、錯＝紅（ADR 0005 的對錯語意） */
+.cb-match {
+  display: grid;
+  gap: 8px;
+}
+
+.cb-match-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cb-match-count {
+  flex: none;
+  padding: 1px 10px;
+  border: var(--border-w) solid var(--line);
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: var(--text-small);
+  color: var(--ink);
+}
+
+.cb-match-hint-wrong {
+  color: var(--red);
+  font-weight: 800;
+}
+
+.cb-match-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: 8px;
+}
+
+.cb-match-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  background: var(--surface);
+  border: var(--border-w) solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: transform 0.12s var(--spring), border-color 0.12s;
+}
+
+.cb-match-text {
+  justify-content: center;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: var(--text-small);
+  line-height: 1.5;
+  background: var(--surface-raised);
+}
+
+.cb-match-item.is-picked {
+  border-color: var(--pink-deep);
+  box-shadow: 0 0 0 3px var(--pink);
+  transform: translateY(-2px);
+}
+
+.cb-match-item.is-done {
+  cursor: default;
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+
+.cb-match-item.is-wrong {
+  border-color: var(--red);
+  background: var(--red-bg);
+  /* 時間要和 ComicMatch.tsx 的 WRONG_SHAKE_MS 一樣 */
+  animation: cb-match-shake 420ms ease-in-out;
+}
+
+@keyframes cb-match-shake {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-match-item.is-wrong {
+    animation-timing-function: steps(1);
+  }
+}
+
+.cb-match-again {
+  width: 100%;
+}

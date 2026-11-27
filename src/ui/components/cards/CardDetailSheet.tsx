@@ -11,6 +11,7 @@ import { LawArticleView } from '../LawArticleView';
 import { CardFaceViewer } from './CardFaceViewer';
 import { EssayCardBody } from './EssayCardBody';
 import { ComicSection } from './comic/ComicSection';
+import { CardLawChips } from './CardLawChips';
 import { CardRoundButton } from './CardRoundButton';
 
 export interface CardDetailSheetProps {
@@ -101,22 +102,7 @@ export function CardDetailSheet({ world, card, onClose }: CardDetailSheetProps) 
 
               {activeCard.kind === 'essay' ? (
                 <>
-                  {activeCard.lawRefs.length > 0 && (
-                    <div className="cb-card-laws">
-                      <span className="cb-card-laws-label">相關法條</span>
-                      <div className="cb-pick-grid">
-                        {activeCard.lawRefs.map((ref, idx) => (
-                          <Chip
-                            key={`${ref.law}-${ref.article}-${idx}`}
-                            tone="blue"
-                            onClick={() => setActiveLawRef(ref)}
-                          >
-                            {formatLawRef(ref)}
-                          </Chip>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <CardLawChips lawRefs={activeCard.lawRefs} onOpen={setActiveLawRef} />
                   <EssayCardBody
                     card={activeCard}
                     onComplete={handleComplete}
@@ -135,22 +121,7 @@ export function CardDetailSheet({ world, card, onClose }: CardDetailSheetProps) 
                     burstTick={burstTick}
                     onBurstDone={handleBurstDone}
                   />
-                  {activeCard.lawRefs.length > 0 && (
-                    <div className="cb-card-laws">
-                      <span className="cb-card-laws-label">相關法條</span>
-                      <div className="cb-pick-grid">
-                        {activeCard.lawRefs.map((ref, idx) => (
-                          <Chip
-                            key={`${ref.law}-${ref.article}-${idx}`}
-                            tone="blue"
-                            onClick={() => setActiveLawRef(ref)}
-                          >
-                            {formatLawRef(ref)}
-                          </Chip>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <CardLawChips lawRefs={activeCard.lawRefs} onOpen={setActiveLawRef} />
                 </>
               )}
             </>

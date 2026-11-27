@@ -54,10 +54,12 @@ function formatCountdown(seconds: number): string {
 export interface QuestionScreenProps {
   world: World;
   onExamTimeout?: () => void;
+  /** 圖卡關卡裡作答：解析區不列「圖卡：…」（會指回正在看的這張卡） */
+  hideCardLinks?: boolean;
 }
 
 /** 作答畫面：進度條與小貓、題組文章收合、四色標記題幹、四個選項與粒子噴發、回饋卡與選項解析抽屜；模擬考模式改為倒數計時與無回饋連續作答。 */
-export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
+export function QuestionScreen({ world, onExamTimeout, hideCardLinks = false }: QuestionScreenProps) {
   useWorld(world);
   const view = currentQuestion(world);
   const config = currentRoundConfig(world);
@@ -513,7 +515,7 @@ export function QuestionScreen({ world, onExamTimeout }: QuestionScreenProps) {
                   label={
                     <small>{isCorrect ? '答對了！口訣再記一次' : '差一點！看這句馬上學會'}</small>
                   }
-                  extra={<CardLinks world={world} questionId={question.id} />}
+                  extra={hideCardLinks ? undefined : <CardLinks world={world} questionId={question.id} />}
                 />
                 {showZh && zh && <QuestionVocabCard vocab={zh.vocab} />}
                 <div className="cb-acts">

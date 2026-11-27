@@ -12,6 +12,7 @@ import {
 } from '../../selectors/cards';
 import '../cards.css';
 import { CardDetailSheet } from '../components/cards/CardDetailSheet';
+import { CardLevelScreen, LevelStars } from '../components/cards/CardLevelScreen';
 import { CardListItem } from '../components/cards/CardListItem';
 import { Button } from '../kit/Button';
 import { Card } from '../kit/Card';
@@ -19,7 +20,9 @@ import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import { Collapse } from '../kit/Collapse';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
+import { cardStars } from '../../selectors/cardLevel';
 import { guideAnchor, useGo } from '../useGuide';
+import { useLevel } from '../useLevel';
 import { useWorld } from '../useWorld';
 
 export interface CardsScreenProps {
@@ -66,12 +69,19 @@ function groupCardsBySubject(cards: readonly CardView[]): CardGroup[] {
   return groups;
 }
 
+/** 這張卡打開是關卡（有漫畫的觀念、新法卡），不是抽屜 */
+function isLevelCard(card: CardView): boolean {
+  return card.kind !== 'essay' && cardHasComic(card);
+}
+
 function CardGrid({
+  world,
   cards,
   firstUnseenId,
   showSubject,
   onSelect,
 }: {
+  world: World;
   cards: readonly CardView[];
   firstUnseenId: string | null;
   showSubject: boolean;
@@ -85,7 +95,12 @@ function CardGrid({
           className="cb-card-slot"
           {...(card.id === firstUnseenId ? guideAnchor('cards-unseen') : {})}
         >
-          <CardListItem card={card} onSelect={onSelect} showSubject={showSubject} />
+          <CardListItem
+            card={card}
+            onSelect={onSelect}
+            showSubject={showSubject}
+            badge={isLevelCard(card) ? <LevelStars stars={cardStars(world, card)} /> : undefined}
+          />
         </div>
       ))}
     </div>
@@ -112,12 +127,23 @@ function CardsContent({ world }: { world: World }) {
   const [selectedKind, setSelectedKind] = useState<CardKind>('concept');
   const [openCardId, setOpenCardId] = useState<string | null>(null);
   const [filter, setFilter] = useState<CardFilter>({ mode: 'all' });
+  const levelApi = useLevel();
 
   const decks = cardDecks(world);
   const firstDeck = decks[0];
   if (!firstDeck) {
     return <CardsPlaceholder />;
   }
+
+  const levelCard = levelApi.level ? cardById(world, levelApi.level.cardId) : null;
+  if (levelCard) {
+    return <CardLevelScreen world={world} card={levelCard} />;
+  }
+  const selectCard = (id: string) => {
+    const card = cardById(world, id);
+    if (card && isLevelCard(card)) levelApi.open(id);
+    else setOpenCardId(id);
+  };
 
   const activeDeck = decks.find((deck) => deck.kind === selectedKind) ?? firstDeck;
   const activeKind = activeDeck.kind;
@@ -224,10 +250,11 @@ function CardsContent({ world }: { world: World }) {
                 defaultOpen={group.key === defaultOpenGroupKey}
               >
                 <CardGrid
+                  world={world}
                   cards={group.cards}
                   firstUnseenId={firstUnseenId}
                   showSubject={false}
-                  onSelect={setOpenCardId}
+                  onSelect={selectCard}
                 />
               </Collapse>
             );
@@ -235,10 +262,11 @@ function CardsContent({ world }: { world: World }) {
         </div>
       ) : (
         <CardGrid
+          world={world}
           cards={flatCards}
           firstUnseenId={firstUnseenId}
           showSubject
-          onSelect={setOpenCardId}
+          onSelect={selectCard}
         />
       )}
 

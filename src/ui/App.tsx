@@ -35,6 +35,7 @@ import { latestChangelog, unseenChangelog } from '../selectors/changelog';
 import { TodayScreen, type StampCelebration } from './screens/TodayScreen';
 import { useAppVersion } from './useAppVersion';
 import { useWorld } from './useWorld';
+import { LevelProvider, type LevelApi, type LevelState, type LevelStep } from './useLevel';
 
 export interface AppProps {
   world: World;
@@ -50,6 +51,11 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
   const [tab, setTab] = useState<TabId>('today');
   const [showResult, setShowResult] = useState(false);
+  // 圖卡闖關：開著哪一關、目前的回合是不是從關卡開的（只在記憶體；docs/plans/level-mode.md §4）
+  const [level, setLevel] = useState<LevelState | null>(null);
+  const [quizFromLevel, setQuizFromLevel] = useState(false);
+  const tabRef = useRef(tab);
+  tabRef.current = tab;
 
   const standalone = isStandaloneApp();
   const dismissed = isInstallHintDismissed(world);
@@ -171,13 +177,16 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
     if (wasInRoundRef.current) {
       wasInRoundRef.current = false;
-      if (summary !== null && summary !== entrySummaryRef.current) {
+      // 關卡裡答完：成績在關卡的第 3 步看，刷題頁不跳結果頁（在刷題頁答完的照常跳）
+      const levelOwnsResult = quizFromLevel && tabRef.current === 'cards';
+      setQuizFromLevel(false);
+      if (summary !== null && summary !== entrySummaryRef.current && !levelOwnsResult) {
         setShowResult(true);
       } else {
         setShowResult(false);
       }
     }
-  }, [hasActiveRound, summary]);
+  }, [hasActiveRound, summary, quizFromLevel]);
 
   const quizStage = questionView
     ? 'question'
@@ -195,7 +204,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
 
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0 });
-  }, [tab, quizStage, activeQuestionKey]);
+  }, [tab, quizStage, activeQuestionKey, level?.cardId, level?.step]);
 
   // 引導：畫面只經 go() 換頁與落點（ADR 0019）。go 要穩定，回合與結果頁的狀態從 ref 讀。
   const [guide, setGuide] = useState<GuideRequest | null>(null);
@@ -208,6 +217,8 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   const go = useCallback((target: GuideTarget) => {
     const plan = planGo(target, goStateRef.current);
     if (plan.closeResult) setShowResult(false);
+    // 引導到圖卡頁的落點在列表上：先關掉開著的關卡
+    if (plan.tab === 'cards') setLevel(null);
     setTab(plan.tab);
     guideSeqRef.current += 1;
     setGuide(plan.land ? { target: plan.land, seq: guideSeqRef.current } : null);
@@ -227,6 +238,18 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
       setShowResult(false);
     }
     setTab(nextTab);
+  };
+
+  const levelApi: LevelApi = {
+    level,
+    open: (cardId: string, step: LevelStep = 'look') => setLevel({ cardId, step }),
+    setStep: (step: LevelStep) => setLevel((prev) => (prev ? { ...prev, step } : prev)),
+    close: () => setLevel(null),
+    startQuiz: (cardId: string) => {
+      dispatch(world, { type: 'startCardRound', cardId });
+      setQuizFromLevel(true);
+    },
+    quizFromLevel,
   };
 
   const renderMain = () => {
@@ -295,6 +318,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
   return (
     <CatVoiceProvider world={world}>
       <GuideProvider value={{ go, request: guide, takePreset }}>
+      <LevelProvider value={levelApi}>
       <div className="cb-shell">
         <Toast message={examToast} onDismiss={() => setExamToast(null)} />
         <RewardToast world={world} />
@@ -331,6 +355,7 @@ export function App({ world, papersLoading = false, loadError = false }: AppProp
           />
         )}
       </div>
+      </LevelProvider>
       </GuideProvider>
     </CatVoiceProvider>
   );

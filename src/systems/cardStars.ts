@@ -15,6 +15,9 @@ export interface CardStars {
   earned: number;
   /** 這張卡有幾顆（＝有幾個步驟） */
   total: number;
+  /** 連到的官方題答對過幾題、共幾題（實戰那顆的進度） */
+  quizCleared: number;
+  quizTotal: number;
 }
 
 /** 這張卡有沒有配對這一步（不看亂數：只看配得出題） */
@@ -26,7 +29,16 @@ export function cardStars(world: World, card: Pick<StudyCard, 'id' | 'hook' | 'f
   const seen = (world.settings.cardsSeen ?? []).includes(card.id);
   const matched = cardHasMatch(card) ? (world.settings.cardsMatched ?? []).includes(card.id) : null;
   const questions = cardQuestionIds(world, card.id);
-  const cleared = questions.length > 0 ? questions.every((id) => (world.progress.get(id)?.correct ?? 0) >= 1) : null;
+  const quizCleared = questions.filter((id) => (world.progress.get(id)?.correct ?? 0) >= 1).length;
+  const cleared = questions.length > 0 ? quizCleared === questions.length : null;
   const steps = [seen, matched, cleared].filter((s): s is boolean => s !== null);
-  return { seen, matched, cleared, earned: steps.filter(Boolean).length, total: steps.length };
+  return {
+    seen,
+    matched,
+    cleared,
+    earned: steps.filter(Boolean).length,
+    total: steps.length,
+    quizCleared,
+    quizTotal: questions.length,
+  };
 }
