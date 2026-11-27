@@ -172,11 +172,11 @@ type ComicTextRef =
 | B | `newlaw-lga-55-city` | lineup | 3 人、14 職等、行政院；2×2：市長（備查）、副市長、秘書長、一級主管 |
 | B | `newlaw-lga-56-county` | lineup | 和上一張同構圖，方便對照 |
 | B | `newlaw-fiscal-8-source` | lineup | 三種稅的標籤用那一行的 `pick`；第四格「不是來源」不舉牌 |
-| C | `concept-pa-classic` | lineup | 三位學者 |
-| C | `concept-pa-three-new` | lineup | |
-| C | `concept-pa-leadership` | timeline | |
-| C | `concept-pa-ppp` | versus | BOT vs OT |
-| C | `concept-pa-org-design` | versus | |
+| C | `concept-pa-classic` | lineup | 原定三位學者；加古立克（POSDCORB）成 2×2：泰勒碼錶、費堯「中上層」配辦公大樓（對應 hook「泰勒管工人、費堯管主管」）、韋伯組織圖（CC4c） |
+| C | `concept-pa-three-new` | lineup | 2×2：三個「新」＋黑堡宣言，新公共管理握舵輪（CC4c） |
+| C | `concept-pa-leadership` | timeline | 第一張上線的 timeline；每格加 `label`（面標題），2×2 只有往右接的格畫箭頭（CC4c） |
+| C | `concept-pa-ppp` | versus | BOT vs OT：上列誰蓋（民間出錢／政府蓋好）、下列期滿還什麼（產權／營運權）（CC4c） |
+| C | `concept-pa-org-design` | lineup | 原定 versus「首長制 vs 委員制」：這兩個字只在 hook 與 `visual`，面裡沒有，欄標題指不到原文；改排排站一面一列 5 格（CC4c 改） |
 | C | `newlaw-lga-61-pay` | story | |
 | C | `newlaw-lga-57-township` | story | |
 | C | `newlaw-lga-33-gender` | lineup | |
@@ -186,17 +186,17 @@ type ComicTextRef =
 | D | `concept-zh-official-doc` | ladder | 上行、平行、下行 |
 | 加碼 | `concept-al-penalty` | story | 規格沒列的 11 張，從這裡起 |
 | 加碼 | `concept-al-discipline` | versus | |
-| 加碼 | `concept-pa-motivation` | versus | |
-| 加碼 | `concept-pa-policy` | timeline | |
+| 加碼 | `concept-pa-motivation` | lineup | 原定 versus「內容 vs 過程」：面裡沒有「內容理論」這幾個字（只有「其他內容理論」），欄標題指不到；改 2×2，標籤是面標題（CC4c 改） |
+| 加碼 | `concept-pa-policy` | timeline | 5 格，第 5 格在左下單獨一格；看圖頁看過不擠（CC4c） |
 | 加碼 | `concept-pa-budget` | timeline | |
 | 加碼 | `concept-pa-evolution` | timeline | |
-| 加碼 | `concept-pa-responsibility` | versus | |
-| 加碼 | `concept-pa-personnel` | versus | |
-| 加碼 | `concept-pa-npo` | story | |
-| 加碼 | `concept-pa-participation` | ladder | |
+| 加碼 | `concept-pa-responsibility` | lineup | 原定 versus「正式 vs 非正式」：面裡只有「內部正式」這類四個標題，沒有單獨的「正式」；改 2×2，上排正式、下排非正式，左內部、右外部（CC4c 改） |
+| 加碼 | `concept-pa-personnel` | lineup | 原定 versus「分贓 vs 功績」：這兩個字只在 hook 與 `visual`；改 2×2：代表性官僚、俸給（沒有績效加給）、訓練評量、公務人員協會（CC4c 改） |
+| 加碼 | `concept-pa-npo` | story | 市場失靈、政府失靈、「轉」＝志願失靈（慈善不足）、「合」＝第三方政府（政府出錢）（CC4c） |
+| 加碼 | `concept-pa-participation` | ladder | 三層：公民權力在最上面（和卡片的行序相反，畫面才對得上「越往上實權越大」）（CC4c） |
 | 加碼 | `concept-zh-reading` | timeline | |
 
-張數核對：樣張 3＋A 7＋B 8＋C 8＋D 4＝30（規格列的全部）；加碼 11；合計 41。版型（CC4b 改完，含樣張 remedy-route 改 story）：story 12、timeline 5、versus 8、ladder 3、lineup 13。
+張數核對：樣張 3＋A 7＋B 8＋C 8＋D 4＝30（規格列的全部）；加碼 11；合計 41。版型（CC4b 改完，含樣張 remedy-route 改 story）：story 12、timeline 5、versus 8、ladder 3、lineup 13。CC4c 改完：story 12、timeline 5、versus 4、ladder 3、lineup 17（versus 改 lineup 4 張：org-design、motivation、responsibility、personnel）。
 
 **16 張申論卡**（2026-11-27 使用者：考後才畫沒有用 → 提前到考前，由工作樹線 comic-essay 做；申論卡的關卡只有看圖、配對兩步，看圖下面是原本的遮起來背）。原排在第三條切線（考後，或 12-01 前 41 張都做完還有時間）：它們已經是編號骨架加「遮起來背」，最不缺；一張 10–15 行的論述骨架要先決定哪四行當錨點，比觀念卡費工。做的時候版型一律 `story`（申論本來就是起承轉合），順序照 `essay-local-gov.json`、`essay_chinese.json` 的檔案順序（年度新的在前）。要不要整個拿掉見 §10-4。
 
@@ -273,7 +273,7 @@ type ComicTextRef =
 | CC4a 美術 A 批 | 11-29 | A 批 7 張（含數字型樣張與 `ladder`、`lineup` 版型）＋道具；更新紀錄 | 主席 | 樣張過關 |
 | CC2 排一排（2026-11-27 改成 `docs/plans/level-mode.md` 的連連看，不另做） | 11-30 | `systems/comicQuiz.ts`（純函式，給種子就固定）＋ `src/ui/components/cards/comic/*` 的排序與配對練習。主席先寫紅色測試 | agy Neon medium（`C:\Git\_wt_civic_comic_quiz`） | CC1 併入 |
 | CC4b 美術 B 批 | 11-30（11-27 完成） | 8 張 | 主席 | CC4a |
-| CC4c 美術 C 批前 4 | 12-01 上午 | `concept-pa-classic`、`concept-pa-three-new`、`concept-pa-leadership`、`concept-pa-ppp`；這四張的掛題由主席自己挑（行政學沒有法條可比對），來不及就先不掛、沒有「刷題」鈕 | 主席 | CC4b |
+| CC4c 美術行政學 13 張（11-27 起，工作樹線 comic-pa） | 12-01 上午 | 原定 C 批前 4 張，使用者 11-27 改成行政學 13 張全做：`concept-pa-*` 全部；掛題由該線主席逐題看題幹挑（行政學沒有法條可比對，用關鍵詞與考點找候選），找不到就不掛 | 主席（工作樹線） | CC4b |
 | CC5 複習記號 | 12-01 上午 | 「該複習／熟了」：由 `Progress` 導出的 selector＋測試，加一個小元件放進 UX3 在列表上留的位置（不改 `CardsScreen.tsx`、`cards.css` 的版面）。中午前併不進來就留到考後 | agy Neon medium | CC3、UX3 併入 |
 | CC7 收尾 | 12-01 下午 | 全量驗收、兩種尺寸×日夜截圖、`docs/HANDOFF.md` 更新（含沒在實機驗到的）；和 UX5 同一個下午一起做 | 主席 | 全部 |
 | CC4c 後 4、CC4d、加碼 | 考後 | §6 第三條切線列的 8 張＋加碼 11 張；其餘行政學、國文卡的掛題（Hydrogen 找候選、主席審） | 主席＋agy Hydrogen | 使用者決定 |

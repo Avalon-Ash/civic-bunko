@@ -25,7 +25,15 @@
         { "heading": "之後的發展", "lines": ["1968 年新公共行政：社會公平", "1980 年代新公共管理：師法企業", "2000 年新公共服務：公民優先"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q06", "114-local4-public-admin-q03", "114-local4-public-admin-q19", "115-general-public-admin-q03"],
+      "comic": { "layout": "timeline",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "run", "facing": "right"}], "props": ["stopwatch"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "把人當機器"},
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "sit", "mood": "yay", "facing": "right"}, {"cast": "official", "pose": "sit", "mood": "yay"}, {"cast": "official", "pose": "sit", "mood": "yay", "facing": "left"}], "props": ["heart"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "非正式組織"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}], "props": ["door"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "開放系統"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["ship-wheel"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "師法企業"}
+        ] }
     },
     {
       "id": "concept-pa-classic",
@@ -58,7 +66,15 @@
         { "heading": "共同缺點", "lines": ["把組織當成封閉系統", "忽略人的心理與非正式組織"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-local4-public-admin-q14", "114-general-public-admin-q35", "115-general-public-admin-q05"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "run", "facing": "right"}], "props": ["stopwatch", "coins"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "時間研究"},
+          {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["office"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "中上層"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "POSDCORB"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["org-chart"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 0}, "sign": "官僚體制"}
+        ] }
     },
     {
       "id": "concept-pa-motivation",
@@ -78,7 +94,15 @@
         { "heading": "過程理論", "lines": ["佛洛姆：期望理論（期望、工具、價值）", "亞當斯：公平理論，和別人比", "洛克：目標設定理論"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q32", "113-general-public-admin-q33", "113-local4-public-admin-q34", "113-local4-public-admin-q35", "114-general-public-admin-q34"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "hop", "mood": "yay", "facing": "right"}], "props": ["ladder"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "自我實現"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["coins"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "只能防不滿"},
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}, {"cast": "official", "pose": "stand"}, {"cast": "official", "pose": "hop", "mood": "yay", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "ERG"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["target", "coins"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 0}, "sign": "期望理論"}
+        ] }
     },
     {
       "id": "concept-pa-three-new",
@@ -110,7 +134,15 @@
         { "heading": "黑堡宣言", "lines": ["1980 年代萬斯來等人提出", "行政人員是公共利益的受託者", "和新公共行政同樣重視公平正義"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q03", "113-general-public-admin-q07", "113-local4-public-admin-q02", "113-local4-public-admin-q03", "113-local4-public-admin-q04", "113-local4-public-admin-q06", "113-local4-public-admin-q07", "114-general-public-admin-q04", "114-local4-public-admin-q05", "114-local4-public-admin-q06", "114-local4-public-admin-q34"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "sit", "mood": "yay", "facing": "left"}], "props": ["scale"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "社會公平"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["ship-wheel"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 2}, "sign": "領航而不操槳"},
+          {"scene": "duo", "actors": [{"cast": "official", "pose": "walk", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "服務的是公民"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}], "props": ["key"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "受託者"}
+        ] }
     },
     {
       "id": "concept-pa-budget",
@@ -137,7 +169,15 @@
         { "heading": "之後", "lines": ["1990 年代：成果（企業化）預算", "重視施政成果與授權彈性"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["114-local4-public-admin-q28", "115-general-public-admin-q29"],
+      "comic": { "layout": "timeline",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["document", "magnifier"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "控制"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "run", "facing": "right"}], "props": ["stopwatch"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "管理與效率"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["scale", "calendar"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "長期規劃"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["eraser"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "優先順序"}
+        ] }
     },
     {
       "id": "concept-pa-policy",
@@ -167,7 +207,16 @@
         { "heading": "政策評估", "lines": ["預評估、過程評估、結果評估", "看政策有沒有達成目標，要不要調整"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q41", "114-general-public-admin-q42", "114-local4-public-admin-q40"],
+      "comic": { "layout": "timeline",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["target"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "第三類型錯誤"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["document"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "可行性"},
+          {"scene": "solo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}], "props": ["ballot-box"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 1}, "sign": "審議通過"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "walk", "facing": "right"}], "props": ["stamp"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "由下而上"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["magnifier"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 1}, "sign": "達成目標"}
+        ] }
     },
     {
       "id": "concept-pa-leadership",
@@ -193,7 +242,15 @@
         { "heading": "轉換型領導", "lines": ["柏恩斯提出，相對於交易型領導", "用願景與魅力激發部屬超越自我"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q34", "113-local4-public-admin-q33", "115-general-public-admin-q32"],
+      "comic": { "layout": "timeline",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["crown"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "天生"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "stand", "facing": "left"}], "props": ["scale"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 2}, "sign": "關心人或事"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["umbrella"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "看情境"},
+          {"scene": "crowd", "actors": [{"cast": "agency", "pose": "walk", "mood": "yay", "facing": "right"}, {"cast": "official", "pose": "walk", "facing": "right"}, {"cast": "official", "pose": "walk", "facing": "right"}], "props": ["flag"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "願景與魅力"}
+        ] }
     },
     {
       "id": "concept-pa-responsibility",
@@ -214,7 +271,15 @@
         { "heading": "兩種看法", "lines": ["費納：靠外部控制才可靠", "傅立德：靠內在的專業與良知"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q09", "114-general-public-admin-q12", "114-local4-public-admin-q11"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "stand", "facing": "left"}], "props": ["org-chart"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "層級監督"},
+          {"scene": "solo", "actors": [{"cast": "council", "pose": "stand", "facing": "right"}], "props": ["courthouse"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "議會監督"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["heart"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "專業倫理"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["megaphone"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 0}, "sign": "傳播媒體"}
+        ] }
     },
     {
       "id": "concept-pa-ppp",
@@ -235,7 +300,16 @@
         { "heading": "為什麼要做", "lines": ["減輕政府的財政負擔", "引進民間資金與經營效率"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q48", "113-local4-public-admin-q49", "114-general-public-admin-q48", "114-local4-public-admin-q48", "115-general-public-admin-q48"],
+      "comic": { "layout": "versus",
+        "columns": [{"from": "heading", "face": 0}, {"from": "heading", "face": 1}],
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}], "props": ["crane", "coins"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "民間出錢"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "產權"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["crane"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "政府蓋好"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}, {"cast": "agency", "pose": "stand", "facing": "left"}], "props": ["key"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "營運權"}
+        ] }
     },
     {
       "id": "concept-pa-npo",
@@ -256,7 +330,15 @@
         { "heading": "社會企業", "lines": ["用商業模式解決社會或環境問題", "兼顧經濟價值與社會價值"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q45", "113-local4-public-admin-q48", "114-general-public-admin-q46", "114-general-public-admin-q47", "114-local4-public-admin-q45", "114-local4-public-admin-q47", "115-general-public-admin-q47"],
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["coins"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "市場失靈"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "left"}, {"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "left"}], "props": ["office"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "政府失靈"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["heart", "coins"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "慈善不足"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "walk", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["money-bag"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "政府出錢"}
+        ] }
     },
     {
       "id": "concept-pa-participation",
@@ -278,7 +360,14 @@
         { "heading": "跨域治理", "lines": ["跨行政疆界，也跨公、私、第三部門", "要打破本位主義", "牽涉地盤與經費，政治性高"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q35", "113-general-public-admin-q39", "113-general-public-admin-q49", "113-local4-public-admin-q37", "113-local4-public-admin-q38", "113-local4-public-admin-q44", "113-local4-public-admin-q47", "113-local4-public-admin-q50", "114-general-public-admin-q49", "115-general-public-admin-q44"],
+      "comic": { "layout": "ladder",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "hop", "mood": "yay", "facing": "right"}], "props": ["ladder", "ballot-box"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "公民權力"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "sit", "facing": "left"}], "props": ["document"], "text": {"from": "line", "face": 1, "line": 1}, "sign": "象徵式參與"},
+          {"scene": "duo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}, {"cast": "citizen", "pose": "dangle", "mood": "oops", "facing": "left"}], "props": [], "text": {"from": "line", "face": 1, "line": 0}, "sign": "無參與"}
+        ] }
     },
     {
       "id": "concept-pa-org-design",
@@ -304,7 +393,15 @@
         { "law": "行政院組織法", "article": "9" }
       ],
       "essay": null,
-      "questions": ["113-general-admin-law-q09", "114-general-admin-law-q09", "114-local4-public-admin-q17", "115-general-admin-law-q09"]
+      "questions": ["113-general-admin-law-q09", "114-general-admin-law-q09", "114-local4-public-admin-q17", "115-general-admin-law-q09", "113-general-public-admin-q13", "113-general-public-admin-q14", "114-general-public-admin-q11", "114-general-public-admin-q15", "114-general-public-admin-q18", "115-general-public-admin-q13", "115-general-public-admin-q14", "115-general-public-admin-q17"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "sit"}, {"cast": "official", "pose": "stand", "facing": "left"}], "props": ["fence"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "依功能分"},
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "stand", "mood": "yay", "facing": "right"}, {"cast": "agency", "pose": "stand"}, {"cast": "official", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["org-chart"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "部屬越強"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["office", "document"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 2}, "sign": "要用法律定"},
+          {"scene": "crowd", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}, {"cast": "agency", "pose": "sit"}, {"cast": "agency", "pose": "sit", "facing": "left"}], "props": ["ballot-box"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "中選會"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["curtain"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 1}, "sign": "兩廳院"}
+        ] }
     },
     {
       "id": "concept-pa-personnel",
@@ -325,7 +422,15 @@
         { "heading": "公務人員協會", "lines": ["公務員不能組一般工會", "可以依法組公務人員協會", "可談通案制度，不能談個人考績"] }
       ],
       "lawRefs": [],
-      "essay": null
+      "essay": null,
+      "questions": ["113-general-public-admin-q01", "113-general-public-admin-q04", "113-general-public-admin-q22", "113-local4-public-admin-q21", "113-local4-public-admin-q23", "114-general-public-admin-q23", "114-local4-public-admin-q22", "115-general-public-admin-q11", "115-general-public-admin-q23"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}, {"cast": "local", "pose": "stand"}, {"cast": "council", "pose": "stand", "facing": "left"}], "props": [], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "社會的縮影"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["coins"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 2}, "sign": "沒有「績效加給」"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "mood": "yay", "facing": "right"}], "props": ["test-paper"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 2}, "sign": "反應層次"},
+          {"scene": "crowd", "actors": [{"cast": "official", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "stand"}, {"cast": "official", "pose": "stand", "facing": "left"}], "props": ["megaphone"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 2}, "sign": "不能談個人考績"}
+        ] }
     }
   ]
 }
