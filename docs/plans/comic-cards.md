@@ -198,6 +198,8 @@ type ComicTextRef =
 
 張數核對：樣張 3＋A 7＋B 8＋C 8＋D 4＝30（規格列的全部）；加碼 11；合計 41。版型（CC4b 改完，含樣張 remedy-route 改 story）：story 12、timeline 5、versus 8、ladder 3、lineup 13。CC4c 改完：story 12、timeline 5、versus 4、ladder 3、lineup 17（versus 改 lineup 4 張：org-design、motivation、responsibility、personnel）。 CC4d 改完：story 11、timeline 5、versus 4、ladder 3、lineup 18（57 號鄉鎮市 story 改 lineup）。
 
+CC4d 併入時主席裁定（11-27）：Codex 兩條要動引擎的必改不做。①公文用語「上級站高一點」：構圖模板沒有高低擺位，現在靠列的上下、誰走向誰、下行收件那隻坐著來分，夠用；考前不為一張卡加擺位。②時間軸 2→3 換列沒有箭頭：這是引擎原本的設計（`comic.css` 只在往右接的格子畫箭頭，換列靠編號 1–4），已上線的 5 張時間軸都一樣；改它會一次動 5 張，考前不動。
+
 **16 張申論卡**（2026-11-27 使用者：考後才畫沒有用 → 提前到考前，由工作樹線 comic-essay 做；申論卡的關卡只有看圖、配對兩步，看圖下面是原本的遮起來背）。原排在第三條切線（考後，或 12-01 前 41 張都做完還有時間）：它們已經是編號骨架加「遮起來背」，最不缺；一張 10–15 行的論述骨架要先決定哪四行當錨點，比觀念卡費工。做的時候版型一律 `story`（申論本來就是起承轉合），順序照 `essay-local-gov.json`、`essay_chinese.json` 的檔案順序（年度新的在前）。要不要整個拿掉見 §10-4。
 
 **狀態（2026-11-27，CC8 完成，分支 `claude/comic-essay-40e3f2`，主席審過、11-27 併入）**：16 張都有漫畫，全部 `story`。挑格子的規則：「起」破題或定義、「承」制度或要點、「轉」問題、爭議或例外、「合」結論或對策；每格挑最容易考、最好畫成畫面的那一行，舉牌是那行要背的詞。新道具 4 個（拱橋 `bridge`、手機 `phone`、魚 `fish`、虎鯨 `whale`，agy Neon 畫）；Codex 審兩輪（第一輪 18 條：必改 3、建議 15，必改全照改；第二輪 11 條：必改 1、建議 10；原文在共用筆記 `CC8-codex-review-r1.txt`、`r2.txt`）。
