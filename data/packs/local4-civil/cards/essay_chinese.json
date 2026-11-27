@@ -32,7 +32,7 @@
         "panels": [
           {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["phone"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "觸發"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "hop", "mood": "yay", "facing": "right"}], "props": ["phone"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "行動"},
-          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["coins", "hourglass"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "不確定的回報"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["coins", "hourglass"], "text": {"from": "line", "face": 0, "line": 2}, "sign": "獎賞"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "mood": "yay", "facing": "right"}], "props": ["calendar"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "好習慣"}
         ] }
     },
@@ -110,10 +110,10 @@
       "essay": { "paperId": "113-general-chinese", "no": 1 },
       "comic": { "layout": "story",
         "panels": [
-          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "sleepy", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "比較的對象是自己"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "sleepy", "facing": "right"}, {"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "對象是自己"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["magnifier", "test-paper"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "見聞更廣"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stumble", "mood": "oops", "facing": "right"}], "props": ["pothole"], "text": {"from": "line", "face": 2, "line": 1}, "sign": "挫折與堅持"},
-          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["coins", "calendar"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "每天一點點的累積"}
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["coins"], "text": {"from": "line", "face": 3, "line": 0}, "sign": "一點點的累積"}
         ] }
     },
     {
@@ -140,7 +140,7 @@
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "run", "facing": "right"}], "props": ["hourglass"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "把事做好"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "做對的事"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "run", "facing": "left"}], "props": ["target"], "text": {"from": "line", "face": 1, "line": 2}, "sign": "離楚國越來越遠"},
-          {"scene": "prop-big", "actors": [{"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "效能卻是零"}
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "oops", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "效能卻是零"}
         ] }
     },
     {
@@ -172,8 +172,8 @@
         "panels": [
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "mood": "oops", "facing": "right"}], "props": ["hourglass"], "text": {"from": "line", "face": 0, "line": 0}, "sign": "不等於有收穫"},
           {"scene": "solo", "actors": [{"cast": "citizen", "pose": "sit", "facing": "right"}], "props": ["target"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "先問目標"},
-          {"scene": "crowd", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "stand"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 2, "line": 1}, "sign": "分工、時程、檢查"},
-          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["target", "coins"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "方向與方法兼備"}
+          {"scene": "crowd", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}, {"cast": "official", "pose": "stand"}, {"cast": "local", "pose": "stand", "facing": "left"}], "props": ["calendar"], "text": {"from": "line", "face": 2, "line": 1}, "sign": "分工"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["target", "coins"], "text": {"from": "line", "face": 4, "line": 0}, "sign": "方向與方法"}
         ] }
     }
   ]

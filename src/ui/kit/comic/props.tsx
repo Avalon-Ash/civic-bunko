@@ -49,10 +49,35 @@ const TEST_ROWS = [
 
 const BENCH_SLATS = [32, 39] as const;
 
-/** 暫時的圓角方塊：還沒畫的道具（派工單 docs/dispatch/CC8-props.md 會換掉並刪掉這個函式） */
-function draft(): ReactNode {
-  return <rect x="10" y="18" width="44" height="42" rx="8" fill="var(--acc-shade)" {...stroke} />;
-}
+const BRIDGE_POSTS = [
+  [8.5, 28, 38],
+  [20, 23, 33],
+  [32, 21.5, 31.5],
+  [44, 23, 33],
+  [55.5, 28, 38],
+] as const;
+
+const BRIDGE_BODY =
+  'M4.5 38.5 Q32 22 59.5 38.5 V57 Q59.5 59.5 57 59.5 H46.5 V53.5 A14.5 14.5 0 0 0 17.5 53.5 V59.5 H7 Q4.5 59.5 4.5 57 Z';
+
+const PHONE_APPS = [
+  [19.25, 22, 'var(--acc-coral)'],
+  [30.25, 22, 'var(--acc-gold)'],
+  [19.25, 33.5, 'var(--acc-leaf)'],
+  [30.25, 33.5, 'var(--acc-lav)'],
+] as const;
+
+const FISH_DROPS = [
+  [10, 10.5],
+  [52, 17],
+  [16, 49.5],
+] as const;
+
+const FISH_BODY =
+  'M7 33 C8 20 23 15 36 21 C43 24.5 47 32 48.5 39.5 L43 44.5 C37.5 37.5 27 37 18.5 40.5 C12 43 7 39 7 33 Z';
+
+const WHALE_BODY =
+  'M7.5 39 C7.5 28 16 24 27 24.5 C28 18 30 11 33 7.5 C34.5 6 36.2 7.2 36 10.5 C35.8 16 35.5 21 37.5 26.5 C43 29 46.5 34.5 49 36.5 C50.5 34 51.5 31 51.5 28.5 C48.5 27.5 45.5 24.5 46.5 21.8 C47.8 20 51.5 22 53.5 25.5 C56.5 23 60 23.5 60.2 26 C60.5 29 56.5 31.5 53.5 32.5 C52 38 49 44 45 49 H9.5 C7.5 46 7.5 42.5 7.5 39 Z';
 
 export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
   stamp: (
@@ -617,10 +642,84 @@ export const PROP_ART: Readonly<Record<ComicPropId, ReactNode>> = {
       <path d="M26.5 39.2 A6.8 6.8 0 0 1 30.8 36.6" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
     </g>
   ),
-  bridge: draft(),
-  phone: draft(),
-  fish: draft(),
-  whale: draft(),
+  bridge: (
+    <g>
+      <path d="M15 50.5 Q20.5 48.2 26 50.5 Q32 52.8 38 50.5 Q43.5 48.2 49 50.5 V59.5 H15 Z" fill="var(--acc-sky)" {...thin} />
+      {BRIDGE_POSTS.map(([x, yTop, yBot]) => (
+        <rect key={x} x={x - 2} y={yTop} width="4" height={yBot - yTop} rx="1.4" fill="var(--acc-cream)" {...thin} />
+      ))}
+      <path d="M5.5 29 Q32 13 58.5 29" fill="none" stroke={LINE} strokeWidth="6.8" strokeLinecap="round" />
+      <path d="M5.5 29 Q32 13 58.5 29" fill="none" stroke="var(--acc-wood)" strokeWidth="2.8" strokeLinecap="round" />
+      <path d={BRIDGE_BODY} fill="var(--acc-wood)" />
+      <path d="M14.5 53.5 A17.5 17.5 0 0 1 49.5 53.5 H46.5 A14.5 14.5 0 0 0 17.5 53.5 Z" fill="var(--acc-cream)" {...fine} />
+      <path d="M7.5 39.8 Q32 25.5 56.5 39.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.65" />
+      <path d={BRIDGE_BODY} fill="none" {...stroke} />
+      <path d="M17.5 50.5 Q22.5 48.4 27.2 50.5 Q32 52.6 36.8 50.5 Q41.5 48.4 46.5 50.5" fill="none" {...thin} />
+      <path d="M21 54.6 Q24.7 53 28.3 54.6 Q32 56.2 35.7 54.6 Q39.3 53 43 54.6" fill="none" stroke="var(--acc-cream)" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.9" />
+      <path d="M24.5 57.6 Q28.2 56.4 32 57.6 Q35.8 58.8 39.5 57.6" fill="none" stroke="var(--acc-navy)" strokeWidth="1.3" strokeLinecap="round" strokeOpacity="0.5" />
+      <path d="M17.5 59.5 H46.5" fill="none" {...stroke} />
+    </g>
+  ),
+  phone: (
+    <g>
+      <rect x="13" y="9" width="32" height="50.5" rx="6.5" fill="var(--acc-navy)" {...stroke} />
+      <path d="M25.5 13.3 H32.5 M25.5 55.5 H32.5" fill="none" stroke="var(--acc-cream)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.85" />
+      <rect x="17" y="17.5" width="24" height="34" rx="2.8" fill="var(--acc-sky)" {...thin} />
+      <path d="M19.5 46.5 L37 22.5" fill="none" stroke="var(--acc-cream)" strokeWidth="2.8" strokeLinecap="round" strokeOpacity="0.35" />
+      {PHONE_APPS.map(([x, y, fill]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width="8.5" height="8.5" rx="2.2" fill={fill} {...fine} />
+      ))}
+      <path d="M22.5 47 H35.5" fill="none" stroke="var(--acc-cream)" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.8" />
+      <circle cx="44.5" cy="12" r="5.8" fill="var(--acc-coral)" {...stroke} />
+      <path d="M41.8 10 A3.6 3.6 0 0 1 44.6 8.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.85" />
+      <path d="M52.5 9.5 Q55.6 13 53 17.5 M56.3 6.8 Q60.8 13 56.8 20.5" fill="none" stroke="var(--acc-orange)" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M8.5 27.5 Q5.5 34 8.5 40.5" fill="none" stroke="var(--acc-orange)" strokeWidth="2.4" strokeLinecap="round" />
+    </g>
+  ),
+  fish: (
+    <g>
+      {FISH_DROPS.map(([x, y]) => (
+        <path
+          key={`${x}-${y}`}
+          d={`M${x} ${y} C${x + 3.4} ${y + 4} ${x + 3.4} ${y + 8} ${x} ${y + 8} C${x - 3.4} ${y + 8} ${x - 3.4} ${y + 4} ${x} ${y} Z`}
+          fill="var(--acc-sky)"
+          {...thin}
+        />
+      ))}
+      <path d="M19 20.5 C22 10 35.5 10.5 40 21 L35 23.5 L20 22 Z" fill="var(--acc-coral)" {...stroke} />
+      <path d="M26 14.5 L25.5 19.5 M32 15.2 L31 20.2" fill="none" {...fine} />
+      <path
+        d="M47.5 39 C53.5 38 59.8 39.8 60 44.8 C60.2 47.8 57.2 49.6 54.8 50.2 C57 52.8 56.5 56.8 53.2 58.8 C49.2 60.5 44.5 54 43 44 Z"
+        fill="var(--acc-coral)"
+        {...stroke}
+      />
+      <path d="M48.5 43.5 L55.5 44.8 M46.8 46.2 L52.5 53.5" fill="none" {...fine} />
+      <path d={FISH_BODY} fill="var(--acc-silver)" />
+      <path d="M10 37.5 C15 41 25 36.5 37 38 C40 39 42 41 43 44.5 C37.5 37.5 27 37 18.5 40.5 C13.5 42.5 10.5 40.5 10 37.5 Z" fill="var(--acc-cream)" fillOpacity="0.45" />
+      <path d="M16 21.5 Q24.5 18.2 33 21.5" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.75" />
+      <path d="M21 24.5 C23.2 28.8 22.8 33.8 20 37 M7.5 34.5 Q10 36.2 12 34.8" fill="none" {...thin} />
+      <path d="M27.5 24.8 A3.1 3.1 0 0 1 27.5 30.2 M33.5 25.8 A3.1 3.1 0 0 1 33.5 31.2 M30.5 29.8 A3.1 3.1 0 0 1 30.5 35.2 M37.5 30.2 A3.1 3.1 0 0 1 37.5 35.6" fill="none" {...fine} />
+      <path d={FISH_BODY} fill="none" {...stroke} />
+      <path d="M23 34 C26.5 33.5 31 37.2 29.5 41.5 C28 44.8 22.8 43.2 21.5 38.5 Z" fill="var(--acc-coral)" {...thin} />
+      <circle cx="14.5" cy="29.5" r="4.2" fill="var(--acc-cream)" {...thin} />
+      <circle cx="13.8" cy="29.3" r="2.2" fill={LINE} />
+      <circle cx="14.7" cy="28.2" r="0.9" fill="var(--acc-cream)" />
+    </g>
+  ),
+  whale: (
+    <g>
+      <path d={WHALE_BODY} fill="var(--acc-night)" />
+      <path d="M8 41 C13 42.5 18 41.5 23 41 C28 40.5 33 35.5 38 36 C41.5 36.5 41 42 39 49 H9.5 C8 46.5 7.8 43.5 8 41 Z" fill="var(--acc-cream)" />
+      <path d="M8 41 Q13 42.5 17.5 41.6" fill="none" {...fine} />
+      <ellipse cx="21.5" cy="31.5" rx="5.2" ry="2.8" transform="rotate(-14 21.5 31.5)" fill="var(--acc-cream)" />
+      <path d="M12.5 30 Q18 26.5 24.8 26.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.45" />
+      <circle cx="13.8" cy="35.2" r="2.2" fill="var(--acc-cream)" />
+      <circle cx="13.4" cy="35.3" r="1.2" fill={LINE} />
+      <path d={WHALE_BODY} fill="none" {...stroke} />
+      <path d="M4 47 Q11 43.5 18 47 Q25 50.5 32 47 Q39 43.5 46 47 Q53 50.5 60 47 V56.5 Q60 59.5 57 59.5 H7 Q4 59.5 4 56.5 Z" fill="var(--acc-sky)" {...stroke} />
+      <path d="M11 53.5 Q16.5 51.5 22 53.5 Q27.5 55.5 33 53.5 M39.5 54.2 Q44.8 52.2 50 54.2 Q53 55.2 55.5 53.8" fill="none" stroke="var(--acc-cream)" strokeWidth="1.8" strokeLinecap="round" strokeOpacity="0.9" />
+    </g>
+  ),
 };
 
 export function ComicProp({ id, title }: { id: ComicPropId; title?: string }) {
