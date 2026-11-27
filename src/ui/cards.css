@@ -550,3 +550,16 @@
 .cb-level-next {
   width: 100%;
 }
+
+/* 標題旁的記號：「該複習」＋星星（CC5） */
+.cb-card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+
+.cb-card-due {
+  font-size: var(--text-small);
+  padding-block: 1px;
+}

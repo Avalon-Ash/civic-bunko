@@ -6,7 +6,7 @@ import type { LawRef } from '../../../core/types';
 import type { World } from '../../../core/world';
 import { formatLawRef } from '../../../data/laws';
 import { currentQuestion, readView, roundSummary } from '../../../selectors';
-import { cardHasMatch, cardStars, type CardStars } from '../../../selectors/cardLevel';
+import { cardDueCount, cardHasMatch, cardStars, type CardStars } from '../../../selectors/cardLevel';
 import { cardQuestionIds } from '../../../selectors/cardLinks';
 import type { CardView } from '../../../selectors/cards';
 import { Button } from '../../kit/Button';
@@ -68,6 +68,7 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
   const steps: LevelStep[] = ['look', ...(comic && cardHasMatch(card) ? (['match'] as const) : []), ...(questionCount > 0 ? (['quiz'] as const) : [])];
   const step: LevelStep = level && steps.includes(level.step) ? level.step : 'look';
   const stars = cardStars(world, card);
+  const dueToday = cardDueCount(world, card, new Date());
   const nextStep = steps[steps.indexOf(step) + 1] ?? null;
 
   // 第 3 步的「這次成績」：只認這一關打開之後才有的回合成績（一題都沒答就結束的不算），避免顯示上一回合的舊成績。
@@ -209,6 +210,7 @@ export function CardLevelScreen({ world, card }: CardLevelScreenProps) {
                   <p>
                     這張卡連到 {questionCount} 題考古題，答法和刷題一樣，會計小魚乾。
                     {stars.quizCleared > 0 ? `已經答對過 ${stars.quizCleared} 題。` : ''}
+                    {dueToday > 0 ? `其中 ${dueToday} 題今天該複習。` : ''}
                   </p>
                 )}
                 <Button

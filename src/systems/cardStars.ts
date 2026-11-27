@@ -1,8 +1,10 @@
 // 圖卡闖關的三顆星（ADR 0023）：只在這裡導出，畫面經 selectors/cardStars 讀。
+// 該複習＝連到的官方題有幾題今天到期（到期的判斷只在 date.isDue，和刷題頁的「該複習」回合同一個）。
 // 看過＝cardsSeen；配對＝cardsMatched（沒有可配對的漫畫就沒有這顆）；實戰＝連到的官方題每題都答對過（沒掛題就沒有這顆）。
 import type { StudyCard } from '../core/types';
 import type { World } from '../core/world';
 import { cardQuestionIds } from './cardLinks';
+import { isDue } from './date';
 import { comicMatchSet } from './comicMatch';
 
 export interface CardStars {
@@ -41,4 +43,12 @@ export function cardStars(world: World, card: Pick<StudyCard, 'id' | 'hook' | 'f
     quizCleared,
     quizTotal: questions.length,
   };
+}
+
+/** 這張卡連到的官方題裡，今天該複習（到期）的有幾題；0＝不用複習 */
+export function cardDueCount(world: World, card: Pick<StudyCard, 'id'>, now: Date): number {
+  return cardQuestionIds(world, card.id).filter((id) => {
+    const prog = world.progress.get(id);
+    return prog !== undefined && isDue(prog.due, now);
+  }).length;
 }

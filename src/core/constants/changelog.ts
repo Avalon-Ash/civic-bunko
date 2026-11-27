@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-27-card-due',
+    date: '2026-11-27',
+    title: '圖卡會告訴你哪張該複習了',
+    items: [
+      '圖卡連到的考古題裡，有題目今天到了複習時間，卡片標題旁就會出現「該複習」（和刷題頁的「該複習」是同一套時間）',
+      '點進那一關的「實戰」，會寫出其中幾題今天該複習',
+    ],
+  },
+  {
     id: '2026-11-27-comic-d',
     date: '2026-11-27',
     title: '再多 10 張圖卡有漫畫：新法、作文、公文、閱讀題、行政罰、懲戒',

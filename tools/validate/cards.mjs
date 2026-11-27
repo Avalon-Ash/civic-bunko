@@ -1,10 +1,27 @@
-// 卡片驗收：node tools/validate/cards.mjs
-// 字數上限與 src/core/constants/cards.ts 相同（.mjs 無法 import）；改那邊時要一起改。
+// 卡片驗收：node --import tsx tools/validate/cards.mjs（npm run validate）
+// 字數上限只在 src/core/constants/cards.ts，這裡直接讀它。
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { LAWS_DIR, listPacks, packPaths } from '../paths.mjs';
+import {
+  CARD_FACE_LINES_MAX,
+  CARD_FACES_MAX,
+  CARD_HEADING_MAX,
+  CARD_HOOK_MAX,
+  CARD_LINE_MAX,
+  CARD_TITLE_MAX,
+  CARD_VISUAL_TEXT_MAX,
+} from '../../src/core/constants/cards.ts';
 
-const LIMIT = { title: 16, hook: 30, heading: 10, line: 30, faceLines: 3, faces: 5, visualText: 14 };
+const LIMIT = {
+  title: CARD_TITLE_MAX,
+  hook: CARD_HOOK_MAX,
+  heading: CARD_HEADING_MAX,
+  line: CARD_LINE_MAX,
+  faceLines: CARD_FACE_LINES_MAX,
+  faces: CARD_FACES_MAX,
+  visualText: CARD_VISUAL_TEXT_MAX,
+};
 const KINDS = new Set(['concept', 'newlaw', 'essay']);
 const TONES = new Set(['plain', 'hot', 'key']);
 const read = (p) => JSON.parse(readFileSync(p, 'utf8'));

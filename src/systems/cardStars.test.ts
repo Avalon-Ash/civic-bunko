@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import { COMIC_SCENES } from '../core/constants/comic';
 import type { ComicSceneId, StudyCard } from '../core/types';
 import { createTestWorld, testPaperFiles } from '../testing/fixture';
-import { cardStars } from './cardStars';
+import { cardDueCount, cardStars } from './cardStars';
 
 const ids = testPaperFiles.flatMap((f) => f.questions.map((q) => q.id));
 const scene = Object.keys(COMIC_SCENES)[0] as ComicSceneId;
@@ -32,8 +32,8 @@ function card(id: string, opts: { comic?: boolean; questions?: string[] } = {}):
   };
 }
 
-function progress(correct: number) {
-  return { seen: 1, correct, views: 0, streak: correct, lastPick: null, lastAt: '2026-11-27T00:00:00.000Z', due: null };
+function progress(correct: number, due: string | null = null) {
+  return { seen: 1, correct, views: 0, streak: correct, lastPick: null, lastAt: '2026-11-27T00:00:00.000Z', due };
 }
 
 test('有漫畫又有題的卡有三顆星，各自從看過、配對過、題目都答對過導出', () => {
@@ -60,4 +60,19 @@ test('沒有漫畫的卡沒有配對那顆；沒掛題的卡沒有實戰那顆',
   world.settings = { ...world.settings, cardsSeen: ['n'], cardsMatched: ['n', 'p'] };
   assert.deepEqual(cardStars(world, plain), { seen: false, matched: null, cleared: false, earned: 0, total: 2, quizCleared: 0, quizTotal: 1 });
   assert.deepEqual(cardStars(world, noQuiz), { seen: true, matched: true, cleared: null, earned: 2, total: 2, quizCleared: 0, quizTotal: 0 });
+});
+
+test('該複習：連到的官方題今天到期的題數（沒作答過、已畢業、還沒到期的不算）', () => {
+  const world = createTestWorld();
+  const linked = ids.slice(0, 4);
+  const c = card('d', { questions: linked });
+  world.cards = [c];
+  const now = new Date(2026, 10, 27, 12);
+  assert.equal(cardDueCount(world, c, now), 0);
+  world.progress.set(linked[0]!, progress(1, '2026-11-27'));
+  world.progress.set(linked[1]!, progress(0, '2026-11-20'));
+  world.progress.set(linked[2]!, progress(1, '2026-11-28'));
+  world.progress.set(linked[3]!, progress(3, null));
+  assert.equal(cardDueCount(world, c, now), 2);
+  assert.equal(cardDueCount(world, card('none'), now), 0);
 });

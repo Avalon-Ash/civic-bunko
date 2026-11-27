@@ -20,7 +20,7 @@ import { Cat } from '../kit/Cat';
 import { Chip } from '../kit/Chip';
 import { Collapse } from '../kit/Collapse';
 import { Segmented, type SegmentedOption } from '../kit/Segmented';
-import { cardStars } from '../../selectors/cardLevel';
+import { cardDueCount, cardStars } from '../../selectors/cardLevel';
 import { guideAnchor, useGo } from '../useGuide';
 import { useLevel } from '../useLevel';
 import { useWorld } from '../useWorld';
@@ -87,6 +87,7 @@ function CardGrid({
   showSubject: boolean;
   onSelect: (id: string) => void;
 }) {
+  const now = new Date();
   return (
     <div className="cb-card-grid">
       {cards.map((card) => (
@@ -99,11 +100,27 @@ function CardGrid({
             card={card}
             onSelect={onSelect}
             showSubject={showSubject}
-            badge={isLevelCard(card) ? <LevelStars stars={cardStars(world, card)} /> : undefined}
+            badge={<CardBadge world={world} card={card} now={now} />}
           />
         </div>
       ))}
     </div>
+  );
+}
+
+/** 標題旁的記號：關卡的星星；連到的考古題今天有到期的，再加「該複習」 */
+function CardBadge({ world, card, now }: { world: World; card: CardView; now: Date }) {
+  const due = cardDueCount(world, card, now);
+  if (!isLevelCard(card) && due === 0) return null;
+  return (
+    <span className="cb-card-badge">
+      {due > 0 ? (
+        <Chip tone="orange" className="cb-card-due" aria-label={`該複習 ${due} 題`}>
+          該複習
+        </Chip>
+      ) : null}
+      {isLevelCard(card) ? <LevelStars stars={cardStars(world, card)} /> : null}
+    </span>
   );
 }
 

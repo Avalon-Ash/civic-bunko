@@ -93,3 +93,4 @@
 - [0021 漫畫的資料在 pack、版型與道具畫法在引擎，道具與角色是引擎的通用詞彙表](0021-comic-vocabulary-in-engine.md)：版型、構圖、道具、角色只列在 `constants/comic.ts`，畫法在 `ui/kit/comic/`，演員沿用小貓，卡片只引用詞彙表的 ID。
 - [0022 卡片↔官方題的連結只存在卡片的 questions；卡片回合不存卡片、複習狀態由作答紀錄導出](0022-card-question-links.md)：`StudyCard.questions` 是唯一正本，查詢只經 `cardLinks`；`startCardRound` 不在 `RoundConfig` 加欄位，零新存檔欄位。
 - [0023 圖卡闖關：配對完成存進選填的 settings.cardsMatched，三顆星只在一處導出](0023-card-levels-match-saved.md)：（部分取代 0022）配對全對過的卡片 ID 存選填欄位、同步取聯集；看過、配對、實戰三顆星只在 `systems/cardStars.ts` 導出；連連看由漫畫資料機械產生，實戰只用官方題。
+- [0024 驗證腳本經 tsx 直接讀 src 的常數，字數上限只有一份](0024-validators-read-ts-constants.md)：（部分取代 0002 的後果）`tools/validate/cards.mjs` 經 `--import tsx` 讀 `constants/cards.ts`，visual 格子上限一起搬進去；新驗證腳本用 `src/` 的常數一律經 tsx 讀，不抄。

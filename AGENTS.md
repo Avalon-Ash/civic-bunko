@@ -36,7 +36,7 @@
 - 每筆帶 `model`、`generatedAt`、`reviewed`（預設 `false`）。畫面上未審查的解析要標示「AI 解析」。
 - 卡片（觀念、新法、申論架構）放 `data/packs/<包ID>/cards/**`，由主代理撰寫；申論題原文不寫進卡片檔，載入時從官方層帶入。
 - 解析引用法條必須寫法規名稱與條號，且條文內容要能在 `data/laws/**`（全國法規資料庫的本機副本）查到；查不到就寫 `lawRef: null` 並在 `note` 說明，不憑印象寫條號。
-- 字數上限由 `npm run validate` 強制（口訣 ≤ 40 字、陷阱提醒 ≤ 30 字、白話情境 ≤ 60 字、單一選項解析 ≤ 50 字；卡片每行 ≤ 30 字、每面 ≤ 3 行、每張 ≤ 5 面，數字在 `src/core/constants/cards.ts` 與 `tools/validate/cards.mjs`）。超過就拆卡，不放寬上限。
+- 字數上限由 `npm run validate` 強制（口訣 ≤ 40 字、陷阱提醒 ≤ 30 字、白話情境 ≤ 60 字、單一選項解析 ≤ 50 字；卡片每行 ≤ 30 字、每面 ≤ 3 行、每張 ≤ 5 面，數字只在 `src/core/constants/cards.ts`，驗證腳本經 tsx 讀它，ADR 0024）。超過就拆卡，不放寬上限。
 
 **架構（ECS＋SSOT，細節在開案書 §4）**
 - 型別只定義在 `src/core/types.ts`；數值、上限、日期、顏色語意只定義在 `src/core/constants/*.ts` 與 `src/theme.css`。其他地方不寫魔術數字、不重複定義。

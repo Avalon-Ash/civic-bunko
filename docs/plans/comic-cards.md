@@ -285,7 +285,7 @@ Codex 意見沒照改的（理由）：
 | 包數 | 3 包（CC1、CC3、CC4a）＋UX 案的 UX3 | 7 包（再加 CC2、CC4b、CC4c、CC7）；CC5 的記號看時間 |
 | 申論卡 | 不做 | 不做（第三條切線） |
 
-**第三條切線（考後）**：規格列的剩下 8 張（`concept-pa-org-design`、`newlaw-lga-61-pay`、`newlaw-lga-57-township`、`newlaw-lga-33-gender`、`newlaw-lga-83-7-fund`、`newlaw-fiscal-16-1-split`、`concept-zh-essay-structure`、`concept-zh-official-doc`）、加碼 11 張、16 張申論卡（CC8）、§10-3 的解耦（CC6）、CC5 沒趕上的部分。12-02 起不加功能，所以這條線是考後；做不做由使用者決定（題庫切換 PK3 之後換包，漫畫引擎可以沿用）。12-01 上午若 22 張提早畫完，照上面這 8 張的順序往下畫，畫幾張算幾張。
+**第三條切線（原排考後，2026-11-27 全部提前做完）**：規格列的剩下 8 張、加碼 11 張、16 張申論卡（CC8）都已上線（漫畫共 57 張）；CC5、CC6 也在 11-27 做完（使用者：考完就不會再開）。
 
 - **CC1 當天她就用得到**：3 張樣張連同引擎、遮起來想一起上線（本專案驗收過可直接推，`docs/HANDOFF.md`「push 授權」）。
 - **2 天版不假設樣張一次過關**。樣張造形被退：停下來要參考圖（§9），主席那天改審 UX 包與 CC3（題目連結對文字卡也有用），張數照退幾天少幾批。
@@ -308,10 +308,10 @@ Codex 意見沒照改的（理由）：
 | CC2 排一排（2026-11-27 改成 `docs/plans/level-mode.md` 的連連看，不另做） | 11-30 | `systems/comicQuiz.ts`（純函式，給種子就固定）＋ `src/ui/components/cards/comic/*` 的排序與配對練習。主席先寫紅色測試 | agy Neon medium（`C:\Git\_wt_civic_comic_quiz`） | CC1 併入 |
 | CC4b 美術 B 批 | 11-30（11-27 完成） | 8 張 | 主席 | CC4a |
 | CC4c 美術行政學 13 張（11-27 起，工作樹線 comic-pa） | 12-01 上午 | 原定 C 批前 4 張，使用者 11-27 改成行政學 13 張全做：`concept-pa-*` 全部；掛題由該線主席逐題看題幹挑（行政學沒有法條可比對，用關鍵詞與考點找候選），找不到就不掛 | 主席（工作樹線） | CC4b |
-| CC5 複習記號 | 12-01 上午 | 「該複習／熟了」：由 `Progress` 導出的 selector＋測試，加一個小元件放進 UX3 在列表上留的位置（不改 `CardsScreen.tsx`、`cards.css` 的版面）。中午前併不進來就留到考後 | agy Neon medium | CC3、UX3 併入 |
+| CC5 複習記號 | 11-27 完成 | 「該複習」：卡片連到的官方題今天有到期的（判斷沿用 `date.isDue`，和刷題頁的「該複習」回合同一個），列表標題旁加「該複習」，關卡實戰步驟寫「其中 N 題今天該複習」；「熟了」由星星表示，不另做。導出在 `systems/cardStars.ts` 的 `cardDueCount`＋測試 | 主席 | — |
 | CC7 收尾 | 12-01 下午 | 全量驗收、兩種尺寸×日夜截圖、`docs/HANDOFF.md` 更新（含沒在實機驗到的）；和 UX5 同一個下午一起做 | 主席 | 全部 |
 | CC4c 後 4、CC4d、加碼 | 考後 | §6 第三條切線列的 8 張＋加碼 11 張；其餘行政學、國文卡的掛題（Hydrogen 找候選、主席審） | 主席＋agy Hydrogen | 使用者決定 |
-| CC6 驗證腳本解耦 | 考後（使用者同意後） | `tools/validate/cards.mjs` 改用 `node --import tsx` 讀 `constants/cards.ts`；證明行為不變：改前改後 `npm run validate` 輸出逐字相同，再故意放一張超長卡確認仍會紅 | agy Hydrogen high | §10-3 同意 |
+| CC6 驗證腳本解耦 | 11-27 完成（ADR 0024） | `tools/validate/cards.mjs` 經 `node --import tsx` 讀 `constants/cards.ts`（visual 格子上限一起搬過去）；改前改後輸出逐字相同，17 字標題仍會紅 | 主席 | — |
 | CC8 申論卡漫畫 | 11-27 起（使用者：考後才畫沒有用；11-27 完成，§4 末） | 16 張，版型 `story` | 工作樹線 comic-essay | — |
 
 **檔案歸屬**（完整的表在 `ux-cleanup.md` §6）：
