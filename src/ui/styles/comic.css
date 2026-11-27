@@ -50,6 +50,8 @@
 
 /* 上到下：每往下一層往右退一階，像樓梯 */
 .cb-comic-ladder .cb-comic-panel {
+  /* 遮起來想時格子是按鈕（width: 100%），加上退階的邊距會超出右邊：寬度交給格線 */
+  width: auto;
   margin-inline-start: calc(var(--cb-comic-i, 0) * var(--cb-comic-step));
   --cb-comic-step: 7%;
 }
