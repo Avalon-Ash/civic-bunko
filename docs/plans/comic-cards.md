@@ -164,14 +164,14 @@ type ComicTextRef =
 | A | `concept-lg-supervision` | story | |
 | A | `concept-lg-council` | story | |
 | A | `concept-law-rank` | ladder | 三層樓 |
-| B | `concept-period` | timeline | 日曆 |
-| B | `concept-al-principles` | lineup | |
-| B | `concept-con-limit` | timeline | 三道關卡 |
-| B | `concept-con-five-yuan` | lineup | |
-| B | `concept-lg-residents` | story | |
-| B | `newlaw-lga-55-city` | lineup | 3 人、14 職等、行政院 |
+| B | `concept-period` | story | 原定 timeline；內容是「規則、規則、例外、例外的例外」不是先後步驟，「處罰類例外」正好當「轉」，「對人民有利就用一般」當「合」（CC4b 改） |
+| B | `concept-al-principles` | lineup | 五個原則一格一列 |
+| B | `concept-con-limit` | lineup | 原定 timeline「三道關卡」；三個條件是同時要過、不是先後，改排排站 2×2：目的、法律、必要＋人身自由的 24 小時（CC4b 改） |
+| B | `concept-con-five-yuan` | lineup | 一院一列，舉牌是人數；行政院舉「總統任命」 |
+| B | `concept-lg-residents` | story | 卡片沒有陷阱行：「轉」放義務（繳稅） |
+| B | `newlaw-lga-55-city` | lineup | 3 人、14 職等、行政院；2×2：市長（備查）、副市長、秘書長、一級主管 |
 | B | `newlaw-lga-56-county` | lineup | 和上一張同構圖，方便對照 |
-| B | `newlaw-fiscal-8-source` | lineup | |
+| B | `newlaw-fiscal-8-source` | lineup | 三種稅的標籤用那一行的 `pick`；第四格「不是來源」不舉牌 |
 | C | `concept-pa-classic` | lineup | 三位學者 |
 | C | `concept-pa-three-new` | lineup | |
 | C | `concept-pa-leadership` | timeline | |
@@ -196,7 +196,7 @@ type ComicTextRef =
 | 加碼 | `concept-pa-participation` | ladder | |
 | 加碼 | `concept-zh-reading` | timeline | |
 
-張數核對：樣張 3＋A 7＋B 8＋C 8＋D 4＝30（規格列的全部）；加碼 11；合計 41。版型：story 10、timeline 8、versus 8、ladder 3、lineup 12。
+張數核對：樣張 3＋A 7＋B 8＋C 8＋D 4＝30（規格列的全部）；加碼 11；合計 41。版型（CC4b 改完，含樣張 remedy-route 改 story）：story 12、timeline 5、versus 8、ladder 3、lineup 13。
 
 **16 張申論卡排在第三條切線（考後，或 12-01 前 41 張都做完還有時間）**：它們已經是編號骨架加「遮起來背」，最不缺；一張 10–15 行的論述骨架要先決定哪四行當錨點，比觀念卡費工。做的時候版型一律 `story`（申論本來就是起承轉合），順序照 `essay-local-gov.json`、`essay_chinese.json` 的檔案順序（年度新的在前）。要不要整個拿掉見 §10-4。
 

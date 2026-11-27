@@ -70,7 +70,15 @@
         { "law": "行政程序法", "article": "10" }
       ],
       "essay": null,
-      "questions": ["113-general-admin-law-q50", "114-general-admin-law-q04"]
+      "questions": ["113-general-admin-law-q50", "114-general-admin-law-q04"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["document"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 2}, "sign": "法律保留"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}], "props": ["scale"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "損害最少"},
+          {"scene": "crowd", "actors": [{"cast": "citizen", "pose": "sit"},{"cast": "citizen", "pose": "sit"},{"cast": "citizen", "pose": "sit"}], "props": [], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "不得差別待遇"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "yay", "facing": "right"}], "props": ["umbrella"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 1}, "sign": "合理的信賴"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["fence"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 0}, "sign": "不得逾越"}
+        ] }
     },
     {
       "id": "concept-al-act-defect",
@@ -587,7 +595,14 @@
         { "law": "地方制度法", "article": "17" }
       ],
       "essay": null,
-      "questions": ["113-general-public-admin-q44", "114-general-local-gov-q03", "114-local4-local-gov-q05", "115-general-local-gov-q09"]
+      "questions": ["113-general-public-admin-q44", "114-general-local-gov-q03", "114-local4-local-gov-q05", "115-general-local-gov-q09"],
+      "comic": { "layout": "story",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "walk", "facing": "right"}], "props": ["house"], "text": {"from": "line", "face": 0, "line": 1}, "sign": "設籍"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "facing": "right"}], "props": ["ballot-box"], "text": {"from": "line", "face": 1, "line": 0}, "sign": "選舉、罷免"},
+          {"scene": "duo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"},{"cast": "local", "pose": "stand", "facing": "left"}], "props": ["coins"], "text": {"from": "line", "face": 3, "line": 1}, "sign": "自治稅捐"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "sit", "mood": "yay", "facing": "right"}], "props": ["bench"], "text": {"from": "line", "face": 2, "line": 0}, "sign": "公共設施"}
+        ] }
     },
     {
       "id": "concept-con-limit",
@@ -651,7 +666,14 @@
         { "law": "中華民國憲法", "article": "8" },
         { "law": "行政程序法", "article": "7" }
       ],
-      "essay": null
+      "essay": null,
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["target"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 1}, "sign": "公共利益"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}], "props": ["document"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 1}, "sign": "法律保留"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["scale"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "比例原則"},
+          {"scene": "solo", "actors": [{"cast": "citizen", "pose": "stand", "mood": "oops", "facing": "right"}], "props": ["handcuffs", "hourglass"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 1}, "sign": "24 小時"}
+        ] }
     },
     {
       "id": "concept-con-thresholds",
@@ -792,7 +814,15 @@
         { "law": "行政院組織法", "article": "5" }
       ],
       "essay": null,
-      "questions": ["113-local4-law-english-q14", "114-general-public-admin-q20", "114-local4-law-english-q08", "115-general-law-english-q12"]
+      "questions": ["113-local4-law-english-q14", "114-general-public-admin-q20", "114-local4-law-english-q08", "115-general-law-english-q12"],
+      "comic": { "layout": "lineup",
+        "panels": [
+          {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["office"], "label": {"from": "heading", "face": 0}, "text": {"from": "line", "face": 0, "line": 0}, "sign": "總統任命"},
+          {"scene": "crowd", "actors": [{"cast": "council", "pose": "stand", "facing": "right"},{"cast": "council", "pose": "stand"},{"cast": "council", "pose": "stand", "facing": "left"}], "props": ["ballot-box"], "label": {"from": "heading", "face": 1}, "text": {"from": "line", "face": 1, "line": 0}, "sign": "113 人"},
+          {"scene": "prop-big", "actors": [{"cast": "agency", "pose": "sit", "facing": "right"}], "props": ["courthouse"], "label": {"from": "heading", "face": 2}, "text": {"from": "line", "face": 2, "line": 0}, "sign": "15 人"},
+          {"scene": "solo", "actors": [{"cast": "official", "pose": "sit", "facing": "right"}], "props": ["test-paper"], "label": {"from": "heading", "face": 3}, "text": {"from": "line", "face": 3, "line": 0}, "sign": "若干人"},
+          {"scene": "solo", "actors": [{"cast": "agency", "pose": "stand", "facing": "right"}], "props": ["magnifier"], "label": {"from": "heading", "face": 4}, "text": {"from": "line", "face": 4, "line": 0}, "sign": "29 人"}
+        ] }
     },
     {
       "id": "concept-lg-council",
