@@ -3,6 +3,16 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-28-card-diagrams-all',
+    date: '2026-11-28',
+    title: '57 張圖卡的架構圖全部重畫',
+    items: [
+      '有層級、有分支的（行政法、地方自治、新法、行政學的理論演進）畫成樹狀圖，每一層是什麼、線上寫著期限與條件',
+      '要比較好幾項的（五院、憲法門檻、BOT 家族、自治條例與規則、預算制度）畫成表格',
+      '申論卡的圖照答題架構畫：破題、論述、結論各寫什麼',
+    ],
+  },
+  {
     id: '2026-11-28-card-diagrams',
     date: '2026-11-28',
     title: '圖卡的架構圖畫得更完整（先改 4 張）',
