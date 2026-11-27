@@ -198,6 +198,41 @@
   border-bottom: 2px dashed var(--line);
 }
 
+/* 登場角色（kit/comic/ComicCastList.tsx）：手機上兩欄，一格＝頭像＋名字＋一句說明 */
+.cb-comic-cast {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px 10px;
+  margin: 6px 0 2px;
+  padding: 0;
+  list-style: none;
+}
+
+.cb-comic-cast-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cb-comic-cast-item > :first-child {
+  flex: none;
+}
+
+.cb-comic-cast-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: var(--text-small);
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
+.cb-comic-cast-text b {
+  color: var(--ink);
+  font-weight: 800;
+}
+
 /* 列表小圖（UX3 放進圖卡列表） */
 .cb-comic-thumb {
   display: block;

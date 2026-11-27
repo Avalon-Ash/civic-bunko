@@ -3,6 +3,15 @@ import type { ChangelogEntry } from '../types';
 
 export const CHANGELOG: readonly ChangelogEntry[] = [
   {
+    id: '2026-11-28-comic-cast',
+    date: '2026-11-28',
+    title: '漫畫上面會介紹誰是誰',
+    items: [
+      '每張漫畫上面多了「登場角色」：這張出場的小貓各是誰、演什麼（灰貓戴單片眼鏡＝機關、橘貓戴毛帽＝人民、銀虎斑戴學士帽＝公務員、暹羅戴貝雷帽＝民意代表、三花綁頭巾＝地方政府）',
+      '同一個角色在每張卡都穿一樣，看熟了就不用再看介紹',
+    ],
+  },
+  {
     id: '2026-11-27-card-due',
     date: '2026-11-27',
     title: '圖卡會告訴你哪張該複習了',

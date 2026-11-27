@@ -2,6 +2,7 @@
 // 遮字的開關與揭曉了哪幾格只在元件狀態裡，不存檔（§2.5、§10-5）。
 import { useEffect, useState } from 'react';
 import type { CardComic, StudyCard } from '../../../../core/types';
+import { ComicCastList } from '../../../kit/comic/ComicCastList';
 import { ComicStrip } from '../../../kit/comic/ComicStrip';
 import { Switch } from '../../../kit/Switch';
 
@@ -43,6 +44,7 @@ export function ComicSection({ card }: ComicSectionProps) {
           <Switch checked={hidden} onChange={toggleHidden} ariaLabel="遮起來想" />
         </label>
       </div>
+      <ComicCastList comic={card.comic} />
       <ComicStrip card={card} hidden={hidden} revealed={revealed} onReveal={reveal} />
     </section>
   );

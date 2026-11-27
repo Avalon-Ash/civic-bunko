@@ -1,7 +1,7 @@
 // 四格漫畫的純函式：把格子的指標解析成卡片原文、檢查一張卡的漫畫資料。ADR 0020。
 // 漫畫不可能出現卡片沒有的字：指標解析不到、pick／sign 不是原文的子字串，comicProblems 就回報。
 import { COMIC_CASTS, COMIC_LAYOUTS, COMIC_PROPS, COMIC_SCENES } from '../core/constants/comic';
-import type { ComicPanel, ComicTextRef, StudyCard } from '../core/types';
+import type { CardComic, ComicCast, ComicPanel, ComicTextRef, StudyCard } from '../core/types';
 
 type CardText = Pick<StudyCard, 'hook' | 'faces'>;
 
@@ -35,6 +35,13 @@ export function comicPanelText(card: CardText, panel: ComicPanel): ComicPanelTex
   const sign = panel.sign !== undefined && text.includes(panel.sign) ? panel.sign : null;
   const label = panel.label ? resolveComicText(card, panel.label) : null;
   return { text, sign, label };
+}
+
+/** 這套漫畫有哪些角色登場（照第一次出場的順序、不重複）；給「登場角色」用 */
+export function comicCasts(comic: Pick<CardComic, 'panels'>): ComicCast[] {
+  const seen = new Set<ComicCast>();
+  for (const panel of comic.panels) for (const actor of panel.actors) seen.add(actor.cast);
+  return [...seen];
 }
 
 /** 這張卡的漫畫資料哪裡不對（空陣列＝沒問題）；給驗證與看圖頁用 */
